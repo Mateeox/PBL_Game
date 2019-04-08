@@ -4,7 +4,7 @@ project (Tutorials)
 
 find_package(OpenGL REQUIRED)
  
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 14)
  
 # Compile external dependencies 
 add_subdirectory (external)
