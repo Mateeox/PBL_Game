@@ -27,4 +27,4 @@
 
 
 ####
-**Wchodzimy w projekt klikamy prawym na "Patrz_Adasiu" ( ?� ?? ?�) i set as start-up project ;)**
+**Wchodzimy w projekt klikamy prawym na "Patrz_Adasiu" ( ͡° ͜ʖ ͡°) i set as start-up project ;)**
