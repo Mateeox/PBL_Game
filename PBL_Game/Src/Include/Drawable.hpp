@@ -4,12 +4,15 @@
 
 class Drawable : public ComponentSystem::Component
 {
-    public:
-    unsigned int VAO,VBO,EBO;
-    Shader& ShaderProgram;
-    Drawable(Shader & aShaderProgram):ShaderProgram(aShaderProgram),Component(nullptr)
+  public:
+    unsigned int VAO, VBO, EBO;
+    Shader &ShaderProgram;
+    Drawable(Shader &aShaderProgram) : ShaderProgram(aShaderProgram), Component(nullptr)
     {
-        
     }
-    virtual void Draw() = 0;
+
+    ComponentSystem::ComponentType GetComponentType() override
+    {
+     return ComponentSystem::Error;
+    }
 };

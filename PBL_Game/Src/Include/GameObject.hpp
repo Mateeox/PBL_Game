@@ -10,15 +10,15 @@ class GameObject
 
 public:
     Drawable* drawable;
+    Transform & transform;
     std::vector<ComponentSystem::Component*> components;
-    GameObject();
-    GameObject(Drawable* aDrawable);
+    GameObject(Transform & transform);
+    GameObject(Drawable* aDrawable,Transform & transform);
     
     ComponentSystem::Component* GetComponent(ComponentSystem::ComponentType type);
     void AddComponent(ComponentSystem::Component*);
     void RemoveComponent(ComponentSystem::ComponentType type);
 
-    void Draw(glm::mat4 transform);
 };
 
 

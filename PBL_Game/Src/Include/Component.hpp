@@ -14,8 +14,6 @@ ShapeRenderer3D
 
 class Component {
 
-	GameObject* gameobject;
-
 	public:
 	Component(GameObject * obj): gameobject(nullptr){}
 
@@ -23,12 +21,11 @@ class Component {
 	{
 		gameobject = gamobj;
 	}
-	
-	ComponentType GetComponentType()
-	{
-		return ComponentType::Error;
-	}
 
+  virtual ComponentType GetComponentType() =0;
+
+
+	GameObject* gameobject;
 };
 
 }

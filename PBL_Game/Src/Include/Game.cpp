@@ -12,9 +12,14 @@ void Game::Granko()
 
   Texture * xD = new Texture("Textures/red.png",GL_LINEAR);
 
-  GameObject * trojObj = new GameObject();
-   GameObject * FloorObj = new GameObject();
-    GameObject * hexObj = new GameObject();
+
+SceneNode scena1_new;
+  SceneNode FloorNode_new;
+  SceneNode scena3_new;
+
+  GameObject * trojObj = new GameObject(scena1_new.world);
+   GameObject * FloorObj = new GameObject(FloorNode_new.world);
+    GameObject * hexObj = new GameObject(scena3_new.world);
 
   ShapeRenderer3D *Floor = new ShapeRenderer3D(Shapes::RainBow_Square,
                                                  Shapes::RB_Square_indices,
@@ -39,24 +44,24 @@ void Game::Granko()
 
 
 
-trojObj->AddComponent(Floor);
-FloorObj->AddComponent(trojkat);
-hexObj->AddComponent(szescian);
+  trojObj->AddComponent(trojkat);
+  FloorObj->AddComponent(Floor);
+  hexObj->AddComponent(szescian);
+  
 
-  SceneNode scena1(new GameObject(trojkat));
-  SceneNode FloorNode(new GameObject(Floor));
-  SceneNode scena3(new GameObject(szescian));
+  scena1_new.AddGameObject(trojObj);
+  FloorNode_new.AddGameObject(FloorObj);
+  scena3_new.AddGameObject(hexObj);
 
-  scena3.Scale(0.3f, 0.2f, 1.0f);
-  FloorNode.Translate(0.0f, -1.0f, 0.1f);
-  FloorNode.Rotate(90.0f,glm::vec3(1,0,0));
-  FloorNode.Scale(100,100,100);
+  scena3_new.Scale(0.3f, 0.2f, 1.0f);
+  FloorNode_new.Translate(0.0f, -1.0f, 0.1f);
+  FloorNode_new.Rotate(90.0f,glm::vec3(1,0,0));
+  FloorNode_new.Scale(100,100,100);
 
+  sNodes.push_back(scena1_new);
+  sNodes.push_back(FloorNode_new);
+  sNodes.push_back(scena3_new);
 
-
-  sNodes.push_back(scena1);
-  sNodes.push_back(FloorNode);
-  sNodes.push_back(scena3);
 
   shaderProgram->use();
 
@@ -132,8 +137,9 @@ void Game::Render()
 
   Transform originTransform = Transform::origin();
  
+
   for (auto node : sNodes) {
-      node.Render(originTransform, true);
+     node.Render(originTransform, true);
   }
 
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

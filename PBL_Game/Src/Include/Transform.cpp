@@ -22,7 +22,7 @@ Transform Transform::combine(Transform &other)
   return t;
 }
 
-glm::mat4 Transform::GetTransform()
+glm::mat4 & Transform::GetTransform()
 {
   return transform;
 }

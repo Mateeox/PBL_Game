@@ -1,5 +1,5 @@
 #include "ShapeRenderer3D.hpp"
-
+#include "GameObject.hpp"
 // Include GLEW
 #include <GL/gl3w.h>
 
@@ -12,17 +12,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 ShapeRenderer3D::ShapeRenderer3D(
-								 GLfloat *g_ver,
-								 unsigned int *aindices,
-								 int size,
-								 int aindices_size,
-								 Shader &aShaderProgram,
-								 Texture *atexture) : Drawable(aShaderProgram),
-													  g_vertex_buffer_data(g_ver),
-													  g_vertex_buffer_data_size(size),
-													  indices_size(aindices_size),
-													  indices(aindices),
-													  texture(atexture)
+	GLfloat *g_ver,
+	unsigned int *aindices,
+	int size,
+	int aindices_size,
+	Shader &aShaderProgram,
+	Texture *atexture) : Drawable(aShaderProgram),
+						 g_vertex_buffer_data(g_ver),
+						 g_vertex_buffer_data_size(size),
+						 indices_size(aindices_size),
+						 indices(aindices),
+						 texture(atexture)
 
 {
 	what_Draw_use = 1;
@@ -52,11 +52,11 @@ ShapeRenderer3D::ShapeRenderer3D(
 }
 
 ShapeRenderer3D::ShapeRenderer3D(
-								 GLfloat *g_ver, int size, 
-								 Shader &aShaderProgram, 
-								 Texture *atexture) : Drawable(aShaderProgram), 
-								                      g_vertex_buffer_data(g_ver),
-													  g_vertex_buffer_data_size(size), texture(atexture)
+	GLfloat *g_ver, int size,
+	Shader &aShaderProgram,
+	Texture *atexture) : Drawable(aShaderProgram),
+						 g_vertex_buffer_data(g_ver),
+						 g_vertex_buffer_data_size(size), texture(atexture)
 {
 	what_Draw_use = 2;
 
@@ -80,8 +80,11 @@ ShapeRenderer3D::ShapeRenderer3D(
 	glEnableVertexAttribArray(2);
 }
 
-void ShapeRenderer3D::Draw()
+void ShapeRenderer3D::Draw(glm::mat4 &  transform)
 {
+
+	unsigned int transformLoc = glGetUniformLocation(ShaderProgram.shaderProgramID, "transform");
+	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
 	if (texture != nullptr)
 	{
 		texture->Bind();
@@ -103,9 +106,13 @@ void ShapeRenderer3D::Draw_Elements()
 	glDrawElements(GL_TRIANGLES, indices_size, GL_UNSIGNED_INT, 0); // 3 indices starting at 0 -> 1 triangle
 }
 
+ComponentSystem::ComponentType ShapeRenderer3D::GetComponentType()
+{
+	return ComponentSystem::ComponentType::ShapeRenderer3D;
+}
+
 void ShapeRenderer3D::Draw_Arrays()
 {
-
 	glBindVertexArray(VAO);
 	glDrawArrays(GL_TRIANGLES, 0, g_vertex_buffer_data_size); // 3 indices starting at 0 -> 1 triangle
 }

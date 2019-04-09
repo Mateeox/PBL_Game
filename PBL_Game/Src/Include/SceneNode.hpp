@@ -6,12 +6,15 @@
 class SceneNode
 {
 
-    Transform local;
-    Transform world;
+    
     int numChildren;
     bool dirty_flag;
 
   public:
+
+    Transform local;
+    Transform world;
+
     std::vector<SceneNode *> childres;
     GameObject *gameObject;
 
@@ -20,7 +23,7 @@ class SceneNode
 
     void AddChild(SceneNode *aSceneNode);
     void AddGameObject(GameObject *aGameObject);
-    void Render(Transform parentWorld, bool aDirty_Flag);
+    void Render(Transform& parentWorld, bool aDirty_Flag);
 
     void Scale(float x, float y, float z);
     void Translate(float x, float y, float z);

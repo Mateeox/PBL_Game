@@ -3,7 +3,7 @@
 #include "ShapeRenderer3D.hpp"
 #include <algorithm>
 
-GameObject::GameObject()
+GameObject::GameObject(Transform & trans):transform(trans)
 {
 
     drawable = nullptr;
@@ -30,29 +30,20 @@ void GameObject::RemoveComponent(ComponentSystem::ComponentType type)
 
 }
 
-ComponentSystem::Component *GameObject::GetComponent(ComponentSystem::ComponentType typee)
+ComponentSystem::Component *GameObject::GetComponent(ComponentSystem::ComponentType type)
 {
     using ComponentSystem::ComponentType;
     for (auto comp : components)
     {
-        if (comp->GetComponentType() == typee )
+        if (comp->GetComponentType() == type )
         {
-            return comp;
+            return (ShapeRenderer3D*)comp;
         }
     }
     return nullptr;
 }
 
-GameObject::GameObject(Drawable *adrawable)
+GameObject::GameObject(Drawable *adrawable,Transform & trans):transform(trans)
 {
     drawable = adrawable;
-}
-void GameObject::Draw(glm::mat4 transform)
-{
-    if (drawable != nullptr)
-    {
-        unsigned int transformLoc = glGetUniformLocation(drawable->ShaderProgram.shaderProgramID, "transform");
-        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
-        drawable->Draw();
-    }
 }

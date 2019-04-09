@@ -19,8 +19,12 @@ class ShapeRenderer3D :public Drawable
 
     ShapeRenderer3D(float* g_vertex_buffer_data,unsigned int * aindices,int array_size,int aindices_size,Shader& ShaderProgram,Texture* Texture);
     ShapeRenderer3D(float * g_vertex_buffer_date,int indices_size,Shader & shaderProgram,Texture * texture);
-    void Draw();
+    void Draw(glm::mat4 &  transform);
    
+
+    ComponentSystem::ComponentType GetComponentType() override;
+
+
     
     ~ShapeRenderer3D();
 
