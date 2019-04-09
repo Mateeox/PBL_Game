@@ -37,7 +37,7 @@ add_definitions(
 	-D_CRT_SECURE_NO_WARNINGS
 )
 
-add_executable(PatrzAdasiu 
+add_executable(PBL_Game 
     PBL_Game.cpp
     Src/Include/Transform.cpp
     Src/Include/Game.cpp
@@ -61,6 +61,6 @@ add_executable(PatrzAdasiu
 	
 )
 
-target_link_libraries(PatrzAdasiu
+target_link_libraries(PBL_Game
 	${ALL_LIBS}
 )
