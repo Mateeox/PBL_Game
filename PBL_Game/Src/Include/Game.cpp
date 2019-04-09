@@ -12,6 +12,10 @@ void Game::Granko()
 
   Texture * xD = new Texture("Textures/red.png",GL_LINEAR);
 
+  GameObject * trojObj = new GameObject();
+   GameObject * FloorObj = new GameObject();
+    GameObject * hexObj = new GameObject();
+
   ShapeRenderer3D *Floor = new ShapeRenderer3D(Shapes::RainBow_Square,
                                                  Shapes::RB_Square_indices,
                                                  sizeof(Shapes::RainBow_Square),
@@ -32,6 +36,12 @@ void Game::Granko()
                                                   sizeof(Shapes::RB_Cube_indices),
                                                   *shaderProgram,
                                                   xD);
+
+
+
+trojObj->AddComponent(Floor);
+FloorObj->AddComponent(trojkat);
+hexObj->AddComponent(szescian);
 
   SceneNode scena1(new GameObject(trojkat));
   SceneNode FloorNode(new GameObject(Floor));

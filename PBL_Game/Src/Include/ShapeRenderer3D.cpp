@@ -11,7 +11,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-ShapeRenderer3D::ShapeRenderer3D(GLfloat *g_ver,
+ShapeRenderer3D::ShapeRenderer3D(
+								 GLfloat *g_ver,
 								 unsigned int *aindices,
 								 int size,
 								 int aindices_size,
@@ -50,8 +51,12 @@ ShapeRenderer3D::ShapeRenderer3D(GLfloat *g_ver,
 	glEnableVertexAttribArray(2);
 }
 
-ShapeRenderer3D::ShapeRenderer3D(GLfloat *g_ver, int size, Shader &aShaderProgram, Texture *atexture) : Drawable(aShaderProgram), g_vertex_buffer_data(g_ver),
-																										g_vertex_buffer_data_size(size), texture(atexture)
+ShapeRenderer3D::ShapeRenderer3D(
+								 GLfloat *g_ver, int size, 
+								 Shader &aShaderProgram, 
+								 Texture *atexture) : Drawable(aShaderProgram), 
+								                      g_vertex_buffer_data(g_ver),
+													  g_vertex_buffer_data_size(size), texture(atexture)
 {
 	what_Draw_use = 2;
 

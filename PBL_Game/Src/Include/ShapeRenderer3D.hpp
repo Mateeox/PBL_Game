@@ -16,6 +16,7 @@ class ShapeRenderer3D :public Drawable
     Texture* texture;
 
     public:
+
     ShapeRenderer3D(float* g_vertex_buffer_data,unsigned int * aindices,int array_size,int aindices_size,Shader& ShaderProgram,Texture* Texture);
     ShapeRenderer3D(float * g_vertex_buffer_date,int indices_size,Shader & shaderProgram,Texture * texture);
     void Draw();
