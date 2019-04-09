@@ -25,6 +25,7 @@ class Game{
 
     public:
     Game(Window& okienko);
+
     
     void Granko();
     void Update(float interpolation);

@@ -10,23 +10,22 @@ Game::Game(Window &aOkno) : okienko(aOkno)
 void Game::Granko()
 {
 
-  Texture * xD = new Texture("Textures/red.png",GL_LINEAR);
+  Texture *xD = new Texture("Textures/red.png", GL_LINEAR);
 
-
-SceneNode scena1_new;
+  SceneNode scena1_new;
   SceneNode FloorNode_new;
   SceneNode scena3_new;
 
-  GameObject * trojObj = new GameObject(scena1_new.world);
-   GameObject * FloorObj = new GameObject(FloorNode_new.world);
-    GameObject * hexObj = new GameObject(scena3_new.world);
+  GameObject *trojObj = new GameObject(scena1_new.world);
+  GameObject *FloorObj = new GameObject(FloorNode_new.world);
+  GameObject *hexObj = new GameObject(scena3_new.world);
 
   ShapeRenderer3D *Floor = new ShapeRenderer3D(Shapes::RainBow_Square,
-                                                 Shapes::RB_Square_indices,
-                                                 sizeof(Shapes::RainBow_Square),
-                                                 sizeof(Shapes::RB_Square_indices),
-                                                 *shaderProgram,
-                                                 nullptr);
+                                               Shapes::RB_Square_indices,
+                                               sizeof(Shapes::RainBow_Square),
+                                               sizeof(Shapes::RB_Square_indices),
+                                               *shaderProgram,
+                                               nullptr);
 
   ShapeRenderer3D *trojkat = new ShapeRenderer3D(Shapes::RainBow_Triangle,
                                                  Shapes::RB_Triangle_indices,
@@ -42,12 +41,9 @@ SceneNode scena1_new;
                                                   *shaderProgram,
                                                   xD);
 
-
-
   trojObj->AddComponent(trojkat);
   FloorObj->AddComponent(Floor);
   hexObj->AddComponent(szescian);
-  
 
   scena1_new.AddGameObject(trojObj);
   FloorNode_new.AddGameObject(FloorObj);
@@ -55,13 +51,12 @@ SceneNode scena1_new;
 
   scena3_new.Scale(0.3f, 0.2f, 1.0f);
   FloorNode_new.Translate(0.0f, -1.0f, 0.1f);
-  FloorNode_new.Rotate(90.0f,glm::vec3(1,0,0));
-  FloorNode_new.Scale(100,100,100);
+  FloorNode_new.Rotate(90.0f, glm::vec3(1, 0, 0));
+  FloorNode_new.Scale(100, 100, 100);
 
   sNodes.push_back(scena1_new);
   sNodes.push_back(FloorNode_new);
   sNodes.push_back(scena3_new);
-
 
   shaderProgram->use();
 
@@ -90,6 +85,12 @@ SceneNode scena1_new;
     Render();
   }
 
+
+
+  delete trojObj;
+  delete FloorObj;
+  delete hexObj;
+
   delete trojkat;
   delete Floor;
   delete szescian;
@@ -103,12 +104,11 @@ SceneNode scena1_new;
 
 void Game::Update(float interpolation)
 {
-   okienko.ProcessInput(interpolation);
+  okienko.ProcessInput(interpolation);
 }
 
 void Game::Render()
 {
-
 
   projection = glm::perspective(okienko.camera.Zoom, 1280.0f / 720.0f, 0.1f, 100.0f);
   view = okienko.camera.GetViewMatrix();
@@ -122,24 +122,24 @@ void Game::Render()
   ImGui_ImplGlfw_NewFrame();
   ImGui::NewFrame();
 
-  if (show_demo_window) 
+  if (show_demo_window)
   {
     ImGui::Begin("Another Window",
-        &show_demo_window); // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+                 &show_demo_window); // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
     ImGui::Text("Hello from another window!");
     if (ImGui::Button("Close Me"))
     {
-        show_demo_window = false;
+      show_demo_window = false;
     }
     ImGui::End();
   }
   ImGui::Render();
 
   Transform originTransform = Transform::origin();
- 
 
-  for (auto node : sNodes) {
-     node.Render(originTransform, true);
+  for (auto node : sNodes)
+  {
+    node.Render(originTransform, true);
   }
 
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
