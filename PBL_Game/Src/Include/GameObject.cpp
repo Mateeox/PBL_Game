@@ -1,46 +1,21 @@
-#include "IComponent.h"
-#include <vector>
-#include <algorithm>
-
-#include "Transform.h"
-#include "GameObject.h"
-#include <string>
-
-using namespace std;
-
-std::string tag;
-Transform* transform;
-GameObject* parent;
-vector<GameObject*> children;
-vector<IComponent*> components;
+#include "GameObject.hpp"
+#include "Drawable.hpp"
 
 GameObject::GameObject()
 {
-
+    
+    drawable = nullptr;
 }
-
-void GameObject::Start()
+GameObject::GameObject(Drawable* adrawable)
 {
-	for_each(components.begin(), components.end(), [](IComponent* component)
-	{
-		component->Start();
-	});
-
-	for_each(children.begin(), children.end(), [](GameObject* child)
-	{
-		child->Start();
-	});
+    drawable = adrawable;
 }
-
-void GameObject::Update()
+void GameObject::Draw(glm::mat4 transform)
 {
-	for_each(components.begin(), components.end(), [](IComponent* component)
-	{
-		component->Update();
-	});
-
-	for_each(children.begin(), children.end(), [](GameObject* child)
-	{
-		child->Update();
-	});
+    if(drawable != nullptr)
+    {
+      unsigned int transformLoc = glGetUniformLocation(drawable->ShaderProgram.shaderProgramID, "transform");
+      glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
+      drawable->Draw();
+    }
 }

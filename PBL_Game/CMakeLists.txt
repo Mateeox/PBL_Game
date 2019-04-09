@@ -42,7 +42,22 @@ add_executable(PatrzAdasiu
     Src/Include/Transform.cpp
     Src/Include/Game.cpp
     Src/Include/GameObject.cpp 
-    Src/Include/Transform.cpp
+	Src/Include/Transform.cpp
+	Src/Include/Window.cpp
+	Src/Include/Camera.cpp
+	Src/Include/Shader.cpp
+	Src/Include/Texture.cpp
+	Src/Include/ShapeRenderer3D.cpp
+	Src/Include/SceneNode.cpp
+	#Stb_image
+	Src/Include/stb_image.cpp
+	#ImGui
+	external/Imgui/examples/libs/gl3w/GL/gl3w.c
+	external/Imgui/Include/imgui.cpp
+	external/Imgui/Include/imgui_impl_glfw.cpp
+	external/Imgui/Include/imgui_impl_opengl3.cpp
+	external/Imgui/Include/imgui_draw.cpp
+	external/Imgui/Include/imgui_widgets.cpp
 	
 )
 
