@@ -37,7 +37,7 @@ ComponentSystem::Component *GameObject::GetComponent(ComponentSystem::ComponentT
     {
         if (comp->GetComponentType() == type )
         {
-            return (ShapeRenderer3D*)comp;
+            return comp;
         }
     }
     return nullptr;
