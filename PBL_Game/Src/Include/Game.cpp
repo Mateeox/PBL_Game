@@ -147,3 +147,13 @@ void Game::Render()
   // Swap buffers
   glfwSwapBuffers(okienko.window);
 }
+
+void Game::Serialize()
+{
+
+}
+
+void Game::Deserialize(std::string path)
+{
+
+}

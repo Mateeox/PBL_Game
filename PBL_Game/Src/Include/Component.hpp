@@ -23,7 +23,7 @@ class Component {
 	}
 
   virtual ComponentType GetComponentType() =0;
-
+  virtual std::string Serialize() = 0;
 
 	GameObject* gameobject;
 };

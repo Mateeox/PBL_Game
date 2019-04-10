@@ -28,4 +28,5 @@ public:
   void Translate(glm::vec3 Value);
   void Rotate(float value, glm::vec3 axis);
   glm::mat4 & GetTransform();
+  std::string Serialize();
 };

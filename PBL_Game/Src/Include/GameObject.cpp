@@ -47,3 +47,8 @@ GameObject::GameObject(Drawable *adrawable,Transform & trans):transform(trans)
 {
     drawable = adrawable;
 }
+
+std::string GameObject::Serialize()
+{
+
+}

@@ -50,3 +50,8 @@ void Transform::Rotate(float value, glm::vec3 axis)
 
   transform = glm::rotate(transform, glm::radians(value), axis);
 }
+
+std::string Transform::Serialize()
+{
+
+}

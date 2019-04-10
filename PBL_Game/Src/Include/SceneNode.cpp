@@ -59,3 +59,8 @@ void SceneNode::Rotate(float value, glm::vec3 axis)
   local.Rotate(value, axis);
   dirty_flag = true;
 }
+
+std::string SceneNode::Serialize()
+{
+
+}

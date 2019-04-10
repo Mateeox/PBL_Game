@@ -29,5 +29,7 @@ class Game{
     void Granko();
     void Update(float interpolation);
     void Render();
+	void Serialize();
+	void Deserialize(std::string path);
 
 };
