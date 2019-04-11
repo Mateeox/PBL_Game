@@ -122,7 +122,8 @@ void Game::Render()
   ImGui_ImplGlfw_NewFrame();
   ImGui::NewFrame();
 
-  if (show_demo_window)
+
+  /*if (show_demo_window)
   {
     ImGui::Begin("Another Window",
                  &show_demo_window); // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
@@ -132,14 +133,28 @@ void Game::Render()
       show_demo_window = false;
     }
     ImGui::End();
-  }
+  }*/
   ImGui::Render();
 
+
   Transform originTransform = Transform::origin();
+
+  glViewport(0, 0, 1280 / 2, 720);
 
   for (auto node : sNodes)
   {
     node.Render(originTransform, true);
+  }
+
+  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+
+
+  glViewport(1280 / 2, 0, 1280 / 2, 720);
+
+  for (auto node : sNodes)
+  {
+	  node.Render(originTransform, true);
   }
 
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
