@@ -1,3 +1,4 @@
+#pragma once
 #include "Game.hpp"
 #include "ShapeRenderer3D.hpp"
 #include "Shapes.hpp"
@@ -110,7 +111,7 @@ void Game::Update(float interpolation)
 void Game::Render()
 {
 
-  projection = glm::perspective(okienko.camera.Zoom, 1280.0f / 720.0f, 0.1f, 100.0f);
+  projection = glm::perspective(okienko.camera.Zoom, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
   view = okienko.camera.GetViewMatrix();
   shaderProgram->setMat4("projection", projection);
   shaderProgram->setMat4("view", view);
@@ -139,7 +140,8 @@ void Game::Render()
 
   Transform originTransform = Transform::origin();
 
-  glViewport(0, 0, 1280 / 2, 720);
+  // Render lewej kamery
+  glViewport(0, 0, WINDOW_WIDTH / 2, WINDOW_HEIGHT);
 
   for (auto node : sNodes)
   {
@@ -149,13 +151,15 @@ void Game::Render()
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 
+  // Render prawej kamery
+  glViewport(WINDOW_WIDTH / 2, 0, WINDOW_WIDTH / 2, WINDOW_HEIGHT);
 
-  glViewport(1280 / 2, 0, 1280 / 2, 720);
-
-  for (auto node : sNodes)
+  /*for (auto node : sNodes)
   {
 	  node.Render(originTransform, true);
-  }
+  }*/
+
+  sNodes[1].Render(originTransform, true);
 
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 

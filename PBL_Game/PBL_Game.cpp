@@ -8,7 +8,7 @@ using namespace PBLGame;
 
 int main()
 {
-    Window okienko(1280,720, "37");
+    Window okienko(Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT, "37");
     Game gierka(okienko);
      gierka.Granko();
     std::cout << "Hello World!\n"; 

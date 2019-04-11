@@ -8,6 +8,8 @@ const int TICKS_PER_SECOND = 128;
 const int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
 const int MAX_FRAMESKIP = 5;
 
+
+
 using namespace PBLGame;
 
 class Game{
@@ -22,6 +24,9 @@ class Game{
 
     //Imgui
     bool show_demo_window = true;
+
+	public:
+	static const int WINDOW_WIDTH = 1280, WINDOW_HEIGHT = 720;
 
     public:
     Game(Window& okienko);
