@@ -15,12 +15,14 @@ class SceneNode
     Transform local;
     Transform world;
 
-    std::vector<SceneNode *> childres;
+	SceneNode *parent;
+    std::vector<SceneNode *> children;
     GameObject *gameObject;
 
     SceneNode();
     SceneNode(GameObject *gameObject);
 
+	void AddParent(SceneNode *parent);
     void AddChild(SceneNode *aSceneNode);
     void AddGameObject(GameObject *aGameObject);
     void Render(Transform& parentWorld, bool aDirty_Flag);

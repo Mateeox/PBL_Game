@@ -15,4 +15,8 @@ class Drawable : public ComponentSystem::Component
     {
      return ComponentSystem::Error;
     }
+	std::string Serialize() override
+	{
+		return std::to_string(VAO) + ";" + std::to_string(VBO) + ";" + std::to_string(EBO);
+	}
 };

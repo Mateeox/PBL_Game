@@ -53,5 +53,6 @@ void Transform::Rotate(float value, glm::vec3 axis)
 
 std::string Transform::Serialize()
 {
-
+	return glm::to_string(transform) + ";" + glm::to_string(Position) + ";" + glm::to_string(Scale) 
+		+ ";" + glm::to_string(Rotation) + ";" + glm::to_string(Rotation_matrix) + ";" + glm::to_string(Quaterion);
 }

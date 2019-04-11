@@ -126,5 +126,6 @@ ShapeRenderer3D::~ShapeRenderer3D()
 
 std::string ShapeRenderer3D::Serialize()
 {
-	return "<component type='" GetComponentType()
+	return "";
+	//return "<component type='" GetComponentType();
 }

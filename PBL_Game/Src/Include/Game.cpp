@@ -103,6 +103,7 @@ SceneNode scena1_new;
 
 void Game::Update(float interpolation)
 {
+   Serialize();
    okienko.ProcessInput(interpolation);
 }
 
@@ -150,7 +151,61 @@ void Game::Render()
 
 void Game::Serialize()
 {
+	std::map<SceneNode*, unsigned> oidMap;
+	SerializeFaza1(oidMap);
+	std::vector<SceneNode> tempNodes;
+	SerializeFaza2(oidMap, tempNodes);
+	oidMap.clear();
+	SerializeFaza3(tempNodes);
+	tempNodes.clear();
+}
 
+void Game::SerializeFaza1(std::map<SceneNode*, unsigned> &map)
+{
+	for (SceneNode &scene : this->sNodes)
+	{
+		unsigned n = map.size();
+		if(n > 0)
+			scene.AddParent(&sNodes[n-1]);
+		map.insert(std::pair<SceneNode*, unsigned>(&scene, n));
+	}
+}
+
+void Game::SerializeFaza2(std::map<SceneNode*, unsigned> &map, std::vector<SceneNode> &temp)
+{
+	for(std::pair<SceneNode*, unsigned> scene : map)
+	{
+		SceneNode tempNode;
+		if (scene.first->parent && scene.first->parent != scene.first->parent)
+			tempNode.AddParent((SceneNode *)map[scene.first->parent]);
+
+		if(scene.first->children.size() > 0) 
+			for (SceneNode* child : scene.first->children)
+			{
+				if (child)
+					tempNode.AddChild((SceneNode *)map[child]);
+			}
+
+		if (scene.first->gameObject)
+			tempNode.AddGameObject(scene.first->gameObject);
+
+		tempNode.local = scene.first->local;
+		tempNode.world = scene.first->world;
+		temp.push_back(tempNode);
+	}
+}
+
+void Game::SerializeFaza3(std::vector<SceneNode> &temp)
+{
+	std::string serialized = "";
+	for (SceneNode node : temp)
+	{
+		serialized += node.Serialize();
+	}
+	serialized += "END";
+	std::ofstream out("output.txt");
+	out << serialized;
+	out.close();
 }
 
 void Game::Deserialize(std::string path)

@@ -3,20 +3,28 @@
 
 SceneNode::SceneNode() : local(Transform::origin()), dirty_flag(true), gameObject(nullptr)
 {
+	parent = this;
 }
 
 SceneNode::SceneNode(GameObject *aGameobject) : local(Transform::origin()), dirty_flag(true), gameObject(aGameobject)
 {
+	parent = this;
 }
 
 void SceneNode::AddGameObject(GameObject *aGameObject)
 {
-  aGameObject->transform = world;
-  gameObject = aGameObject;
+	aGameObject->transform = world;
+	gameObject = aGameObject;
 }
+
+void SceneNode::AddParent(SceneNode *parent)
+{
+	this->parent = parent;
+}
+
 void SceneNode::AddChild(SceneNode *aSceneNode)
 {
-  childres.push_back(aSceneNode);
+  children.push_back(aSceneNode);
 }
 
 void SceneNode::Render(Transform &parentWorld, bool aDirty_Flag)
@@ -37,7 +45,7 @@ void SceneNode::Render(Transform &parentWorld, bool aDirty_Flag)
       shape->Draw(world.GetTransform());
     }
   }
-  for (SceneNode *sn : childres)
+  for (SceneNode *sn : children)
   {
     sn->Render(world, aDirty_Flag);
   }
@@ -62,5 +70,13 @@ void SceneNode::Rotate(float value, glm::vec3 axis)
 
 std::string SceneNode::Serialize()
 {
-
+	std::string str = "SN\n\t";
+	str += "W;" + this->world.Serialize() + "\n\t";
+	str += "L;" + this->local.Serialize() + "\n\t";
+	if(this->parent)
+	str += "P;" + std::to_string((unsigned)this->parent) + "\n\t";
+	for(SceneNode* child : this->children)
+		str += "CH;" + std::to_string((unsigned)child) + "\n\t";
+	str += "O\n\t\t" + this->gameObject->Serialize() + "\n";
+	return str;
 }
