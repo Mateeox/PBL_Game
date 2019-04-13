@@ -58,6 +58,14 @@ bld/
 [Oo]bj/
 [Ll]og/
 
+
+*/[Bb]uild/
+#we want to keep tracking some subdirectories of Build
+!*/[Bb]uild/Models
+!*/[Bb]uild/Shaders
+!*/[Bb]uild/Textures
+
+
 # Visual Studio 2015/2017 cache/options directory
 .vs/
 # Uncomment if you have tasks that create the project's static files in wwwroot
