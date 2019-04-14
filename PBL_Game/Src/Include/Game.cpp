@@ -103,6 +103,7 @@ SceneNode scena1_new;
 
 void Game::Update(float interpolation)
 {
+   Deserialize("output.txt");
    Serialize();
    okienko.ProcessInput(interpolation);
 }
@@ -162,11 +163,11 @@ void Game::Serialize()
 
 void Game::SerializeFaza1(std::map<SceneNode*, unsigned> &map)
 {
+	this->sNodes[0].AddChild(&this->sNodes[1]);
+	this->sNodes[1].AddParent(&this->sNodes[0]);
 	for (SceneNode &scene : this->sNodes)
 	{
-		unsigned n = map.size();
-		if(n > 0)
-			scene.AddParent(&sNodes[n-1]);
+		unsigned n = map.size() + 1;
 		map.insert(std::pair<SceneNode*, unsigned>(&scene, n));
 	}
 }
@@ -176,8 +177,7 @@ void Game::SerializeFaza2(std::map<SceneNode*, unsigned> &map, std::vector<Scene
 	for(std::pair<SceneNode*, unsigned> scene : map)
 	{
 		SceneNode tempNode;
-		if (scene.first->parent && scene.first->parent != scene.first->parent)
-			tempNode.AddParent((SceneNode *)map[scene.first->parent]);
+		tempNode.AddParent((SceneNode *)map[scene.first->parent]);
 
 		if(scene.first->children.size() > 0) 
 			for (SceneNode* child : scene.first->children)
@@ -210,5 +210,58 @@ void Game::SerializeFaza3(std::vector<SceneNode> &temp)
 
 void Game::Deserialize(std::string path)
 {
+	std::ifstream in(path);
+	std::map<unsigned, SceneNode*> oidMap;
+	unsigned index = 1;
+	std::string line;
+	while (std::getline(in, line))
+	{
+		if (line.substr(0, 2) == "SN")
+		{
+			SceneNode node;
+			//this->sNodes.push_back(node);  TEMPORARY
+			oidMap.insert(std::pair<unsigned, SceneNode*>(index, &node));
+			index++;
+		}
 
+		if (line.substr(0, 3) == "\tW;")
+		{
+			oidMap[index - 1]->world.Deserialize(line.substr(3));
+		}
+
+		if (line.substr(0, 3) == "\tL;")
+		{
+			oidMap[index - 1]->local.Deserialize(line.substr(3));
+		}
+
+		if (line.substr(0, 3) == "\tP;")
+		{
+			unsigned i_dec = atoi(line.substr(3).c_str());
+			oidMap[index - 1]->AddParent((SceneNode*)i_dec);
+		}
+
+		if (line.substr(0, 4) == "\tCH;")
+		{
+			unsigned i_dec = atoi(line.substr(4).c_str());
+			oidMap[index - 1]->AddChild((SceneNode*)i_dec);
+		}
+
+		if (line.substr(0, 2) == "\tO")
+		{
+			Transform transform;
+			GameObject go(transform);
+			oidMap[index - 1]->AddGameObject(&go);
+		}
+
+		if (line.substr(0, 4) == "\t\tT;")
+		{
+			oidMap[index - 1]->gameObject->transform.Deserialize(line.substr(4));
+		}
+
+		if (line.substr(0, 5) == "\t\tCO;")
+		{
+			line.substr(0, 5); // to be implemented
+		}
+	}
+	in.close();
 }

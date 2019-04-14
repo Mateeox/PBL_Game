@@ -1,7 +1,6 @@
 #pragma once
 #include "GameObject.hpp"
 #include "Transform.hpp"
-#include <vector>
 
 class SceneNode
 {
