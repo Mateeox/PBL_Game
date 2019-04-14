@@ -50,3 +50,14 @@ void Transform::Rotate(float value, glm::vec3 axis)
 
   transform = glm::rotate(transform, glm::radians(value), axis);
 }
+
+
+glm::vec3 Transform::getPosition()
+{
+	return Position;
+}
+
+glm::vec3 Transform::getScale()
+{
+	return Scale;
+}

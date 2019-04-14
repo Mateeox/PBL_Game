@@ -15,7 +15,7 @@ class SceneNode
     Transform local;
     Transform world;
 
-    std::vector<SceneNode *> childres;
+    std::vector<SceneNode *> children;
     GameObject *gameObject;
 
     SceneNode();

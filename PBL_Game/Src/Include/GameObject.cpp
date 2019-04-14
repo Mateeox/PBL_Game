@@ -34,3 +34,13 @@ ComponentSystem::Component *GameObject::GetComponent(ComponentSystem::ComponentT
     }
     return nullptr;
 }
+
+void GameObject::setTag(std::string tag)
+{
+	this->tag = tag;
+}
+
+std::string GameObject::getTag()
+{
+	return tag;
+}

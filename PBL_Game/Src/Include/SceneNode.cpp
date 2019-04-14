@@ -16,7 +16,7 @@ void SceneNode::AddGameObject(GameObject *aGameObject)
 }
 void SceneNode::AddChild(SceneNode *aSceneNode)
 {
-  childres.push_back(aSceneNode);
+  children.push_back(aSceneNode);
 }
 
 void SceneNode::Render(Transform &parentWorld, bool aDirty_Flag)
@@ -37,7 +37,7 @@ void SceneNode::Render(Transform &parentWorld, bool aDirty_Flag)
       shape->Draw(world.GetTransform());
     }
   }
-  for (SceneNode *sn : childres)
+  for (SceneNode *sn : children)
   {
     sn->Render(world, aDirty_Flag);
   }

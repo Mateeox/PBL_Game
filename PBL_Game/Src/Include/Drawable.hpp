@@ -7,7 +7,7 @@ class Drawable : public ComponentSystem::Component
   public:
     unsigned int VAO, VBO, EBO;
     Shader &ShaderProgram;
-    Drawable(Shader &aShaderProgram) : ShaderProgram(aShaderProgram), Component(nullptr)
+    Drawable(Shader &aShaderProgram) : ShaderProgram(aShaderProgram)
     {
     }
 

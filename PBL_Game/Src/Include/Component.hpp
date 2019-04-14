@@ -15,7 +15,6 @@ ShapeRenderer3D
 class Component {
 
 	public:
-	Component(GameObject * obj): gameobject(nullptr){}
 
 	void SetGameObject(GameObject * gamobj)
 	{
