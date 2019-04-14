@@ -104,7 +104,7 @@ SceneNode scena1_new;
 void Game::Update(float interpolation)
 {
    Deserialize("output.txt");
-   Serialize();
+   //Serialize();
    okienko.ProcessInput(interpolation);
 }
 
@@ -203,6 +203,11 @@ void Game::SerializeFaza3(std::vector<SceneNode> &temp)
 		serialized += node.Serialize();
 	}
 	serialized += "END";
+	SerializeZapisz(serialized);
+}
+
+void Game::SerializeZapisz(std::string serialized)
+{
 	std::ofstream out("output.txt");
 	out << serialized;
 	out.close();
@@ -218,9 +223,8 @@ void Game::Deserialize(std::string path)
 	{
 		if (line.substr(0, 2) == "SN")
 		{
-			SceneNode node;
-			//this->sNodes.push_back(node);  TEMPORARY
-			oidMap.insert(std::pair<unsigned, SceneNode*>(index, &node));
+			SceneNode* node = new SceneNode;
+			oidMap.insert(std::pair<unsigned, SceneNode*>(index, node));
 			index++;
 		}
 
@@ -264,4 +268,18 @@ void Game::Deserialize(std::string path)
 		}
 	}
 	in.close();
+	DeserializeOrderPointers(oidMap);
+}
+
+void Game::DeserializeOrderPointers(std::map<unsigned, SceneNode*>& map)
+{
+	for (std::pair<unsigned, SceneNode*> node : map)
+	{
+		if (node.second->parent > 0 && node.second->parent != node.second)
+			node.second->parent = map[(unsigned)node.second->parent];
+			for (int i = 0; i < node.second->children.size(); i++)
+				node.second->children[i] = map[(unsigned)node.second->children[i]];
+		this->sNodes.push_back(*(node.second));
+	}
+	map.clear();
 }

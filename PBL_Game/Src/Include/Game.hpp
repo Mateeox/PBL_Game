@@ -37,4 +37,5 @@ class Game{
 	void SerializeFaza2(std::map <SceneNode*, unsigned> &map, std::vector<SceneNode> &temp);
 	void SerializeFaza3(std::vector<SceneNode> &temp);
 	void SerializeZapisz(std::string serialized);
+	void DeserializeOrderPointers(std::map<unsigned, SceneNode*> &map);
 };
