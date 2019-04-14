@@ -8,7 +8,8 @@ enum ComponentType{
 Error,
 Renderer,
 Collider,
-ShapeRenderer3D
+ShapeRenderer3D,
+Model
 
 };
 

@@ -1,5 +1,5 @@
 #include "Game.hpp"
-#include "ShapeRenderer3D.hpp"
+#include "Component/ShapeRenderer3D.hpp"
 #include "Shapes.hpp"
 
 Game::Game(Window &aOkno) : okienko(aOkno)

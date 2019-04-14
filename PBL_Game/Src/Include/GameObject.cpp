@@ -1,6 +1,6 @@
 #include "GameObject.hpp"
-#include "Drawable.hpp"
-#include "ShapeRenderer3D.hpp"
+#include "Component/Drawable.hpp"
+#include "Component/ShapeRenderer3D.hpp"
 #include <algorithm>
 
 GameObject::GameObject(Transform &trans) : transform(trans) {}

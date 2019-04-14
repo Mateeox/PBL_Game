@@ -1,5 +1,5 @@
 #include "SceneNode.hpp"
-#include "ShapeRenderer3D.hpp"
+#include "Component/ShapeRenderer3D.hpp"
 
 SceneNode::SceneNode() : local(Transform::origin()), dirty_flag(true), gameObject(nullptr)
 {

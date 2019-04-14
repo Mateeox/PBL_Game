@@ -1,9 +1,9 @@
 #pragma once
 #include "Transform.hpp"
-#include "Drawable.hpp"
+#include "Component/Drawable.hpp"
 #include <vector>
 
-#include "Component.hpp"
+#include "Component/Component.hpp"
 
 class GameObject
 {
