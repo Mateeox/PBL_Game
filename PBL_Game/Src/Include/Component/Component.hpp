@@ -2,32 +2,33 @@
 
 class GameObject;
 
-namespace ComponentSystem{
-enum ComponentType{
+namespace ComponentSystem
+{
+enum ComponentType
+{
 
-Error,
-Renderer,
-Collider,
-ShapeRenderer3D,
-Model,
-ModelMesh
+	Error,
+	Renderer,
+	Collider,
+	ShapeRenderer3D,
+	Model,
+	ModelMesh
 
 };
 
-class Component {
+class Component
+{
 
-	public:
-	Component(GameObject * obj): gameobject(nullptr){}
+  public:
+	Component(GameObject *obj) : gameobject(nullptr) {}
 
-	void SetGameObject(GameObject * gamobj)
+	void SetGameObject(GameObject *gamobj)
 	{
 		gameobject = gamobj;
 	}
 
-  virtual ComponentType GetComponentType() =0;
-
-
-	GameObject* gameobject;
+	virtual ComponentType GetComponentType() = 0;
+	GameObject *gameobject;
 };
 
-}
+} // namespace ComponentSystem

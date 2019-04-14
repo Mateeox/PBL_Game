@@ -55,7 +55,6 @@ add_executable(PBL_Game
 	Src/Include/Component/Model.cpp
 	#Stb_image
 	Src/Include/stb_image.cpp
-	#Model
 	#ImGui
 	external/Imgui/examples/libs/gl3w/GL/gl3w.c
 	external/Imgui/Include/imgui.cpp

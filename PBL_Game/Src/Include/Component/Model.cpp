@@ -25,7 +25,6 @@ ComponentSystem::ComponentType Model::GetComponentType()
 void Model::processNode(aiNode *node, const aiScene *scene)
 {
 
-    printf("Model node meshes number : %u \n", node->mNumMeshes);
     // process each mesh located at the current node
     for (unsigned int i = 0; i < node->mNumMeshes; i++)
     {
@@ -43,13 +42,10 @@ void Model::processNode(aiNode *node, const aiScene *scene)
             processNode(node->mChildren[i], scene);
         }
     }
-    printf("Model node mesh Processed. \n");
 }
 
 void Model::loadModel(std::string &path)
 {
-
-    printf("Loading Model ... \n");
     // read file via ASSIMP
     Assimp::Importer importer;
     const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
@@ -69,6 +65,7 @@ void Model::loadModel(std::string &path)
 
 void Model::Draw(glm::mat4 &transform)
 {
+    ShaderProgram.use();
     //Set transform
     unsigned int transformLoc = glGetUniformLocation(ShaderProgram.shaderProgramID, "transform");
     glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
@@ -83,7 +80,6 @@ ModelMesh::Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
     std::vector<unsigned int> indices;
     std::vector<ModelMesh::Texture> textures;
 
-    printf("Prrocessing Mesh ... \n");
     // Walk through each of the mesh's vertices
     for (unsigned int i = 0; i < mesh->mNumVertices; i++)
     {

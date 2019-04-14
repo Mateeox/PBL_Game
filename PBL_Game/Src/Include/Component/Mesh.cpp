@@ -13,6 +13,7 @@ Mesh::Mesh(vector<Vertex> aVertices,
                                      Indices(aIndices),
                                      Textures(aTextures)
 {
+    setupMesh();
 }
 
 void Mesh::setupMesh()
@@ -23,12 +24,10 @@ void Mesh::setupMesh()
 
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
     glBufferData(GL_ARRAY_BUFFER, Vertices.size() * sizeof(Vertex), &Vertices[0], GL_STATIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, Indices.size() * sizeof(unsigned int),
-                 &Indices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, Indices.size() * sizeof(unsigned int), &Indices[0], GL_STATIC_DRAW);
 
     // set the vertex attribute pointers
     // vertex Positions
@@ -53,7 +52,6 @@ void Mesh::setupMesh()
 void Mesh::Draw(glm::mat4 &transform)
 {
 
-       printf("Draw Mesh \n");
     // bind appropriate textures
     unsigned int diffuseNr = 1;
     unsigned int specularNr = 1;
@@ -80,10 +78,10 @@ void Mesh::Draw(glm::mat4 &transform)
         glBindTexture(GL_TEXTURE_2D, Textures[i].id);
     }
 
-    // draw mesh
-    glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, Indices.size(), GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
+    // // draw mesh
+     glBindVertexArray(VAO);
+     glDrawElements(GL_TRIANGLES, Indices.size(), GL_UNSIGNED_INT, 0);
+     glBindVertexArray(0);
 
     // always good practice to set everything back to defaults once configured.
     glActiveTexture(GL_TEXTURE0);

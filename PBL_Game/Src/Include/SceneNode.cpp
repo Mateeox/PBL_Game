@@ -42,6 +42,7 @@ void SceneNode::Render(Transform &parentWorld, bool aDirty_Flag)
     Model *model = (Model *)gameObject->GetComponent(ComponentSystem::Model);
     if (model != nullptr)
     {
+      printf("Draw Model \n");
       model->Draw(world.GetTransform());
     }
 

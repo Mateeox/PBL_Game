@@ -83,6 +83,7 @@ ShapeRenderer3D::ShapeRenderer3D(
 void ShapeRenderer3D::Draw(glm::mat4 &  transform)
 {
 
+	ShaderProgram.use();
 	unsigned int transformLoc = glGetUniformLocation(ShaderProgram.shaderProgramID, "transform");
 	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
 	if (texture != nullptr)
@@ -97,6 +98,9 @@ void ShapeRenderer3D::Draw(glm::mat4 &  transform)
 	{
 		Draw_Arrays();
 	}
+
+	 glActiveTexture(GL_TEXTURE0);
+
 }
 
 void ShapeRenderer3D::Draw_Elements()

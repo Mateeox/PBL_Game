@@ -11,7 +11,7 @@ public:
   {
   }
 
-  virtual void Draw(glm::mat4 &  transform) =0;
+  virtual void Draw(glm::mat4 &  transform) = 0;
 
   ComponentSystem::ComponentType GetComponentType() override
   {

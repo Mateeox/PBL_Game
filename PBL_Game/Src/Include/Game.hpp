@@ -13,7 +13,8 @@ using namespace PBLGame;
 class Game{
 
     Window& okienko;
-    Shader *shaderProgram;    
+    Shader *shaderProgram;
+    Shader *shaderProgram_For_Model;     
     std::vector<SceneNode> sNodes;
 
     //camera

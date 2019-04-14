@@ -6,6 +6,7 @@
 Game::Game(Window &aOkno) : okienko(aOkno)
 {
   shaderProgram = new Shader("Shaders/vertex4.txt", "Shaders/fragment3.txt");
+  shaderProgram_For_Model = new Shader("Shaders/vertexModel.txt", "Shaders/fragmentModel.txt");
 }
 
 void Game::Granko()
@@ -18,15 +19,15 @@ void Game::Granko()
   SceneNode scena3_new;
 
   SceneNode beeNode;
-  GameObject *beeObj = new GameObject(beeNode.world);
 
+  GameObject *beeObj = new GameObject(beeNode.world);
   GameObject *trojObj = new GameObject(scena1_new.world);
   GameObject *FloorObj = new GameObject(FloorNode_new.world);
   GameObject *hexObj = new GameObject(scena3_new.world);
 
 
-  std::string BeeModelPath = "Models/chair/chair.obj";
-  Model * BeeModel = new Model(BeeModelPath,*shaderProgram,false);
+  std::string BeeModelPath = "Models/LibertyStatue/LibertStatue.obj";
+  Model * BeeModel = new Model(BeeModelPath,*shaderProgram_For_Model,false);
 
   printf("Model Loaded !! \n");
 
@@ -35,14 +36,14 @@ void Game::Granko()
                                                sizeof(Shapes::RainBow_Square),
                                                sizeof(Shapes::RB_Square_indices),
                                                *shaderProgram,
-                                               nullptr);
+                                               xD);
 
   ShapeRenderer3D *trojkat = new ShapeRenderer3D(Shapes::RainBow_Triangle,
                                                  Shapes::RB_Triangle_indices,
                                                  sizeof(Shapes::RainBow_Triangle),
                                                  sizeof(Shapes::RB_Triangle_indices),
                                                  *shaderProgram,
-                                                 nullptr);
+                                                 xD);
 
   ShapeRenderer3D *szescian = new ShapeRenderer3D(Shapes::RainBow_Cube,
                                                   Shapes::RB_Cube_indices,
@@ -53,18 +54,34 @@ void Game::Granko()
 
 
   beeObj->AddComponent(BeeModel);
+
   trojObj->AddComponent(trojkat);
   FloorObj->AddComponent(Floor);
   hexObj->AddComponent(szescian);
 
+  beeNode.AddGameObject(beeObj);
   scena1_new.AddGameObject(trojObj);
   FloorNode_new.AddGameObject(FloorObj);
   scena3_new.AddGameObject(hexObj);
+
+
+   auto xd = beeObj->GetComponent(ComponentSystem::Model);
+  if(xd != nullptr)
+  {
+    printf("no jest \n");
+  }
+
+    if(beeNode.gameObject == nullptr)
+  {
+    printf("beeNode gameobject nullptr ;/ \n");
+  }
 
   scena3_new.Scale(0.3f, 0.2f, 1.0f);
   FloorNode_new.Translate(0.0f, -1.0f, 0.1f);
   FloorNode_new.Rotate(90.0f, glm::vec3(1, 0, 0));
   FloorNode_new.Scale(100, 100, 100);
+
+  
 
   sNodes.push_back(beeNode);
   sNodes.push_back(scena1_new);
@@ -125,8 +142,13 @@ void Game::Render()
 
   projection = glm::perspective(okienko.camera.Zoom, 1280.0f / 720.0f, 0.1f, 100.0f);
   view = okienko.camera.GetViewMatrix();
+  shaderProgram->use();
   shaderProgram->setMat4("projection", projection);
   shaderProgram->setMat4("view", view);
+
+  shaderProgram_For_Model->use();
+  shaderProgram_For_Model->setMat4("projection", projection);
+  shaderProgram_For_Model->setMat4("view", view);
 
   glfwPollEvents();
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
