@@ -193,22 +193,17 @@ void Game::UpdatePlayer(SceneNode& player, short direction)
 {
 	Transform transformBeforeMove(player.gameObject->transform);
 	player.Translate(0.01 * direction, 0, 0);
-	bool coll = false;
 	Collider* playerCollider = ((Collider*)player.gameObject->GetComponent(ComponentSystem::ComponentType::Collider));
+	//check if there are any collisions, if yes - abort the move
 	for (Collider* collider : collidableObjects)
 	{
 		if (playerCollider->checkCollision(collider))
 		{
 			player.local = transformBeforeMove;
 			playerCollider->transform = transformBeforeMove;
-			coll = true;
 			break;
 		}
 	}
-	//Collider* tmp = ((Collider*)box2.gameObject->GetComponent(ComponentSystem::ComponentType::Collider));
-	
-
-	coll ? printf("true\n") : printf("false\n");
 }
 
 void Game::gatherCollidableObjects(std::vector<SceneNode*>& nodes)
