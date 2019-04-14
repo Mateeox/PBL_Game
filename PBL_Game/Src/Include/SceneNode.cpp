@@ -1,5 +1,6 @@
 #include "SceneNode.hpp"
 #include "Component/ShapeRenderer3D.hpp"
+#include "Component/Model.hpp"
 
 SceneNode::SceneNode() : local(Transform::origin()), dirty_flag(true), gameObject(nullptr)
 {
@@ -31,11 +32,19 @@ void SceneNode::Render(Transform &parentWorld, bool aDirty_Flag)
   }
   if (gameObject != nullptr)
   {
+
     ShapeRenderer3D *shape = (ShapeRenderer3D *)gameObject->GetComponent(ComponentSystem::ShapeRenderer3D);
     if (shape != nullptr)
     {
       shape->Draw(world.GetTransform());
     }
+
+    Model *model = (Model *)gameObject->GetComponent(ComponentSystem::Model);
+    if (model != nullptr)
+    {
+      model->Draw(world.GetTransform());
+    }
+
   }
   for (SceneNode *sn : childres)
   {

@@ -9,7 +9,8 @@ Error,
 Renderer,
 Collider,
 ShapeRenderer3D,
-Model
+Model,
+ModelMesh
 
 };
 

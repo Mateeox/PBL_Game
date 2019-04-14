@@ -1,8 +1,6 @@
 #include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
 #include "Mesh.hpp"
-#include <glm/gtc/type_ptr.hpp>
-
 
 namespace ModelMesh
 {
@@ -54,6 +52,8 @@ void Mesh::setupMesh()
 // render the mesh
 void Mesh::Draw(glm::mat4 &transform)
 {
+
+       printf("Draw Mesh \n");
     // bind appropriate textures
     unsigned int diffuseNr = 1;
     unsigned int specularNr = 1;
@@ -80,10 +80,6 @@ void Mesh::Draw(glm::mat4 &transform)
         glBindTexture(GL_TEXTURE_2D, Textures[i].id);
     }
 
-    //Set transform
-    unsigned int transformLoc = glGetUniformLocation(ShaderProgram.shaderProgramID, "transform");
-    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
-
     // draw mesh
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, Indices.size(), GL_UNSIGNED_INT, 0);
@@ -91,6 +87,13 @@ void Mesh::Draw(glm::mat4 &transform)
 
     // always good practice to set everything back to defaults once configured.
     glActiveTexture(GL_TEXTURE0);
+
+ 
 }
+
+  ComponentSystem::ComponentType Mesh::GetComponentType()
+  {
+      return ComponentSystem::ComponentType::ModelMesh;
+  }
 
 } // namespace ModelMesh

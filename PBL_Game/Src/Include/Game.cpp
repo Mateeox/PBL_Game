@@ -1,5 +1,6 @@
 #include "Game.hpp"
 #include "Component/ShapeRenderer3D.hpp"
+#include "Component/Model.hpp"
 #include "Shapes.hpp"
 
 Game::Game(Window &aOkno) : okienko(aOkno)
@@ -16,9 +17,18 @@ void Game::Granko()
   SceneNode FloorNode_new;
   SceneNode scena3_new;
 
+  SceneNode beeNode;
+  GameObject *beeObj = new GameObject(beeNode.world);
+
   GameObject *trojObj = new GameObject(scena1_new.world);
   GameObject *FloorObj = new GameObject(FloorNode_new.world);
   GameObject *hexObj = new GameObject(scena3_new.world);
+
+
+  std::string BeeModelPath = "Models/chair/chair.obj";
+  Model * BeeModel = new Model(BeeModelPath,*shaderProgram,false);
+
+  printf("Model Loaded !! \n");
 
   ShapeRenderer3D *Floor = new ShapeRenderer3D(Shapes::RainBow_Square,
                                                Shapes::RB_Square_indices,
@@ -41,6 +51,8 @@ void Game::Granko()
                                                   *shaderProgram,
                                                   xD);
 
+
+  beeObj->AddComponent(BeeModel);
   trojObj->AddComponent(trojkat);
   FloorObj->AddComponent(Floor);
   hexObj->AddComponent(szescian);
@@ -54,6 +66,7 @@ void Game::Granko()
   FloorNode_new.Rotate(90.0f, glm::vec3(1, 0, 0));
   FloorNode_new.Scale(100, 100, 100);
 
+  sNodes.push_back(beeNode);
   sNodes.push_back(scena1_new);
   sNodes.push_back(FloorNode_new);
   sNodes.push_back(scena3_new);

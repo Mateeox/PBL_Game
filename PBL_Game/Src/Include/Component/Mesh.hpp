@@ -38,6 +38,7 @@ class Mesh : public Drawable
          Shader & aShaderProgram);
     void Draw(glm::mat4 &  transform) override;
 
+    ComponentSystem::ComponentType GetComponentType() override;
     private:
     void setupMesh();
 

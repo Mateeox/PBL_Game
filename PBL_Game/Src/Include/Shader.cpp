@@ -9,7 +9,7 @@
 	GLuint VertexShaderID = glCreateShader(GL_VERTEX_SHADER);
 	GLuint FragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
 
-	// Read the Vertex Shader code from the file
+	// Read the Vertex Shader code from the files
 	std::string VertexShaderCode;
 	std::ifstream VertexShaderStream(vertex_file_path, std::ios::in);
 	if(VertexShaderStream.is_open()){

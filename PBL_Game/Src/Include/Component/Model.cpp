@@ -6,34 +6,50 @@
 #include <string>
 #include <cstring>
 
+#include <glm/gtc/type_ptr.hpp>
+
 unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma = false);
 
-Model::Model(std::string &path,Shader & aShaderProgram, bool gammaCor = false) : Component(nullptr),
+Model::Model(std::string &path, Shader &aShaderProgram, bool gammaCor = false) : Component(nullptr),
                                                                                  ShaderProgram(aShaderProgram),
                                                                                  gammaCorrection(gammaCor)
 {
     loadModel(path);
 }
 
+ComponentSystem::ComponentType Model::GetComponentType()
+{
+    return ComponentSystem::ComponentType::Model;
+}
+
 void Model::processNode(aiNode *node, const aiScene *scene)
 {
+
+    printf("Model node meshes number : %u \n", node->mNumMeshes);
     // process each mesh located at the current node
     for (unsigned int i = 0; i < node->mNumMeshes; i++)
     {
         // the node object only contains indices to index the actual objects in the scene.
         // the scene contains all the data, node is just to keep stuff organized (like relations between nodes).
+
         aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
         meshes.push_back(processMesh(mesh, scene));
     }
     // after we've processed all of the meshes (if any) we then recursively process each of the children nodes
     for (unsigned int i = 0; i < node->mNumChildren; i++)
     {
-        processNode(node->mChildren[i], scene);
+        if (node != nullptr)
+        {
+            processNode(node->mChildren[i], scene);
+        }
     }
+    printf("Model node mesh Processed. \n");
 }
 
 void Model::loadModel(std::string &path)
 {
+
+    printf("Loading Model ... \n");
     // read file via ASSIMP
     Assimp::Importer importer;
     const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
@@ -46,8 +62,18 @@ void Model::loadModel(std::string &path)
     // retrieve the directory path of the filepath
     directory = path.substr(0, path.find_last_of('/'));
 
+    printf("Model Loaded %s \n", path.c_str());
     // process ASSIMP's root node recursively
     processNode(scene->mRootNode, scene);
+}
+
+void Model::Draw(glm::mat4 &transform)
+{
+    //Set transform
+    unsigned int transformLoc = glGetUniformLocation(ShaderProgram.shaderProgramID, "transform");
+    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
+    for (unsigned int i = 0; i < meshes.size(); i++)
+        meshes[i].Draw(transform);
 }
 
 ModelMesh::Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
@@ -57,6 +83,7 @@ ModelMesh::Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
     std::vector<unsigned int> indices;
     std::vector<ModelMesh::Texture> textures;
 
+    printf("Prrocessing Mesh ... \n");
     // Walk through each of the mesh's vertices
     for (unsigned int i = 0; i < mesh->mNumVertices; i++)
     {
@@ -83,17 +110,25 @@ ModelMesh::Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
             vertex.TexCoords = vec;
         }
         else
+        {
             vertex.TexCoords = glm::vec2(0.0f, 0.0f);
+        }
         // tangent
-        vector.x = mesh->mTangents[i].x;
-        vector.y = mesh->mTangents[i].y;
-        vector.z = mesh->mTangents[i].z;
-        vertex.Tangent = vector;
+        if (mesh->mTangents)
+        {
+            vector.x = mesh->mTangents[i].x;
+            vector.y = mesh->mTangents[i].y;
+            vector.z = mesh->mTangents[i].z;
+            vertex.Tangent = vector;
+        }
         // bitangent
-        vector.x = mesh->mBitangents[i].x;
-        vector.y = mesh->mBitangents[i].y;
-        vector.z = mesh->mBitangents[i].z;
-        vertex.Bitangent = vector;
+        if (mesh->mTangents)
+        {
+            vector.x = mesh->mBitangents[i].x;
+            vector.y = mesh->mBitangents[i].y;
+            vector.z = mesh->mBitangents[i].z;
+            vertex.Bitangent = vector;
+        }
         vertices.push_back(vertex);
     }
     // now wak through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
@@ -127,7 +162,7 @@ ModelMesh::Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
     textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
     // return a mesh object created from the extracted mesh data
-    return ModelMesh::Mesh(vertices, indices, textures,ShaderProgram);
+    return ModelMesh::Mesh(vertices, indices, textures, ShaderProgram);
 }
 
 std::vector<ModelMesh::Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName)
@@ -161,7 +196,7 @@ std::vector<ModelMesh::Texture> Model::loadMaterialTextures(aiMaterial *mat, aiT
     return textures;
 }
 
-unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma )
+unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma)
 {
     std::string filename = std::string(path);
     filename = directory + '/' + filename;

@@ -18,20 +18,22 @@ class Model : public ComponentSystem::Component
   Shader & ShaderProgram;
 
   public:
-    /*  Functions   */
     Model(std::string &path,Shader & aShaderProgram, bool gammaCorrection);
-    void Draw(Shader shader);
+    void Draw(glm::mat4 &  transform);
 
   private:
-    /*  Model Data  */
+
     std::vector<ModelMesh::Texture> textures_loaded;
     std::vector<ModelMesh::Mesh> meshes;
     std::string directory;
     bool gammaCorrection;
-    /*  Functions   */
+
     void loadModel(std::string & path);
     void processNode(aiNode *node, const aiScene *scene);
     ModelMesh::Mesh processMesh(aiMesh *mesh, const aiScene *scene);
     std::vector<ModelMesh::Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type,
                                          std::string typeName);
+
+ ComponentSystem::ComponentType GetComponentType() override;
+
 };
