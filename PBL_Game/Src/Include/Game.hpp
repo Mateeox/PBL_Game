@@ -13,7 +13,8 @@ using namespace PBLGame;
 class Game{
 
     Window& okienko;
-    Shader *shaderProgram;    
+    Shader *shaderProgram;
+    Shader *shaderProgram_For_Model;     
     std::vector<SceneNode> sNodes;
 
     //camera
@@ -22,9 +23,12 @@ class Game{
 
     //Imgui
     bool show_demo_window = true;
+	int offset = 250;	// Jak bardzo maja sie roznic rozmiary kamery, szerokosc aktywnej to pol okna + offset, szerokosc nieaktywnej to pol okna - offset
 
     public:
+	static const int WINDOW_WIDTH = 1280, WINDOW_HEIGHT = 720;
     Game(Window& okienko);
+
     
     void Granko();
     void Update(float interpolation);

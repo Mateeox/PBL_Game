@@ -1,39 +1,49 @@
 #include "Game.hpp"
-#include "ShapeRenderer3D.hpp"
+#include "Component/ShapeRenderer3D.hpp"
+#include "Component/Model.hpp"
 #include "Shapes.hpp"
 
 Game::Game(Window &aOkno) : okienko(aOkno)
 {
   shaderProgram = new Shader("Shaders/vertex4.txt", "Shaders/fragment3.txt");
+  shaderProgram_For_Model = new Shader("Shaders/vertexModel.txt", "Shaders/fragmentModel.txt");
 }
 
 void Game::Granko()
 {
 
-  Texture * xD = new Texture("Textures/red.png",GL_LINEAR);
+  Texture *xD = new Texture("Textures/red.png", GL_LINEAR);
 
-
-SceneNode scena1_new;
+  SceneNode scena1_new;
   SceneNode FloorNode_new;
   SceneNode scena3_new;
 
-  GameObject * trojObj = new GameObject(scena1_new.world);
-   GameObject * FloorObj = new GameObject(FloorNode_new.world);
-    GameObject * hexObj = new GameObject(scena3_new.world);
+  SceneNode beeNode;
+
+  GameObject *beeObj = new GameObject(beeNode.world);
+  GameObject *trojObj = new GameObject(scena1_new.world);
+  GameObject *FloorObj = new GameObject(FloorNode_new.world);
+  GameObject *hexObj = new GameObject(scena3_new.world);
+
+
+  std::string BeeModelPath = "Models/Statue/LibertStatue.obj";
+  Model * BeeModel = new Model(BeeModelPath,*shaderProgram_For_Model,false);
+
+  printf("Model Loaded !! \n");
 
   ShapeRenderer3D *Floor = new ShapeRenderer3D(Shapes::RainBow_Square,
-                                                 Shapes::RB_Square_indices,
-                                                 sizeof(Shapes::RainBow_Square),
-                                                 sizeof(Shapes::RB_Square_indices),
-                                                 *shaderProgram,
-                                                 nullptr);
+                                               Shapes::RB_Square_indices,
+                                               sizeof(Shapes::RainBow_Square),
+                                               sizeof(Shapes::RB_Square_indices),
+                                               *shaderProgram,
+                                               xD);
 
   ShapeRenderer3D *trojkat = new ShapeRenderer3D(Shapes::RainBow_Triangle,
                                                  Shapes::RB_Triangle_indices,
                                                  sizeof(Shapes::RainBow_Triangle),
                                                  sizeof(Shapes::RB_Triangle_indices),
                                                  *shaderProgram,
-                                                 nullptr);
+                                                 xD);
 
   ShapeRenderer3D *szescian = new ShapeRenderer3D(Shapes::RainBow_Cube,
                                                   Shapes::RB_Cube_indices,
@@ -43,25 +53,40 @@ SceneNode scena1_new;
                                                   xD);
 
 
+  beeObj->AddComponent(BeeModel);
 
   trojObj->AddComponent(trojkat);
   FloorObj->AddComponent(Floor);
   hexObj->AddComponent(szescian);
-  
 
+  beeNode.AddGameObject(beeObj);
   scena1_new.AddGameObject(trojObj);
   FloorNode_new.AddGameObject(FloorObj);
   scena3_new.AddGameObject(hexObj);
 
+
+   auto xd = beeObj->GetComponent(ComponentSystem::Model);
+  if(xd != nullptr)
+  {
+    printf("no jest \n");
+  }
+
+    if(beeNode.gameObject == nullptr)
+  {
+    printf("beeNode gameobject nullptr ;/ \n");
+  }
+
   scena3_new.Scale(0.3f, 0.2f, 1.0f);
   FloorNode_new.Translate(0.0f, -1.0f, 0.1f);
-  FloorNode_new.Rotate(90.0f,glm::vec3(1,0,0));
-  FloorNode_new.Scale(100,100,100);
+  FloorNode_new.Rotate(90.0f, glm::vec3(1, 0, 0));
+  FloorNode_new.Scale(100, 100, 100);
 
+  
+
+  sNodes.push_back(beeNode);
   sNodes.push_back(scena1_new);
   sNodes.push_back(FloorNode_new);
   sNodes.push_back(scena3_new);
-
 
   shaderProgram->use();
 
@@ -90,6 +115,12 @@ SceneNode scena1_new;
     Render();
   }
 
+
+
+  delete trojObj;
+  delete FloorObj;
+  delete hexObj;
+
   delete trojkat;
   delete Floor;
   delete szescian;
@@ -103,46 +134,88 @@ SceneNode scena1_new;
 
 void Game::Update(float interpolation)
 {
-   Deserialize("output.txt");
-   //Serialize();
+   //Deserialize("output.txt");
+   Serialize();
    okienko.ProcessInput(interpolation);
 }
 
 void Game::Render()
 {
 
-
-  projection = glm::perspective(okienko.camera.Zoom, 1280.0f / 720.0f, 0.1f, 100.0f);
+  projection = glm::perspective(okienko.camera.Zoom, (float)Game::WINDOW_WIDTH / (float)Game::WINDOW_HEIGHT, 0.1f, 100.0f);
   view = okienko.camera.GetViewMatrix();
+  shaderProgram->use();
   shaderProgram->setMat4("projection", projection);
   shaderProgram->setMat4("view", view);
 
+  shaderProgram_For_Model->use();
+  shaderProgram_For_Model->setMat4("projection", projection);
+  shaderProgram_For_Model->setMat4("view", view);
+
   glfwPollEvents();
+  glScissor(0, 0, Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT);
+  glEnable(GL_SCISSOR_TEST);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   ImGui_ImplOpenGL3_NewFrame();
   ImGui_ImplGlfw_NewFrame();
   ImGui::NewFrame();
 
-  if (show_demo_window) 
+  /*if (show_demo_window)
   {
     ImGui::Begin("Another Window",
-        &show_demo_window); // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+                 &show_demo_window); // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
     ImGui::Text("Hello from another window!");
     if (ImGui::Button("Close Me"))
     {
-        show_demo_window = false;
+      show_demo_window = false;
     }
     ImGui::End();
-  }
+  }*/
   ImGui::Render();
 
   Transform originTransform = Transform::origin();
- 
 
-  for (auto node : sNodes) {
-     node.Render(originTransform, true);
+  static bool leftSideActive = true;
+  static bool swapButtonPressed = false;
+
+  if (GetKeyState('Q') < 0 && swapButtonPressed == false)
+  {
+	  offset *= -1;
+	  leftSideActive = !leftSideActive;
+	  swapButtonPressed = true;
   }
+  if (swapButtonPressed && GetKeyState('Q') >= 0)
+  {
+	  swapButtonPressed = false;
+  }
+
+  // RENDER LEWEJ STRONY
+  glViewport(0, 0, (Game::WINDOW_WIDTH / 2) + offset, Game::WINDOW_HEIGHT);
+  glScissor(0, 0, (Game::WINDOW_WIDTH / 2) + offset, Game::WINDOW_HEIGHT);
+  glClearColor(1, 0, 0, 1);
+  glClear(GL_COLOR_BUFFER_BIT);
+  for (auto node : sNodes)
+  {
+    node.Render(originTransform, true);
+  }
+
+  // RENDER PRAWEJ STRONY
+  glViewport((Game::WINDOW_WIDTH / 2) + offset, 0, (Game::WINDOW_WIDTH / 2) - offset, Game::WINDOW_HEIGHT);
+  glScissor((Game::WINDOW_WIDTH / 2) + offset, 0, (Game::WINDOW_WIDTH / 2) - offset, Game::WINDOW_HEIGHT);
+  glClearColor(0, 0, 1, 1);
+  glClear(GL_COLOR_BUFFER_BIT);
+  sNodes[2].Render(originTransform, true);
+  sNodes[1].Render(originTransform, true);
+
+
+  // RENDER PASKA ODDZIELAJACAEGO KAMERY - TODO
+  glViewport((Game::WINDOW_WIDTH / 2) + offset - 5, 0, 10, Game::WINDOW_HEIGHT);
+  glScissor((Game::WINDOW_WIDTH / 2) + offset - 5, 0, 10, Game::WINDOW_HEIGHT);
+  glEnable(GL_SCISSOR_TEST);
+  glClearColor(0, 0, 0, 1);
+  glClear(GL_COLOR_BUFFER_BIT);
+
 
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 

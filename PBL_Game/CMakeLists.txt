@@ -27,6 +27,7 @@ set(ALL_LIBS
 	${OPENGL_LIBRARY}
 	glfw
 	GLEW_1130
+	assimp
 )
 
 add_definitions(
@@ -47,8 +48,11 @@ add_executable(PBL_Game
 	Src/Include/Camera.cpp
 	Src/Include/Shader.cpp
 	Src/Include/Texture.cpp
-	Src/Include/ShapeRenderer3D.cpp
 	Src/Include/SceneNode.cpp
+	#Component
+	Src/Include/Component/ShapeRenderer3D.cpp
+	Src/Include/Component/Mesh.cpp
+	Src/Include/Component/Model.cpp
 	#Stb_image
 	Src/Include/stb_image.cpp
 	#ImGui
