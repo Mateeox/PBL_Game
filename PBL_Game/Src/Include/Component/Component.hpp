@@ -1,5 +1,5 @@
 #pragma once
-
+#include <string>
 class GameObject;
 
 namespace ComponentSystem
@@ -26,7 +26,9 @@ class Component
 	{
 		gameobject = gamobj;
 	}
-
+	std::string Serialize() {
+		return std::to_string(this->GetComponentType());
+	}
 	virtual ComponentType GetComponentType() = 0;
 	GameObject *gameobject;
 };
