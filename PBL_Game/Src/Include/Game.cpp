@@ -140,7 +140,7 @@ void Game::Update(float interpolation)
 void Game::Render()
 {
 
-  projection = glm::perspective(okienko.camera.Zoom, 1280.0f / 720.0f, 0.1f, 100.0f);
+  projection = glm::perspective(okienko.camera.Zoom, (float)Game::WINDOW_WIDTH / (float)Game::WINDOW_HEIGHT, 0.1f, 100.0f);
   view = okienko.camera.GetViewMatrix();
   shaderProgram->use();
   shaderProgram->setMat4("projection", projection);
@@ -151,13 +151,15 @@ void Game::Render()
   shaderProgram_For_Model->setMat4("view", view);
 
   glfwPollEvents();
+  glScissor(0, 0, Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT);
+  glEnable(GL_SCISSOR_TEST);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   ImGui_ImplOpenGL3_NewFrame();
   ImGui_ImplGlfw_NewFrame();
   ImGui::NewFrame();
 
-  if (show_demo_window)
+  /*if (show_demo_window)
   {
     ImGui::Begin("Another Window",
                  &show_demo_window); // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
@@ -167,15 +169,51 @@ void Game::Render()
       show_demo_window = false;
     }
     ImGui::End();
-  }
+  }*/
   ImGui::Render();
 
   Transform originTransform = Transform::origin();
 
+  static bool leftSideActive = true;
+  static bool swapButtonPressed = false;
+
+  if (GetKeyState('Q') < 0 && swapButtonPressed == false)
+  {
+	  offset *= -1;
+	  leftSideActive = !leftSideActive;
+	  swapButtonPressed = true;
+  }
+  if (swapButtonPressed && GetKeyState('Q') >= 0)
+  {
+	  swapButtonPressed = false;
+  }
+
+  // RENDER LEWEJ STRONY
+  glViewport(0, 0, (Game::WINDOW_WIDTH / 2) + offset, Game::WINDOW_HEIGHT);
+  glScissor(0, 0, (Game::WINDOW_WIDTH / 2) + offset, Game::WINDOW_HEIGHT);
+  glClearColor(1, 0, 0, 1);
+  glClear(GL_COLOR_BUFFER_BIT);
   for (auto node : sNodes)
   {
     node.Render(originTransform, true);
   }
+
+  // RENDER PRAWEJ STRONY
+  glViewport((Game::WINDOW_WIDTH / 2) + offset, 0, (Game::WINDOW_WIDTH / 2) - offset, Game::WINDOW_HEIGHT);
+  glScissor((Game::WINDOW_WIDTH / 2) + offset, 0, (Game::WINDOW_WIDTH / 2) - offset, Game::WINDOW_HEIGHT);
+  glClearColor(0, 0, 1, 1);
+  glClear(GL_COLOR_BUFFER_BIT);
+  sNodes[2].Render(originTransform, true);
+  sNodes[1].Render(originTransform, true);
+
+
+  // RENDER PASKA ODDZIELAJACAEGO KAMERY - TODO
+  glViewport((Game::WINDOW_WIDTH / 2) + offset - 5, 0, 10, Game::WINDOW_HEIGHT);
+  glScissor((Game::WINDOW_WIDTH / 2) + offset - 5, 0, 10, Game::WINDOW_HEIGHT);
+  glEnable(GL_SCISSOR_TEST);
+  glClearColor(0, 0, 0, 1);
+  glClear(GL_COLOR_BUFFER_BIT);
+
 
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
