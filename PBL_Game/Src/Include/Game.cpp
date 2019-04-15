@@ -26,7 +26,7 @@ void Game::Granko()
   GameObject *hexObj = new GameObject(scena3_new.world);
 
 
-  std::string BeeModelPath = "Models/LibertyStatue/LibertStatue.obj";
+  std::string BeeModelPath = "Models/Statue/LibertStatue.obj";
   Model * BeeModel = new Model(BeeModelPath,*shaderProgram_For_Model,false);
 
   printf("Model Loaded !! \n");
