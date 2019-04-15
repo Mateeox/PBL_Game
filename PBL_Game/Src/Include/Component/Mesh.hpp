@@ -42,6 +42,9 @@ class Mesh : public Drawable
     private:
     void setupMesh();
 
+	std::string Serialize() {
+		return Drawable::Serialize();
+	}
 };
 
 } // namespace ModelMesh

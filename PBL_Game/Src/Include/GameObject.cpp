@@ -38,7 +38,7 @@ ComponentSystem::Component *GameObject::GetComponent(ComponentSystem::ComponentT
 std::string GameObject::Serialize()
 {
 	std::string str = "";
-	str += "\tD;" + drawable->Serialize() + "\n\t\t";
+	//str += "\tD;" + drawable->Serialize() + "\n\t\t";
 	str += "T;" + transform.Serialize();
 	for (ComponentSystem::Component* component : components)
 	{

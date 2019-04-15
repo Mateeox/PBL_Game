@@ -127,9 +127,3 @@ ShapeRenderer3D::~ShapeRenderer3D()
 	glDeleteBuffers(1, &EBO);
 	glDeleteVertexArrays(1, &VAO);
 }
-
-std::string ShapeRenderer3D::Serialize()
-{
-	return "";
-	//return "<component type='" GetComponentType();
-}

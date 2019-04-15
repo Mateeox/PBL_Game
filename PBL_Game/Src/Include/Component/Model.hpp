@@ -33,6 +33,8 @@ class Model : public ComponentSystem::Component
     std::vector<ModelMesh::Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type,
                                          std::string typeName);
 
- ComponentSystem::ComponentType GetComponentType() override;
-
+	ComponentSystem::ComponentType GetComponentType() override;
+	std::string Serialize() {
+		return Component::Serialize();
+	}
 };
