@@ -4,9 +4,6 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
-#include <glm/gtx/string_cast.hpp>
-#include <string>
-#include <vector>
 
 // Include GLEW
 #include <GL/gl3w.h>
@@ -31,6 +28,4 @@ public:
   void Translate(glm::vec3 Value);
   void Rotate(float value, glm::vec3 axis);
   glm::mat4 & GetTransform();
-  std::string Serialize();
-  void Deserialize(std::string data);
 };

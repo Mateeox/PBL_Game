@@ -17,8 +17,4 @@ public:
   {
     return ComponentSystem::Error;
   }
-
-  std::string Serialize() {
-	  return Component::Serialize();
-  }
 };

@@ -1,3 +1,4 @@
+
 #include "Game.hpp"
 #include "Component/ShapeRenderer3D.hpp"
 #include "Component/Model.hpp"
@@ -26,7 +27,7 @@ void Game::Granko()
   GameObject *hexObj = new GameObject(scena3_new.world);
 
 
-  std::string BeeModelPath = "Models/Statue/LibertStatue.obj";
+  std::string BeeModelPath = "Models/enemy_model.obj";
   Model * BeeModel = new Model(BeeModelPath,*shaderProgram_For_Model,false);
 
   printf("Model Loaded !! \n");
@@ -76,6 +77,8 @@ void Game::Granko()
     printf("beeNode gameobject nullptr ;/ \n");
   }
 
+
+  beeNode.Scale(0.01,0.01,0.01);
   scena3_new.Scale(0.3f, 0.2f, 1.0f);
   FloorNode_new.Translate(0.0f, -1.0f, 0.1f);
   FloorNode_new.Rotate(90.0f, glm::vec3(1, 0, 0));
@@ -134,9 +137,7 @@ void Game::Granko()
 
 void Game::Update(float interpolation)
 {
-   //Deserialize("output.txt");
-   Serialize();
-   okienko.ProcessInput(interpolation);
+  okienko.ProcessInput(interpolation);
 }
 
 void Game::Render()
@@ -161,17 +162,13 @@ void Game::Render()
   ImGui_ImplGlfw_NewFrame();
   ImGui::NewFrame();
 
-  /*if (show_demo_window)
+  if (show_demo_window)
   {
-    ImGui::Begin("Another Window",
+    ImGui::Begin("Klawiszologia",
                  &show_demo_window); // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-    ImGui::Text("Hello from another window!");
-    if (ImGui::Button("Close Me"))
-    {
-      show_demo_window = false;
-    }
+	ImGui::Text("Q - zmiana strony");
     ImGui::End();
-  }*/
+  }
   ImGui::Render();
 
   Transform originTransform = Transform::origin();
@@ -179,13 +176,13 @@ void Game::Render()
   static bool leftSideActive = true;
   static bool swapButtonPressed = false;
 
-  if (GetKeyState('Q') < 0 && swapButtonPressed == false)
+  if (glfwGetKey(okienko.window, 81) == GLFW_PRESS && swapButtonPressed == false)
   {
 	  offset *= -1;
 	  leftSideActive = !leftSideActive;
 	  swapButtonPressed = true;
   }
-  if (swapButtonPressed && GetKeyState('Q') >= 0)
+  if (swapButtonPressed && glfwGetKey(okienko.window, 81) != GLFW_PRESS)
   {
 	  swapButtonPressed = false;
   }
@@ -221,28 +218,6 @@ void Game::Render()
 
   // Swap buffers
   glfwSwapBuffers(okienko.window);
-}
-
-void Game::Serialize()
-{
-	std::map<SceneNode*, unsigned> oidMap;
-	SerializeFaza1(oidMap);
-	std::vector<SceneNode> tempNodes;
-	SerializeFaza2(oidMap, tempNodes);
-	oidMap.clear();
-	SerializeFaza3(tempNodes);
-	tempNodes.clear();
-}
-
-void Game::SerializeFaza1(std::map<SceneNode*, unsigned> &map)
-{
-	this->sNodes[0].AddChild(&this->sNodes[1]);
-	this->sNodes[1].AddParent(&this->sNodes[0]);
-	for (SceneNode &scene : this->sNodes)
-	{
-		unsigned n = map.size() + 1;
-		map.insert(std::pair<SceneNode*, unsigned>(&scene, n));
-	}
 }
 
 void Game::SerializeFaza2(std::map<SceneNode*, unsigned> &map, std::vector<SceneNode> &temp)
