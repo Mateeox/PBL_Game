@@ -159,17 +159,13 @@ void Game::Render()
   ImGui_ImplGlfw_NewFrame();
   ImGui::NewFrame();
 
-  /*if (show_demo_window)
+  if (show_demo_window)
   {
-    ImGui::Begin("Another Window",
+    ImGui::Begin("Klawiszologia",
                  &show_demo_window); // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-    ImGui::Text("Hello from another window!");
-    if (ImGui::Button("Close Me"))
-    {
-      show_demo_window = false;
-    }
+	ImGui::Text("Q - zmiana strony");
     ImGui::End();
-  }*/
+  }
   ImGui::Render();
 
   Transform originTransform = Transform::origin();
@@ -177,13 +173,13 @@ void Game::Render()
   static bool leftSideActive = true;
   static bool swapButtonPressed = false;
 
-  if (GetKeyState('Q') < 0 && swapButtonPressed == false)
+  if (glfwGetKey(okienko.window, 81) == GLFW_PRESS && swapButtonPressed == false)
   {
 	  offset *= -1;
 	  leftSideActive = !leftSideActive;
 	  swapButtonPressed = true;
   }
-  if (swapButtonPressed && GetKeyState('Q') >= 0)
+  if (swapButtonPressed && glfwGetKey(okienko.window, 81) != GLFW_PRESS)
   {
 	  swapButtonPressed = false;
   }
