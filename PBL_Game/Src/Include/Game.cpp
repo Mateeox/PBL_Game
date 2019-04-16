@@ -1,3 +1,4 @@
+
 #include "Game.hpp"
 #include "Component/ShapeRenderer3D.hpp"
 #include "Component/Model.hpp"
@@ -26,7 +27,7 @@ void Game::Granko()
   GameObject *hexObj = new GameObject(scena3_new.world);
 
 
-  std::string BeeModelPath = "Models/Statue/LibertStatue.obj";
+  std::string BeeModelPath = "Models/enemy_animated.FBX";
   Model * BeeModel = new Model(BeeModelPath,*shaderProgram_For_Model,false);
 
   printf("Model Loaded !! \n");
@@ -76,6 +77,8 @@ void Game::Granko()
     printf("beeNode gameobject nullptr ;/ \n");
   }
 
+
+  beeNode.Scale(0.01,0.01,0.01);
   scena3_new.Scale(0.3f, 0.2f, 1.0f);
   FloorNode_new.Translate(0.0f, -1.0f, 0.1f);
   FloorNode_new.Rotate(90.0f, glm::vec3(1, 0, 0));
@@ -216,3 +219,6 @@ void Game::Render()
   // Swap buffers
   glfwSwapBuffers(okienko.window);
 }
+
+ 
+
