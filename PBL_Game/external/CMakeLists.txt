@@ -59,14 +59,13 @@ target_link_libraries(GLEW_1130
 # AssImp already has a CMakeLists.txt so let's use these
 
 add_definitions( -DASSIMP_BUILD_BOOST_WORKAROUND )
- add_definitions( -DLIBRARY_SUFFIX="" )
- add_definitions(-DASSIMP_LIB_INSTALL_DIR=lib)
+add_definitions( -DLIBRARY_SUFFIX="" )
 # Compile AssImp
 set(LIB_INSTALL_DIR "lib")
 set(LIBASSIMP_COMPONENT libassimp3.3.1-OGLtuts)
 set(BUILD_STATIC_LIB ON)
 #set(ZLIB_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/zlib)
-#add_subdirectory( assimp-3.3.1/code )
+add_subdirectory( assimp-3.3.1 )
 
 
 
