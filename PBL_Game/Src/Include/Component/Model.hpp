@@ -30,7 +30,7 @@ class Model : public ComponentSystem::Component
     void loadModel(std::string & path);
     void processNode(aiNode *node, const aiScene *scene);
     ModelMesh::Mesh processMesh(aiMesh *mesh, const aiScene *scene);
-    std::vector<ModelMesh::Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type,
+    std::vector<ModelMesh::Texture> loadMaterialTextures(const aiScene *scene,aiMaterial *mat, aiTextureType type,
                                          std::string typeName);
 
  ComponentSystem::ComponentType GetComponentType() override;
