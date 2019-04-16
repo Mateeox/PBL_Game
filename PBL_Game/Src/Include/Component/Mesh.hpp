@@ -37,7 +37,10 @@ class Mesh : public Drawable
          vector<Texture> aTextures,
          Shader & aShaderProgram);
     void Draw(glm::mat4 &  transform) override;
-
+	std::string Serialize() {
+		return Drawable::Serialize();
+	}
+	
     ComponentSystem::ComponentType GetComponentType() override;
     private:
     void setupMesh();

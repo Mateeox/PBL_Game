@@ -33,7 +33,9 @@ class ShapeRenderer3D :public Drawable
    
 
     ComponentSystem::ComponentType GetComponentType() override;
-
+	std::string Serialize() {
+		return Drawable::Serialize();
+	}
 
     
     ~ShapeRenderer3D();
