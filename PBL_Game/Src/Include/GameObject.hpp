@@ -7,6 +7,7 @@
 
 class GameObject
 {
+
   public:
     Transform &transform;
     std::vector<ComponentSystem::Component *> components;
@@ -15,5 +16,4 @@ class GameObject
     ComponentSystem::Component *GetComponent(ComponentSystem::ComponentType type);
     void AddComponent(ComponentSystem::Component *);
     void RemoveComponent(ComponentSystem::ComponentType type);
-	std::string Serialize();
 };
