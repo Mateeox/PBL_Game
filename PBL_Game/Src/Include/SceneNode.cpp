@@ -79,9 +79,9 @@ std::string SceneNode::Serialize()
 	str += "W;" + this->world.Serialize() + "\n\t";
 	str += "L;" + this->local.Serialize() + "\n\t";
 	if (this->parent)
-		str += "P;" + std::to_string((unsigned)this->parent) + "\n\t";
+		str += "P;" + std::to_string((intptr_t)this->parent) + "\n\t";
 	for (SceneNode* child : this->children)
-		str += "CH;" + std::to_string((unsigned)child) + "\n\t";
+		str += "CH;" + std::to_string((intptr_t)child) + "\n\t";
 	str += "O\n\t\t" + this->gameObject->Serialize() + "\n";
 	return str;
 }

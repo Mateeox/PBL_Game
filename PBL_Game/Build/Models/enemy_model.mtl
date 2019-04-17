@@ -12,11 +12,11 @@ newmtl coat
 	Kd 0.5882 0.5882 0.5882
 	Ks 0.0000 0.0000 0.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka maps\Enemy_painted_Enemy_Diffuse.png
-	map_Kd maps\Enemy_painted_Enemy_Diffuse.png
-	map_Ke maps\Enemy_painted_Enemy_Emissive.png
-	map_bump maps\Enemy_painted_Enemy_Normal.png
-	bump maps\Enemy_painted_Enemy_Normal.png
+	map_Ka maps/Enemy_painted_Enemy_Diffuse.png
+	map_Kd maps/Enemy_painted_Enemy_Diffuse.png
+	map_Ke maps/Enemy_painted_Enemy_Emissive.png
+	map_bump maps/Enemy_painted_Enemy_Normal.png
+	bump maps/Enemy_painted_Enemy_Normal.png
 
 newmtl skin
 	Ns 10.0000
@@ -29,11 +29,11 @@ newmtl skin
 	Kd 0.5882 0.5882 0.5882
 	Ks 0.0000 0.0000 0.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka maps\Enemy_painted_Enemy_Diffuse_1.png
-	map_Kd maps\Enemy_painted_Enemy_Diffuse_1.png
-	map_Ke maps\Enemy_painted_Enemy_Emissive_1.png
-	map_bump maps\Enemy_painted_Enemy_Normal_1.png
-	bump maps\Enemy_painted_Enemy_Normal_1.png
+	map_Ka maps/Enemy_painted_Enemy_Diffuse_1.png
+	map_Kd maps/Enemy_painted_Enemy_Diffuse_1.png
+	map_Ke maps/Enemy_painted_Enemy_Emissive_1.png
+	map_bump maps/Enemy_painted_Enemy_Normal_1.png
+	bump maps/Enemy_painted_Enemy_Normal_1.png
 
 newmtl trousers
 	Ns 10.0000
@@ -46,11 +46,11 @@ newmtl trousers
 	Kd 0.5882 0.5882 0.5882
 	Ks 0.0000 0.0000 0.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka maps\Enemy_painted_Enemy_Diffuse_2.png
-	map_Kd maps\Enemy_painted_Enemy_Diffuse_2.png
-	map_Ke maps\Enemy_painted_Enemy_Emissive_2.png
-	map_bump maps\Enemy_painted_Enemy_Normal_2.png
-	bump maps\Enemy_painted_Enemy_Normal_2.png
+	map_Ka maps/Enemy_painted_Enemy_Diffuse_2.png
+	map_Kd maps/Enemy_painted_Enemy_Diffuse_2.png
+	map_Ke maps/Enemy_painted_Enemy_Emissive_2.png
+	map_bump maps/Enemy_painted_Enemy_Normal_2.png
+	bump maps/Enemy_painted_Enemy_Normal_2.png
 
 newmtl shirt
 	Ns 10.0000
@@ -63,11 +63,11 @@ newmtl shirt
 	Kd 0.5882 0.5882 0.5882
 	Ks 0.0000 0.0000 0.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka maps\Enemy_painted_Enemy_Diffuse_0.png
-	map_Kd maps\Enemy_painted_Enemy_Diffuse_0.png
-	map_Ke maps\Enemy_painted_Enemy_Emissive_0.png
-	map_bump maps\Enemy_painted_Enemy_Normal_0.png
-	bump maps\Enemy_painted_Enemy_Normal_0.png
+	map_Ka maps/Enemy_painted_Enemy_Diffuse_0.png
+	map_Kd maps/Enemy_painted_Enemy_Diffuse_0.png
+	map_Ke maps/Enemy_painted_Enemy_Emissive_0.png
+	map_bump maps/Enemy_painted_Enemy_Normal_0.png
+	bump maps/Enemy_painted_Enemy_Normal_0.png
 
 newmtl candelabrum
 	Ns 10.0000
@@ -80,11 +80,11 @@ newmtl candelabrum
 	Kd 0.5882 0.5882 0.5882
 	Ks 0.0000 0.0000 0.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka maps\Candelabrum_Candelabrum_Diffuse.png
-	map_Kd maps\Candelabrum_Candelabrum_Diffuse.png
-	map_Ke maps\Candelabrum_Candelabrum_Emissive.png
-	map_bump maps\Candelabrum_Candelabrum_Normal.png
-	bump maps\Candelabrum_Candelabrum_Normal.png
+	map_Ka maps/Candelabrum_Candelabrum_Diffuse.png
+	map_Kd maps/Candelabrum_Candelabrum_Diffuse.png
+	map_Ke maps/Candelabrum_Candelabrum_Emissive.png
+	map_bump maps/Candelabrum_Candelabrum_Normal.png
+	bump maps/Candelabrum_Candelabrum_Normal.png
 
 newmtl wax
 	Ns 10.0000
@@ -97,11 +97,11 @@ newmtl wax
 	Kd 0.5882 0.5882 0.5882
 	Ks 0.0000 0.0000 0.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka maps\Candelabrum_Candelabrum_Diffuse_1.png
-	map_Kd maps\Candelabrum_Candelabrum_Diffuse_1.png
-	map_Ke maps\Candelabrum_Candelabrum_Emissive_1.png
-	map_bump maps\Candelabrum_Candelabrum_Normal_1.png
-	bump maps\Candelabrum_Candelabrum_Normal_1.png
+	map_Ka maps/Candelabrum_Candelabrum_Diffuse_1.png
+	map_Kd maps/Candelabrum_Candelabrum_Diffuse_1.png
+	map_Ke maps/Candelabrum_Candelabrum_Emissive_1.png
+	map_bump maps/Candelabrum_Candelabrum_Normal_1.png
+	bump maps/Candelabrum_Candelabrum_Normal_1.png
 
 newmtl knot
 	Ns 10.0000
@@ -114,11 +114,11 @@ newmtl knot
 	Kd 0.5882 0.5882 0.5882
 	Ks 0.0000 0.0000 0.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka maps\Candelabrum_Candelabrum_Diffuse_0.png
-	map_Kd maps\Candelabrum_Candelabrum_Diffuse_0.png
-	map_Ke maps\Candelabrum_Candelabrum_Emissive_0.png
-	map_bump maps\Candelabrum_Candelabrum_Normal_0.png
-	bump maps\Candelabrum_Candelabrum_Normal_0.png
+	map_Ka maps/Candelabrum_Candelabrum_Diffuse_0.png
+	map_Kd maps/Candelabrum_Candelabrum_Diffuse_0.png
+	map_Ke maps/Candelabrum_Candelabrum_Emissive_0.png
+	map_bump maps/Candelabrum_Candelabrum_Normal_0.png
+	bump maps/Candelabrum_Candelabrum_Normal_0.png
 
 newmtl fire
 	Ns 10.0000
@@ -131,8 +131,8 @@ newmtl fire
 	Kd 0.5882 0.5882 0.5882
 	Ks 0.0000 0.0000 0.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka maps\Fire_Diffuse.png
-	map_Kd maps\Fire_Diffuse.png
-	map_Ke maps\Fire_Emissive.png
-	map_bump maps\Fire_Normal.png
-	bump maps\Fire_Normal.png
+	map_Ka maps/Fire_Diffuse.png
+	map_Kd maps/Fire_Diffuse.png
+	map_Ke maps/Fire_Emissive.png
+	map_bump maps/Fire_Normal.png
+	bump maps/Fire_Normal.png

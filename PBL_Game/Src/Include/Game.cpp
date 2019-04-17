@@ -346,9 +346,9 @@ void Game::DeserializeOrderPointers(std::map<unsigned, SceneNode*>& map)
 	for (std::pair<unsigned, SceneNode*> node : map)
 	{
 		if (node.second->parent > 0 && node.second->parent != node.second)
-			node.second->parent = map[(unsigned)std::abs((int)node.second->parent)];
+			node.second->parent = map[(unsigned)std::abs((intptr_t)node.second->parent)];
 		for (int i = 0; i < node.second->children.size(); i++)
-			node.second->children[i] = map[(unsigned)std::abs((int)node.second->children[i])];
+			node.second->children[i] = map[(unsigned)std::abs((intptr_t)node.second->children[i])];
 		this->sNodes.push_back(*(node.second));
 	}
 	map.clear();

@@ -305,14 +305,14 @@ IF ( ASSIMP_BUILD_SAMPLES)
   ADD_SUBDIRECTORY( samples/SimpleOpenGL/ )
 ENDIF ( ASSIMP_BUILD_SAMPLES )
 
-OPTION ( ASSIMP_BUILD_TESTS
-  "If the test suite for Assimp is built in addition to the library."
-  ON
-)
-
-IF ( ASSIMP_BUILD_TESTS )
-  ADD_SUBDIRECTORY( test/ )
-ENDIF ( ASSIMP_BUILD_TESTS )
+#OPTION ( ASSIMP_BUILD_TESTS
+#  "If the test suite for Assimp is built in addition to the library."
+#  ON
+#)
+#
+#IF ( ASSIMP_BUILD_TESTS )
+#  ADD_SUBDIRECTORY( test/ )
+#ENDIF ( ASSIMP_BUILD_TESTS )
 
 IF(MSVC)
   OPTION ( ASSIMP_INSTALL_PDB
