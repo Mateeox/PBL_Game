@@ -26,7 +26,7 @@ class Game{
     Shader *shaderProgram;
     Shader *shaderProgram_For_Model;     
     std::vector<SceneNode> sNodes;
-    
+
   bool mouseCallBack = true;
   bool firstMouse = true;
   double lastY;
@@ -50,7 +50,8 @@ class Game{
 
     void SetCamera(Camera camera,int camera_nr);
     void ProcessMouse();
-    void ProcessInput(float interpolation);
+    void ProcessInput(float interpolation,Camera & camera_update);
+    void SwtichCamera();
     
     void Granko();
     void Update(float interpolation);

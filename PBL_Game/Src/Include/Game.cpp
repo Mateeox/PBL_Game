@@ -4,6 +4,9 @@
 #include "Component/Model.hpp"
 #include "Shapes.hpp"
 
+static bool leftSideActive = true;
+static bool swapButtonPressed = false;
+
 Game::Game(Window &aOkno) : okienko(aOkno), camera(Camera()), camera2(Camera())
 {
   shaderProgram = new Shader("Shaders/vertex4.txt", "Shaders/fragment3.txt");
@@ -131,7 +134,18 @@ void Game::Granko()
 
 void Game::Update(float interpolation)
 {
-  ProcessInput(interpolation);
+  if (leftSideActive)
+  {
+    ProcessInput(interpolation, camera);
+  }
+  else
+  {
+    ProcessInput(interpolation, camera2);
+  }
+}
+
+void Game::SwtichCamera()
+{
 }
 
 void Game::Render()
@@ -139,6 +153,7 @@ void Game::Render()
 
   projection = glm::perspective(camera.Zoom, (float)Game::WINDOW_WIDTH / (float)Game::WINDOW_HEIGHT, 0.1f, 100.0f);
   view = camera.GetViewMatrix();
+
   shaderProgram->use();
   shaderProgram->setMat4("projection", projection);
   shaderProgram->setMat4("view", view);
@@ -167,22 +182,8 @@ void Game::Render()
 
   Transform originTransform = Transform::origin();
 
-  static bool leftSideActive = true;
-  static bool swapButtonPressed = false;
-
-  if (glfwGetKey(okienko.window, 81) == GLFW_PRESS && swapButtonPressed == false)
-  {
-    offset *= -1;
-    leftSideActive = !leftSideActive;
-    swapButtonPressed = true;
-  }
-  if (swapButtonPressed && glfwGetKey(okienko.window, 81) != GLFW_PRESS)
-  {
-    swapButtonPressed = false;
-  }
-
   // RENDER LEWEJ STRONY
-  glViewport(0, 0, (Game::WINDOW_WIDTH / 2) , Game::WINDOW_HEIGHT);
+  glViewport(0, 0, (Game::WINDOW_WIDTH / 2), Game::WINDOW_HEIGHT);
   glScissor(0, 0, (Game::WINDOW_WIDTH / 2) + offset, Game::WINDOW_HEIGHT);
   glClearColor(1, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT);
@@ -191,8 +192,19 @@ void Game::Render()
     node.Render(originTransform, true);
   }
 
+  projection = glm::perspective(camera2.Zoom, (float)Game::WINDOW_WIDTH / (float)Game::WINDOW_HEIGHT, 0.1f, 100.0f);
+  view = camera2.GetViewMatrix();
+
+  shaderProgram->use();
+  shaderProgram->setMat4("projection", projection);
+  shaderProgram->setMat4("view", view);
+
+  shaderProgram_For_Model->use();
+  shaderProgram_For_Model->setMat4("projection", projection);
+  shaderProgram_For_Model->setMat4("view", view);
+
   // RENDER PRAWEJ STRONY
-  glViewport((Game::WINDOW_WIDTH / 2), 0, (Game::WINDOW_WIDTH / 2) , Game::WINDOW_HEIGHT);
+  glViewport((Game::WINDOW_WIDTH / 2), 0, (Game::WINDOW_WIDTH / 2), Game::WINDOW_HEIGHT);
   glScissor((Game::WINDOW_WIDTH / 2) + offset, 0, (Game::WINDOW_WIDTH / 2) - offset, Game::WINDOW_HEIGHT);
   glClearColor(0, 0, 1, 1);
   glClear(GL_COLOR_BUFFER_BIT);
@@ -200,11 +212,11 @@ void Game::Render()
   sNodes[1].Render(originTransform, true);
 
   // RENDER PASKA ODDZIELAJACAEGO KAMERY - TODO
-  // glViewport((Game::WINDOW_WIDTH / 2) + offset - 5, 0, 10, Game::WINDOW_HEIGHT);
-  // glScissor((Game::WINDOW_WIDTH / 2) + offset - 5, 0, 10, Game::WINDOW_HEIGHT);
-  // glEnable(GL_SCISSOR_TEST);
-  // glClearColor(0, 0, 0, 1);
-  // glClear(GL_COLOR_BUFFER_BIT);
+  glViewport((Game::WINDOW_WIDTH / 2) + offset - 5, 0, 10, Game::WINDOW_HEIGHT);
+  glScissor((Game::WINDOW_WIDTH / 2) + offset - 5, 0, 10, Game::WINDOW_HEIGHT);
+  glEnable(GL_SCISSOR_TEST);
+  glClearColor(0, 0, 0, 1);
+  glClear(GL_COLOR_BUFFER_BIT);
 
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -357,19 +369,30 @@ void Game::SetCamera(Camera aCamera, int camera)
     this->camera2 = aCamera;
   }
 }
-void Game::ProcessInput(float interpolation)
+void Game::ProcessInput(float interpolation, Camera &camera_update)
 {
 
   ProcessMouse();
 
   if (glfwGetKey(okienko.window, GLFW_KEY_W) == GLFW_PRESS)
-    camera.ProcessKeyboard(Camera_Movement::FORWARD, interpolation);
+    camera_update.ProcessKeyboard(Camera_Movement::FORWARD, interpolation);
   if (glfwGetKey(okienko.window, GLFW_KEY_S) == GLFW_PRESS)
-    camera.ProcessKeyboard(Camera_Movement::BACKWARD, interpolation);
+    camera_update.ProcessKeyboard(Camera_Movement::BACKWARD, interpolation);
   if (glfwGetKey(okienko.window, GLFW_KEY_A) == GLFW_PRESS)
-    camera.ProcessKeyboard(Camera_Movement::LEFT, interpolation);
+    camera_update.ProcessKeyboard(Camera_Movement::LEFT, interpolation);
   if (glfwGetKey(okienko.window, GLFW_KEY_D) == GLFW_PRESS)
-    camera.ProcessKeyboard(Camera_Movement::RIGHT, interpolation);
+    camera_update.ProcessKeyboard(Camera_Movement::RIGHT, interpolation);
+
+  if (glfwGetKey(okienko.window, 81) == GLFW_PRESS && swapButtonPressed == false)
+  {
+    offset *= -1;
+    leftSideActive = !leftSideActive;
+    swapButtonPressed = true;
+  }
+  if (swapButtonPressed && glfwGetKey(okienko.window, 81) != GLFW_PRESS)
+  {
+    swapButtonPressed = false;
+  }
 
   if (!Tab_Pressed)
   {
