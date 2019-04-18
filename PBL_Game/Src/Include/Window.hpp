@@ -17,31 +17,17 @@ using namespace glm;
 
 #include "Camera.hpp"
 
-
-namespace PBLGame{
-
-static bool mouseToUpdate = false;
-static double posx;
-static double posy;
+namespace PBLGame
+{
 
 class Window
 {
-
-  bool mouseCallBack = true;
-  bool firstMouse = true;
-  double lastY;
-  double lastX;
+public:
   uint16_t iWidth;
   uint16_t iHeight;
 
-public:
-  void SetCamera(Camera camera);
-  void ProcessMouse();
-  void ProcessInput(float interpolation);
-
-  Camera camera;
   GLFWwindow *window;
   int Initialise();
   Window(uint16_t Width, uint16_t height, const char *title);
 };
-}
+} // namespace PBLGame

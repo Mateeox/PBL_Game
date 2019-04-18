@@ -10,16 +10,34 @@ const int MAX_FRAMESKIP = 5;
 
 using namespace PBLGame;
 
+static bool mouseToUpdate = false;
+static double posx;
+static double posy;
+
+static bool First_tab_push = false;
+static bool Tab_Pressed = false;
+
+void mouse_callback(GLFWwindow *window, double xpos, double ypos);
+
+
 class Game{
 
     Window& okienko;
     Shader *shaderProgram;
     Shader *shaderProgram_For_Model;     
     std::vector<SceneNode> sNodes;
+    
+  bool mouseCallBack = true;
+  bool firstMouse = true;
+  double lastY;
+  double lastX;
 
     //camera
     glm::mat4 view;
     glm::mat4 projection;
+
+    Camera camera;
+    Camera camera2;
 
     //Imgui
     bool show_demo_window = true;
@@ -29,6 +47,10 @@ class Game{
 	static const int WINDOW_WIDTH = 1280, WINDOW_HEIGHT = 720;
     Game(Window& okienko);
 
+
+    void SetCamera(Camera camera,int camera_nr);
+    void ProcessMouse();
+    void ProcessInput(float interpolation);
     
     void Granko();
     void Update(float interpolation);
