@@ -383,13 +383,13 @@ void Game::ProcessInput(float interpolation, Camera &camera_update)
   if (glfwGetKey(okienko.window, GLFW_KEY_D) == GLFW_PRESS)
     camera_update.ProcessKeyboard(Camera_Movement::RIGHT, interpolation);
 
-  if (glfwGetKey(okienko.window, 81) == GLFW_PRESS && swapButtonPressed == false)
+  if (glfwGetKey(okienko.window, GLFW_KEY_Q) == GLFW_PRESS && swapButtonPressed == false)
   {
     offset *= -1;
     leftSideActive = !leftSideActive;
     swapButtonPressed = true;
   }
-  if (swapButtonPressed && glfwGetKey(okienko.window, 81) != GLFW_PRESS)
+  if (swapButtonPressed && glfwGetKey(okienko.window, GLFW_KEY_Q) != GLFW_PRESS)
   {
     swapButtonPressed = false;
   }
