@@ -7,6 +7,20 @@
 static bool leftSideActive = true;
 static bool swapButtonPressed = false;
 
+void Game::SetViewAndPerspective(Camera & aCamera)
+{
+  projection = glm::perspective(aCamera.Zoom, (float)Game::WINDOW_WIDTH / (float)Game::WINDOW_HEIGHT, 0.1f, 100.0f);
+  view = aCamera.GetViewMatrix();
+
+  shaderProgram->use();
+  shaderProgram->setMat4("projection", projection);
+  shaderProgram->setMat4("view", view);
+
+  shaderProgram_For_Model->use();
+  shaderProgram_For_Model->setMat4("projection", projection);
+  shaderProgram_For_Model->setMat4("view", view);
+}
+
 Game::Game(Window &aOkno) : okienko(aOkno), camera(Camera()), camera2(Camera())
 {
   shaderProgram = new Shader("Shaders/vertex4.txt", "Shaders/fragment3.txt");
@@ -144,23 +158,12 @@ void Game::Update(float interpolation)
   }
 }
 
-void Game::SwtichCamera()
-{
-}
+
 
 void Game::Render()
 {
 
-  projection = glm::perspective(camera.Zoom, (float)Game::WINDOW_WIDTH / (float)Game::WINDOW_HEIGHT, 0.1f, 100.0f);
-  view = camera.GetViewMatrix();
 
-  shaderProgram->use();
-  shaderProgram->setMat4("projection", projection);
-  shaderProgram->setMat4("view", view);
-
-  shaderProgram_For_Model->use();
-  shaderProgram_For_Model->setMat4("projection", projection);
-  shaderProgram_For_Model->setMat4("view", view);
 
   glfwPollEvents();
   glScissor(0, 0, Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT);
@@ -182,6 +185,8 @@ void Game::Render()
 
   Transform originTransform = Transform::origin();
 
+
+  SetViewAndPerspective(camera);
   // RENDER LEWEJ STRONY
   glViewport(0, 0, (Game::WINDOW_WIDTH / 2), Game::WINDOW_HEIGHT);
   glScissor(0, 0, (Game::WINDOW_WIDTH / 2) + offset, Game::WINDOW_HEIGHT);
@@ -192,16 +197,7 @@ void Game::Render()
     node.Render(originTransform, true);
   }
 
-  projection = glm::perspective(camera2.Zoom, (float)Game::WINDOW_WIDTH / (float)Game::WINDOW_HEIGHT, 0.1f, 100.0f);
-  view = camera2.GetViewMatrix();
-
-  shaderProgram->use();
-  shaderProgram->setMat4("projection", projection);
-  shaderProgram->setMat4("view", view);
-
-  shaderProgram_For_Model->use();
-  shaderProgram_For_Model->setMat4("projection", projection);
-  shaderProgram_For_Model->setMat4("view", view);
+  SetViewAndPerspective(camera2);
 
   // RENDER PRAWEJ STRONY
   glViewport((Game::WINDOW_WIDTH / 2), 0, (Game::WINDOW_WIDTH / 2), Game::WINDOW_HEIGHT);
