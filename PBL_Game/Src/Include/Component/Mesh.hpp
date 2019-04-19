@@ -31,7 +31,7 @@ class Mesh : public Drawable
     vector<Vertex> Vertices;
     vector<unsigned int> Indices;
     vector<Texture> Textures;
-
+    
     Mesh(vector<Vertex> aVertices,
          vector<unsigned int> aIndices,
          vector<Texture> aTextures,

@@ -49,6 +49,7 @@ add_executable(PBL_Game
 	#Component
 	Src/Include/Component/ShapeRenderer3D.cpp
 	Src/Include/Component/Mesh.cpp
+	Src/Include/Component/AnimatedMesh.cpp
 	Src/Include/Component/Model.cpp
 	#Stb_image
 	Src/Include/stb_image.cpp
