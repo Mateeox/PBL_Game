@@ -39,8 +39,6 @@ class AnimatedMesh : public Mesh
     unsigned int VBO_bones;
 
     void SetupMesh();
-    void Draw(glm::mat4 &transform);
-
     private:
     void addBoneData(unsigned int bone_id, float weight);
 };
