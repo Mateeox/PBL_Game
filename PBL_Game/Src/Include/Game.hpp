@@ -4,7 +4,7 @@
 #include "SceneNode.hpp"
 #include <map>
 
-const int TICKS_PER_SECOND = 128;
+const int TICKS_PER_SECOND = 32;
 const int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
 const int MAX_FRAMESKIP = 5;
 
@@ -41,7 +41,7 @@ class Game
 
     //Imgui
     bool show_demo_window = true;
-    int offset = 250; // Jak bardzo maja sie roznic rozmiary kamery, szerokosc aktywnej to pol okna + offset, szerokosc nieaktywnej to pol okna - offset
+    int offset = 125; // Jak bardzo maja sie roznic rozmiary kamery, szerokosc aktywnej to pol okna + offset, szerokosc nieaktywnej to pol okna - offset
 
   public:
     static const int WINDOW_WIDTH = 1280, WINDOW_HEIGHT = 720;

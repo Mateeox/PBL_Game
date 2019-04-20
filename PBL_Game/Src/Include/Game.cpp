@@ -188,7 +188,7 @@ void Game::Render()
 
   SetViewAndPerspective(camera);
   // RENDER LEWEJ STRONY
-  glViewport(0, 0, (Game::WINDOW_WIDTH / 2), Game::WINDOW_HEIGHT);
+  glViewport(0, 0, (Game::WINDOW_WIDTH / 2) +125, Game::WINDOW_HEIGHT);
   glScissor(0, 0, (Game::WINDOW_WIDTH / 2) + offset, Game::WINDOW_HEIGHT);
   glClearColor(1, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT);
@@ -200,7 +200,7 @@ void Game::Render()
   SetViewAndPerspective(camera2);
 
   // RENDER PRAWEJ STRONY
-  glViewport((Game::WINDOW_WIDTH / 2), 0, (Game::WINDOW_WIDTH / 2), Game::WINDOW_HEIGHT);
+  glViewport((Game::WINDOW_WIDTH / 2) -125 , 0, (Game::WINDOW_WIDTH / 2) +125, Game::WINDOW_HEIGHT);
   glScissor((Game::WINDOW_WIDTH / 2) + offset, 0, (Game::WINDOW_WIDTH / 2) - offset, Game::WINDOW_HEIGHT);
   glClearColor(0, 0, 1, 1);
   glClear(GL_COLOR_BUFFER_BIT);
