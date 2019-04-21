@@ -2,6 +2,7 @@
 #include "Game.hpp"
 #include "Component/ShapeRenderer3D.hpp"
 #include "Component/Model.hpp"
+#include "Component/AnimatedModel.hpp"
 #include "Shapes.hpp"
 
 static bool leftSideActive = true;
@@ -19,12 +20,18 @@ void Game::SetViewAndPerspective(Camera & aCamera)
   shaderProgram_For_Model->use();
   shaderProgram_For_Model->setMat4("projection", projection);
   shaderProgram_For_Model->setMat4("view", view);
+
+
+  shaderProgramAnimated->use();
+  shaderProgramAnimated->setMat4("projection", projection);
+  shaderProgramAnimated->setMat4("view", view);
 }
 
 Game::Game(Window &aOkno) : okienko(aOkno), camera(Camera()), camera2(Camera())
 {
   shaderProgram = new Shader("Shaders/vertex4.txt", "Shaders/fragment3.txt");
   shaderProgram_For_Model = new Shader("Shaders/vertexModel.txt", "Shaders/fragmentModel.txt");
+   shaderProgramAnimated = new Shader("Shaders/Animated.vs", "Shaders/Animated.fs");
 
   glfwSetCursorPosCallback(okienko.window, mouse_callback);
 }
@@ -39,14 +46,19 @@ void Game::Granko()
   SceneNode scena3_new;
 
   SceneNode beeNode;
+   SceneNode EnemyNode;
 
+GameObject *EnemyObj = new GameObject(EnemyNode.world);
   GameObject *beeObj = new GameObject(beeNode.world);
   GameObject *trojObj = new GameObject(scena1_new.world);
   GameObject *FloorObj = new GameObject(FloorNode_new.world);
   GameObject *hexObj = new GameObject(scena3_new.world);
 
   std::string BeeModelPath = "Models/enemy_model.obj";
+   std::string FbxModelPath = "Models/enemy_animated.FBX";
+
   Model *BeeModel = new Model(BeeModelPath, *shaderProgram_For_Model, false);
+    Model *enemyModel = new Model(FbxModelPath, *shaderProgramAnimated, false);
 
   printf("Model Loaded !! \n");
 
@@ -72,11 +84,13 @@ void Game::Granko()
                                                   xD);
 
   beeObj->AddComponent(BeeModel);
+  EnemyObj->AddComponent(enemyModel);
 
   trojObj->AddComponent(trojkat);
   FloorObj->AddComponent(Floor);
   hexObj->AddComponent(szescian);
 
+  EnemyNode.AddGameObject(EnemyObj);
   beeNode.AddGameObject(beeObj);
   scena1_new.AddGameObject(trojObj);
   FloorNode_new.AddGameObject(FloorObj);
@@ -93,12 +107,15 @@ void Game::Granko()
     printf("beeNode gameobject nullptr ;/ \n");
   }
 
+  EnemyNode.Translate(1.0,0.0,0.0);
+   EnemyNode.Scale(0.01,0.01,0.01);
   beeNode.Scale(0.01, 0.01, 0.01);
   scena3_new.Scale(0.3f, 0.2f, 1.0f);
   FloorNode_new.Translate(0.0f, -1.0f, 0.1f);
   FloorNode_new.Rotate(90.0f, glm::vec3(1, 0, 0));
   FloorNode_new.Scale(100, 100, 100);
 
+  sNodes.push_back(EnemyNode);
   sNodes.push_back(beeNode);
   sNodes.push_back(scena1_new);
   sNodes.push_back(FloorNode_new);

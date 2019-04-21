@@ -64,5 +64,9 @@ void VertexBoneData::addBoneData(unsigned int bone_id, float weight)
 	}
 }
 
+ComponentSystem::ComponentType AnimatedMesh::GetComponentType()
+{
+	return ComponentSystem::AnimatedMesh;
+}
 
 }

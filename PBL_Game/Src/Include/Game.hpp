@@ -25,6 +25,7 @@ class Game
     Window &okienko;
     Shader *shaderProgram;
     Shader *shaderProgram_For_Model;
+    Shader *shaderProgramAnimated;
     std::vector<SceneNode> sNodes;
 
     bool mouseCallBack = true;

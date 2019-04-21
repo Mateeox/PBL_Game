@@ -39,6 +39,7 @@ class AnimatedMesh : public Mesh
     unsigned int VBO_bones;
 
     void SetupMesh();
+    ComponentSystem::ComponentType GetComponentType() override;
     private:
     void addBoneData(unsigned int bone_id, float weight);
 };
