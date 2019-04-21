@@ -1,5 +1,5 @@
 #include "Mesh.hpp"
-#include <assimp\Importer.hpp>
+#include <assimp/Importer.hpp>
 #define NUM_BONES_PER_VEREX 4
 
 
