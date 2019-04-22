@@ -13,6 +13,9 @@ using namespace PBLGame;
 static bool mouseToUpdate = false;
 static double posx;
 static double posy;
+static bool leftSideActive = true;
+
+
 
 static bool First_tab_push = false;
 static bool Tab_Pressed = false;
@@ -26,6 +29,7 @@ class Game
     Shader *shaderProgram;
     Shader *shaderProgram_For_Model;
     std::vector<SceneNode> sNodes;
+
 
     bool mouseCallBack = true;
     bool firstMouse = true;
@@ -45,7 +49,8 @@ class Game
 
   public:
     static const int WINDOW_WIDTH = 1280, WINDOW_HEIGHT = 720;
-    Game(Window &okienko);
+
+	Game(Window &okienko);
 
     void SetCamera(Camera camera, int camera_nr);
     void ProcessMouse();

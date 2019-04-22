@@ -4,7 +4,6 @@
 #include "Component/Model.hpp"
 #include "Shapes.hpp"
 
-static bool leftSideActive = true;
 static bool swapButtonPressed = false;
 
 void Game::SetViewAndPerspective(Camera & aCamera)
@@ -23,6 +22,8 @@ void Game::SetViewAndPerspective(Camera & aCamera)
 
 Game::Game(Window &aOkno) : okienko(aOkno), camera(Camera()), camera2(Camera())
 {
+	leftSideActive = true;
+
   shaderProgram = new Shader("Shaders/vertex4.txt", "Shaders/fragment3.txt");
   shaderProgram_For_Model = new Shader("Shaders/vertexModel.txt", "Shaders/fragmentModel.txt");
 
@@ -35,6 +36,7 @@ void Game::Granko()
   Texture *xD = new Texture("Textures/red.png", GL_LINEAR);
 
   SceneNode scena1_new;
+  SceneNode playerNodeLeft, playerNodeRight;
   SceneNode FloorNode_new;
   SceneNode scena3_new;
 
@@ -44,6 +46,10 @@ void Game::Granko()
   GameObject *trojObj = new GameObject(scena1_new.world);
   GameObject *FloorObj = new GameObject(FloorNode_new.world);
   GameObject *hexObj = new GameObject(scena3_new.world);
+
+  // Obiekty reprezentujace gracza
+  GameObject *leftPlayerObj = new GameObject(playerNodeLeft.world);
+  GameObject *rightPlayerObj = new GameObject(playerNodeRight.world);
 
   std::string BeeModelPath = "Models/enemy_model.obj";
   Model *BeeModel = new Model(BeeModelPath, *shaderProgram_For_Model, false);
@@ -64,6 +70,20 @@ void Game::Granko()
                                                  *shaderProgram,
                                                  xD);
 
+  ShapeRenderer3D *leftPlayer = new ShapeRenderer3D(Shapes::RainBow_Triangle,
+	  Shapes::RB_Triangle_indices,
+	  sizeof(Shapes::RainBow_Triangle),
+	  sizeof(Shapes::RB_Triangle_indices),
+	  *shaderProgram,
+	  xD);
+
+  ShapeRenderer3D *rightPlayer = new ShapeRenderer3D(Shapes::RainBow_Triangle,
+	  Shapes::RB_Triangle_indices,
+	  sizeof(Shapes::RainBow_Triangle),
+	  sizeof(Shapes::RB_Triangle_indices),
+	  *shaderProgram,
+	  xD);
+
   ShapeRenderer3D *szescian = new ShapeRenderer3D(Shapes::RainBow_Cube,
                                                   Shapes::RB_Cube_indices,
                                                   sizeof(Shapes::RainBow_Cube),
@@ -73,12 +93,19 @@ void Game::Granko()
 
   beeObj->AddComponent(BeeModel);
 
+  leftPlayerObj->AddComponent(leftPlayer);
+  rightPlayerObj->AddComponent(rightPlayer);
+
   trojObj->AddComponent(trojkat);
   FloorObj->AddComponent(Floor);
   hexObj->AddComponent(szescian);
 
   beeNode.AddGameObject(beeObj);
   scena1_new.AddGameObject(trojObj);
+
+  scena1_new.AddGameObject(leftPlayerObj);
+  scena1_new.AddGameObject(rightPlayerObj);
+
   FloorNode_new.AddGameObject(FloorObj);
   scena3_new.AddGameObject(hexObj);
 
@@ -110,6 +137,9 @@ void Game::Granko()
   int loops;
   float interpolation = 1.0;
 
+
+  // Przygotowanie skryptu do poruszania sie
+
   while (glfwGetKey(okienko.window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
          glfwWindowShouldClose(okienko.window) == 0)
   {
@@ -138,6 +168,9 @@ void Game::Granko()
   delete trojkat;
   delete Floor;
   delete szescian;
+
+  delete leftPlayerObj;
+  delete rightPlayerObj;
 
   ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplGlfw_Shutdown();
@@ -192,6 +225,7 @@ void Game::Render()
   glScissor(0, 0, (Game::WINDOW_WIDTH / 2) + offset, Game::WINDOW_HEIGHT);
   glClearColor(1, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT);
+  
   for (auto node : sNodes)
   {
     node.Render(originTransform, true);
@@ -204,6 +238,8 @@ void Game::Render()
   glScissor((Game::WINDOW_WIDTH / 2) + offset, 0, (Game::WINDOW_WIDTH / 2) - offset, Game::WINDOW_HEIGHT);
   glClearColor(0, 0, 1, 1);
   glClear(GL_COLOR_BUFFER_BIT);
+  
+  
   sNodes[2].Render(originTransform, true);
   sNodes[1].Render(originTransform, true);
 
