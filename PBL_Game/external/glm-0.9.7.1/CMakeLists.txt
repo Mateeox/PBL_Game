@@ -12,11 +12,6 @@ enable_testing()
 
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
-option(GLM_TEST_ENABLE "GLM test" OFF)
-if(NOT GLM_TEST_ENABLE)
-	message(STATUS "GLM is a header only library, no need to build it. Set the option GLM_TEST_ENABLE with ON to build and run the test bench")
-endif()
-
 if(("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU") OR (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel") AND UNIX))
 	option(GLM_TEST_ENABLE_CXX_98 "Enable C++ 98" OFF)
 	option(GLM_TEST_ENABLE_CXX_0X "Enable C++ 0x" OFF)
@@ -140,10 +135,8 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 endif()
 
 include_directories("${PROJECT_SOURCE_DIR}")
-include_directories("${PROJECT_SOURCE_DIR}/test/external")
 
 add_subdirectory(glm)
-add_subdirectory(test)
 
 set(GLM_INSTALL_CONFIGDIR "${CMAKE_INSTALL_LIBDIR}/cmake/glm")
 install(DIRECTORY glm DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
