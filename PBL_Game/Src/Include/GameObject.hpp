@@ -1,9 +1,9 @@
 #pragma once
 #include "Transform.hpp"
-#include "Drawable.hpp"
+#include "Component/Drawable.hpp"
 #include <vector>
 
-#include "Component.hpp"
+#include "Component/Component.hpp"
 
 class GameObject
 {
@@ -16,6 +16,7 @@ class GameObject
     ComponentSystem::Component *GetComponent(ComponentSystem::ComponentType type);
     void AddComponent(ComponentSystem::Component *);
     void RemoveComponent(ComponentSystem::ComponentType type);
+	std::string Serialize();
 
 	void setTag(std::string tag);
 	std::string getTag();

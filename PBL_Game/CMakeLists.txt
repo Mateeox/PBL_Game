@@ -4,7 +4,7 @@ project (Tutorials)
 
 find_package(OpenGL REQUIRED)
  
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
  
 # Compile external dependencies 
 add_subdirectory (external)
@@ -16,17 +16,16 @@ include_directories(
 	external/glfw-3.2.1/include/
 	external/glm-0.9.7.1/
 	external/glew-1.13.0/include/
-	external/assimp-3.0.1270/include/
+	external/assimp-4.1.0/include/
+	Build/external/assimp-4.1.0/include/
 	.
 )
-
-
-
 
 set(ALL_LIBS
 	${OPENGL_LIBRARY}
 	glfw
 	GLEW_1130
+	assimp
 )
 
 add_definitions(
@@ -47,8 +46,11 @@ add_executable(PBL_Game
 	Src/Include/Camera.cpp
 	Src/Include/Shader.cpp
 	Src/Include/Texture.cpp
-	Src/Include/ShapeRenderer3D.cpp
 	Src/Include/SceneNode.cpp
+	#Component
+	Src/Include/Component/ShapeRenderer3D.cpp
+	Src/Include/Component/Mesh.cpp
+	Src/Include/Component/Model.cpp
 	#Stb_image
 	Src/Include/stb_image.cpp
 	#ImGui

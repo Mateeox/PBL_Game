@@ -1,5 +1,6 @@
 #include "SceneNode.hpp"
-#include "ShapeRenderer3D.hpp"
+#include "Component/ShapeRenderer3D.hpp"
+#include "Component/Model.hpp"
 
 SceneNode::SceneNode() : local(Transform::origin()), dirty_flag(true), gameObject(nullptr)
 {
@@ -13,6 +14,10 @@ void SceneNode::AddGameObject(GameObject *aGameObject)
 {
   aGameObject->transform = world;
   gameObject = aGameObject;
+}
+void SceneNode::AddParent(SceneNode * aSceneNode)
+{
+	parent = aSceneNode;
 }
 void SceneNode::AddChild(SceneNode *aSceneNode)
 {
@@ -31,11 +36,19 @@ void SceneNode::Render(Transform &parentWorld, bool aDirty_Flag)
   }
   if (gameObject != nullptr)
   {
+
     ShapeRenderer3D *shape = (ShapeRenderer3D *)gameObject->GetComponent(ComponentSystem::ShapeRenderer3D);
     if (shape != nullptr)
     {
       shape->Draw(world.GetTransform());
     }
+
+    Model *model = (Model *)gameObject->GetComponent(ComponentSystem::Model);
+    if (model != nullptr)
+    {
+      model->Draw(world.GetTransform());
+    }
+
   }
   for (SceneNode *sn : children)
   {
@@ -58,4 +71,17 @@ void SceneNode::Rotate(float value, glm::vec3 axis)
 {
   local.Rotate(value, axis);
   dirty_flag = true;
+}
+
+std::string SceneNode::Serialize()
+{
+	std::string str = "SN\n\t";
+	str += "W;" + this->world.Serialize() + "\n\t";
+	str += "L;" + this->local.Serialize() + "\n\t";
+	if (this->parent)
+		str += "P;" + std::to_string((intptr_t)this->parent) + "\n\t";
+	for (SceneNode* child : this->children)
+		str += "CH;" + std::to_string((intptr_t)child) + "\n\t";
+	str += "O\n\t\t" + this->gameObject->Serialize() + "\n";
+	return str;
 }

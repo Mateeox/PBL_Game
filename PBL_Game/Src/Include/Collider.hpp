@@ -1,5 +1,5 @@
 #pragma once
-#include "Component.hpp"
+#include "Component/Component.hpp"
 #include "Transform.hpp"
 
 //using namespace ComponentSystem;

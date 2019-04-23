@@ -1,6 +1,6 @@
 #include "GameObject.hpp"
-#include "Drawable.hpp"
-#include "ShapeRenderer3D.hpp"
+#include "Component/Drawable.hpp"
+#include "Component/ShapeRenderer3D.hpp"
 #include <algorithm>
 
 GameObject::GameObject(Transform &trans) : transform(trans) {}
@@ -35,6 +35,17 @@ ComponentSystem::Component *GameObject::GetComponent(ComponentSystem::ComponentT
     return nullptr;
 }
 
+std::string GameObject::Serialize()
+{
+	std::string str = "";
+	//str += "\tD;" + drawable->Serialize() + "\n\t\t";
+	str += "T;" + transform.Serialize();
+	for (ComponentSystem::Component* component : components)
+	{
+		str += "\n\t\tCO;" + component->Serialize();
+	}
+	return str;
+}
 void GameObject::setTag(std::string tag)
 {
 	this->tag = tag;

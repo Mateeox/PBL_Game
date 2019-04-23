@@ -2,7 +2,7 @@
 
 using namespace ComponentSystem;
 
-Collider::Collider(Transform & transform) : transform(transform)
+Collider::Collider(Transform & transform) : transform(transform), Component(nullptr)
 {
 }
 
