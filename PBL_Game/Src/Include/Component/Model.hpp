@@ -31,14 +31,15 @@ class Model : public ComponentSystem::Component
     std::vector<ModelMesh::Mesh> meshes;
     std::map<std::string,unsigned> m_BoneMapping;
     std::vector<ModelMesh::BoneInfo> m_BoneInfo;
-    
+    std::vector<ModelMesh::MeshEntry> m_Entries;
+
     unsigned m_NumBones;
     std::string directory;
     bool gammaCorrection;
 
     void loadModel(std::string & path);
     void processNode(aiNode *node, const aiScene *scene);
-    ModelMesh::Mesh processMesh(aiMesh *mesh, const aiScene *scene);
+    ModelMesh::Mesh processMesh(unsigned aMeshID,aiMesh *mesh, const aiScene *scene);
     std::vector<ModelMesh::Texture> loadMaterialTextures(const aiScene *scene,aiMaterial *mat, aiTextureType type,
                                          std::string typeName);
 

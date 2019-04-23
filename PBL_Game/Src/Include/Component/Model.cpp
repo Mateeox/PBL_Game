@@ -32,7 +32,7 @@ void Model::processNode(aiNode *node, const aiScene *scene)
         // the scene contains all the data, node is just to keep stuff organized (like relations between nodes).
 
         aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-        meshes.push_back(processMesh(mesh, scene));
+        meshes.push_back(processMesh(i,mesh, scene));
     }
     // after we've processed all of the meshes (if any) we then recursively process each of the children nodes
     for (unsigned int i = 0; i < node->mNumChildren; i++)
@@ -74,7 +74,7 @@ void Model::Draw(glm::mat4 &transform)
         meshes[i].Draw(transform);
 }
 
-ModelMesh::Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
+ModelMesh::Mesh Model::processMesh(unsigned aMeshID,aiMesh *mesh, const aiScene *scene)
 {
     // data to fill
     std::vector<ModelMesh::Vertex> vertices;
@@ -156,6 +156,12 @@ ModelMesh::Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
         else
         {
             BoneIndex = m_BoneMapping[BoneName];
+        }
+
+           for (unsigned j = 0 ; j < mesh->mBones[i]->mNumWeights ; j++) {
+            unsigned VertexID = m_Entries[aMeshID].BaseVertex + mesh->mBones[i]->mWeights[j].mVertexId;
+            float Weight  = mesh->mBones[i]->mWeights[j].mWeight;                   
+            Bones[VertexID].AddBoneData(BoneIndex, Weight);
         }
 
 

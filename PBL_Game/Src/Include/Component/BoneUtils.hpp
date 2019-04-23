@@ -3,6 +3,13 @@
 #ifndef M_PI
 #define M_PI 3.14159265358979323846264338327
 #endif
+#include <assimp/vector3.h>
+#include <assimp/matrix3x3.h>
+#include <assimp/matrix4x4.h>
+#include <cstdio>
+#include <cstring>
+
+#define ZERO_MEM(a) memset(a, 0, sizeof(a))
 
 #define ToRadian(x) (float)(((x) * M_PI / 180.0f))
 #define ToDegree(x) (float)(((x) * 180.0f / M_PI))
@@ -300,3 +307,7 @@ public:
     void InitPersProjTransform(const PersProjInfo& p);
     void InitOrthoProjTransform(const OrthoProjInfo& p);
 };
+
+Quaternion operator*(const Quaternion& l, const Quaternion& r);
+
+Quaternion operator*(const Quaternion& q, const Vector3f& v);

@@ -278,3 +278,4 @@ Vector3f Quaternion::ToDegrees()
 
     return Vector3f(f);
 }
+
