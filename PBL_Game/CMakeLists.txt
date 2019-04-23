@@ -47,6 +47,7 @@ add_executable(PBL_Game
 	Src/Include/Shader.cpp
 	Src/Include/Texture.cpp
 	Src/Include/SceneNode.cpp
+	Src/Include/Collider.cpp
 	#Component
 	Src/Include/Component/ShapeRenderer3D.cpp
 	Src/Include/Component/Mesh.cpp
