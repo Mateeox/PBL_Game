@@ -8,12 +8,26 @@ namespace ModelMesh
 Mesh::Mesh(vector<Vertex> aVertices,
            vector<unsigned int> aIndices,
            vector<Texture> aTextures,
+           vector<VertexBoneData> aBones,
            Shader &aShaderProgram) : Drawable(aShaderProgram),
                                      Vertices(aVertices),
                                      Indices(aIndices),
                                      Textures(aTextures)
 {
     setupMesh();
+}
+
+void VertexBoneData::AddBoneData(unsigned BoneID, float Weight)
+{
+    for (unsigned i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(IDs) ; i++) {
+        if (Weights[i] == 0.0) {
+            IDs[i]     = BoneID;
+            Weights[i] = Weight;
+            return;
+        }        
+    }
+    // should never get here - more bones than we have space for
+    assert(0);
 }
 
 void Mesh::setupMesh()

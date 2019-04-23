@@ -51,7 +51,7 @@ void Model::loadModel(std::string &path)
     const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 
     // check for errors
-    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
+    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode || !scene->mAnimations) // if is Not Zero
     {
         std::cout << "ERROR::ASSIMP:: " << importer.GetErrorString() << "\n";
         return;
@@ -80,6 +80,7 @@ ModelMesh::Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
     std::vector<ModelMesh::Vertex> vertices;
     std::vector<unsigned int> indices;
     std::vector<ModelMesh::Texture> textures;
+    std::vector<ModelMesh::VertexBoneData> Bones;
 
     // Walk through each of the mesh's vertices
     for (unsigned int i = 0; i < mesh->mNumVertices; i++)
@@ -129,13 +130,38 @@ ModelMesh::Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
         vertices.push_back(vertex);
     }
     // now wak through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
-    for (unsigned int i = 0; i < mesh->mNumFaces; i++)
+    for (unsigned i = 0; i < mesh->mNumFaces; i++)
     {
         aiFace face = mesh->mFaces[i];
         // retrieve all indices of the face and store them in the indices vector
-        for (unsigned int j = 0; j < face.mNumIndices; j++)
+        for (unsigned j = 0; j < face.mNumIndices; j++)
             indices.push_back(face.mIndices[j]);
     }
+
+    for (unsigned i = 0; i < mesh->mNumBones; i++)
+    {
+        unsigned BoneIndex = 0;
+        std::string BoneName(mesh->mBones[i]->mName.data);
+
+        if (m_BoneMapping.find(BoneName) == m_BoneMapping.end())
+        {
+            // Allocate an index for a new bone
+            BoneIndex = m_NumBones;
+            m_NumBones++;
+            ModelMesh::BoneInfo bi;
+            m_BoneInfo.push_back(bi);
+            m_BoneInfo[BoneIndex].BoneOffset = mesh->mBones[i]->mOffsetMatrix;
+            m_BoneMapping[BoneName] = BoneIndex;
+        }
+        else
+        {
+            BoneIndex = m_BoneMapping[BoneName];
+        }
+
+
+
+    }
+
     // process materials
     aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
     // we assume a convention for sampler names in the shaders. Each diffuse texture should be named
@@ -146,23 +172,23 @@ ModelMesh::Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
     // normal: texture_normalN
 
     // 1. diffuse maps
-    std::vector<ModelMesh::Texture> diffuseMaps = loadMaterialTextures(scene,material, aiTextureType_DIFFUSE, "texture_diffuse");
+    std::vector<ModelMesh::Texture> diffuseMaps = loadMaterialTextures(scene, material, aiTextureType_DIFFUSE, "texture_diffuse");
     textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
     // 2. specular maps
-    std::vector<ModelMesh::Texture> specularMaps = loadMaterialTextures(scene,material, aiTextureType_SPECULAR, "texture_specular");
+    std::vector<ModelMesh::Texture> specularMaps = loadMaterialTextures(scene, material, aiTextureType_SPECULAR, "texture_specular");
     textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
     // 3. normal maps
-    std::vector<ModelMesh::Texture> normalMaps = loadMaterialTextures(scene,material, aiTextureType_HEIGHT, "texture_normal");
+    std::vector<ModelMesh::Texture> normalMaps = loadMaterialTextures(scene, material, aiTextureType_HEIGHT, "texture_normal");
     textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
     // 4. height maps
-    std::vector<ModelMesh::Texture> heightMaps = loadMaterialTextures(scene,material, aiTextureType_AMBIENT, "texture_height");
+    std::vector<ModelMesh::Texture> heightMaps = loadMaterialTextures(scene, material, aiTextureType_AMBIENT, "texture_height");
     textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
     // return a mesh object created from the extracted mesh data
-    return ModelMesh::Mesh(vertices, indices, textures, ShaderProgram);
+    return ModelMesh::Mesh(vertices, indices, textures, Bones, ShaderProgram);
 }
 
-std::vector<ModelMesh::Texture> Model::loadMaterialTextures(const aiScene *scene,aiMaterial *mat, aiTextureType type, std::string typeName)
+std::vector<ModelMesh::Texture> Model::loadMaterialTextures(const aiScene *scene, aiMaterial *mat, aiTextureType type, std::string typeName)
 {
     std::vector<ModelMesh::Texture> textures;
     for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
@@ -184,45 +210,42 @@ std::vector<ModelMesh::Texture> Model::loadMaterialTextures(const aiScene *scene
         if (!skip)
         { // if texture hasn't been loaded already, load it
 
+            if (str.C_Str()[0] == '*')
+            {
 
-  if(str.C_Str()[0] == '*')
-    {
-        
-printf("%i \n",(int)(str.C_Str()[1]- '0'));
-     auto data = scene->mTextures[(int)(str.C_Str()[1]- '0')];  
-     unsigned int textureID;
+                printf("%i \n", (int)(str.C_Str()[1] - '0'));
+                auto data = scene->mTextures[(int)(str.C_Str()[1] - '0')];
+                unsigned int textureID;
 
-     
-    glGenTextures(1, &textureID);
+                glGenTextures(1, &textureID);
 
-        printf(data->achFormatHint);
-        glBindTexture(GL_TEXTURE_2D, textureID);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, data->mWidth, data->mHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, data->pcData);
-        glGenerateMipmap(GL_TEXTURE_2D);
+                printf(data->achFormatHint);
+                glBindTexture(GL_TEXTURE_2D, textureID);
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, data->mWidth, data->mHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, data->pcData);
+                glGenerateMipmap(GL_TEXTURE_2D);
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-            ModelMesh::Texture texture;
-            texture.id = textureID;
-            texture.type = typeName;
-            texture.path = str.C_Str();
-            textures.push_back(texture);
-            textures_loaded.push_back(texture); // store it as texture loaded for entire model, to ensure we won't unnecesery load duplicate textures.
+                ModelMesh::Texture texture;
+                texture.id = textureID;
+                texture.type = typeName;
+                texture.path = str.C_Str();
+                textures.push_back(texture);
+                textures_loaded.push_back(texture); // store it as texture loaded for entire model, to ensure we won't unnecesery load duplicate textures.
+            }
+            else
+            {
 
-    }
-    else
-    {
-    
-            ModelMesh::Texture texture;
-            texture.id = TextureFromFile(str.C_Str(), this->directory);
-            texture.type = typeName;
-            texture.path = str.C_Str();
-            textures.push_back(texture);
-            textures_loaded.push_back(texture); // store it as texture loaded for entire model, to ensure we won't unnecesery load duplicate textures.
-    }
+                ModelMesh::Texture texture;
+                texture.id = TextureFromFile(str.C_Str(), this->directory);
+                texture.type = typeName;
+                texture.path = str.C_Str();
+                textures.push_back(texture);
+                textures_loaded.push_back(texture); // store it as texture loaded for entire model, to ensure we won't unnecesery load duplicate textures.
+            }
         }
     }
     return textures;

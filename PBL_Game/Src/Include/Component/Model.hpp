@@ -20,10 +20,19 @@ class Model : public ComponentSystem::Component
     void Draw(glm::mat4 &  transform);
     Shader & ShaderProgram;
 
+    unsigned NumBones() const
+    {
+        return m_NumBones;
+    }
+
   private:
 
     std::vector<ModelMesh::Texture> textures_loaded;
     std::vector<ModelMesh::Mesh> meshes;
+    std::map<std::string,unsigned> m_BoneMapping;
+    std::vector<ModelMesh::BoneInfo> m_BoneInfo;
+    
+    unsigned m_NumBones;
     std::string directory;
     bool gammaCorrection;
 

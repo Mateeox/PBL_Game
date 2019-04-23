@@ -3,6 +3,12 @@
 #include <string>
 #include <vector>
 #include "Drawable.hpp"
+#include <map>
+
+#define ZERO_MEM(a) memset(a, 0, sizeof(a))
+#define ARRAY_SIZE_IN_ELEMENTS(a) (sizeof(a)/sizeof(a[0]))
+
+#include "BoneUtils.hpp"
 
 namespace ModelMesh
 {
@@ -24,6 +30,40 @@ struct Texture
     string path;
 };
 
+
+
+  struct BoneInfo
+    {
+        Matrix4f BoneOffset;
+        Matrix4f  FinalTransformation;        
+
+        BoneInfo()
+        {
+            BoneOffset.SetZero();
+            FinalTransformation.SetZero();        
+        }
+    };
+
+  struct VertexBoneData
+    {        
+        unsigned IDs[4];
+        float Weights[4];
+
+        VertexBoneData()
+        {
+            Reset();
+        };
+        
+        void Reset()
+        {
+            ZERO_MEM(IDs);
+            ZERO_MEM(Weights);        
+        }
+        
+        void AddBoneData(unsigned BoneID, float Weight);
+    };
+
+
 class Mesh : public Drawable
 {
 
@@ -31,10 +71,13 @@ class Mesh : public Drawable
     vector<Vertex> Vertices;
     vector<unsigned int> Indices;
     vector<Texture> Textures;
+    vector<VertexBoneData> Bones;
+   
 
     Mesh(vector<Vertex> aVertices,
          vector<unsigned int> aIndices,
          vector<Texture> aTextures,
+         vector<VertexBoneData> aBones,
          Shader & aShaderProgram);
     void Draw(glm::mat4 &  transform) override;
 	std::string Serialize() {

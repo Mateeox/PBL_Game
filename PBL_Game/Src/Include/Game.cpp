@@ -45,7 +45,7 @@ void Game::Granko()
   GameObject *FloorObj = new GameObject(FloorNode_new.world);
   GameObject *hexObj = new GameObject(scena3_new.world);
 
-  std::string BeeModelPath = "Models/enemy_model.obj";
+  std::string BeeModelPath = "Models/enemy_anim_embeded.fbx";
   Model *BeeModel = new Model(BeeModelPath, *shaderProgram_For_Model, false);
 
   printf("Model Loaded !! \n");
