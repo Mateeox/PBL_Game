@@ -34,4 +34,6 @@ public:
   
   std::string Serialize();
   void Deserialize(std::string data);
+  glm::vec3 getPosition();
+  glm::vec3 getScale();
 };

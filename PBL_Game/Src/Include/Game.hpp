@@ -2,6 +2,7 @@
 #include "Window.hpp"
 #include "Shader.hpp"
 #include "SceneNode.hpp"
+#include "Collider.hpp"
 #include <map>
 
 const int TICKS_PER_SECOND = 32;
@@ -25,7 +26,8 @@ class Game
     Window &okienko;
     Shader *shaderProgram;
     Shader *shaderProgram_For_Model;
-    std::vector<SceneNode> sNodes;
+    std::vector<SceneNode*> sNodes;
+    std::vector<Collider*> collidableObjects;
 
     bool mouseCallBack = true;
     bool firstMouse = true;
@@ -56,6 +58,8 @@ class Game
     void Render();
     void Serialize();
     void Deserialize(std::string path);
+	void UpdatePlayer(SceneNode& player);
+	void gatherCollidableObjects(std::vector<SceneNode*>& nodes);
 
   private:
     void SerializeFaza1(std::map<SceneNode *, unsigned> &map);

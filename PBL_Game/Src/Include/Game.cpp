@@ -36,14 +36,18 @@ void Game::Granko()
 
   SceneNode scena1_new;
   SceneNode FloorNode_new;
-  SceneNode scena3_new;
+  SceneNode box1;
+  SceneNode box2;
+  SceneNode box3;
 
   SceneNode beeNode;
 
-  GameObject *beeObj = new GameObject(beeNode.world);
+  GameObject *beeObj = new GameObject(beeNode.local);
+  beeObj->setTag("player");
   GameObject *trojObj = new GameObject(scena1_new.world);
   GameObject *FloorObj = new GameObject(FloorNode_new.world);
-  GameObject *hexObj = new GameObject(scena3_new.world);
+  GameObject *hexObj2 = new GameObject(box2.local);
+  GameObject *hexObj3 = new GameObject(box3.local);
 
   std::string BeeModelPath = "Models/enemy_model.obj";
   Model *BeeModel = new Model(BeeModelPath, *shaderProgram_For_Model, false);
@@ -75,12 +79,25 @@ void Game::Granko()
 
   trojObj->AddComponent(trojkat);
   FloorObj->AddComponent(Floor);
-  hexObj->AddComponent(szescian);
+  hexObj2->AddComponent(szescian);
+  hexObj3->AddComponent(szescian);
 
+  Collider* beeCollider = new Collider(beeObj->transform);
+  beeCollider->setDimensions(-0.12, 0, 0.25, 2.3, 2, 3.05);
+  beeObj->AddComponent(beeCollider);
   beeNode.AddGameObject(beeObj);
+
+  Collider* box2Collider = new Collider(hexObj2->transform);
+  box2Collider->setDimensions(0, 0, 0, 2, 2, 2);
+  hexObj2->AddComponent(box2Collider);
+  Collider* box3Collider = new Collider(hexObj3->transform);
+  box3Collider->setDimensions(0, 0, 0, 2, 2, 2);
+  hexObj3->AddComponent(box3Collider);
+
   scena1_new.AddGameObject(trojObj);
   FloorNode_new.AddGameObject(FloorObj);
-  scena3_new.AddGameObject(hexObj);
+  box2.AddGameObject(hexObj2);
+  box3.AddGameObject(hexObj3);
 
   auto xd = beeObj->GetComponent(ComponentSystem::Model);
   if (xd != nullptr)
@@ -94,15 +111,21 @@ void Game::Granko()
   }
 
   beeNode.Scale(0.01, 0.01, 0.01);
-  scena3_new.Scale(0.3f, 0.2f, 1.0f);
+
+  box1.Scale(0.1f, 0.6f, 1.0f);
+  box2.Translate(5, 0, 0);
+  box3.Translate(-5, 0, 0);
   FloorNode_new.Translate(0.0f, -1.0f, 0.1f);
   FloorNode_new.Rotate(90.0f, glm::vec3(1, 0, 0));
   FloorNode_new.Scale(100, 100, 100);
 
-  sNodes.push_back(beeNode);
-  sNodes.push_back(scena1_new);
-  sNodes.push_back(FloorNode_new);
-  sNodes.push_back(scena3_new);
+  sNodes.push_back(&beeNode);
+  //sNodes.push_back(&scena1_new);
+  sNodes.push_back(&FloorNode_new);
+
+  //sNodes.push_back(&box1);
+  sNodes.push_back(&box2);
+  sNodes.push_back(&box3);
 
   shaderProgram->use();
 
@@ -110,12 +133,13 @@ void Game::Granko()
   int loops;
   float interpolation = 1.0;
 
+  gatherCollidableObjects(sNodes);
   while (glfwGetKey(okienko.window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
          glfwWindowShouldClose(okienko.window) == 0)
   {
 
     loops = 0;
-
+	
     while ((glfwGetTime() * 1000) > next_game_tick && loops < MAX_FRAMESKIP)
     {
       Update(interpolation);
@@ -123,6 +147,9 @@ void Game::Granko()
       next_game_tick += SKIP_TICKS;
       loops++;
     }
+
+	UpdatePlayer(beeNode);
+	
 
     interpolation =
         float((glfwGetTime() * 1000) + SKIP_TICKS - next_game_tick) /
@@ -133,7 +160,8 @@ void Game::Granko()
 
   delete trojObj;
   delete FloorObj;
-  delete hexObj;
+  delete hexObj2;
+  delete hexObj3;
 
   delete trojkat;
   delete Floor;
@@ -179,6 +207,7 @@ void Game::Render()
     ImGui::Begin("Klawiszologia",
                  &show_demo_window); // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
     ImGui::Text("Q - zmiana strony");
+	ImGui::Text("WSAD - ruch");
     ImGui::End();
   }
   ImGui::Render();
@@ -194,7 +223,7 @@ void Game::Render()
   glClear(GL_COLOR_BUFFER_BIT);
   for (auto node : sNodes)
   {
-    node.Render(originTransform, true);
+    node->Render(originTransform, true);
   }
 
   SetViewAndPerspective(camera2);
@@ -204,8 +233,8 @@ void Game::Render()
   glScissor((Game::WINDOW_WIDTH / 2) + offset, 0, (Game::WINDOW_WIDTH / 2) - offset, Game::WINDOW_HEIGHT);
   glClearColor(0, 0, 1, 1);
   glClear(GL_COLOR_BUFFER_BIT);
-  sNodes[2].Render(originTransform, true);
-  sNodes[1].Render(originTransform, true);
+  sNodes[2]->Render(originTransform, true);
+  sNodes[1]->Render(originTransform, true);
 
   // RENDER PASKA ODDZIELAJACAEGO KAMERY - TODO
   glViewport((Game::WINDOW_WIDTH / 2) + offset - 5, 0, 10, Game::WINDOW_HEIGHT);
@@ -233,12 +262,12 @@ void Game::Serialize()
 
 void Game::SerializeFaza1(std::map<SceneNode *, unsigned> &map)
 {
-  this->sNodes[0].AddChild(&this->sNodes[1]);
-  this->sNodes[1].AddParent(&this->sNodes[0]);
-  for (SceneNode &scene : this->sNodes)
+  this->sNodes[0]->AddChild(this->sNodes[1]);
+  this->sNodes[1]->AddParent(this->sNodes[0]);
+  for (SceneNode* scene : this->sNodes)
   {
     unsigned n = map.size() + 1;
-    map.insert(std::pair<SceneNode *, unsigned>(&scene, n));
+    map.insert(std::pair<SceneNode *, unsigned>(scene, n));
   }
 }
 
@@ -349,7 +378,7 @@ void Game::DeserializeOrderPointers(std::map<unsigned, SceneNode *> &map)
       node.second->parent = map[(unsigned)std::abs((intptr_t)node.second->parent)];
     for (int i = 0; i < node.second->children.size(); i++)
       node.second->children[i] = map[(unsigned)std::abs((intptr_t)node.second->children[i])];
-    this->sNodes.push_back(*(node.second));
+    this->sNodes.push_back(node.second);
   }
   map.clear();
 }
@@ -449,3 +478,52 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos)
   posx = xpos;
   posy = ypos;
 }
+
+
+void Game::UpdatePlayer(SceneNode& player)
+{
+	Transform transformBeforeMove(player.gameObject->transform);
+
+	const float movementSpeed = 0.8;
+	glm::vec3 movementDir(0);
+
+	if (glfwGetKey(okienko.window, GLFW_KEY_UP) == GLFW_PRESS)
+		movementDir.z = -1;
+	if (glfwGetKey(okienko.window, GLFW_KEY_DOWN) == GLFW_PRESS)
+		movementDir.z = 1;
+	if (glfwGetKey(okienko.window, GLFW_KEY_LEFT) == GLFW_PRESS)
+		movementDir.x = -1;
+	if (glfwGetKey(okienko.window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+		movementDir.x = 1;
+
+	glm::vec3 move = movementDir * movementSpeed;
+	player.Translate(move.x, move.y, move.z);
+	Collider* playerCollider = ((Collider*)player.gameObject->GetComponent(ComponentSystem::ComponentType::Collider));
+	//check if there are any collisions, if yes - abort the move
+	for (Collider* collider : collidableObjects)
+	{
+		if (playerCollider->checkCollision(collider))
+		{
+			player.local = transformBeforeMove;
+			playerCollider->transform = transformBeforeMove;
+			break;
+		}
+	}
+}
+
+void Game::gatherCollidableObjects(std::vector<SceneNode*>& nodes)
+{
+	for (auto node : nodes)
+	{
+		if (node->gameObject->getTag() != "player" && node->gameObject->getTag() != "enemy")
+		{
+			ComponentSystem::Component* possibleCollider = node->gameObject->GetComponent(ComponentSystem::ComponentType::Collider);
+			if (possibleCollider != nullptr)
+			{
+				collidableObjects.push_back((Collider*)possibleCollider);
+			}
+			gatherCollidableObjects(node->children);
+		}
+	}
+}
+
