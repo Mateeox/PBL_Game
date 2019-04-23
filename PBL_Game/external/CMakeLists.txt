@@ -62,9 +62,9 @@ add_definitions( -DASSIMP_BUILD_BOOST_WORKAROUND )
 add_definitions( -DLIBRARY_SUFFIX="" )
 # Compile AssImp
 set(LIB_INSTALL_DIR "lib")
-set(LIBASSIMP_COMPONENT libassimp4.0.1-OGLtuts)
+set(LIBASSIMP_COMPONENT libassimp4.1.0-OGLtuts)
 #set(BUILD_STATIC_LIB ON)
-add_subdirectory( assimp-4.0.1 )
+add_subdirectory( assimp-4.1.0 )
 
 
 
