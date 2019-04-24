@@ -27,6 +27,7 @@ class Game
     Shader *shaderProgram;
     Shader *shaderProgram_For_Model;
     std::vector<SceneNode*> sNodes;
+	std::vector<SceneNode*> rightNodes;
     std::vector<Collider*> collidableObjects;
 
     bool mouseCallBack = true;

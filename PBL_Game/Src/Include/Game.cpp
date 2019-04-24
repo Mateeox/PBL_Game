@@ -40,10 +40,13 @@ void Game::Granko()
   SceneNode box2;
   SceneNode box3;
 
-  SceneNode beeNode;
+  SceneNode leftPlayerNode;
+  SceneNode rightPlayerNode;
 
-  GameObject *beeObj = new GameObject(beeNode.local);
-  beeObj->setTag("player");
+  GameObject *leftPlayerObj = new GameObject(leftPlayerNode.local);
+  leftPlayerObj->setTag("player");
+  GameObject *rightPlayerObj = new GameObject(rightPlayerNode.local);
+  rightPlayerObj->setTag("player");
   GameObject *trojObj = new GameObject(scena1_new.world);
   GameObject *FloorObj = new GameObject(FloorNode_new.world);
   GameObject *hexObj2 = new GameObject(box2.local);
@@ -75,17 +78,22 @@ void Game::Granko()
                                                   *shaderProgram,
                                                   xD);
 
-  beeObj->AddComponent(BeeModel);
+  leftPlayerObj->AddComponent(BeeModel);
+  rightPlayerObj->AddComponent(BeeModel);
 
   trojObj->AddComponent(trojkat);
   FloorObj->AddComponent(Floor);
   hexObj2->AddComponent(szescian);
   hexObj3->AddComponent(szescian);
 
-  Collider* beeCollider = new Collider(beeObj->transform);
-  beeCollider->setDimensions(-0.12, 0, 0.25, 2.3, 2, 3.05);
-  beeObj->AddComponent(beeCollider);
-  beeNode.AddGameObject(beeObj);
+  Collider* leftPlayerCollider = new Collider(leftPlayerObj->transform);
+  Collider* rightPlayerCollider = new Collider(rightPlayerObj->transform);
+  leftPlayerCollider->setDimensions(-0.12, 0, 0.25, 2.3, 2, 3.05);
+  rightPlayerCollider->setDimensions(-0.12, 0, 0.25, 2.3, 2, 3.05);
+  leftPlayerObj->AddComponent(leftPlayerCollider);
+  rightPlayerObj->AddComponent(rightPlayerCollider);
+  leftPlayerNode.AddGameObject(leftPlayerObj);
+  rightPlayerNode.AddGameObject(rightPlayerObj);
 
   Collider* box2Collider = new Collider(hexObj2->transform);
   box2Collider->setDimensions(0, 0, 0, 2, 2, 2);
@@ -99,18 +107,28 @@ void Game::Granko()
   box2.AddGameObject(hexObj2);
   box3.AddGameObject(hexObj3);
 
-  auto xd = beeObj->GetComponent(ComponentSystem::Model);
+  auto xd = leftPlayerObj->GetComponent(ComponentSystem::Model);
+  auto rightPlayerModel = rightPlayerObj->GetComponent(ComponentSystem::Model);
   if (xd != nullptr)
   {
     printf("no jest \n");
   }
-
-  if (beeNode.gameObject == nullptr)
+  if (rightPlayerModel == nullptr)
   {
-    printf("beeNode gameobject nullptr ;/ \n");
+	  printf("rightPlayerModel is nullptr");
   }
 
-  beeNode.Scale(0.01, 0.01, 0.01);
+  if (leftPlayerNode.gameObject == nullptr)
+  {
+    printf("leftPlayerNode gameObject nullptr ;/ \n");
+  }
+  if (rightPlayerNode.gameObject == nullptr)
+  {
+	  printf("rightPlayerNode gameObject nullptr ;/ \n");
+  }
+
+  leftPlayerNode.Scale(0.01, 0.01, 0.01);
+  rightPlayerNode.Scale(0.01, 0.01, 0.01);
 
   box1.Scale(0.1f, 0.6f, 1.0f);
   box2.Translate(5, 0, 0);
@@ -119,7 +137,8 @@ void Game::Granko()
   FloorNode_new.Rotate(90.0f, glm::vec3(1, 0, 0));
   FloorNode_new.Scale(100, 100, 100);
 
-  sNodes.push_back(&beeNode);
+  sNodes.push_back(&leftPlayerNode);
+  rightNodes.push_back(&rightPlayerNode);
   //sNodes.push_back(&scena1_new);
   sNodes.push_back(&FloorNode_new);
 
@@ -148,7 +167,10 @@ void Game::Granko()
       loops++;
     }
 
-	UpdatePlayer(beeNode);
+	if (leftSideActive)
+		UpdatePlayer(leftPlayerNode);
+	else
+		UpdatePlayer(rightPlayerNode);
 	
 
     interpolation =
@@ -207,7 +229,8 @@ void Game::Render()
     ImGui::Begin("Klawiszologia",
                  &show_demo_window); // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
     ImGui::Text("Q - zmiana strony");
-	ImGui::Text("WSAD - ruch");
+	ImGui::Text("WSAD - ruch kamery");
+	ImGui::Text("Strzalki - ruch postaci");
     ImGui::End();
   }
   ImGui::Render();
@@ -235,6 +258,10 @@ void Game::Render()
   glClear(GL_COLOR_BUFFER_BIT);
   sNodes[2]->Render(originTransform, true);
   sNodes[1]->Render(originTransform, true);
+  for (auto node : rightNodes)
+  {
+	  node->Render(originTransform, true);
+  }
 
   // RENDER PASKA ODDZIELAJACAEGO KAMERY - TODO
   glViewport((Game::WINDOW_WIDTH / 2) + offset - 5, 0, 10, Game::WINDOW_HEIGHT);
@@ -484,7 +511,8 @@ void Game::UpdatePlayer(SceneNode& player)
 {
 	Transform transformBeforeMove(player.gameObject->transform);
 
-	const float movementSpeed = 0.8;
+
+	const float movementSpeed = 2.0f;
 	glm::vec3 movementDir(0);
 
 	if (glfwGetKey(okienko.window, GLFW_KEY_UP) == GLFW_PRESS)
