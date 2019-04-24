@@ -14,6 +14,7 @@ Model::Model(std::string &path, Shader &aShaderProgram, bool gammaCor = false) :
                                                                                  ShaderProgram(aShaderProgram),
                                                                                  gammaCorrection(gammaCor)
 {
+    m_NumBones = 0;
     loadModel(path);
 }
 
@@ -24,7 +25,6 @@ ComponentSystem::ComponentType Model::GetComponentType()
 
 void Model::processNode(aiNode *node, const aiScene *scene)
 {
-
     // process each mesh located at the current node
     for (unsigned int i = 0; i < node->mNumMeshes; i++)
     {
@@ -50,6 +50,22 @@ void Model::loadModel(std::string &path)
     Assimp::Importer importer;
     const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 
+
+   m_Entries.resize(scene->mNumMeshes);
+
+   unsigned NumVertices = 0;
+    unsigned NumIndices = 0;
+
+    for (unsigned i = 0 ; i < m_Entries.size() ; i++) {
+        m_Entries[i].MaterialIndex = scene->mMeshes[i]->mMaterialIndex;        
+        m_Entries[i].NumIndices    = scene->mMeshes[i]->mNumFaces * 3;
+        m_Entries[i].BaseVertex    = NumVertices;
+        m_Entries[i].BaseIndex     = NumIndices;
+        
+        NumVertices += scene->mMeshes[i]->mNumVertices;
+        NumIndices  += m_Entries[i].NumIndices;
+    }
+
     // check for errors
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode || !scene->mAnimations) // if is Not Zero
     {
@@ -68,9 +84,9 @@ void Model::Draw(glm::mat4 &transform)
 {
     ShaderProgram.use();
     //Set transform
-    unsigned int transformLoc = glGetUniformLocation(ShaderProgram.shaderProgramID, "transform");
+    unsigned  transformLoc = glGetUniformLocation(ShaderProgram.shaderProgramID, "transform");
     glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
-    for (unsigned int i = 0; i < meshes.size(); i++)
+    for (unsigned  i = 0; i < meshes.size(); i++)
         meshes[i].Draw(transform);
 }
 
@@ -78,12 +94,12 @@ ModelMesh::Mesh Model::processMesh(unsigned aMeshID,aiMesh *mesh, const aiScene 
 {
     // data to fill
     std::vector<ModelMesh::Vertex> vertices;
-    std::vector<unsigned int> indices;
+    std::vector<unsigned > indices;
     std::vector<ModelMesh::Texture> textures;
     std::vector<ModelMesh::VertexBoneData> Bones;
 
     // Walk through each of the mesh's vertices
-    for (unsigned int i = 0; i < mesh->mNumVertices; i++)
+    for (unsigned i = 0; i < mesh->mNumVertices; i++)
     {
         ModelMesh::Vertex vertex;
         glm::vec3 vector; // we declare a placeholder vector since assimp uses its own vector class that doesn't directly convert to glm's vec3 class so we transfer the data to this placeholder glm::vec3 first.
@@ -138,10 +154,15 @@ ModelMesh::Mesh Model::processMesh(unsigned aMeshID,aiMesh *mesh, const aiScene 
             indices.push_back(face.mIndices[j]);
     }
 
+    
+    //Bones
     for (unsigned i = 0; i < mesh->mNumBones; i++)
     {
         unsigned BoneIndex = 0;
         std::string BoneName(mesh->mBones[i]->mName.data);
+
+        
+    printf("Bone:  %s  \n", mesh->mBones[i]->mName.data);
 
         if (m_BoneMapping.find(BoneName) == m_BoneMapping.end())
         {
@@ -149,25 +170,36 @@ ModelMesh::Mesh Model::processMesh(unsigned aMeshID,aiMesh *mesh, const aiScene 
             BoneIndex = m_NumBones;
             m_NumBones++;
             ModelMesh::BoneInfo bi;
+            printf("Bruh: before push back \n");
             m_BoneInfo.push_back(bi);
             m_BoneInfo[BoneIndex].BoneOffset = mesh->mBones[i]->mOffsetMatrix;
             m_BoneMapping[BoneName] = BoneIndex;
+            
         }
         else
         {
             BoneIndex = m_BoneMapping[BoneName];
         }
 
-           for (unsigned j = 0 ; j < mesh->mBones[i]->mNumWeights ; j++) {
+        printf("Weights:  %i  \n", mesh->mBones[i]->mNumWeights);
+
+           for (unsigned j = 0 ; j < mesh->mBones[i]->mNumWeights ; j++) 
+           {
+               printf("Bruh:  Before get VertexID  \n");
             unsigned VertexID = m_Entries[aMeshID].BaseVertex + mesh->mBones[i]->mWeights[j].mVertexId;
+            printf("Bruh:  Before get Weight  \n");
             float Weight  = mesh->mBones[i]->mWeights[j].mWeight;                   
+            printf("Bruh:  Before AddBone  \n");
             Bones[VertexID].AddBoneData(BoneIndex, Weight);
+
+             printf("Bruh:  %i  \n",  j);
         }
 
 
-
+   
     }
 
+     
     // process materials
     aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
     // we assume a convention for sampler names in the shaders. Each diffuse texture should be named
