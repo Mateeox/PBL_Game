@@ -49,7 +49,6 @@ add_executable(PBL_Game
 	Src/Include/SceneNode.cpp
 	#Component
 	Src/Include/Component/ShapeRenderer3D.cpp
-	Src/Include/Component/Mesh.cpp
 	Src/Include/Component/Model.cpp
 	Src/Include/Component/BoneUtils.cpp
 	#Stb_image

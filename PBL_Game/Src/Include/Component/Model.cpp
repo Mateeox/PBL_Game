@@ -8,6 +8,10 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
+#define SAFE_DELETE(p) if (p) { delete p; p = NULL; }
+
+#define GLCheckError() (glGetError() == GL_NO_ERROR)
+
 unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma = false);
 
 Model::Model(std::string &path, Shader &aShaderProgram, bool gammaCor = false) : Component(nullptr),
@@ -23,308 +27,286 @@ ComponentSystem::ComponentType Model::GetComponentType()
     return ComponentSystem::ComponentType::Model;
 }
 
-void Model::processNode(aiNode *node, const aiScene *scene)
+bool Model::loadModel(std::string &path)
 {
-    // process each mesh located at the current node
-    for (unsigned int i = 0; i < node->mNumMeshes; i++)
-    {
-        // the node object only contains indices to index the actual objects in the scene.
-        // the scene contains all the data, node is just to keep stuff organized (like relations between nodes).
+    // Release the previously loaded mesh (if it exists)
+    Clear();
+ 
+    // Create the VAO
+    glGenVertexArrays(1, &m_VAO);   
+    glBindVertexArray(m_VAO);
+    
+    // Create the buffers for the vertices attributes
+    glGenBuffers(ARRAY_SIZE_IN_ELEMENTS(m_Buffers), m_Buffers);
 
-        aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-        meshes.push_back(processMesh(i,mesh, scene));
+    bool Ret = false;    
+  
+    m_pScene = m_Importer.ReadFile(path.c_str(), ASSIMP_LOAD_FLAGS);
+    
+    if (m_pScene) {  
+        m_GlobalInverseTransform = m_pScene->mRootNode->mTransformation;
+        m_GlobalInverseTransform.Inverse();
+        Ret = InitFromScene(m_pScene, path);
     }
-    // after we've processed all of the meshes (if any) we then recursively process each of the children nodes
-    for (unsigned int i = 0; i < node->mNumChildren; i++)
-    {
-        if (node != nullptr)
-        {
-            processNode(node->mChildren[i], scene);
-        }
+    else {
+        printf("Error parsing '%s': '%s'\n", path.c_str(), m_Importer.GetErrorString());
     }
+
+    // Make sure the VAO is not changed from the outside
+    glBindVertexArray(0);	
+
+    return Ret;
 }
 
-void Model::loadModel(std::string &path)
-{
-    // read file via ASSIMP
-    Assimp::Importer importer;
-    const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+bool Model::InitFromScene(const aiScene* pScene, const std::string& Filename)
+{  
+    m_Entries.resize(pScene->mNumMeshes);
+    m_Textures.resize(pScene->mNumMaterials);
 
-
-   m_Entries.resize(scene->mNumMeshes);
-
-   unsigned NumVertices = 0;
+    std::vector<Vector3f> Positions;
+    std::vector<Vector3f> Normals;
+    std::vector<Vector2f> TexCoords;
+    std::vector<VertexBoneData> Bones;
+    std::vector<unsigned> Indices;
+       
+    unsigned NumVertices = 0;
     unsigned NumIndices = 0;
-
+    
+    // Count the number of vertices and indices
     for (unsigned i = 0 ; i < m_Entries.size() ; i++) {
-        m_Entries[i].MaterialIndex = scene->mMeshes[i]->mMaterialIndex;        
-        m_Entries[i].NumIndices    = scene->mMeshes[i]->mNumFaces * 3;
+        m_Entries[i].MaterialIndex = pScene->mMeshes[i]->mMaterialIndex;        
+        m_Entries[i].NumIndices    = pScene->mMeshes[i]->mNumFaces * 3;
         m_Entries[i].BaseVertex    = NumVertices;
         m_Entries[i].BaseIndex     = NumIndices;
         
-        NumVertices += scene->mMeshes[i]->mNumVertices;
+        NumVertices += pScene->mMeshes[i]->mNumVertices;
         NumIndices  += m_Entries[i].NumIndices;
     }
-
-    // check for errors
-    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode || !scene->mAnimations) // if is Not Zero
-    {
-        std::cout << "ERROR::ASSIMP:: " << importer.GetErrorString() << "\n";
-        return;
-    }
-    // retrieve the directory path of the filepath
-    directory = path.substr(0, path.find_last_of('/'));
-
-    printf("Model Loaded %s \n", path.c_str());
-    // process ASSIMP's root node recursively
-    processNode(scene->mRootNode, scene);
-}
-
-void Model::Draw(glm::mat4 &transform)
-{
-    ShaderProgram.use();
-    //Set transform
-    unsigned  transformLoc = glGetUniformLocation(ShaderProgram.shaderProgramID, "transform");
-    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
-    for (unsigned  i = 0; i < meshes.size(); i++)
-        meshes[i].Draw(transform);
-}
-
-ModelMesh::Mesh Model::processMesh(unsigned aMeshID,aiMesh *mesh, const aiScene *scene)
-{
-    // data to fill
-    std::vector<ModelMesh::Vertex> vertices;
-    std::vector<unsigned > indices;
-    std::vector<ModelMesh::Texture> textures;
-    std::vector<ModelMesh::VertexBoneData> Bones;
-
-    // Walk through each of the mesh's vertices
-    for (unsigned i = 0; i < mesh->mNumVertices; i++)
-    {
-        ModelMesh::Vertex vertex;
-        glm::vec3 vector; // we declare a placeholder vector since assimp uses its own vector class that doesn't directly convert to glm's vec3 class so we transfer the data to this placeholder glm::vec3 first.
-        // positions
-        vector.x = mesh->mVertices[i].x;
-        vector.y = mesh->mVertices[i].y;
-        vector.z = mesh->mVertices[i].z;
-        vertex.Position = vector;
-        // normals
-        vector.x = mesh->mNormals[i].x;
-        vector.y = mesh->mNormals[i].y;
-        vector.z = mesh->mNormals[i].z;
-        vertex.Normal = vector;
-        // texture coordinates
-        if (mesh->mTextureCoords[0]) // does the mesh contain texture coordinates?
-        {
-            glm::vec2 vec;
-            // a vertex can contain up to 8 different texture coordinates. We thus make the assumption that we won't
-            // use models where a vertex can have multiple texture coordinates so we always take the first set (0).
-            vec.x = mesh->mTextureCoords[0][i].x;
-            vec.y = mesh->mTextureCoords[0][i].y;
-            vertex.TexCoords = vec;
-        }
-        else
-        {
-            vertex.TexCoords = glm::vec2(0.0f, 0.0f);
-        }
-        // tangent
-        if (mesh->mTangents)
-        {
-            vector.x = mesh->mTangents[i].x;
-            vector.y = mesh->mTangents[i].y;
-            vector.z = mesh->mTangents[i].z;
-            vertex.Tangent = vector;
-        }
-        // bitangent
-        if (mesh->mTangents)
-        {
-            vector.x = mesh->mBitangents[i].x;
-            vector.y = mesh->mBitangents[i].y;
-            vector.z = mesh->mBitangents[i].z;
-            vertex.Bitangent = vector;
-        }
-        vertices.push_back(vertex);
-    }
-    // now wak through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
-    for (unsigned i = 0; i < mesh->mNumFaces; i++)
-    {
-        aiFace face = mesh->mFaces[i];
-        // retrieve all indices of the face and store them in the indices vector
-        for (unsigned j = 0; j < face.mNumIndices; j++)
-            indices.push_back(face.mIndices[j]);
-    }
-
     
-    //Bones
-    for (unsigned i = 0; i < mesh->mNumBones; i++)
+    // Reserve space in the vectors for the vertex attributes and indices
+    Positions.reserve(NumVertices);
+    Normals.reserve(NumVertices);
+    TexCoords.reserve(NumVertices);
+    Bones.resize(NumVertices);
+    Indices.reserve(NumIndices);
+        
+    // Initialize the meshes in the scene one by one
+    for (unsigned i = 0 ; i < m_Entries.size() ; i++) {
+        const aiMesh* paiMesh = pScene->mMeshes[i];
+        InitMesh(i, paiMesh, Positions, Normals, TexCoords, Bones, Indices);
+    }
+
+    if (!InitMaterials(pScene, Filename)) {
+        return false;
+    }
+
+    // Generate and populate the buffers with vertex attributes and the indices
+  	glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[POS_VB]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Positions[0]) * Positions.size(), &Positions[0], GL_STATIC_DRAW);
+    glEnableVertexAttribArray(POSITION_LOCATION);
+    glVertexAttribPointer(POSITION_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);    
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[TEXCOORD_VB]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(TexCoords[0]) * TexCoords.size(), &TexCoords[0], GL_STATIC_DRAW);
+    glEnableVertexAttribArray(TEX_COORD_LOCATION);
+    glVertexAttribPointer(TEX_COORD_LOCATION, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+   	glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[NORMAL_VB]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Normals[0]) * Normals.size(), &Normals[0], GL_STATIC_DRAW);
+    glEnableVertexAttribArray(NORMAL_LOCATION);
+    glVertexAttribPointer(NORMAL_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+   	glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[BONE_VB]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Bones[0]) * Bones.size(), &Bones[0], GL_STATIC_DRAW);
+    glEnableVertexAttribArray(BONE_ID_LOCATION);
+    glVertexAttribIPointer(BONE_ID_LOCATION, 4, GL_INT, sizeof(VertexBoneData), (const GLvoid*)0);
+    glEnableVertexAttribArray(BONE_WEIGHT_LOCATION);    
+    glVertexAttribPointer(BONE_WEIGHT_LOCATION, 4, GL_FLOAT, GL_FALSE, sizeof(VertexBoneData), (const GLvoid*)16);
+    
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Buffers[INDEX_BUFFER]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices[0]) * Indices.size(), &Indices[0], GL_STATIC_DRAW);
+
+    return GLCheckError();
+}
+
+bool Model::InitMaterials(const aiScene* pScene, const std::string& Filename)
+{
+    // Extract the directory part from the file name
+    std::string::size_type SlashIndex = Filename.find_last_of("/");
+    std::string Dir;
+
+    if (SlashIndex == std::string::npos) {
+        Dir = ".";
+    }
+    else if (SlashIndex == 0) {
+        Dir = "/";
+    }
+    else {
+        Dir = Filename.substr(0, SlashIndex);
+    }
+
+    bool Ret = true;
+
+    // Initialize the materials
+    for (unsigned i = 0 ; i < pScene->mNumMaterials ; i++) {
+        const aiMaterial* pMaterial = pScene->mMaterials[i];
+
+        m_Textures[i] = NULL;
+
+        if (pMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
+            aiString Path;
+
+            if (pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
+                std::string p(Path.data);
+                
+                if (p.substr(0, 2) == ".\\") {                    
+                    p = p.substr(2, p.size() - 2);
+                }
+                               
+                std::string FullPath = Dir + "/" + p;
+                    
+                m_Textures[i] = new Texture(FullPath.c_str(),GL_LINEAR);
+
+                if (!m_Textures[i]->Load()) 
+                {
+                    printf("Error loading texture '%s'\n", FullPath.c_str());
+                    delete m_Textures[i];
+                    m_Textures[i] = NULL;
+                    Ret = false;
+                }
+                else {
+                    printf("%d - loaded texture '%s'\n", i, FullPath.c_str());
+                }
+            }
+        }
+    }
+
+    return Ret;
+}
+
+void Model::LoadBones(unsigned MeshIndex, const aiMesh *pMesh, std::vector<VertexBoneData> &Bones)
+{
+    for (unsigned i = 0; i < pMesh->mNumBones; i++)
     {
         unsigned BoneIndex = 0;
-        std::string BoneName(mesh->mBones[i]->mName.data);
-
-        
-    printf("Bone:  %s  \n", mesh->mBones[i]->mName.data);
+        std::string BoneName(pMesh->mBones[i]->mName.data);
 
         if (m_BoneMapping.find(BoneName) == m_BoneMapping.end())
         {
             // Allocate an index for a new bone
             BoneIndex = m_NumBones;
             m_NumBones++;
-            ModelMesh::BoneInfo bi;
-            printf("Bruh: before push back \n");
+            BoneInfo bi;
             m_BoneInfo.push_back(bi);
-            m_BoneInfo[BoneIndex].BoneOffset = mesh->mBones[i]->mOffsetMatrix;
+            m_BoneInfo[BoneIndex].BoneOffset = pMesh->mBones[i]->mOffsetMatrix;
             m_BoneMapping[BoneName] = BoneIndex;
-            
         }
         else
         {
             BoneIndex = m_BoneMapping[BoneName];
         }
 
-        printf("Weights:  %i  \n", mesh->mBones[i]->mNumWeights);
-
-           for (unsigned j = 0 ; j < mesh->mBones[i]->mNumWeights ; j++) 
-           {
-               printf("Bruh:  Before get VertexID  \n");
-            unsigned VertexID = m_Entries[aMeshID].BaseVertex + mesh->mBones[i]->mWeights[j].mVertexId;
-            printf("Bruh:  Before get Weight  \n");
-            float Weight  = mesh->mBones[i]->mWeights[j].mWeight;                   
-            printf("Bruh:  Before AddBone  \n");
-            Bones[VertexID].AddBoneData(BoneIndex, Weight);
-
-             printf("Bruh:  %i  \n",  j);
-        }
-
-
-   
-    }
-
-     
-    // process materials
-    aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
-    // we assume a convention for sampler names in the shaders. Each diffuse texture should be named
-    // as 'texture_diffuseN' where N is a sequential number ranging from 1 to MAX_SAMPLER_NUMBER.
-    // Same applies to other texture as the following list summarizes:
-    // diffuse: texture_diffuseN
-    // specular: texture_specularN
-    // normal: texture_normalN
-
-    // 1. diffuse maps
-    std::vector<ModelMesh::Texture> diffuseMaps = loadMaterialTextures(scene, material, aiTextureType_DIFFUSE, "texture_diffuse");
-    textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-    // 2. specular maps
-    std::vector<ModelMesh::Texture> specularMaps = loadMaterialTextures(scene, material, aiTextureType_SPECULAR, "texture_specular");
-    textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
-    // 3. normal maps
-    std::vector<ModelMesh::Texture> normalMaps = loadMaterialTextures(scene, material, aiTextureType_HEIGHT, "texture_normal");
-    textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
-    // 4. height maps
-    std::vector<ModelMesh::Texture> heightMaps = loadMaterialTextures(scene, material, aiTextureType_AMBIENT, "texture_height");
-    textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
-
-    // return a mesh object created from the extracted mesh data
-    return ModelMesh::Mesh(vertices, indices, textures, Bones, ShaderProgram);
-}
-
-std::vector<ModelMesh::Texture> Model::loadMaterialTextures(const aiScene *scene, aiMaterial *mat, aiTextureType type, std::string typeName)
-{
-    std::vector<ModelMesh::Texture> textures;
-    for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
-    {
-        aiString str;
-        mat->GetTexture(type, i, &str);
-
-        // check if texture was loaded before and if so, continue to next iteration: skip loading a new texture
-        bool skip = false;
-        for (unsigned int j = 0; j < textures_loaded.size(); j++)
+        for (unsigned j = 0; j < pMesh->mBones[i]->mNumWeights; j++)
         {
-            if (std::strcmp(textures_loaded[j].path.data(), str.C_Str()) == 0)
-            {
-                textures.push_back(textures_loaded[j]);
-                skip = true; // a texture with the same filepath has already been loaded, continue to next one. (optimization)
-                break;
-            }
-        }
-        if (!skip)
-        { // if texture hasn't been loaded already, load it
-
-            if (str.C_Str()[0] == '*')
-            {
-
-                printf("%i \n", (int)(str.C_Str()[1] - '0'));
-                auto data = scene->mTextures[(int)(str.C_Str()[1] - '0')];
-                unsigned int textureID;
-
-                glGenTextures(1, &textureID);
-
-                printf(data->achFormatHint);
-                glBindTexture(GL_TEXTURE_2D, textureID);
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, data->mWidth, data->mHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, data->pcData);
-                glGenerateMipmap(GL_TEXTURE_2D);
-
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-                ModelMesh::Texture texture;
-                texture.id = textureID;
-                texture.type = typeName;
-                texture.path = str.C_Str();
-                textures.push_back(texture);
-                textures_loaded.push_back(texture); // store it as texture loaded for entire model, to ensure we won't unnecesery load duplicate textures.
-            }
-            else
-            {
-
-                ModelMesh::Texture texture;
-                texture.id = TextureFromFile(str.C_Str(), this->directory);
-                texture.type = typeName;
-                texture.path = str.C_Str();
-                textures.push_back(texture);
-                textures_loaded.push_back(texture); // store it as texture loaded for entire model, to ensure we won't unnecesery load duplicate textures.
-            }
+            unsigned VertexID = m_Entries[MeshIndex].BaseVertex + pMesh->mBones[i]->mWeights[j].mVertexId;
+            float Weight = pMesh->mBones[i]->mWeights[j].mWeight;
+            Bones[VertexID].AddBoneData(BoneIndex, Weight);
         }
     }
-    return textures;
 }
 
-unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma)
+void VertexBoneData::AddBoneData(unsigned BoneID, float Weight)
 {
-    std::string filename = std::string(path);
-    filename = directory + '/' + filename;
-
-    unsigned int textureID;
-    glGenTextures(1, &textureID);
-
-    int width, height, nrComponents;
-    unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
-    if (data)
-    {
-        GLenum format;
-        if (nrComponents == 1)
-            format = GL_RED;
-        else if (nrComponents == 3)
-            format = GL_RGB;
-        else if (nrComponents == 4)
-            format = GL_RGBA;
-
-        glBindTexture(GL_TEXTURE_2D, textureID);
-        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-        stbi_image_free(data);
+    for (unsigned i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(IDs) ; i++) {
+        if (Weights[i] == 0.0) {
+            IDs[i]     = BoneID;
+            Weights[i] = Weight;
+            return;
+        }        
     }
-    else
-    {
-        std::cout << "Texture failed to load at path: " << path << std::endl;
-        stbi_image_free(data);
+    
+    // should never get here - more bones than we have space for
+    assert(0);
+}
+
+void Model::Draw(glm::mat4 &transform)
+{
+    ShaderProgram.use();
+    //Set transform
+    unsigned transformLoc = glGetUniformLocation(ShaderProgram.shaderProgramID, "transform");
+    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
+   
+      glBindVertexArray(m_VAO);
+    
+    for (unsigned i = 0 ; i < m_Entries.size() ; i++) {
+        const unsigned MaterialIndex = m_Entries[i].MaterialIndex;
+
+        assert(MaterialIndex < m_Textures.size());
+        
+        if (m_Textures[MaterialIndex])
+         {
+            m_Textures[MaterialIndex]->Bind(GL_TEXTURE0);
+        }
+
+		glDrawElementsBaseVertex(GL_TRIANGLES, 
+                                 m_Entries[i].NumIndices, 
+                                 GL_UNSIGNED_INT, 
+                                 (void*)(sizeof(unsigned) * m_Entries[i].BaseIndex), 
+                                 m_Entries[i].BaseVertex);
     }
 
-    return textureID;
+    // Make sure the VAO is not changed from the outside    
+    glBindVertexArray(0);
+}
+
+void Model::InitMesh(unsigned MeshIndex,
+                     const aiMesh *paiMesh,
+                     std::vector<Vector3f> &Positions,
+                     std::vector<Vector3f> &Normals,
+                     std::vector<Vector2f> &TexCoords,
+                     std::vector<VertexBoneData> &Bones,
+                     std::vector<unsigned> &Indices)
+{
+    const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
+
+    // Populate the vertex attribute vectors
+    for (unsigned i = 0; i < paiMesh->mNumVertices; i++)
+    {
+        const aiVector3D *pPos = &(paiMesh->mVertices[i]);
+        const aiVector3D *pNormal = &(paiMesh->mNormals[i]);
+        const aiVector3D *pTexCoord = paiMesh->HasTextureCoords(0) ? &(paiMesh->mTextureCoords[0][i]) : &Zero3D;
+
+        Positions.push_back(Vector3f(pPos->x, pPos->y, pPos->z));
+        Normals.push_back(Vector3f(pNormal->x, pNormal->y, pNormal->z));
+        TexCoords.push_back(Vector2f(pTexCoord->x, pTexCoord->y));
+    }
+
+    LoadBones(MeshIndex, paiMesh, Bones);
+
+    // Populate the index buffer
+    for (unsigned i = 0; i < paiMesh->mNumFaces; i++)
+    {
+        const aiFace &Face = paiMesh->mFaces[i];
+        assert(Face.mNumIndices == 3);
+        Indices.push_back(Face.mIndices[0]);
+        Indices.push_back(Face.mIndices[1]);
+        Indices.push_back(Face.mIndices[2]);
+    }
+}
+
+
+void Model::Clear()
+{
+    for (unsigned i = 0 ; i < m_Textures.size() ; i++) {
+        SAFE_DELETE(m_Textures[i]);
+    }
+
+    if (m_Buffers[0] != 0) {
+        glDeleteBuffers(ARRAY_SIZE_IN_ELEMENTS(m_Buffers), m_Buffers);
+    }
+       
+    if (m_VAO != 0) {
+        glDeleteVertexArrays(1, &m_VAO);
+        m_VAO = 0;
+    }
 }

@@ -32,7 +32,7 @@ Game::Game(Window &aOkno) : okienko(aOkno), camera(Camera()), camera2(Camera())
 void Game::Granko()
 {
 
-  Texture *xD = new Texture("Textures/red.png", GL_LINEAR);
+  Texture *xD = new Texture("Textures/red.png", (unsigned)GL_LINEAR);
 
   SceneNode scena1_new;
   SceneNode FloorNode_new;
