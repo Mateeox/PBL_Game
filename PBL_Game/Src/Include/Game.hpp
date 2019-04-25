@@ -50,6 +50,11 @@ class Game
     static const int WINDOW_WIDTH = 1280, WINDOW_HEIGHT = 720;
     Game(Window &okienko);
 
+
+	const float cameraZOffset = 7;
+	const float cameraYOffset = 2;
+	const float cameraAngle = 35;
+
     void SetCamera(Camera camera, int camera_nr);
     void ProcessMouse();
     void ProcessInput(float interpolation, Camera &camera_update);
@@ -59,7 +64,7 @@ class Game
     void Render();
     void Serialize();
     void Deserialize(std::string path);
-	void UpdatePlayer(SceneNode& player);
+	void UpdatePlayer(SceneNode& player, Camera& camera);
 	void gatherCollidableObjects(std::vector<SceneNode*>& nodes);
 
   private:

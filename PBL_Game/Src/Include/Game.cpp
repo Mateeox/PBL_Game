@@ -31,7 +31,6 @@ Game::Game(Window &aOkno) : okienko(aOkno), camera(Camera()), camera2(Camera())
 
 void Game::Granko()
 {
-
   Texture *xD = new Texture("Textures/red.png", GL_LINEAR);
 
   SceneNode scena1_new;
@@ -168,9 +167,9 @@ void Game::Granko()
     }
 
 	if (leftSideActive)
-		UpdatePlayer(leftPlayerNode);
+		UpdatePlayer(leftPlayerNode, camera);
 	else
-		UpdatePlayer(rightPlayerNode);
+		UpdatePlayer(rightPlayerNode, camera2);
 	
 
     interpolation =
@@ -212,9 +211,6 @@ void Game::Update(float interpolation)
 
 void Game::Render()
 {
-
-
-
   glfwPollEvents();
   glScissor(0, 0, Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT);
   glEnable(GL_SCISSOR_TEST);
@@ -229,7 +225,6 @@ void Game::Render()
     ImGui::Begin("Klawiszologia",
                  &show_demo_window); // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
     ImGui::Text("Q - zmiana strony");
-	ImGui::Text("WSAD - ruch kamery");
 	ImGui::Text("Strzalki - ruch postaci");
     ImGui::End();
   }
@@ -424,9 +419,9 @@ void Game::SetCamera(Camera aCamera, int camera)
 void Game::ProcessInput(float interpolation, Camera &camera_update)
 {
 
-  ProcessMouse();
+  //ProcessMouse();
 
-  if (glfwGetKey(okienko.window, GLFW_KEY_W) == GLFW_PRESS)
+  /*if (glfwGetKey(okienko.window, GLFW_KEY_W) == GLFW_PRESS)
     camera_update.ProcessKeyboard(Camera_Movement::FORWARD, interpolation);
   if (glfwGetKey(okienko.window, GLFW_KEY_S) == GLFW_PRESS)
     camera_update.ProcessKeyboard(Camera_Movement::BACKWARD, interpolation);
@@ -434,6 +429,7 @@ void Game::ProcessInput(float interpolation, Camera &camera_update)
     camera_update.ProcessKeyboard(Camera_Movement::LEFT, interpolation);
   if (glfwGetKey(okienko.window, GLFW_KEY_D) == GLFW_PRESS)
     camera_update.ProcessKeyboard(Camera_Movement::RIGHT, interpolation);
+  */
 
   if (glfwGetKey(okienko.window, GLFW_KEY_Q) == GLFW_PRESS && swapButtonPressed == false)
   {
@@ -507,12 +503,12 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos)
 }
 
 
-void Game::UpdatePlayer(SceneNode& player)
+void Game::UpdatePlayer(SceneNode& player, Camera& camera)
 {
 	Transform transformBeforeMove(player.gameObject->transform);
 
 
-	const float movementSpeed = 2.0f;
+	const float movementSpeed = 4.0f;
 	glm::vec3 movementDir(0);
 
 	if (glfwGetKey(okienko.window, GLFW_KEY_UP) == GLFW_PRESS)
@@ -537,6 +533,9 @@ void Game::UpdatePlayer(SceneNode& player)
 			break;
 		}
 	}
+
+	camera.Position.x = player.gameObject->transform.getPosition().x * player.gameObject->transform.getScale().x;
+	camera.Position.z = player.gameObject->transform.getPosition().z * player.gameObject->transform.getScale().z + cameraZOffset;
 }
 
 void Game::gatherCollidableObjects(std::vector<SceneNode*>& nodes)
