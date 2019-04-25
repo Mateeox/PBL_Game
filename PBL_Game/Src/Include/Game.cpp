@@ -94,6 +94,7 @@ void Game::Granko()
     printf("beeNode gameobject nullptr ;/ \n");
   }
 
+
   beeNode.Scale(0.01, 0.01, 0.01);
   scena3_new.Scale(0.3f, 0.2f, 1.0f);
   FloorNode_new.Translate(0.0f, -1.0f, 0.1f);
@@ -163,11 +164,6 @@ void Game::Update(float interpolation)
 
 void Game::Render()
 {
-
-
-
-
-
   glfwPollEvents();
   glScissor(0, 0, Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT);
   glEnable(GL_SCISSOR_TEST);

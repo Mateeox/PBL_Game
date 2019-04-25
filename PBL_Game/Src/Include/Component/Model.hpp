@@ -133,8 +133,18 @@ private:
   std::string directory;
   bool gammaCorrection;
 
+  void BoneTransform(float TimeInSeconds, std::vector<Matrix4f>& Transforms);
+  void ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const Matrix4f& ParentTransform);
+  const aiNodeAnim* FindNodeAnim(const aiAnimation* pAnimation, const std::string NodeName);
+  void CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
+  void CalcInterpolatedScaling(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
+  void CalcInterpolatedPosition(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);  
   bool loadModel(std::string &path);
   bool InitMaterials(const aiScene *pScene, const std::string &Filename);
+
+  unsigned FindRotation(float AnimationTime, const aiNodeAnim* pNodeAnim);
+  unsigned FindScaling(float AnimationTime, const aiNodeAnim* pNodeAnim);
+  unsigned FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim);
 
   void InitMesh(unsigned MeshIndex,
                 const aiMesh *paiMesh,
