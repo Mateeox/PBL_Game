@@ -246,6 +246,18 @@ void VertexBoneData::AddBoneData(unsigned BoneID, float Weight)
 
 void Model::Draw(glm::mat4 &transform)
 {
+
+    std::vector<Matrix4f> Transforms;
+               
+        float RunningTime = glfwGetTime();
+
+
+    for (uint i = 0 ; i < Transforms.size() ; i++) {
+            SetBoneTransform(i, Transforms[i]);
+        }
+        
+
+
     ShaderProgram.use();
     //Set transform
     unsigned transformLoc = glGetUniformLocation(ShaderProgram.shaderProgramID, "transform");

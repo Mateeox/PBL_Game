@@ -24,7 +24,7 @@ void Game::SetViewAndPerspective(Camera & aCamera)
 Game::Game(Window &aOkno) : okienko(aOkno), camera(Camera()), camera2(Camera())
 {
   shaderProgram = new Shader("Shaders/vertex4.txt", "Shaders/fragment3.txt");
-  shaderProgram_For_Model = new Shader("Shaders/vertexModel.txt", "Shaders/fragmentModel.txt");
+  shaderProgram_For_Model = new Shader("Shaders/skinning.vs", "Shaders/skinning.fs");
 
   glfwSetCursorPosCallback(okienko.window, mouse_callback);
 }
@@ -163,6 +163,8 @@ void Game::Update(float interpolation)
 
 void Game::Render()
 {
+
+
 
 
 
