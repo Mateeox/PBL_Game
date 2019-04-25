@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Component.hpp"
 #include <Shader.hpp>
 #include <vector>
@@ -15,6 +16,19 @@
 #include "Texture.hpp"
 #include <map>
 
+
+#ifdef WIN32
+#define SNPRINTF _snprintf_s
+#define VSNPRINTF vsnprintf_s
+#define RANDOM rand
+#define SRANDOM srand((unsigned)time(NULL))
+#else
+#define SNPRINTF snprintf
+#define VSNPRINTF vsnprintf
+#define RANDOM random
+#define SRANDOM srandom(getpid())
+#endif
+
 #define ASSIMP_LOAD_FLAGS (aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices)
 
 #define ZERO_MEM(a) memset(a, 0, sizeof(a))
@@ -27,10 +41,10 @@
 
 #define NUM_BONES_PER_VEREX 4
 
-
 #define INVALID_MATERIAL 0xFFFFFFFF
 
-#define ARRAY_SIZE_IN_ELEMENTS(a) (sizeof(a)/sizeof(a[0]))
+#define ARRAY_SIZE_IN_ELEMENTS(a) (sizeof(a) / sizeof(a[0]))
+static const unsigned MAX_BONES = 100;
 
 enum VB_TYPES
 {
@@ -113,6 +127,8 @@ private:
   std::vector<BoneInfo> m_BoneInfo;
   std::vector<MeshEntry> m_Entries;
 
+  unsigned m_boneLocation[MAX_BONES];
+
   unsigned m_NumBones;
   std::string directory;
   bool gammaCorrection;
@@ -132,10 +148,11 @@ private:
 
   void LoadBones(unsigned MeshIndex, const aiMesh *pMesh, std::vector<VertexBoneData> &Bones);
 
+  void SetBoneTransform(unsigned Index, const Matrix4f &Transform);
+
   Matrix4f m_GlobalInverseTransform;
   const aiScene *m_pScene;
   Assimp::Importer m_Importer;
-
 
   ComponentSystem::ComponentType GetComponentType() override;
   std::string Serialize()

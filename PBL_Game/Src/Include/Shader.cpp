@@ -2,6 +2,21 @@
 #include <GL/gl3w.h>
 #include <vector>
 
+
+ unsigned Shader::GetUniformLocation(const char* pUniformName)
+ {
+
+	    unsigned Location = glGetUniformLocation(shaderProgramID, pUniformName);
+
+    if (Location == INVALID_UNIFORM_LOCATION) {
+        fprintf(stderr, "Warning! Unable to get the location of uniform '%s'\n", pUniformName);
+    }
+
+    return Location;
+
+
+ }
+
     // constructor reads and builds the shader
     Shader::Shader(const char * vertex_file_path,const char * fragment_file_path)
     {

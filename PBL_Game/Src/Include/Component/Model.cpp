@@ -55,6 +55,14 @@ bool Model::loadModel(std::string &path)
     // Make sure the VAO is not changed from the outside
     glBindVertexArray(0);	
 
+   for (unsigned int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_boneLocation) ; i++) {
+        char Name[128];
+        memset(Name, 0, sizeof(Name));
+        SNPRINTF(Name, sizeof(Name), "gBones[%d]", i);
+        m_boneLocation[i] = ShaderProgram.GetUniformLocation(Name);
+    }
+
+
     return Ret;
 }
 
@@ -164,10 +172,17 @@ bool Model::InitMaterials(const aiScene* pScene, const std::string& Filename)
                 }
                                
                 std::string FullPath = Dir + "/" + p;
-                    
-                m_Textures[i] = new Texture(FullPath.c_str(),GL_LINEAR);
 
-                if (!m_Textures[i]->Load()) 
+                 if(p.c_str()[0] == '*')
+                 {
+                     m_Textures[i] = new Texture(p.c_str(),GL_LINEAR,pScene->mTextures);
+                 }else
+                 {
+                     m_Textures[i] = new Texture(FullPath.c_str(),GL_LINEAR);
+                 }
+                 
+                    
+                if (m_Textures[i]->Load()) 
                 {
                     printf("Error loading texture '%s'\n", FullPath.c_str());
                     delete m_Textures[i];
@@ -292,6 +307,13 @@ void Model::InitMesh(unsigned MeshIndex,
         Indices.push_back(Face.mIndices[1]);
         Indices.push_back(Face.mIndices[2]);
     }
+}
+
+void Model::SetBoneTransform(unsigned Index, const Matrix4f& Transform)
+{
+    assert(Index < MAX_BONES);
+    //Transform.Print();
+    glUniformMatrix4fv(m_boneLocation[Index], 1, GL_TRUE, (const GLfloat*)Transform);       
 }
 
 

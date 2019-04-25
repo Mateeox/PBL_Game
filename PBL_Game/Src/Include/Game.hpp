@@ -26,6 +26,7 @@ class Game
     Shader *shaderProgram;
     Shader *shaderProgram_For_Model;
     std::vector<SceneNode> sNodes;
+    
 
     bool mouseCallBack = true;
     bool firstMouse = true;
