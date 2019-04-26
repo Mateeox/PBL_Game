@@ -108,8 +108,6 @@ class Model : public ComponentSystem::Component
   unsigned m_VAO;
   unsigned m_Buffers[NUM_VBs];
 
-  std::vector<Texture *> m_Textures;
-
 public:
   void Clear();
   Model(std::string &path, Shader &aShaderProgram, bool gammaCorrection);
@@ -122,11 +120,10 @@ public:
   }
 
 private:
-  std::vector<Texture> textures_loaded;
   std::map<std::string, unsigned> m_BoneMapping;
   std::vector<BoneInfo> m_BoneInfo;
   std::vector<MeshEntry> m_Entries;
-
+  std::vector<Texture *> m_Textures;
   unsigned m_boneLocation[MAX_BONES];
 
   unsigned m_NumBones;
