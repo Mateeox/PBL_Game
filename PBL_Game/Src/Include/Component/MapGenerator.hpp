@@ -8,7 +8,8 @@ class MapGenerator //: public Script
 	private:
 	std::map <glm::vec2, MapElement> map;
 	
-	float GetDirection();
+	float GetDirection(bool canBeZero);
+	void CheckFroWallsNDoors();
 
 	public:
 	MapGenerator();
