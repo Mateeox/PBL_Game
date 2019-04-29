@@ -233,8 +233,6 @@ void Game::Serialize()
 
 void Game::SerializeFaza1(std::map<SceneNode *, unsigned> &map)
 {
-  this->sNodes[0].AddChild(&this->sNodes[1]);
-  this->sNodes[1].AddParent(&this->sNodes[0]);
   for (SceneNode &scene : this->sNodes)
   {
     unsigned n = map.size() + 1;

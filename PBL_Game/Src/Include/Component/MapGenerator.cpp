@@ -1,15 +1,21 @@
 #include "Component/MapGenerator.hpp"
 
-MapGenerator::MapGenerator()
+MapGenerator::MapGenerator(std::vector<SceneNode>* nodes)
 {
+	this->nodes = nodes;
 	srand(time(NULL));
 	GenerateMap(4);
+	CheckForWallsNDoors();
+	FnishGeneration();
 }
 
-MapGenerator::MapGenerator(int squares, int doors, bool glass_doors)
+MapGenerator::MapGenerator(std::vector<SceneNode>* nodes, int squares, int doors, bool glass_doors)
 {
+	this->nodes = nodes;
 	srand(time(NULL));
 	GenerateMap(squares);
+	CheckForWallsNDoors();
+	FnishGeneration();
 }
 
 void MapGenerator::GenerateMap(int n)
@@ -35,7 +41,7 @@ float MapGenerator::GetDirection(bool canBeZero = true)
 	return result;
 }
 
-void MapGenerator::CheckFroWallsNDoors()
+void MapGenerator::CheckForWallsNDoors()
 {
 	for (std::map<glm::vec2, MapElement>::iterator it = map.begin(); it != map.end(); ++it)
 	{
@@ -47,5 +53,14 @@ void MapGenerator::CheckFroWallsNDoors()
 			else
 				it->second.SetDoor(it->second.Position - *neighbour);
 		}
+	}
+}
+
+void MapGenerator::FnishGeneration()
+{
+	SceneNode mapRoot;
+	for (std::map<glm::vec2, MapElement>::iterator element = map.begin(); element != map.end(); ++element)
+	{
+		element->second.GenerateNode(nodes, &mapRoot);
 	}
 }

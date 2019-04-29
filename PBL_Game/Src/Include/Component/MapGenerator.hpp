@@ -7,12 +7,14 @@ class MapGenerator //: public Script
 {
 	private:
 	std::map <glm::vec2, MapElement> map;
-	
+	std::vector<SceneNode>* nodes;
+
 	float GetDirection(bool canBeZero);
-	void CheckFroWallsNDoors();
+	void CheckForWallsNDoors();
+	void GenerateMap(int n);
+	void FnishGeneration();
 
 	public:
-	MapGenerator();
-	MapGenerator(int squares, int doors, bool glass_door);
-	void GenerateMap(int n);
+	MapGenerator(std::vector<SceneNode>* nodes);
+	MapGenerator(std::vector<SceneNode>* nodes, int squares, int doors, bool glass_door);
 };
