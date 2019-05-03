@@ -27,16 +27,18 @@ bool Texture::Load()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mipmap_param);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mipmap_param);
 	// load image, create texture and generate mipmaps
-	int width, height, nrChannels;
+	int width, height, nrChannels, components_per_pixel;
 	// The FileSystem::getPath(...) is part of the GitHub repository so we can find files on any IDE/platform; replace it with your own image path.
 
 	unsigned char *data = nullptr;
+	unsigned char *embdata = nullptr;
 	aiTexture *embededData = nullptr;
 
 	if (textures != nullptr)
 	{
 
 		embededData = textures[(int)(path.c_str()[1] - '0')];
+		embdata = stbi_load_from_memory(reinterpret_cast<unsigned char *>(embededData->pcData), embededData->mWidth, &width, &height, &components_per_pixel, 0);
 	}
 	else
 	{
@@ -45,9 +47,17 @@ bool Texture::Load()
 
 	if (data != nullptr || embededData != nullptr)
 	{
-		if (textures != nullptr)
+		if (embededData != nullptr)
 		{
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, embededData->mWidth, embededData->mHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, embededData->pcData);
+			
+			if (components_per_pixel == 3)
+			{
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, embdata);
+			}
+			else if (components_per_pixel == 4)
+			{
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, embdata);
+			}
 		}
 		else
 		{
@@ -67,7 +77,6 @@ bool Texture::Load()
 	{
 		stbi_image_free(data);
 	}
-
 
 	return 0;
 }
