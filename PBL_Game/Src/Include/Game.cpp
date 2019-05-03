@@ -19,12 +19,18 @@ void Game::SetViewAndPerspective(Camera & aCamera)
   shaderProgram_For_Model->use();
   shaderProgram_For_Model->setMat4("projection", projection);
   shaderProgram_For_Model->setMat4("view", view);
+
+  animatedModel->use();
+  animatedModel->setMat4("projection", projection);
+  animatedModel->setMat4("view", view);
 }
 
 Game::Game(Window &aOkno) : okienko(aOkno), camera(Camera()), camera2(Camera())
 {
   shaderProgram = new Shader("Shaders/vertex4.txt", "Shaders/fragment3.txt");
   shaderProgram_For_Model = new Shader("Shaders/vertexModel.txt", "Shaders/fragmentModel.txt");
+
+  animatedModel = new Shader("Shaders/skinning.vs", "Shaders/skinning.fs");
 
   glfwSetCursorPosCallback(okienko.window, mouse_callback);
 }
@@ -33,7 +39,7 @@ void Game::Granko()
 {
   Texture *xD = new Texture("Textures/red.png", GL_LINEAR);
   xD->Load();
-  
+
   SceneNode scena1_new;
   SceneNode FloorNode_new;
   SceneNode box1;
