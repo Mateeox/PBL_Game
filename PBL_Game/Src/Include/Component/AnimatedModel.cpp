@@ -179,7 +179,7 @@ bool AnimatedModel::InitMaterials(const aiScene *pScene, const std::string &File
 		{
 			aiString Path;
 
-			if (pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS)
+			if (pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &Path) == AI_SUCCESS)
 			{
 				std::string p(Path.data);
 
