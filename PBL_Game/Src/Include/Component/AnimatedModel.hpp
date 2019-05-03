@@ -103,14 +103,14 @@ struct MeshEntry
   unsigned int MaterialIndex;
 };
 
-class Model : public ComponentSystem::Component
+class AnimatedModel : public ComponentSystem::Component
 {
   unsigned m_VAO;
   unsigned m_Buffers[NUM_VBs];
 
 public:
   void Clear();
-  Model(std::string &path, Shader &aShaderProgram, bool gammaCorrection);
+  AnimatedModel(std::string &path, Shader &aShaderProgram, bool gammaCorrection);
   void Draw(glm::mat4 &transform);
   Shader &ShaderProgram;
 
@@ -136,7 +136,7 @@ private:
   void CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
   void CalcInterpolatedScaling(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
   void CalcInterpolatedPosition(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);  
-  bool loadModel(std::string &path);
+  bool loadAnimatedModel(std::string &path);
   bool InitMaterials(const aiScene *pScene, const std::string &Filename);
 
   unsigned FindRotation(float AnimationTime, const aiNodeAnim* pNodeAnim);

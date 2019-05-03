@@ -1,7 +1,7 @@
 
 #include "Game.hpp"
 #include "Component/ShapeRenderer3D.hpp"
-#include "Component/Model.hpp"
+#include "Component/AnimatedModel.hpp"
 #include "Shapes.hpp"
 
 static bool leftSideActive = true;
@@ -47,9 +47,9 @@ void Game::Granko()
   GameObject *hexObj = new GameObject(scena3_new.world);
 
   std::string BeeModelPath = "Models/enemy_anim_embeded.fbx";
-  Model *BeeModel = new Model(BeeModelPath, *shaderProgram_For_Model, false);
+  AnimatedModel *BeeModel = new AnimatedModel(BeeModelPath, *shaderProgram_For_Model, false);
 
-  printf("Model Loaded !! \n");
+  printf("AnimatedModel Loaded !! \n");
 
   ShapeRenderer3D *Floor = new ShapeRenderer3D(Shapes::RainBow_Square,
                                                Shapes::RB_Square_indices,
@@ -83,7 +83,7 @@ void Game::Granko()
   FloorNode_new.AddGameObject(FloorObj);
   scena3_new.AddGameObject(hexObj);
 
-  auto xd = beeObj->GetComponent(ComponentSystem::Model);
+  auto xd = beeObj->GetComponent(ComponentSystem::AnimatedModel);
   if (xd != nullptr)
   {
     printf("no jest \n");
