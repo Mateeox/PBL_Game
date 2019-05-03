@@ -2,6 +2,7 @@
 #include "Game.hpp"
 #include "Component/ShapeRenderer3D.hpp"
 #include "Component/Model.hpp"
+#include "Component/AnimatedModel.hpp"
 #include "Shapes.hpp"
 
 static bool leftSideActive = true;
@@ -20,9 +21,9 @@ void Game::SetViewAndPerspective(Camera & aCamera)
   shaderProgram_For_Model->setMat4("projection", projection);
   shaderProgram_For_Model->setMat4("view", view);
 
-  animatedModel->use();
-  animatedModel->setMat4("projection", projection);
-  animatedModel->setMat4("view", view);
+  shaderAnimatedModel->use();
+  shaderAnimatedModel->setMat4("projection", projection);
+  shaderAnimatedModel->setMat4("view", view);
 }
 
 Game::Game(Window &aOkno) : okienko(aOkno), camera(Camera()), camera2(Camera())
@@ -30,7 +31,7 @@ Game::Game(Window &aOkno) : okienko(aOkno), camera(Camera()), camera2(Camera())
   shaderProgram = new Shader("Shaders/vertex4.txt", "Shaders/fragment3.txt");
   shaderProgram_For_Model = new Shader("Shaders/vertexModel.txt", "Shaders/fragmentModel.txt");
 
-  animatedModel = new Shader("Shaders/skinning.vs", "Shaders/skinning.fs");
+  shaderAnimatedModel = new Shader("Shaders/skinning.vs", "Shaders/skinning.fs");
 
   glfwSetCursorPosCallback(okienko.window, mouse_callback);
 }
@@ -46,22 +47,29 @@ void Game::Granko()
   SceneNode box2;
   SceneNode box3;
 
+  SceneNode Enemy_Node;
+
   SceneNode leftPlayerNode;
   SceneNode rightPlayerNode;
+
+  GameObject *enemyGameObject = new GameObject(Enemy_Node.local); 
 
   GameObject *leftPlayerObj = new GameObject(leftPlayerNode.local);
   leftPlayerObj->setTag("player");
   GameObject *rightPlayerObj = new GameObject(rightPlayerNode.local);
   rightPlayerObj->setTag("player");
+  
   GameObject *trojObj = new GameObject(scena1_new.world);
   GameObject *FloorObj = new GameObject(FloorNode_new.world);
   GameObject *hexObj2 = new GameObject(box2.local);
   GameObject *hexObj3 = new GameObject(box3.local);
 
   std::string BeeModelPath = "Models/enemy_model.obj";
-  Model *BeeModel = new Model(BeeModelPath, *shaderProgram_For_Model, false);
+  std::string AnimatedEnemyPAth = "Models/enemy_anim_embeded.fbx";
 
-  printf("Model Loaded !! \n");
+  Model *BeeModel = new Model(BeeModelPath, *shaderProgram_For_Model, false);
+  AnimatedModel *animatedModel = new AnimatedModel(AnimatedEnemyPAth, *shaderAnimatedModel, false);
+
 
   ShapeRenderer3D *Floor = new ShapeRenderer3D(Shapes::RainBow_Square,
                                                Shapes::RB_Square_indices,
@@ -86,6 +94,7 @@ void Game::Granko()
 
   leftPlayerObj->AddComponent(BeeModel);
   rightPlayerObj->AddComponent(BeeModel);
+  enemyGameObject->AddComponent(animatedModel);
 
   trojObj->AddComponent(trojkat);
   FloorObj->AddComponent(Floor);
@@ -96,6 +105,7 @@ void Game::Granko()
   Collider* rightPlayerCollider = new Collider(rightPlayerObj->transform);
   leftPlayerCollider->setDimensions(-0.12, 0, 0.25, 2.3, 2, 3.05);
   rightPlayerCollider->setDimensions(-0.12, 0, 0.25, 2.3, 2, 3.05);
+  
   leftPlayerObj->AddComponent(leftPlayerCollider);
   rightPlayerObj->AddComponent(rightPlayerCollider);
   leftPlayerNode.AddGameObject(leftPlayerObj);
@@ -108,41 +118,32 @@ void Game::Granko()
   box3Collider->setDimensions(0, 0, 0, 2, 2, 2);
   hexObj3->AddComponent(box3Collider);
 
+
+  Enemy_Node.AddGameObject(enemyGameObject);
   scena1_new.AddGameObject(trojObj);
   FloorNode_new.AddGameObject(FloorObj);
   box2.AddGameObject(hexObj2);
   box3.AddGameObject(hexObj3);
 
-  auto xd = leftPlayerObj->GetComponent(ComponentSystem::Model);
-  auto rightPlayerModel = rightPlayerObj->GetComponent(ComponentSystem::Model);
-  if (xd != nullptr)
-  {
-    printf("no jest \n");
-  }
-  if (rightPlayerModel == nullptr)
-  {
-	  printf("rightPlayerModel is nullptr");
-  }
-
-  if (leftPlayerNode.gameObject == nullptr)
-  {
-    printf("leftPlayerNode gameObject nullptr ;/ \n");
-  }
-  if (rightPlayerNode.gameObject == nullptr)
-  {
-	  printf("rightPlayerNode gameObject nullptr ;/ \n");
-  }
-
   leftPlayerNode.Scale(0.01, 0.01, 0.01);
   rightPlayerNode.Scale(0.01, 0.01, 0.01);
-
+  Enemy_Node.Scale(0.01, 0.01, 0.01);
   box1.Scale(0.1f, 0.6f, 1.0f);
+
+  leftPlayerNode.Translate(-150.0,0,0);
+  rightPlayerNode.Translate(150.0,0,0);
+
+  Enemy_Node.Translate(5, 5, 0);
   box2.Translate(5, 0, 0);
   box3.Translate(-5, 0, 0);
   FloorNode_new.Translate(0.0f, -1.0f, 0.1f);
-  FloorNode_new.Rotate(90.0f, glm::vec3(1, 0, 0));
-  FloorNode_new.Scale(100, 100, 100);
 
+  FloorNode_new.Rotate(90.0f, glm::vec3(1, 0, 0));
+ 
+ FloorNode_new.Scale(100, 100, 100);
+
+
+  sNodes.push_back(&Enemy_Node);
   sNodes.push_back(&leftPlayerNode);
   rightNodes.push_back(&rightPlayerNode);
   //sNodes.push_back(&scena1_new);

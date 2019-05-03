@@ -1,7 +1,8 @@
-
+#pragma once
 #include <GL/gl3w.h>
 #include <string>
 #include <assimp/scene.h>
+
 class Texture
 {
 

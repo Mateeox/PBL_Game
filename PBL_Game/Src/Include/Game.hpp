@@ -26,7 +26,7 @@ class Game
     Window &okienko;
     Shader *shaderProgram;
     Shader *shaderProgram_For_Model;
-    Shader *animatedModel;
+    Shader *shaderAnimatedModel;
     std::vector<SceneNode*> sNodes;
 	std::vector<SceneNode*> rightNodes;
     std::vector<Collider*> collidableObjects;
