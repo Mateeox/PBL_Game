@@ -8,6 +8,8 @@
 #include <iostream>
 #include <glm/glm.hpp>
 
+#define INVALID_UNIFORM_LOCATION 0xffffffff
+
 class Shader
 {
 

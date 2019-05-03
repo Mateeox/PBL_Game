@@ -53,6 +53,7 @@ add_executable(PBL_Game
 	Src/Include/Component/Mesh.cpp
 	Src/Include/Component/Model.cpp
 	Src/Include/Component/AnimatedModel.cpp
+	Src/Include/Component/BoneUtils.cpp
 	#Stb_image
 	Src/Include/stb_image.cpp
 	#ImGui
