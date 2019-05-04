@@ -3,6 +3,8 @@
 #include "Component.hpp"
 #include "Shader.hpp"
 #include <glm/glm.hpp>
+#include <map>
+
 
 using glm::vec3;
 
@@ -19,7 +21,10 @@ class PointLight : public ComponentSystem::Component
     
     unsigned mLightNumber;
     std::string mLightNumberAsString;
+    std::map<std::string,std::string>  pointLightStringMap;
 
+    void SetLightMapStringValues(std::string aNumber);
+    
   public:
     PointLight(vec3 aAmbient, vec3 aDiffuse, vec3 aSpecular,
                float aConstant, float aLinear, float aQuadratic,Shader & aShaderProgram,unsigned aLightNumber);
