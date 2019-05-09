@@ -5,10 +5,13 @@
 #include "Component/AnimatedModel.hpp"
 #include "Shapes.hpp"
 
+#include <fstream>
+#include <iterator>
+
 static bool leftSideActive = true;
 static bool swapButtonPressed = false;
 
-void Game::SetViewAndPerspective(Camera & aCamera)
+void Game::SetViewAndPerspective(Camera &aCamera)
 {
   projection = glm::perspective(aCamera.Zoom, (float)Game::WINDOW_WIDTH / (float)Game::WINDOW_HEIGHT, 0.1f, 100.0f);
   view = aCamera.GetViewMatrix();
@@ -28,12 +31,66 @@ void Game::SetViewAndPerspective(Camera & aCamera)
 
 Game::Game(Window &aOkno) : okienko(aOkno), camera(Camera()), camera2(Camera())
 {
+  LoadConfig();
+
   shaderProgram = new Shader("Shaders/vertex4.txt", "Shaders/fragment3.txt");
   shaderProgram_For_Model = new Shader("Shaders/vertexModel.txt", "Shaders/fragmentModel.txt");
-
   shaderAnimatedModel = new Shader("Shaders/skinning.vs", "Shaders/skinning.fs");
 
   glfwSetCursorPosCallback(okienko.window, mouse_callback);
+}
+
+void Game::LoadConfig()
+{
+  std::ifstream fileStream;
+  fileStream.open("Configuration/Cale_te.txt", fileStream.in);
+
+  if (fileStream.good())
+  {
+    std::string str;
+    std::string emptyString{};
+    std::vector<std::string> StringsInLine;
+    std::string Name{};
+    std::string ValueType;
+    TypeVariant value;
+
+    while (getline(fileStream, str))
+    {
+      if (str != emptyString)
+      {
+        StringsInLine = ConfigUtils::split(str, ' ');
+        Name = StringsInLine[0];
+        ValueType = StringsInLine[1];
+
+        if (ValueType == "i")
+        {
+          value = ConfigUtils::GetTypeFromString<int>(ValueType, StringsInLine[2]);
+        }
+        else if (ValueType == "u")
+        {
+          value = ConfigUtils::GetTypeFromString<unsigned long>(ValueType, StringsInLine[2]);
+        }
+        else if (ValueType == "f")
+        {
+          value = ConfigUtils::GetTypeFromString<float>(ValueType, StringsInLine[2]);
+        }
+        else if (ValueType == "d")
+        {
+          value = ConfigUtils::GetTypeFromString<double>(ValueType, StringsInLine[2]);
+        }
+        else
+        {
+          value = ConfigUtils::GetTypeFromString<std::string>(ValueType, StringsInLine[2]);
+        }
+
+        ConfigMap.insert(Name, value);
+      }
+      else
+      {
+        continue;
+      }
+    }
+  }
 }
 
 void Game::Granko()
@@ -52,13 +109,13 @@ void Game::Granko()
   SceneNode leftPlayerNode;
   SceneNode rightPlayerNode;
 
-  GameObject *enemyGameObject = new GameObject(Enemy_Node.local); 
+  GameObject *enemyGameObject = new GameObject(Enemy_Node.local);
 
   GameObject *leftPlayerObj = new GameObject(leftPlayerNode.local);
   leftPlayerObj->setTag("player");
   GameObject *rightPlayerObj = new GameObject(rightPlayerNode.local);
   rightPlayerObj->setTag("player");
-  
+
   GameObject *trojObj = new GameObject(scena1_new.world);
   GameObject *FloorObj = new GameObject(FloorNode_new.world);
   GameObject *hexObj2 = new GameObject(box2.local);
@@ -69,7 +126,6 @@ void Game::Granko()
 
   Model *BeeModel = new Model(BeeModelPath, *shaderProgram_For_Model, false);
   AnimatedModel *animatedModel = new AnimatedModel(AnimatedEnemyPAth, *shaderAnimatedModel, false);
-
 
   ShapeRenderer3D *Floor = new ShapeRenderer3D(Shapes::RainBow_Square,
                                                Shapes::RB_Square_indices,
@@ -101,23 +157,22 @@ void Game::Granko()
   hexObj2->AddComponent(szescian);
   hexObj3->AddComponent(szescian);
 
-  Collider* leftPlayerCollider = new Collider(leftPlayerObj->transform);
-  Collider* rightPlayerCollider = new Collider(rightPlayerObj->transform);
+  Collider *leftPlayerCollider = new Collider(leftPlayerObj->transform);
+  Collider *rightPlayerCollider = new Collider(rightPlayerObj->transform);
   leftPlayerCollider->setDimensions(-0.12, 0, 0.25, 2.3, 2, 3.05);
   rightPlayerCollider->setDimensions(-0.12, 0, 0.25, 2.3, 2, 3.05);
-  
+
   leftPlayerObj->AddComponent(leftPlayerCollider);
   rightPlayerObj->AddComponent(rightPlayerCollider);
   leftPlayerNode.AddGameObject(leftPlayerObj);
   rightPlayerNode.AddGameObject(rightPlayerObj);
 
-  Collider* box2Collider = new Collider(hexObj2->transform);
+  Collider *box2Collider = new Collider(hexObj2->transform);
   box2Collider->setDimensions(0, 0, 0, 2, 2, 2);
   hexObj2->AddComponent(box2Collider);
-  Collider* box3Collider = new Collider(hexObj3->transform);
+  Collider *box3Collider = new Collider(hexObj3->transform);
   box3Collider->setDimensions(0, 0, 0, 2, 2, 2);
   hexObj3->AddComponent(box3Collider);
-
 
   Enemy_Node.AddGameObject(enemyGameObject);
   scena1_new.AddGameObject(trojObj);
@@ -130,8 +185,8 @@ void Game::Granko()
   Enemy_Node.Scale(0.01, 0.01, 0.01);
   box1.Scale(0.1f, 0.6f, 1.0f);
 
-  leftPlayerNode.Translate(-150.0,0,0);
-  rightPlayerNode.Translate(150.0,0,0);
+  leftPlayerNode.Translate(-150.0, 0, 0);
+  rightPlayerNode.Translate(150.0, 0, 0);
 
   Enemy_Node.Translate(5, 5, 0);
   box2.Translate(5, 0, 0);
@@ -139,9 +194,8 @@ void Game::Granko()
   FloorNode_new.Translate(0.0f, -1.0f, 0.1f);
 
   FloorNode_new.Rotate(90.0f, glm::vec3(1, 0, 0));
- 
- FloorNode_new.Scale(100, 100, 100);
 
+  FloorNode_new.Scale(100, 100, 100);
 
   sNodes.push_back(&Enemy_Node);
   sNodes.push_back(&leftPlayerNode);
@@ -165,7 +219,7 @@ void Game::Granko()
   {
 
     loops = 0;
-	
+
     while ((glfwGetTime() * 1000) > next_game_tick && loops < MAX_FRAMESKIP)
     {
       Update(interpolation);
@@ -174,11 +228,10 @@ void Game::Granko()
       loops++;
     }
 
-	if (leftSideActive)
-		UpdatePlayer(leftPlayerNode, camera);
-	else
-		UpdatePlayer(rightPlayerNode, camera2);
-	
+    if (leftSideActive)
+      UpdatePlayer(leftPlayerNode, camera);
+    else
+      UpdatePlayer(rightPlayerNode, camera2);
 
     interpolation =
         float((glfwGetTime() * 1000) + SKIP_TICKS - next_game_tick) /
@@ -215,8 +268,6 @@ void Game::Update(float interpolation)
   }
 }
 
-
-
 void Game::Render()
 {
   glfwPollEvents();
@@ -233,17 +284,16 @@ void Game::Render()
     ImGui::Begin("Klawiszologia",
                  &show_demo_window); // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
     ImGui::Text("Q - zmiana strony");
-	ImGui::Text("Strzalki - ruch postaci");
+    ImGui::Text("Strzalki - ruch postaci");
     ImGui::End();
   }
   ImGui::Render();
 
   Transform originTransform = Transform::origin();
 
-
   SetViewAndPerspective(camera);
   // RENDER LEWEJ STRONY
-  glViewport(0, 0, (Game::WINDOW_WIDTH / 2) +125, Game::WINDOW_HEIGHT);
+  glViewport(0, 0, (Game::WINDOW_WIDTH / 2) + 125, Game::WINDOW_HEIGHT);
   glScissor(0, 0, (Game::WINDOW_WIDTH / 2) + offset, Game::WINDOW_HEIGHT);
   glClearColor(1, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT);
@@ -255,7 +305,7 @@ void Game::Render()
   SetViewAndPerspective(camera2);
 
   // RENDER PRAWEJ STRONY
-  glViewport((Game::WINDOW_WIDTH / 2) -125 , 0, (Game::WINDOW_WIDTH / 2) +125, Game::WINDOW_HEIGHT);
+  glViewport((Game::WINDOW_WIDTH / 2) - 125, 0, (Game::WINDOW_WIDTH / 2) + 125, Game::WINDOW_HEIGHT);
   glScissor((Game::WINDOW_WIDTH / 2) + offset, 0, (Game::WINDOW_WIDTH / 2) - offset, Game::WINDOW_HEIGHT);
   glClearColor(0, 0, 1, 1);
   glClear(GL_COLOR_BUFFER_BIT);
@@ -263,7 +313,7 @@ void Game::Render()
   sNodes[1]->Render(originTransform, true);
   for (auto node : rightNodes)
   {
-	  node->Render(originTransform, true);
+    node->Render(originTransform, true);
   }
 
   // RENDER PASKA ODDZIELAJACAEGO KAMERY - TODO
@@ -294,7 +344,7 @@ void Game::SerializeFaza1(std::map<SceneNode *, unsigned> &map)
 {
   this->sNodes[0]->AddChild(this->sNodes[1]);
   this->sNodes[1]->AddParent(this->sNodes[0]);
-  for (SceneNode* scene : this->sNodes)
+  for (SceneNode *scene : this->sNodes)
   {
     unsigned n = map.size() + 1;
     map.insert(std::pair<SceneNode *, unsigned>(scene, n));
@@ -510,55 +560,52 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos)
   posy = ypos;
 }
 
-
-void Game::UpdatePlayer(SceneNode& player, Camera& camera)
+void Game::UpdatePlayer(SceneNode &player, Camera &camera)
 {
-	Transform transformBeforeMove(player.gameObject->transform);
+  Transform transformBeforeMove(player.gameObject->transform);
 
+  const float movementSpeed = 4.0f;
+  glm::vec3 movementDir(0);
 
-	const float movementSpeed = 4.0f;
-	glm::vec3 movementDir(0);
+  if (glfwGetKey(okienko.window, GLFW_KEY_UP) == GLFW_PRESS)
+    movementDir.z = -1;
+  if (glfwGetKey(okienko.window, GLFW_KEY_DOWN) == GLFW_PRESS)
+    movementDir.z = 1;
+  if (glfwGetKey(okienko.window, GLFW_KEY_LEFT) == GLFW_PRESS)
+    movementDir.x = -1;
+  if (glfwGetKey(okienko.window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+    movementDir.x = 1;
 
-	if (glfwGetKey(okienko.window, GLFW_KEY_UP) == GLFW_PRESS)
-		movementDir.z = -1;
-	if (glfwGetKey(okienko.window, GLFW_KEY_DOWN) == GLFW_PRESS)
-		movementDir.z = 1;
-	if (glfwGetKey(okienko.window, GLFW_KEY_LEFT) == GLFW_PRESS)
-		movementDir.x = -1;
-	if (glfwGetKey(okienko.window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-		movementDir.x = 1;
+  glm::vec3 move = movementDir * movementSpeed;
+  player.Translate(move.x, move.y, move.z);
+  Collider *playerCollider = ((Collider *)player.gameObject->GetComponent(ComponentSystem::ComponentType::Collider));
+  //check if there are any collisions, if yes - abort the move
+  for (Collider *collider : collidableObjects)
+  {
+    if (playerCollider->checkCollision(collider))
+    {
+      player.local = transformBeforeMove;
+      playerCollider->transform = transformBeforeMove;
+      break;
+    }
+  }
 
-	glm::vec3 move = movementDir * movementSpeed;
-	player.Translate(move.x, move.y, move.z);
-	Collider* playerCollider = ((Collider*)player.gameObject->GetComponent(ComponentSystem::ComponentType::Collider));
-	//check if there are any collisions, if yes - abort the move
-	for (Collider* collider : collidableObjects)
-	{
-		if (playerCollider->checkCollision(collider))
-		{
-			player.local = transformBeforeMove;
-			playerCollider->transform = transformBeforeMove;
-			break;
-		}
-	}
-
-	camera.Position.x = player.gameObject->transform.getPosition().x * player.gameObject->transform.getScale().x;
-	camera.Position.z = player.gameObject->transform.getPosition().z * player.gameObject->transform.getScale().z + cameraZOffset;
+  camera.Position.x = player.gameObject->transform.getPosition().x * player.gameObject->transform.getScale().x;
+  camera.Position.z = player.gameObject->transform.getPosition().z * player.gameObject->transform.getScale().z + cameraZOffset;
 }
 
-void Game::gatherCollidableObjects(std::vector<SceneNode*>& nodes)
+void Game::gatherCollidableObjects(std::vector<SceneNode *> &nodes)
 {
-	for (auto node : nodes)
-	{
-		if (node->gameObject->getTag() != "player" && node->gameObject->getTag() != "enemy")
-		{
-			ComponentSystem::Component* possibleCollider = node->gameObject->GetComponent(ComponentSystem::ComponentType::Collider);
-			if (possibleCollider != nullptr)
-			{
-				collidableObjects.push_back((Collider*)possibleCollider);
-			}
-			gatherCollidableObjects(node->children);
-		}
-	}
+  for (auto node : nodes)
+  {
+    if (node->gameObject->getTag() != "player" && node->gameObject->getTag() != "enemy")
+    {
+      ComponentSystem::Component *possibleCollider = node->gameObject->GetComponent(ComponentSystem::ComponentType::Collider);
+      if (possibleCollider != nullptr)
+      {
+        collidableObjects.push_back((Collider *)possibleCollider);
+      }
+      gatherCollidableObjects(node->children);
+    }
+  }
 }
-
