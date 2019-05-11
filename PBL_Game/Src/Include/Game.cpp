@@ -29,6 +29,49 @@ void Game::SetViewAndPerspective(Camera &aCamera)
   shaderAnimatedModel->setMat4("view", view);
 }
 
+void Game::GetVariantValueAndInsertToMap(tinyxml2::XMLElement *xmlelemnt)
+{
+  VariantType value;
+  std::string elementType = xmlelemnt->FirstChildElement("Type")->GetText();
+  std::string elementName = xmlelemnt->FirstChildElement("Name")->GetText();
+
+  if (elementType == "I")
+  {
+    value = xmlelemnt->FirstChildElement("Value")->IntText();
+    //std::cout << std::get<int>(value) << "\n";
+  }
+  else if (elementType == "U")
+  {
+    value = xmlelemnt->FirstChildElement("Value")->UnsignedText();
+    //std::cout << std::get<unsigned>(value) << "\n";
+  }
+  else if (elementType == "F")
+  {
+    value = xmlelemnt->FirstChildElement("Value")->FloatText();
+    //std::cout << std::get<float>(value) << "\n";
+  }
+  else if (elementType == "D")
+  {
+    value = xmlelemnt->FirstChildElement("Value")->DoubleText();
+   // std::cout << std::get<double>(value) << "\n";
+  }
+  else if (elementType == "S")
+  {
+    value = xmlelemnt->FirstChildElement("Value")->GetText();
+    //std::cout << std::get<std::string>(value) << "\n";
+  }
+
+  if (ConfigMap.find(elementName) == ConfigMap.end())
+  {
+    ConfigMap[elementName] = value;
+  }
+  else
+  {
+    printf("Element already in map change Name !! \n");
+  }
+  
+}
+
 void Game::LoadConfig()
 {
   tinyxml2::XMLDocument doc;
@@ -38,38 +81,9 @@ void Game::LoadConfig()
 
   if (pRoot != nullptr)
   {
-    tinyxml2::XMLElement *pChild = pRoot->FirstChildElement();
-    if (pChild == nullptr)
-      printf("child == nulptr \n");
-
-    tinyxml2::XMLElement *pElement = pChild->FirstChildElement();
-
-    if (pElement != nullptr)
+    for (tinyxml2::XMLElement *e = pRoot->FirstChildElement(); e != nullptr; e = e->NextSiblingElement())
     {
-      pElement = pRoot->ToElement(); // ->FirstChildElement("ConfigParameter");
-
-      tinyxml2::XMLElement *firstElement = pElement->FirstChildElement();
-      tinyxml2::XMLElement *lastElemnt = pElement->FirstChildElement();
-
-      if (firstElement != nullptr)
-      {
-
-        std::cout << firstElement->Value() << "\n";
-        std::cout << firstElement->FirstChildElement("Name")->GetText() << "\n";
-
-        std::cout << lastElemnt->Value() << "\n";
-        std::cout << lastElemnt->FirstChildElement("Name")->Value() << "\n";
-        tinyxml2::XMLElement *nexElement = firstElement->NextSiblingElement();
-      }
-      else
-      {
-        printf("No element in child \n");
-      }
-    }
-    else
-    {
-      std::cout << "Value not in file ..."
-                << "\n";
+      GetVariantValueAndInsertToMap(e);
     }
   }
 }

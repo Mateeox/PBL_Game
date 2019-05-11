@@ -22,6 +22,8 @@ static bool Tab_Pressed = false;
 
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 
+using VariantType = std::variant<int,unsigned,float,double,std::string>;
+
 class Game
 {
 
@@ -34,7 +36,8 @@ class Game
   std::vector<Collider *> collidableObjects;
 
   void LoadConfig();
-  std::map<std::string,std::variant<int,unsigned long,float,double,std::string>> ConfigMap;
+  void GetVariantValueAndInsertToMap(tinyxml2::XMLElement *xmlelemnt);
+  std::map<std::string,VariantType> ConfigMap;
 
   bool mouseCallBack = true;
   bool firstMouse = true;
@@ -81,3 +84,15 @@ private:
 
   void SetViewAndPerspective(Camera &aCamera);
 };
+
+//How to get value from config
+
+// 
+// 
+// 
+// 
+// 
+// 
+
+
+
