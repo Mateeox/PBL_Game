@@ -29,49 +29,6 @@ void Game::SetViewAndPerspective(Camera &aCamera)
   shaderAnimatedModel->setMat4("view", view);
 }
 
-void Game::GetVariantValueAndInsertToMap(tinyxml2::XMLElement *xmlelemnt)
-{
-  VariantType value;
-  std::string elementType = xmlelemnt->FirstChildElement("Type")->GetText();
-  std::string elementName = xmlelemnt->FirstChildElement("Name")->GetText();
-
-  if (elementType == "I")
-  {
-    value = xmlelemnt->FirstChildElement("Value")->IntText();
-    //std::cout << std::get<int>(value) << "\n";
-  }
-  else if (elementType == "U")
-  {
-    value = xmlelemnt->FirstChildElement("Value")->UnsignedText();
-    //std::cout << std::get<unsigned>(value) << "\n";
-  }
-  else if (elementType == "F")
-  {
-    value = xmlelemnt->FirstChildElement("Value")->FloatText();
-    //std::cout << std::get<float>(value) << "\n";
-  }
-  else if (elementType == "D")
-  {
-    value = xmlelemnt->FirstChildElement("Value")->DoubleText();
-   // std::cout << std::get<double>(value) << "\n";
-  }
-  else if (elementType == "S")
-  {
-    value = xmlelemnt->FirstChildElement("Value")->GetText();
-    //std::cout << std::get<std::string>(value) << "\n";
-  }
-
-  if (ConfigMap.find(elementName) == ConfigMap.end())
-  {
-    ConfigMap[elementName] = value;
-  }
-  else
-  {
-    printf("Element already in map change Name !! \n");
-  }
-  
-}
-
 void Game::LoadConfig()
 {
   tinyxml2::XMLDocument doc;
@@ -83,7 +40,7 @@ void Game::LoadConfig()
   {
     for (tinyxml2::XMLElement *e = pRoot->FirstChildElement(); e != nullptr; e = e->NextSiblingElement())
     {
-      GetVariantValueAndInsertToMap(e);
+      ConfigUtils::GetVariantValueAndInsertToMap(e,ConfigMap);
     }
   }
 }
@@ -92,6 +49,7 @@ Game::Game(Window &aOkno) : okienko(aOkno), camera(Camera()), camera2(Camera())
 {
 
   LoadConfig();
+
   shaderProgram = new Shader("Shaders/vertex4.txt", "Shaders/fragment3.txt");
   shaderProgram_For_Model = new Shader("Shaders/vertexModel.txt", "Shaders/fragmentModel.txt");
   shaderAnimatedModel = new Shader("Shaders/skinning.vs", "Shaders/skinning.fs");

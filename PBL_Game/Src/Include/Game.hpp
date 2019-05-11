@@ -3,9 +3,7 @@
 #include "Shader.hpp"
 #include "SceneNode.hpp"
 #include "Collider.hpp"
-#include <map>
-#include <variant>
-#include <tinyxml2.h>
+#include "ConfigUtils.hpp"
 
 const int TICKS_PER_SECOND = 32;
 const int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
@@ -22,8 +20,6 @@ static bool Tab_Pressed = false;
 
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 
-using VariantType = std::variant<int,unsigned,float,double,std::string>;
-
 class Game
 {
 
@@ -36,7 +32,8 @@ class Game
   std::vector<Collider *> collidableObjects;
 
   void LoadConfig();
-  void GetVariantValueAndInsertToMap(tinyxml2::XMLElement *xmlelemnt);
+  //How to get value from config
+  //ConfigUtils::GetValueFromMap<TYPE>(NAME,ConfigMap) 
   std::map<std::string,VariantType> ConfigMap;
 
   bool mouseCallBack = true;
@@ -84,15 +81,3 @@ private:
 
   void SetViewAndPerspective(Camera &aCamera);
 };
-
-//How to get value from config
-
-// 
-// 
-// 
-// 
-// 
-// 
-
-
-
