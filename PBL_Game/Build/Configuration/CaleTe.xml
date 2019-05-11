@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<Config>
+    <ConfigParameter>
+        <Type>U</Type>
+        <Name>WINDOW_HEIGHT</Name>
+        <Value>900</Value>
+    </ConfigParameter>
+    <ConfigParameter>
+        <Type>U</Type>
+        <Name>WINDOW_WIDTH</Name>
+        <Value>1600</Value>
+    </ConfigParameter>
+</Config>
+
+<!-- types I - int
+           U - unsigned
+           F - float
+           D - dobule
+           S - std::string>
+

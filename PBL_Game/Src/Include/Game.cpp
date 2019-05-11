@@ -11,86 +11,25 @@
 static bool leftSideActive = true;
 static bool swapButtonPressed = false;
 
-void Game::SetViewAndPerspective(Camera &aCamera)
+void Game::InitializeConfig()
 {
-  projection = glm::perspective(aCamera.Zoom, (float)Game::WINDOW_WIDTH / (float)Game::WINDOW_HEIGHT, 0.1f, 100.0f);
-  view = aCamera.GetViewMatrix();
-
-  shaderProgram->use();
-  shaderProgram->setMat4("projection", projection);
-  shaderProgram->setMat4("view", view);
-
-  shaderProgram_For_Model->use();
-  shaderProgram_For_Model->setMat4("projection", projection);
-  shaderProgram_For_Model->setMat4("view", view);
-
-  shaderAnimatedModel->use();
-  shaderAnimatedModel->setMat4("projection", projection);
-  shaderAnimatedModel->setMat4("view", view);
 }
 
 Game::Game(Window &aOkno) : okienko(aOkno), camera(Camera()), camera2(Camera())
 {
+
   LoadConfig();
+
+  WINDOW_WIDTH = ConfigUtils::GetValueFromMap<unsigned>("WINDOW_WIDTH", ConfigMap);
+  WINDOW_HEIGHT = ConfigUtils::GetValueFromMap<unsigned>("WINDOW_HEIGHT", ConfigMap);
+  glfwSetWindowSize(okienko.window, WINDOW_WIDTH, WINDOW_HEIGHT);
+  InitializeConfig();
 
   shaderProgram = new Shader("Shaders/vertex4.txt", "Shaders/fragment3.txt");
   shaderProgram_For_Model = new Shader("Shaders/vertexModel.txt", "Shaders/fragmentModel.txt");
   shaderAnimatedModel = new Shader("Shaders/skinning.vs", "Shaders/skinning.fs");
 
   glfwSetCursorPosCallback(okienko.window, mouse_callback);
-}
-
-void Game::LoadConfig()
-{
-  std::ifstream fileStream;
-  fileStream.open("Configuration/Cale_te.txt", fileStream.in);
-
-  if (fileStream.good())
-  {
-    std::string str;
-    std::string emptyString{};
-    std::vector<std::string> StringsInLine;
-    std::string Name{};
-    std::string ValueType;
-    TypeVariant value;
-
-    while (getline(fileStream, str))
-    {
-      if (str != emptyString)
-      {
-        StringsInLine = ConfigUtils::split(str, ' ');
-        Name = StringsInLine[0];
-        ValueType = StringsInLine[1];
-
-        if (ValueType == "i")
-        {
-          value = ConfigUtils::GetTypeFromString<int>(ValueType, StringsInLine[2]);
-        }
-        else if (ValueType == "u")
-        {
-          value = ConfigUtils::GetTypeFromString<unsigned long>(ValueType, StringsInLine[2]);
-        }
-        else if (ValueType == "f")
-        {
-          value = ConfigUtils::GetTypeFromString<float>(ValueType, StringsInLine[2]);
-        }
-        else if (ValueType == "d")
-        {
-          value = ConfigUtils::GetTypeFromString<double>(ValueType, StringsInLine[2]);
-        }
-        else
-        {
-          value = ConfigUtils::GetTypeFromString<std::string>(ValueType, StringsInLine[2]);
-        }
-
-        ConfigMap.insert(Name, value);
-      }
-      else
-      {
-        continue;
-      }
-    }
-  }
 }
 
 void Game::Granko()
@@ -608,4 +547,38 @@ void Game::gatherCollidableObjects(std::vector<SceneNode *> &nodes)
       gatherCollidableObjects(node->children);
     }
   }
+}
+
+void Game::LoadConfig()
+{
+  tinyxml2::XMLDocument doc;
+  doc.LoadFile("Configuration/CaleTe.xml");
+
+  tinyxml2::XMLElement *pRoot = doc.FirstChildElement();
+
+  if (pRoot != nullptr)
+  {
+    for (tinyxml2::XMLElement *e = pRoot->FirstChildElement(); e != nullptr; e = e->NextSiblingElement())
+    {
+      ConfigUtils::GetVariantValueAndInsertToMap(e, ConfigMap);
+    }
+  }
+}
+
+void Game::SetViewAndPerspective(Camera &aCamera)
+{
+  projection = glm::perspective(aCamera.Zoom, (float)Game::WINDOW_WIDTH / (float)Game::WINDOW_HEIGHT, 0.1f, 100.0f);
+  view = aCamera.GetViewMatrix();
+
+  shaderProgram->use();
+  shaderProgram->setMat4("projection", projection);
+  shaderProgram->setMat4("view", view);
+
+  shaderProgram_For_Model->use();
+  shaderProgram_For_Model->setMat4("projection", projection);
+  shaderProgram_For_Model->setMat4("view", view);
+
+  shaderAnimatedModel->use();
+  shaderAnimatedModel->setMat4("projection", projection);
+  shaderAnimatedModel->setMat4("view", view);
 }

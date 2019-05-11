@@ -3,7 +3,6 @@
 #include "Shader.hpp"
 #include "SceneNode.hpp"
 #include "Collider.hpp"
-#include <map>
 #include "ConfigUtils.hpp"
 
 const int TICKS_PER_SECOND = 32;
@@ -32,9 +31,11 @@ class Game
   std::vector<SceneNode *> rightNodes;
   std::vector<Collider *> collidableObjects;
 
-
- 
-  std::map<std::string, TypeVariant> ConfigMap;
+  void LoadConfig();
+  void InitializeConfig();
+  //How to get value from config
+  //ConfigUtils::GetValueFromMap<TYPE>(NAME,ConfigMap) 
+  std::map<std::string,VariantType> ConfigMap;
 
   bool mouseCallBack = true;
   bool firstMouse = true;
@@ -53,8 +54,11 @@ class Game
   int offset = 125; // Jak bardzo maja sie roznic rozmiary kamery, szerokosc aktywnej to pol okna + offset, szerokosc nieaktywnej to pol okna - offset
 
 public:
-  static const int WINDOW_WIDTH = 1280, WINDOW_HEIGHT = 720;
+  
   Game(Window &okienko);
+
+  unsigned WINDOW_WIDTH = 0;
+  unsigned WINDOW_HEIGHT = 0;
 
   const float cameraZOffset = 7;
   const float cameraYOffset = 2;
@@ -71,8 +75,6 @@ public:
   void Deserialize(std::string path);
   void UpdatePlayer(SceneNode &player, Camera &camera);
   void gatherCollidableObjects(std::vector<SceneNode *> &nodes);
-
-  void LoadConfig();
 
 private:
   void SerializeFaza1(std::map<SceneNode *, unsigned> &map);
