@@ -25,20 +25,14 @@ void MapGenerator::GenerateMap(int n)
 	for (int i = 0; i < n-1; i++)
 	{
 		glm::vec2 pos = map[map.rbegin()->first].Position;
-		float move_first, move_second;
-		move_first = GetDirection();
-		move_second = GetDirection(move_first == 0);
-		MapElement element(pos + glm::vec2(move_first, move_second));
+		MapElement element(pos + GetVector2(pos));
 		map.insert(std::pair<glm::vec2, MapElement>(element.Position, element));
 	}
 }
 
-float MapGenerator::GetDirection(bool canBeZero = true)
+int MapGenerator::GetDirection()
 {
-	float result = 0;
-	while(result != 0 || !canBeZero)
-		result = (float)(rand() % 2 + (-1));
-	return result;
+	return (rand() % 4 + 1);
 }
 
 void MapGenerator::CheckForWallsNDoors()
@@ -49,9 +43,9 @@ void MapGenerator::CheckForWallsNDoors()
 		for (std::vector<glm::vec2>::iterator neighbour = neighbours.begin(); neighbour != neighbours.end(); neighbour++)
 		{
 			if (map.find(*neighbour) == map.end())
-				it->second.SetWall(it->second.Position - *neighbour);
+				it->second.SetWall(GetVector4(it->second.Position - *neighbour));
 			else
-				it->second.SetDoor(it->second.Position - *neighbour);
+				it->second.SetDoor(GetVector4(it->second.Position - *neighbour));
 		}
 	}
 }
@@ -63,4 +57,64 @@ void MapGenerator::FinishGeneration()
 	{
 		element->second.GenerateNode(nodes, &mapRoot);
 	}
+}
+
+glm::vec2 MapGenerator::GetVector2(glm::vec2 pos)
+{
+	glm::vec2 pos_add;
+	while (!CheckIfAvailiable(pos + pos_add)) {
+		int move = GetDirection();
+		switch (move)
+		{
+			case 1: {
+				pos_add = glm::vec2(0, 1.0f);
+				break;
+			}
+			case 2: {
+				pos_add = glm::vec2(1.0f, 0);
+				break;
+			}
+			case 3: {
+				pos_add = glm::vec2(0, -1.0f);
+				break;
+			}
+			case 4: {
+				pos_add = glm::vec2(-1.0f, 0);
+				break;
+			}
+		}
+	}
+	return pos_add;
+}
+
+glm::vec4 MapGenerator::GetVector4(glm::vec2 direction)
+{
+	switch ((int)direction.x)
+	{
+		case 1:
+		{
+			return glm::vec4(0, 1.0f, 0, 0);
+		}
+		case -1:
+		{
+			return glm::vec4(0, 0, 0, 1.0f);
+		}
+	}
+
+	switch ((int)direction.y)
+	{
+		case 1:
+		{
+			return glm::vec4(1.0f, 0, 0, 0);
+		}
+		case -1:
+		{
+			return glm::vec4(0, 0, 1.0f, 0);
+		}
+	}
+}
+
+bool MapGenerator::CheckIfAvailiable(glm::vec2 pos)
+{
+	return map.find(pos) == map.end();
 }

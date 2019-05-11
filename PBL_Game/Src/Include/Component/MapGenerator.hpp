@@ -9,10 +9,13 @@ class MapGenerator //: public Script
 	std::map <glm::vec2, MapElement> map;
 	std::vector<SceneNode>* nodes;
 
-	float GetDirection(bool canBeZero);
+	int GetDirection();
 	void CheckForWallsNDoors();
 	void GenerateMap(int n);
 	void FinishGeneration();
+	bool CheckIfAvailiable(glm::vec2 pos);
+	glm::vec2 GetVector2(glm::vec2 pos);
+	glm::vec4 GetVector4(glm::vec2 direction);
 
 	public:
 	MapGenerator(std::vector<SceneNode>* nodes);
