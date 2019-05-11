@@ -29,68 +29,60 @@ void Game::SetViewAndPerspective(Camera &aCamera)
   shaderAnimatedModel->setMat4("view", view);
 }
 
+void Game::LoadConfig()
+{
+  tinyxml2::XMLDocument doc;
+  doc.LoadFile("Configuration/CaleTe.xml");
+
+  tinyxml2::XMLElement *pRoot = doc.FirstChildElement();
+
+  if (pRoot != nullptr)
+  {
+    tinyxml2::XMLElement *pChild = pRoot->FirstChildElement();
+    if (pChild == nullptr)
+      printf("child == nulptr \n");
+
+    tinyxml2::XMLElement *pElement = pChild->FirstChildElement();
+
+    if (pElement != nullptr)
+    {
+      pElement = pRoot->ToElement(); // ->FirstChildElement("ConfigParameter");
+
+      tinyxml2::XMLElement *firstElement = pElement->FirstChildElement();
+      tinyxml2::XMLElement *lastElemnt = pElement->FirstChildElement();
+
+      if (firstElement != nullptr)
+      {
+
+        std::cout << firstElement->Value() << "\n";
+        std::cout << firstElement->FirstChildElement("Name")->GetText() << "\n";
+
+        std::cout << lastElemnt->Value() << "\n";
+        std::cout << lastElemnt->FirstChildElement("Name")->Value() << "\n";
+        tinyxml2::XMLElement *nexElement = firstElement->NextSiblingElement();
+      }
+      else
+      {
+        printf("No element in child \n");
+      }
+    }
+    else
+    {
+      std::cout << "Value not in file ..."
+                << "\n";
+    }
+  }
+}
+
 Game::Game(Window &aOkno) : okienko(aOkno), camera(Camera()), camera2(Camera())
 {
-  LoadConfig();
 
+  LoadConfig();
   shaderProgram = new Shader("Shaders/vertex4.txt", "Shaders/fragment3.txt");
   shaderProgram_For_Model = new Shader("Shaders/vertexModel.txt", "Shaders/fragmentModel.txt");
   shaderAnimatedModel = new Shader("Shaders/skinning.vs", "Shaders/skinning.fs");
 
   glfwSetCursorPosCallback(okienko.window, mouse_callback);
-}
-
-void Game::LoadConfig()
-{
-  std::ifstream fileStream;
-  fileStream.open("Configuration/Cale_te.txt", fileStream.in);
-
-  if (fileStream.good())
-  {
-    std::string str;
-    std::string emptyString{};
-    std::vector<std::string> StringsInLine;
-    std::string Name{};
-    std::string ValueType;
-    TypeVariant value;
-
-    while (getline(fileStream, str))
-    {
-      if (str != emptyString)
-      {
-        StringsInLine = ConfigUtils::split(str, ' ');
-        Name = StringsInLine[0];
-        ValueType = StringsInLine[1];
-
-        if (ValueType == "i")
-        {
-          value = ConfigUtils::GetTypeFromString<int>(ValueType, StringsInLine[2]);
-        }
-        else if (ValueType == "u")
-        {
-          value = ConfigUtils::GetTypeFromString<unsigned long>(ValueType, StringsInLine[2]);
-        }
-        else if (ValueType == "f")
-        {
-          value = ConfigUtils::GetTypeFromString<float>(ValueType, StringsInLine[2]);
-        }
-        else if (ValueType == "d")
-        {
-          value = ConfigUtils::GetTypeFromString<double>(ValueType, StringsInLine[2]);
-        }
-        else
-        {
-          value = ConfigUtils::GetTypeFromString<std::string>(ValueType, StringsInLine[2]);
-        }
-
-        ConfigMap.insert(Name, value);
-      }
-      else
-      {
-        continue;
-      }
-    }
-  }
 }
 
 void Game::Granko()

@@ -1,11 +1,16 @@
 # CMake entry point
 cmake_minimum_required (VERSION 3.9.3)
-project (Tutorials)
+project (PBL_Game)
 
 find_package(OpenGL REQUIRED)
  
+if(UNIX)
+  set(CMAKE_C_COMPILER /usr/bin/gcc-8 CACHE PATH "" FORCE)
+  set(CMAKE_CXX_COMPILER /usr/bin/g++-8 CACHE PATH "" FORCE)
+endif()
+
 set(CMAKE_CXX_STANDARD 17)
- 
+
 # Compile external dependencies 
 add_subdirectory (external)
 
@@ -17,6 +22,7 @@ include_directories(
 	external/glm-0.9.7.1/
 	external/glew-1.13.0/include/
 	external/assimp-4.1.0/include/
+	external/tinyxml2/
 	Build/external/assimp-4.1.0/include/
 	.
 )
@@ -26,6 +32,7 @@ set(ALL_LIBS
 	glfw
 	GLEW_1130
 	assimp
+	tinyxml2
 )
 
 add_definitions(

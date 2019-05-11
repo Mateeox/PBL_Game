@@ -4,7 +4,8 @@
 #include "SceneNode.hpp"
 #include "Collider.hpp"
 #include <map>
-#include "ConfigUtils.hpp"
+#include <variant>
+#include <tinyxml2.h>
 
 const int TICKS_PER_SECOND = 32;
 const int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
@@ -32,9 +33,8 @@ class Game
   std::vector<SceneNode *> rightNodes;
   std::vector<Collider *> collidableObjects;
 
-
- 
-  std::map<std::string, TypeVariant> ConfigMap;
+  void LoadConfig();
+  std::map<std::string,std::variant<int,unsigned long,float,double,std::string>> ConfigMap;
 
   bool mouseCallBack = true;
   bool firstMouse = true;
@@ -71,8 +71,6 @@ public:
   void Deserialize(std::string path);
   void UpdatePlayer(SceneNode &player, Camera &camera);
   void gatherCollidableObjects(std::vector<SceneNode *> &nodes);
-
-  void LoadConfig();
 
 private:
   void SerializeFaza1(std::map<SceneNode *, unsigned> &map);
