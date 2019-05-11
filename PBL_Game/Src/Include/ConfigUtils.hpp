@@ -7,7 +7,7 @@
 using VariantType = std::variant<int,unsigned,float,double,std::string>;
 namespace ConfigUtils
 {
-    
+
 template<typename T>
 T GetValueFromMap(const std::string & name,const std::map<std::string,VariantType> & aConfigMap)
 {

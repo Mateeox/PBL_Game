@@ -32,6 +32,7 @@ class Game
   std::vector<Collider *> collidableObjects;
 
   void LoadConfig();
+  void InitializeConfig();
   //How to get value from config
   //ConfigUtils::GetValueFromMap<TYPE>(NAME,ConfigMap) 
   std::map<std::string,VariantType> ConfigMap;
@@ -53,8 +54,11 @@ class Game
   int offset = 125; // Jak bardzo maja sie roznic rozmiary kamery, szerokosc aktywnej to pol okna + offset, szerokosc nieaktywnej to pol okna - offset
 
 public:
-  static const int WINDOW_WIDTH = 1280, WINDOW_HEIGHT = 720;
+  
   Game(Window &okienko);
+
+  unsigned WINDOW_WIDTH = 0;
+  unsigned WINDOW_HEIGHT = 0;
 
   const float cameraZOffset = 7;
   const float cameraYOffset = 2;

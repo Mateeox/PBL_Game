@@ -1,29 +1,20 @@
 <?xml version="1.0"?>
 <Config>
     <ConfigParameter>
-        <Type>I</Type>
-        <Name>Cale_TeInt</Name>
-        <Value>-2137</Value>
+        <Type>U</Type>
+        <Name>WINDOW_HEIGHT</Name>
+        <Value>900</Value>
     </ConfigParameter>
     <ConfigParameter>
         <Type>U</Type>
-        <Name>Cale_TeUInt</Name>
-        <Value>2137</Value>
-    </ConfigParameter>
-    <ConfigParameter>
-        <Type>D</Type>
-        <Name>Cale_TeDouble</Name>
-        <Value>2137.2137</Value>
-    </ConfigParameter>
-    <ConfigParameter>
-        <Type>F</Type>
-        <Name>Cale_TeFloat</Name>
-        <Value>2137.213</Value>
-    </ConfigParameter>
-    <ConfigParameter>
-        <Type>S</Type>
-        <Name>Cale_TeString</Name>
-        <Value>Reeeeeee   XDD</Value>
+        <Name>WINDOW_WIDTH</Name>
+        <Value>1600</Value>
     </ConfigParameter>
 </Config>
+
+<!-- types I - int
+           U - unsigned
+           F - float
+           D - dobule
+           S - std::string>
 
