@@ -6,7 +6,7 @@ MapGenerator::MapGenerator(std::vector<SceneNode>* nodes)
 	srand(time(NULL));
 	GenerateMap(4);
 	CheckForWallsNDoors();
-	FnishGeneration();
+	FinishGeneration();
 }
 
 MapGenerator::MapGenerator(std::vector<SceneNode>* nodes, int squares, int doors, bool glass_doors)
@@ -15,7 +15,7 @@ MapGenerator::MapGenerator(std::vector<SceneNode>* nodes, int squares, int doors
 	srand(time(NULL));
 	GenerateMap(squares);
 	CheckForWallsNDoors();
-	FnishGeneration();
+	FinishGeneration();
 }
 
 void MapGenerator::GenerateMap(int n)
@@ -56,7 +56,7 @@ void MapGenerator::CheckForWallsNDoors()
 	}
 }
 
-void MapGenerator::FnishGeneration()
+void MapGenerator::FinishGeneration()
 {
 	SceneNode mapRoot;
 	for (std::map<glm::vec2, MapElement>::iterator element = map.begin(); element != map.end(); ++element)

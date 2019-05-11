@@ -12,7 +12,7 @@ class MapGenerator //: public Script
 	float GetDirection(bool canBeZero);
 	void CheckForWallsNDoors();
 	void GenerateMap(int n);
-	void FnishGeneration();
+	void FinishGeneration();
 
 	public:
 	MapGenerator(std::vector<SceneNode>* nodes);
