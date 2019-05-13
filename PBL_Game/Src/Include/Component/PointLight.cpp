@@ -40,7 +40,7 @@ void PointLight::SetLightMapStringValues(std::string aNumber)
 
 void PointLight::SendValuesToShader()
 {
-    mShaderProgram.setVec3(pointLightStringMap.at("position"), gameobject->transform.getPosition);
+    mShaderProgram.setVec3(pointLightStringMap.at("position"), gameobject->transform.getPosition());
     mShaderProgram.setVec3(pointLightStringMap.at("ambient"), mAmbient.x, mAmbient.y, mAmbient.z);
     mShaderProgram.setVec3(pointLightStringMap.at("diffuse"), mDiffuse.x, mDiffuse.y, mDiffuse.z);
     mShaderProgram.setVec3(pointLightStringMap.at("specular"), mSpecular.x, mSpecular.y, mSpecular.z);
