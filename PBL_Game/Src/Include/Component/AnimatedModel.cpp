@@ -9,19 +9,21 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #define SAFE_DELETE(p) \
-    if (p)             \
-    {                  \
-        delete p;      \
-        p = NULL;      \
-    }
+	if (p)             \
+	{                  \
+		delete p;      \
+		p = NULL;      \
+	}
 
 #define GLCheckError() (glGetError() == GL_NO_ERROR)
 
 unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma = false);
 
 AnimatedModel::AnimatedModel(std::string &path, Shader &aShaderProgram, bool gammaCor = false) : Component(nullptr),
-ShaderProgram(aShaderProgram),
-gammaCorrection(gammaCor)
+																								 ShaderProgram(aShaderProgram),
+																								 m_Animate(true),
+																								 m_AnimationNubmer(0),
+																								 gammaCorrection(gammaCor)
 {
 	m_NumBones = 0;
 	loadAnimatedModel(path);
@@ -389,17 +391,18 @@ void AnimatedModel::CalcInterpolatedPosition(aiVector3D &Out, float AnimationTim
 	Out = Start + Factor * Delta;
 }
 
-void AnimatedModel::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const Matrix4f& ParentTransform)
+void AnimatedModel::ReadNodeHeirarchy(float AnimationTime, const aiNode *pNode, const Matrix4f &ParentTransform)
 {
 	std::string NodeName(pNode->mName.data);
 
-	const aiAnimation* pAnimation = m_pScene->mAnimations[0];
+	const aiAnimation *pAnimation = m_pScene->mAnimations[m_AnimationNubmer];
 
 	Matrix4f NodeTransformation(pNode->mTransformation);
 
-	const aiNodeAnim* pNodeAnim = FindNodeAnim(pAnimation, NodeName);
+	const aiNodeAnim *pNodeAnim = FindNodeAnim(pAnimation, NodeName);
 
-	if (pNodeAnim) {
+	if (pNodeAnim)
+	{
 		// Interpolate scaling and generate scaling transformation matrix
 		aiVector3D Scaling;
 		CalcInterpolatedScaling(Scaling, AnimationTime, pNodeAnim);
@@ -423,12 +426,14 @@ void AnimatedModel::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, 
 
 	Matrix4f GlobalTransformation = ParentTransform * NodeTransformation;
 
-	if (m_BoneMapping.find(NodeName) != m_BoneMapping.end()) {
+	if (m_BoneMapping.find(NodeName) != m_BoneMapping.end())
+	{
 		unsigned int BoneIndex = m_BoneMapping[NodeName];
 		m_BoneInfo[BoneIndex].FinalTransformation = m_GlobalInverseTransform * GlobalTransformation * m_BoneInfo[BoneIndex].BoneOffset;
 	}
 
-	for (unsigned int i = 0; i < pNode->mNumChildren; i++) {
+	for (unsigned int i = 0; i < pNode->mNumChildren; i++)
+	{
 		ReadNodeHeirarchy(AnimationTime, pNode->mChildren[i], GlobalTransformation);
 	}
 }
@@ -466,14 +471,30 @@ void AnimatedModel::Draw(glm::mat4 &transform)
 		}
 
 		glDrawElementsBaseVertex(GL_TRIANGLES,
-			m_Entries[i].NumIndices,
-			GL_UNSIGNED_INT,
-			(void *)(sizeof(unsigned) * m_Entries[i].BaseIndex),
-			m_Entries[i].BaseVertex);
+								 m_Entries[i].NumIndices,
+								 GL_UNSIGNED_INT,
+								 (void *)(sizeof(unsigned) * m_Entries[i].BaseIndex),
+								 m_Entries[i].BaseVertex);
 	}
 
 	// Make sure the VAO is not changed from the outside
 	glBindVertexArray(0);
+}
+
+void AnimatedModel::SelectAnimation(const std::string &aName)
+{
+	for (unsigned i = 0; i < m_pScene->mNumAnimations; i++)
+	{
+		if(aName == m_pScene->mAnimations[i]->mName.C_Str() )
+		{
+			m_AnimationNubmer = i;
+			return;
+		}
+	}
+}
+void AnimatedModel::SelectAnimation(unsigned aNumber)
+{
+	m_AnimationNubmer = aNumber;
 }
 
 void AnimatedModel::BoneTransform(float TimeInSeconds, std::vector<Matrix4f> &Transforms)
@@ -481,14 +502,13 @@ void AnimatedModel::BoneTransform(float TimeInSeconds, std::vector<Matrix4f> &Tr
 	Matrix4f Identity;
 	Identity.InitIdentity();
 
-	float TicksPerSecond = (float)(m_pScene->mAnimations[0]->mTicksPerSecond != 0 ? m_pScene->mAnimations[0]->mTicksPerSecond : 25.0f);
+	float TicksPerSecond = (float)(m_pScene->mAnimations[m_AnimationNubmer]->mTicksPerSecond != 0 ? m_pScene->mAnimations[m_AnimationNubmer]->mTicksPerSecond : 25.0f);
 	float TimeInTicks = TimeInSeconds * TicksPerSecond;
-	float AnimationTime = fmod(TimeInTicks, (float)m_pScene->mAnimations[0]->mDuration);
+	float AnimationTime = fmod(TimeInTicks, (float)m_pScene->mAnimations[m_AnimationNubmer]->mDuration);
 
 	ReadNodeHeirarchy(AnimationTime, m_pScene->mRootNode, Identity);
 
 	Transforms.resize(m_NumBones);
-
 
 	for (unsigned int i = 0; i < m_NumBones; i++)
 	{
@@ -497,12 +517,12 @@ void AnimatedModel::BoneTransform(float TimeInSeconds, std::vector<Matrix4f> &Tr
 }
 
 void AnimatedModel::InitMesh(unsigned MeshIndex,
-	const aiMesh *paiMesh,
-	std::vector<Vector3f> &Positions,
-	std::vector<Vector3f> &Normals,
-	std::vector<Vector2f> &TexCoords,
-	std::vector<VertexBoneData> &Bones,
-	std::vector<unsigned> &Indices)
+							 const aiMesh *paiMesh,
+							 std::vector<Vector3f> &Positions,
+							 std::vector<Vector3f> &Normals,
+							 std::vector<Vector2f> &TexCoords,
+							 std::vector<VertexBoneData> &Bones,
+							 std::vector<unsigned> &Indices)
 {
 	const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
 

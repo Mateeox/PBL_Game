@@ -107,12 +107,19 @@ class AnimatedModel : public ComponentSystem::Component
 {
   unsigned m_VAO;
   unsigned m_Buffers[NUM_VBs];
+  bool m_Animate;
+  unsigned m_AnimationNubmer;
+
 
 public:
   void Clear();
   AnimatedModel(std::string &path, Shader &aShaderProgram, bool gammaCorrection);
   void Draw(glm::mat4 &transform);
   Shader &ShaderProgram;
+  void SelectAnimation(const std::string & aName);
+  void SelectAnimation(unsigned aNumer);
+
+  
 
   unsigned NumBones() const
   {

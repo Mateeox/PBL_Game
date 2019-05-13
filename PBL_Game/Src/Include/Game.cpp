@@ -63,7 +63,7 @@ void Game::Granko()
   GameObject *hexObj3 = new GameObject(box3.local);
 
   std::string BeeModelPath = "Models/enemy_model.obj";
-  std::string AnimatedEnemyPAth = "Models/enemy_anim_embeded.fbx";
+  std::string AnimatedEnemyPAth = "Models/"+ ConfigUtils::GetValueFromMap<std::string>("Enemy_Animated_Model",ConfigMap);
 
   Model *BeeModel = new Model(BeeModelPath, *shaderProgram_For_Model, false);
   AnimatedModel *animatedModel = new AnimatedModel(AnimatedEnemyPAth, *shaderAnimatedModel, false);

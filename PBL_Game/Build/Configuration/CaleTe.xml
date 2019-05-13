@@ -10,6 +10,11 @@
         <Name>WINDOW_WIDTH</Name>
         <Value>1600</Value>
     </ConfigParameter>
+    <ConfigParameter>
+        <Type>S</Type>
+        <Name>Enemy_Animated_Model</Name>
+        <Value>enemy_walk_run.FBX</Value>
+    </ConfigParameter>
 </Config>
 
 <!-- types I - int
