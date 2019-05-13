@@ -5,6 +5,7 @@
 #include "Collider.hpp"
 #include "ConfigUtils.hpp"
 
+
 const int TICKS_PER_SECOND = 32;
 const int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
 const int MAX_FRAMESKIP = 5;
@@ -29,6 +30,7 @@ class Game
   Shader *shaderAnimatedModel;
   std::vector<SceneNode *> sNodes;
   std::vector<SceneNode *> rightNodes;
+  
   std::vector<Collider *> collidableObjects;
 
   void LoadConfig();
@@ -53,6 +55,8 @@ class Game
   bool show_demo_window = true;
   int offset = 125; // Jak bardzo maja sie roznic rozmiary kamery, szerokosc aktywnej to pol okna + offset, szerokosc nieaktywnej to pol okna - offset
 
+
+
 public:
   
   Game(Window &okienko);
@@ -63,6 +67,8 @@ public:
   const float cameraZOffset = 7;
   const float cameraYOffset = 2;
   const float cameraAngle = 35;
+
+  int plotNumber = 1;	// Zmienna wskazujaca na obecna wstawke fabularna
 
   void SetCamera(Camera camera, int camera_nr);
   void ProcessMouse();
@@ -84,4 +90,6 @@ private:
   void DeserializeOrderPointers(std::map<unsigned, SceneNode *> &map);
 
   void SetViewAndPerspective(Camera &aCamera);
+  void Plot();
+  void DisplayImage(const char * path);
 };
