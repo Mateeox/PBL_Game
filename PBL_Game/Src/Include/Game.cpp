@@ -13,15 +13,17 @@ static bool swapButtonPressed = false;
 
 void Game::InitializeConfig()
 {
+
+  WINDOW_WIDTH = ConfigUtils::GetValueFromMap<unsigned>("WINDOW_WIDTH", ConfigMap);
+  WINDOW_HEIGHT = ConfigUtils::GetValueFromMap<unsigned>("WINDOW_HEIGHT", ConfigMap);
 }
 
 Game::Game(Window &aOkno) : okienko(aOkno), camera(Camera()), camera2(Camera())
 {
 
   LoadConfig();
+  InitializeConfig();
 
-  WINDOW_WIDTH = ConfigUtils::GetValueFromMap<unsigned>("WINDOW_WIDTH", ConfigMap);
-  WINDOW_HEIGHT = ConfigUtils::GetValueFromMap<unsigned>("WINDOW_HEIGHT", ConfigMap);
   glfwSetWindowSize(okienko.window, WINDOW_WIDTH, WINDOW_HEIGHT);
   InitializeConfig();
 
