@@ -46,3 +46,12 @@ std::string GameObject::Serialize()
 	}
 	return str;
 }
+void GameObject::setTag(std::string tag)
+{
+	this->tag = tag;
+}
+
+std::string GameObject::getTag()
+{
+	return tag;
+}

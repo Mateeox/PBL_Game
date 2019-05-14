@@ -51,6 +51,17 @@ void Transform::Rotate(float value, glm::vec3 axis)
   transform = glm::rotate(transform, glm::radians(value), axis);
 }
 
+
+glm::vec3 Transform::getPosition()
+{
+	return Position;
+}
+
+glm::vec3 Transform::getScale()
+{
+	return Scale;
+}
+
 std::string Transform::Serialize()
 {
 	return glm::to_string(transform) + ";" + glm::to_string(Position) + ";" + glm::to_string(Scale) 

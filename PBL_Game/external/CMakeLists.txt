@@ -54,6 +54,10 @@ target_link_libraries(GLEW_1130
 	${EXTRA_LIBS}
 )
 
+#TinyXml
+
+include_directories(tinyxml2)
+add_subdirectory (tinyxml2)
 
 ### ASSIMP ###
 # AssImp already has a CMakeLists.txt so let's use these

@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<Config>
+    <ConfigParameter>
+        <Type>U</Type>
+        <Name>WINDOW_HEIGHT</Name>
+        <Value>900</Value>
+    </ConfigParameter>
+    <ConfigParameter>
+        <Type>U</Type>
+        <Name>WINDOW_WIDTH</Name>
+        <Value>1600</Value>
+    </ConfigParameter>
+    <ConfigParameter>
+        <Type>S</Type>
+        <Name>Enemy_Animated_Model</Name>
+        <Value>enemy_walk_run.FBX</Value>
+    </ConfigParameter>
+    <ConfigParameter>
+        <Type>F</Type>
+        <Name>PlayerSpeed</Name>
+        <Value>25</Value>
+    </ConfigParameter>
+</Config>
+
+<!-- types I - int
+           U - unsigned
+           F - float
+           D - dobule
+           S - std::string>
+

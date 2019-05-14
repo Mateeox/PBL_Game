@@ -7,6 +7,7 @@
 
 class GameObject
 {
+	std::string tag;
   public:
     Transform &transform;
     std::vector<ComponentSystem::Component *> components;
@@ -16,4 +17,7 @@ class GameObject
     void AddComponent(ComponentSystem::Component *);
     void RemoveComponent(ComponentSystem::ComponentType type);
 	std::string Serialize();
+
+	void setTag(std::string tag);
+	std::string getTag();
 };

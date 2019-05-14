@@ -1,6 +1,7 @@
 #include "SceneNode.hpp"
 #include "Component/ShapeRenderer3D.hpp"
 #include "Component/Model.hpp"
+#include "Component/AnimatedModel.hpp"
 
 SceneNode::SceneNode() : local(Transform::origin()), dirty_flag(true), gameObject(nullptr)
 {
@@ -47,6 +48,12 @@ void SceneNode::Render(Transform &parentWorld, bool aDirty_Flag)
     if (model != nullptr)
     {
       model->Draw(world.GetTransform());
+    }
+
+     AnimatedModel *animModel = (AnimatedModel *)gameObject->GetComponent(ComponentSystem::AnimatedModel);
+    if (animModel != nullptr)
+    {
+      animModel->Draw(world.GetTransform());
     }
 
   }

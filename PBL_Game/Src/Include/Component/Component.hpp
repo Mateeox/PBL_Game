@@ -12,6 +12,7 @@ enum ComponentType
 	Collider,
 	ShapeRenderer3D,
 	Model,
+	AnimatedModel,
 	ModelMesh
 
 };

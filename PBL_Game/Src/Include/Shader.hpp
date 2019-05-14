@@ -8,6 +8,8 @@
 #include <iostream>
 #include <glm/glm.hpp>
 
+#define INVALID_UNIFORM_LOCATION 0xffffffff
+
 class Shader
 {
 
@@ -16,6 +18,7 @@ class Shader
 
         // the program ID
     unsigned int shaderProgramID;
+    unsigned GetUniformLocation(const char* pUniformName);
   
     // constructor reads and builds the shader
     Shader(const char* vertexPath, const char* fragmentPath);

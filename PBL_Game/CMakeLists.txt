@@ -1,11 +1,16 @@
 # CMake entry point
 cmake_minimum_required (VERSION 3.9.3)
-project (Tutorials)
+project (PBL_Game)
 
 find_package(OpenGL REQUIRED)
  
+if(UNIX)
+  set(CMAKE_C_COMPILER /usr/bin/gcc-8 CACHE PATH "" FORCE)
+  set(CMAKE_CXX_COMPILER /usr/bin/g++-8 CACHE PATH "" FORCE)
+endif()
+
 set(CMAKE_CXX_STANDARD 17)
- 
+
 # Compile external dependencies 
 add_subdirectory (external)
 
@@ -17,6 +22,7 @@ include_directories(
 	external/glm-0.9.7.1/
 	external/glew-1.13.0/include/
 	external/assimp-4.1.0/include/
+	external/tinyxml2/
 	Build/external/assimp-4.1.0/include/
 	.
 )
@@ -26,6 +32,7 @@ set(ALL_LIBS
 	glfw
 	GLEW_1130
 	assimp
+	tinyxml2
 )
 
 add_definitions(
@@ -41,25 +48,29 @@ add_executable(PBL_Game
     Src/Include/Transform.cpp
     Src/Include/Game.cpp
     Src/Include/GameObject.cpp 
-	Src/Include/Transform.cpp
-	Src/Include/Window.cpp
-	Src/Include/Camera.cpp
-	Src/Include/Shader.cpp
-	Src/Include/Texture.cpp
-	Src/Include/SceneNode.cpp
-	#Component
-	Src/Include/Component/ShapeRenderer3D.cpp
-	Src/Include/Component/Mesh.cpp
-	Src/Include/Component/Model.cpp
-	#Stb_image
-	Src/Include/stb_image.cpp
-	#ImGui
-	external/Imgui/examples/libs/gl3w/GL/gl3w.c
-	external/Imgui/Include/imgui.cpp
-	external/Imgui/Include/imgui_impl_glfw.cpp
-	external/Imgui/Include/imgui_impl_opengl3.cpp
-	external/Imgui/Include/imgui_draw.cpp
-	external/Imgui/Include/imgui_widgets.cpp
+	  Src/Include/Transform.cpp
+	  Src/Include/Window.cpp
+	  Src/Include/Camera.cpp
+	  Src/Include/Shader.cpp
+	  Src/Include/Texture.cpp
+	  Src/Include/SceneNode.cpp
+		Src/Include/Collider.cpp
+		Src/Include/ConfigUtils.cpp
+	  #Component
+	  Src/Include/Component/ShapeRenderer3D.cpp
+	  Src/Include/Component/Mesh.cpp
+	  Src/Include/Component/Model.cpp
+	  Src/Include/Component/AnimatedModel.cpp
+	  Src/Include/Component/BoneUtils.cpp
+	  #Stb_image
+	  Src/Include/stb_image.cpp
+	  #ImGui
+	  external/Imgui/examples/libs/gl3w/GL/gl3w.c
+	  external/Imgui/Include/imgui.cpp
+	  external/Imgui/Include/imgui_impl_glfw.cpp
+	  external/Imgui/Include/imgui_impl_opengl3.cpp
+	  external/Imgui/Include/imgui_draw.cpp
+	  external/Imgui/Include/imgui_widgets.cpp
 	
 )
 
