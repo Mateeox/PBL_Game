@@ -56,6 +56,8 @@ add_executable(PBL_Game
 	  Src/Include/SceneNode.cpp
 		Src/Include/Collider.cpp
 		Src/Include/ConfigUtils.cpp
+		Src/Include/MapTileGenertor.cpp
+		Src/Include/MapTile.cpp
 	  #Component
 	  Src/Include/Component/ShapeRenderer3D.cpp
 	  Src/Include/Component/Mesh.cpp
