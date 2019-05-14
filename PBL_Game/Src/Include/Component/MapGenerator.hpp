@@ -7,7 +7,7 @@ class MapGenerator //: public Script
 {
 	private:
 	std::map <glm::vec2, MapElement> map;
-	std::vector<SceneNode>* nodes;
+	std::vector<SceneNode*>* nodes;
 	Shader* shader;
 
 	int GetDirection();
@@ -19,6 +19,6 @@ class MapGenerator //: public Script
 	glm::vec4 GetVector4(glm::vec2 direction);
 
 	public:
-	MapGenerator(std::vector<SceneNode>* nodes, Shader* shaderProgram);
-	MapGenerator(std::vector<SceneNode>* nodes, Shader* shaderProgram, int squares, int doors, bool glass_door);
+	MapGenerator(std::vector<SceneNode*>* nodes, Shader* shaderProgram);
+	MapGenerator(std::vector<SceneNode*>* nodes, Shader* shaderProgram, int squares, int doors, bool glass_door);
 };

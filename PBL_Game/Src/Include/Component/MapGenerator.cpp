@@ -1,6 +1,6 @@
 #include "Component/MapGenerator.hpp"
 
-MapGenerator::MapGenerator(std::vector<SceneNode>* nodes, Shader* shaderProgram)
+MapGenerator::MapGenerator(std::vector<SceneNode*>* nodes, Shader* shaderProgram)
 {
 	this->nodes = nodes;
 	this->shader = shaderProgram;
@@ -10,7 +10,7 @@ MapGenerator::MapGenerator(std::vector<SceneNode>* nodes, Shader* shaderProgram)
 	FinishGeneration();
 }
 
-MapGenerator::MapGenerator(std::vector<SceneNode>* nodes, Shader* shaderProgram, int squares, int doors, bool glass_doors)
+MapGenerator::MapGenerator(std::vector<SceneNode*>* nodes, Shader* shaderProgram, int squares, int doors, bool glass_doors)
 {
 	this->nodes = nodes;
 	this->shader = shaderProgram;

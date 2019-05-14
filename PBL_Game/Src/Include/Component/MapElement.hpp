@@ -1,8 +1,9 @@
 #pragma once
 #include <glm/glm.hpp>
 #include <vector>
-#include "SceneNode.hpp"
-
+#include "../SceneNode.hpp"
+#include "ShapeRenderer3D.hpp"
+#include "Shapes.hpp"
 class MapElement {
 	private:
 	std::vector<SceneNode>* nodes;
@@ -21,7 +22,7 @@ class MapElement {
 	void SetWall(glm::vec4 wall);
 	void SetDoor(glm::vec4 door);
 	std::vector<glm::vec2> GetNeighbours();
-	SceneNode* GenerateNode(std::vector<SceneNode>* nodes, SceneNode* parent);
+	SceneNode* GenerateNode(std::vector<SceneNode*>* nodes, SceneNode* parent);
 	SceneNode* AddFloor();
 	SceneNode* CreateWall(SceneNode* parent, float direction_x, float direction_y);
 	SceneNode* CreateDoor(SceneNode* parent, float direction_x, float direction_y);

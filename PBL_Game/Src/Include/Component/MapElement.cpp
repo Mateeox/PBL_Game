@@ -26,15 +26,31 @@ std::vector<glm::vec2> MapElement::GetNeighbours()
 	return neighbours;
 }
 
-SceneNode* MapElement::GenerateNode(std::vector<SceneNode>* nodes, SceneNode* parent)
+SceneNode* MapElement::GenerateNode(std::vector<SceneNode*>* nodes, SceneNode* parent)
 {
 	SceneNode element;
-	
+	element.AddParent(parent);
+	element.AddChild(AddFloor);
+
+	return &element;
 }
 
 SceneNode* MapElement::AddFloor()
 {
-	return nullptr;
+	SceneNode floor;
+	GameObject oFloor(floor.local);
+	Texture* xD = new Texture("Textures/red.png", GL_LINEAR);
+	xD->Load();
+	ShapeRenderer3D* Floor = new ShapeRenderer3D(Shapes::RainBow_Square,
+		Shapes::RB_Square_indices,
+		sizeof(Shapes::RainBow_Square),
+		sizeof(Shapes::RB_Square_indices),
+		*shaderProgram,
+		xD);
+	oFloor.AddComponent(Floor);
+	floor.AddChild(floor);
+	floor.Translate(Position.x, Position.y, 0);
+	return floor;
 }
 
 SceneNode* MapElement::CreateWall(SceneNode* parent, float direction_x, float direction_y)
