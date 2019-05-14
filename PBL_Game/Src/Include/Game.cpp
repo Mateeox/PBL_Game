@@ -16,9 +16,13 @@ void Game::InitializeConfig()
 
   WINDOW_WIDTH = ConfigUtils::GetValueFromMap<unsigned>("WINDOW_WIDTH", ConfigMap);
   WINDOW_HEIGHT = ConfigUtils::GetValueFromMap<unsigned>("WINDOW_HEIGHT", ConfigMap);
+  movementSpeed = ConfigUtils::GetValueFromMap<float>("PlayerSpeed", ConfigMap);
 }
 
-Game::Game(Window &aOkno) : okienko(aOkno), camera(Camera()), camera2(Camera())
+Game::Game(Window &aOkno) : 
+okienko(aOkno),
+camera(Camera()),
+camera2(Camera())
 {
 
   LoadConfig();
@@ -46,9 +50,6 @@ void Game::Granko()
   SceneNode box3;
 
   SceneNode Enemy_Node;
-
-  SceneNode leftPlayerNode;
-  SceneNode rightPlayerNode;
 
   GameObject *enemyGameObject = new GameObject(Enemy_Node.local);
 
@@ -169,11 +170,6 @@ void Game::Granko()
       loops++;
     }
 
-    if (leftSideActive)
-      UpdatePlayer(leftPlayerNode, camera);
-    else
-      UpdatePlayer(rightPlayerNode, camera2);
-
     interpolation =
         float((glfwGetTime() * 1000) + SKIP_TICKS - next_game_tick) /
         float(SKIP_TICKS);
@@ -207,6 +203,12 @@ void Game::Update(float interpolation)
   {
     ProcessInput(interpolation, camera2);
   }
+
+    if (leftSideActive)
+      UpdatePlayer(leftPlayerNode, camera,interpolation);
+    else
+      UpdatePlayer(rightPlayerNode, camera2,interpolation);
+
 }
 
 void Game::Render()
@@ -418,18 +420,7 @@ void Game::SetCamera(Camera aCamera, int camera)
 void Game::ProcessInput(float interpolation, Camera &camera_update)
 {
 
-  //ProcessMouse();
-
-  /*if (glfwGetKey(okienko.window, GLFW_KEY_W) == GLFW_PRESS)
-    camera_update.ProcessKeyboard(Camera_Movement::FORWARD, interpolation);
-  if (glfwGetKey(okienko.window, GLFW_KEY_S) == GLFW_PRESS)
-    camera_update.ProcessKeyboard(Camera_Movement::BACKWARD, interpolation);
-  if (glfwGetKey(okienko.window, GLFW_KEY_A) == GLFW_PRESS)
-    camera_update.ProcessKeyboard(Camera_Movement::LEFT, interpolation);
-  if (glfwGetKey(okienko.window, GLFW_KEY_D) == GLFW_PRESS)
-    camera_update.ProcessKeyboard(Camera_Movement::RIGHT, interpolation);
-  */
-
+  ProcessMouse();
   if (glfwGetKey(okienko.window, GLFW_KEY_Q) == GLFW_PRESS && swapButtonPressed == false)
   {
     offset *= -1;
@@ -501,23 +492,22 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos)
   posy = ypos;
 }
 
-void Game::UpdatePlayer(SceneNode &player, Camera &camera)
+void Game::UpdatePlayer(SceneNode &player, Camera &camera,float interpolation)
 {
   Transform transformBeforeMove(player.gameObject->transform);
 
-  const float movementSpeed = 4.0f;
   glm::vec3 movementDir(0);
 
-  if (glfwGetKey(okienko.window, GLFW_KEY_UP) == GLFW_PRESS)
+  if (glfwGetKey(okienko.window, GLFW_KEY_W) == GLFW_PRESS)
     movementDir.z = -1;
-  if (glfwGetKey(okienko.window, GLFW_KEY_DOWN) == GLFW_PRESS)
+  if (glfwGetKey(okienko.window, GLFW_KEY_S) == GLFW_PRESS)
     movementDir.z = 1;
-  if (glfwGetKey(okienko.window, GLFW_KEY_LEFT) == GLFW_PRESS)
+  if (glfwGetKey(okienko.window, GLFW_KEY_A) == GLFW_PRESS)
     movementDir.x = -1;
-  if (glfwGetKey(okienko.window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+  if (glfwGetKey(okienko.window, GLFW_KEY_D) == GLFW_PRESS)
     movementDir.x = 1;
 
-  glm::vec3 move = movementDir * movementSpeed;
+  glm::vec3 move = movementDir * movementSpeed * interpolation;
   player.Translate(move.x, move.y, move.z);
   Collider *playerCollider = ((Collider *)player.gameObject->GetComponent(ComponentSystem::ComponentType::Collider));
   //check if there are any collisions, if yes - abort the move

@@ -31,11 +31,18 @@ class Game
   std::vector<SceneNode *> rightNodes;
   std::vector<Collider *> collidableObjects;
 
+  SceneNode leftPlayerNode;
+  SceneNode rightPlayerNode;
+
   void LoadConfig();
   void InitializeConfig();
   //How to get value from config
   //ConfigUtils::GetValueFromMap<TYPE>(NAME,ConfigMap) 
   std::map<std::string,VariantType> ConfigMap;
+
+
+
+  float movementSpeed; //Move to PlayerData
 
   bool mouseCallBack = true;
   bool firstMouse = true;
@@ -73,7 +80,7 @@ public:
   void Render();
   void Serialize();
   void Deserialize(std::string path);
-  void UpdatePlayer(SceneNode &player, Camera &camera);
+  void UpdatePlayer(SceneNode &player, Camera &camera,float interpolation);
   void gatherCollidableObjects(std::vector<SceneNode *> &nodes);
 
 private:

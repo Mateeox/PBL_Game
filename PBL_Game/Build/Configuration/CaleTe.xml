@@ -15,6 +15,11 @@
         <Name>Enemy_Animated_Model</Name>
         <Value>enemy_walk_run.FBX</Value>
     </ConfigParameter>
+    <ConfigParameter>
+        <Type>F</Type>
+        <Name>PlayerSpeed</Name>
+        <Value>25</Value>
+    </ConfigParameter>
 </Config>
 
 <!-- types I - int
