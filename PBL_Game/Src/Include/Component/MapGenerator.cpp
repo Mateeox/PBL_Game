@@ -1,17 +1,19 @@
 #include "Component/MapGenerator.hpp"
 
-MapGenerator::MapGenerator(std::vector<SceneNode>* nodes)
+MapGenerator::MapGenerator(std::vector<SceneNode>* nodes, Shader* shaderProgram)
 {
 	this->nodes = nodes;
+	this->shader = shaderProgram;
 	srand(time(NULL));
 	GenerateMap(4);
 	CheckForWallsNDoors();
 	FinishGeneration();
 }
 
-MapGenerator::MapGenerator(std::vector<SceneNode>* nodes, int squares, int doors, bool glass_doors)
+MapGenerator::MapGenerator(std::vector<SceneNode>* nodes, Shader* shaderProgram, int squares, int doors, bool glass_doors)
 {
 	this->nodes = nodes;
+	this->shader = shaderProgram;
 	srand(time(NULL));
 	GenerateMap(squares);
 	CheckForWallsNDoors();
@@ -20,12 +22,12 @@ MapGenerator::MapGenerator(std::vector<SceneNode>* nodes, int squares, int doors
 
 void MapGenerator::GenerateMap(int n)
 {
-	MapElement element(glm::vec2(0, 0));
+	MapElement element(glm::vec2(0, 0), shader);
 	map.insert(std::pair<glm::vec2, MapElement>(element.Position, element));
 	for (int i = 0; i < n-1; i++)
 	{
 		glm::vec2 pos = map[map.rbegin()->first].Position;
-		MapElement element(pos + GetVector2(pos));
+		MapElement element(pos + GetVector2(pos), shader);
 		map.insert(std::pair<glm::vec2, MapElement>(element.Position, element));
 	}
 }

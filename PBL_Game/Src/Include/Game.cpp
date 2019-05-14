@@ -3,6 +3,7 @@
 #include "Component/ShapeRenderer3D.hpp"
 #include "Component/Model.hpp"
 #include "Shapes.hpp"
+#include "Component/MapGenerator.cpp"
 
 static bool leftSideActive = true;
 static bool swapButtonPressed = false;
@@ -31,18 +32,19 @@ Game::Game(Window &aOkno) : okienko(aOkno), camera(Camera()), camera2(Camera())
 
 void Game::Granko()
 {
+  MapGenerator generator(&sNodes, shaderProgram, 1, 0, false);
 
   Texture *xD = new Texture("Textures/red.png", GL_LINEAR);
 
   SceneNode scena1_new;
-  SceneNode FloorNode_new;
+  //SceneNode FloorNode_new;
   SceneNode scena3_new;
 
   SceneNode beeNode;
 
   GameObject *beeObj = new GameObject(beeNode.world);
   GameObject *trojObj = new GameObject(scena1_new.world);
-  GameObject *FloorObj = new GameObject(FloorNode_new.world);
+  //GameObject *FloorObj = new GameObject(FloorNode_new.world);
   GameObject *hexObj = new GameObject(scena3_new.world);
 
   std::string BeeModelPath = "Models/enemy_model.obj";
@@ -50,12 +52,12 @@ void Game::Granko()
 
   printf("Model Loaded !! \n");
 
-  ShapeRenderer3D *Floor = new ShapeRenderer3D(Shapes::RainBow_Square,
+  /*ShapeRenderer3D *Floor = new ShapeRenderer3D(Shapes::RainBow_Square,
                                                Shapes::RB_Square_indices,
                                                sizeof(Shapes::RainBow_Square),
                                                sizeof(Shapes::RB_Square_indices),
                                                *shaderProgram,
-                                               xD);
+                                               xD);*/
 
   ShapeRenderer3D *trojkat = new ShapeRenderer3D(Shapes::RainBow_Triangle,
                                                  Shapes::RB_Triangle_indices,
@@ -74,12 +76,12 @@ void Game::Granko()
   beeObj->AddComponent(BeeModel);
 
   trojObj->AddComponent(trojkat);
-  FloorObj->AddComponent(Floor);
+  //FloorObj->AddComponent(Floor);
   hexObj->AddComponent(szescian);
 
   beeNode.AddGameObject(beeObj);
   scena1_new.AddGameObject(trojObj);
-  FloorNode_new.AddGameObject(FloorObj);
+  //FloorNode_new.AddGameObject(FloorObj);
   scena3_new.AddGameObject(hexObj);
 
   auto xd = beeObj->GetComponent(ComponentSystem::Model);
@@ -95,13 +97,13 @@ void Game::Granko()
 
   beeNode.Scale(0.01, 0.01, 0.01);
   scena3_new.Scale(0.3f, 0.2f, 1.0f);
-  FloorNode_new.Translate(0.0f, -1.0f, 0.1f);
-  FloorNode_new.Rotate(90.0f, glm::vec3(1, 0, 0));
-  FloorNode_new.Scale(100, 100, 100);
+  //FloorNode_new.Translate(0.0f, -1.0f, 0.1f);
+  //FloorNode_new.Rotate(90.0f, glm::vec3(1, 0, 0));
+  //FloorNode_new.Scale(100, 100, 100);
 
   sNodes.push_back(beeNode);
   sNodes.push_back(scena1_new);
-  sNodes.push_back(FloorNode_new);
+  //sNodes.push_back(FloorNode_new);
   sNodes.push_back(scena3_new);
 
   shaderProgram->use();
@@ -132,11 +134,11 @@ void Game::Granko()
   }
 
   delete trojObj;
-  delete FloorObj;
+  //delete FloorObj;
   delete hexObj;
 
   delete trojkat;
-  delete Floor;
+  //delete Floor;
   delete szescian;
 
   ImGui_ImplOpenGL3_Shutdown();

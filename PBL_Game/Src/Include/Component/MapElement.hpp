@@ -7,6 +7,7 @@ class MapElement {
 	private:
 	std::vector<SceneNode>* nodes;
 	SceneNode* parent;
+	Shader* shader;
 	const float scale = 1.0f;
 	const float floor_offset = 1.0f;
 	const float wall_offset = 1.0f;
@@ -16,7 +17,7 @@ class MapElement {
 	glm::vec4 Walls;
 	glm::vec4 Doors;
 
-	MapElement(glm::vec2 pos);
+	MapElement(glm::vec2 pos, Shader* shaderProgram);
 	void SetWall(glm::vec4 wall);
 	void SetDoor(glm::vec4 door);
 	std::vector<glm::vec2> GetNeighbours();
