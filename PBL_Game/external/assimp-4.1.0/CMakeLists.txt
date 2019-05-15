@@ -289,9 +289,9 @@ ENDIF( SYSTEM_IRRXML )
 
 # Search for external dependencies, and build them from source if not found
 # Search for zlib
-IF ( NOT ASSIMP_BUILD_ZLIB )
-    find_package(ZLIB)
-ENDIF( NOT ASSIMP_BUILD_ZLIB )
+# IF ( NOT ASSIMP_BUILD_ZLIB )
+#     find_package(ZLIB)
+# ENDIF( NOT ASSIMP_BUILD_ZLIB )
 
 IF( NOT ZLIB_FOUND )
   message(STATUS "compiling zlib from souces")

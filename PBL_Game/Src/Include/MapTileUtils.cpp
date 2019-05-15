@@ -2,7 +2,9 @@
 
 std::vector<MapTile *> MapTileUtils::GetMapInstance(const unsigned width,
                                                     const unsigned height,
-                                                    Drawable *aDrawable)
+                                                    ShapeRenderer3D *aDrawable,
+                                                    float MapScale,
+                                                    float FloorTranslation)
 {
 
     MapTile ***map = new MapTile **[width];
@@ -16,11 +18,10 @@ std::vector<MapTile *> MapTileUtils::GetMapInstance(const unsigned width,
     {
         for (unsigned y = 0; y < height; y++)
         {
-            map[x][y] = new MapTile(aDrawable, std::to_string(x) + "" + std::to_string(y));
-            map[x][y]->mSceneNode.Translate(2+4.5 * x, -1.8,2+ 4.5 * y);
-              map[x][y]->mSceneNode.Scale(4.5, 4.5, 4.5);
-             map[x][y]->mSceneNode.Rotate(90.0f, glm::vec3(1, 0, 0));
-            
+            map[x][y] = new MapTile(aDrawable->GetCopy(), std::to_string(x) + "" + std::to_string(y));
+            map[x][y]->mSceneNode.Translate(2 + MapScale * x, FloorTranslation, 2 + MapScale * y);
+            map[x][y]->mSceneNode.Scale(MapScale, MapScale, MapScale);
+            map[x][y]->mSceneNode.Rotate(90.0f, glm::vec3(1, 0, 0));
         }
     }
 
@@ -52,4 +53,15 @@ std::vector<MapTile *> MapTileUtils::GetMapInstance(const unsigned width,
         }
     }
     return toReturn;
+}
+
+std::vector<MapTile *> MapTileUtils::FindPath(MapTile *aStart, MapTile *aEnd,int m,int n) //BFS
+{
+
+    std::vector<MapTile *> mapPath;
+    MapTile *camefrom = aStart;
+    MapTile *currentTile = aStart;
+
+
+return mapPath;
 }

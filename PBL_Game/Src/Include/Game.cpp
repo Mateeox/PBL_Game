@@ -43,8 +43,11 @@ void Game::Granko()
 {
   Texture *xD = new Texture("Textures/red.png", GL_LINEAR);
   Texture *TileTexture = new Texture("Textures/Tile.png", GL_LINEAR);
+  Texture *TakenTileTexture = new Texture("Textures/TakenTile.png", GL_LINEAR);
+
   xD->Load();
   TileTexture->Load();
+  TakenTileTexture->Load();
 
   SceneNode scena1_new;
   SceneNode FloorNode_new;
@@ -80,11 +83,12 @@ void Game::Granko()
                                                xD);
 
   ShapeRenderer3D *TileRenderer = new ShapeRenderer3D(Shapes::RainBow_Square,
-                                               Shapes::RB_Square_indices,
-                                               sizeof(Shapes::RainBow_Square),
-                                               sizeof(Shapes::RB_Square_indices),
-                                               *shaderProgram,
-                                               TileTexture);
+                                                      Shapes::RB_Square_indices,
+                                                      sizeof(Shapes::RainBow_Square),
+                                                      sizeof(Shapes::RB_Square_indices),
+                                                      *shaderProgram,
+                                                      TileTexture);
+
 
   ShapeRenderer3D *trojkat = new ShapeRenderer3D(Shapes::RainBow_Triangle,
                                                  Shapes::RB_Triangle_indices,
@@ -135,7 +139,7 @@ void Game::Granko()
   float floorTransform = ConfigUtils::GetValueFromMap<float>("FloorTranslation", ConfigMap);
 
   float floorTileScale = ConfigUtils::GetValueFromMap<float>("floorTileScale", ConfigMap);
-  
+
   FloorNode_new.Translate(0, floorTransform, 0);
 
   leftPlayerNode.Scale(0.01, 0.01, 0.01);
@@ -152,8 +156,6 @@ void Game::Granko()
   FloorNode_new.Scale(floorTileScale, floorTileScale, floorTileScale);
   FloorNode_new.Rotate(90.0f, glm::vec3(1, 0, 0));
 
-  
-
   sNodes.push_back(&Enemy_Node);
   sNodes.push_back(&leftPlayerNode);
   rightNodes.push_back(&rightPlayerNode);
@@ -164,12 +166,20 @@ void Game::Granko()
   sNodes.push_back(&box2);
   sNodes.push_back(&box3);
 
-  std::vector<MapTile *> mapOfTiles = MapTileUtils::GetMapInstance(9, 9, TileRenderer);
+  std::vector<MapTile *> mapOfTiles = MapTileUtils::GetMapInstance(9, 9,
+                                                                   TileRenderer,
+                                                                   floorTileScale, floorTransform);
 
   for (auto val : mapOfTiles)
   {
     sNodes.push_back(&val->mSceneNode);
-    std::cout << val->mName << "\n";
+    if (val->mName == "11" || val->mName =="22")
+    {
+      printf("Color Changed \n");
+       val->mDrawable->AsignSecondTexture(TakenTileTexture);
+       std::cout<<"Pointer to drawable"<< val->mDrawable <<"\n";
+       val->ChangeMapTileColor();
+    }
   }
 
   shaderProgram->use();

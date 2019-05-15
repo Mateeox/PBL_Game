@@ -8,13 +8,14 @@
 class MapTile 
 {
     
-    Drawable * mDrawable;
-    
-
+   
 public:
-    MapTile(Drawable *aDrawable,std::string name);
+    MapTile(ShapeRenderer3D *aDrawable,std::string name);
     void Draw(glm::mat4 &transform);
+    void ChangeMapTileColor();
+    int textureColor;
 
+    ShapeRenderer3D * mDrawable;
     std::string mName;
     SceneNode  mSceneNode;
     std::vector<MapTile*> kids;

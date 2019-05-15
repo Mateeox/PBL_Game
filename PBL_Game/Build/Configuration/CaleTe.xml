@@ -23,12 +23,12 @@
     <ConfigParameter>
         <Type>F</Type>
         <Name>FloorTranslation</Name>
-        <Value>-1.85</Value>
+        <Value>-1.8</Value>
     </ConfigParameter>
         <ConfigParameter>
         <Type>F</Type>
         <Name>floorTileScale</Name>
-        <Value>4.5</Value>
+        <Value>3</Value>
     </ConfigParameter>
 </Config>
 

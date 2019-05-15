@@ -1,6 +1,7 @@
 #pragma once
 #include "Drawable.hpp"
 #include "Texture.hpp"
+#include <vector>
 
 class ShapeRenderer3D :public Drawable 
 {
@@ -13,7 +14,11 @@ class ShapeRenderer3D :public Drawable
     int what_Draw_use;
     void Draw_Elements();
     void Draw_Arrays();
-    Texture* texture;
+    unsigned textureNumberDisplayed;
+    std::vector<Texture *> textures;
+
+    
+
 
     public:
 
@@ -28,9 +33,12 @@ class ShapeRenderer3D :public Drawable
                     int indices_size,
                     Shader & shaderProgram,
                     Texture * texture);
+
+    ShapeRenderer3D * GetCopy();
                     
     void Draw(glm::mat4 &  transform) override;
-   
+    void SwitchTexture(int aTextureNumber);
+    void AsignSecondTexture(Texture *aTexture);
 
     ComponentSystem::ComponentType GetComponentType() override;
 	std::string Serialize() {

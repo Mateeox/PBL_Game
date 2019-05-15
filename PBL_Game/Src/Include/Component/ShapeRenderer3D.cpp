@@ -22,9 +22,10 @@ ShapeRenderer3D::ShapeRenderer3D(
 						 g_vertex_buffer_data_size(size),
 						 indices_size(aindices_size),
 						 indices(aindices),
-						 texture(atexture)
+						 textureNumberDisplayed(0)
 
 {
+	textures.push_back(atexture);
 	what_Draw_use = 1;
 
 	glGenVertexArrays(1, &VAO);
@@ -56,8 +57,11 @@ ShapeRenderer3D::ShapeRenderer3D(
 	Shader &aShaderProgram,
 	Texture *atexture) : Drawable(aShaderProgram),
 						 g_vertex_buffer_data(g_ver),
-						 g_vertex_buffer_data_size(size), texture(atexture)
+						 g_vertex_buffer_data_size(size),
+						 textureNumberDisplayed(0)
 {
+	textures.push_back(atexture);
+
 	what_Draw_use = 2;
 
 	glGenVertexArrays(1, &VAO);
@@ -80,15 +84,15 @@ ShapeRenderer3D::ShapeRenderer3D(
 	glEnableVertexAttribArray(2);
 }
 
-void ShapeRenderer3D::Draw(glm::mat4 &  transform)
+void ShapeRenderer3D::Draw(glm::mat4 &transform)
 {
 
 	ShaderProgram.use();
 	unsigned int transformLoc = glGetUniformLocation(ShaderProgram.shaderProgramID, "transform");
 	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
-	if (texture != nullptr)
+	if (textures.size() != 0 )
 	{
-		texture->Bind();
+	   textures[textureNumberDisplayed]->Bind();
 	}
 	if (what_Draw_use == 1)
 	{
@@ -99,8 +103,7 @@ void ShapeRenderer3D::Draw(glm::mat4 &  transform)
 		Draw_Arrays();
 	}
 
-	 glActiveTexture(GL_TEXTURE0);
-
+	glActiveTexture(GL_TEXTURE0);
 }
 
 void ShapeRenderer3D::Draw_Elements()
@@ -119,6 +122,23 @@ void ShapeRenderer3D::Draw_Arrays()
 {
 	glBindVertexArray(VAO);
 	glDrawArrays(GL_TRIANGLES, 0, g_vertex_buffer_data_size); // 3 indices starting at 0 -> 1 triangle
+}
+
+void ShapeRenderer3D::SwitchTexture(int textureNumber)
+{
+	textureNumberDisplayed = textureNumber;
+}
+
+ShapeRenderer3D * ShapeRenderer3D::GetCopy()
+{
+ ShapeRenderer3D * newCopy = new  ShapeRenderer3D(g_vertex_buffer_data,indices,g_vertex_buffer_data_size,indices_size,ShaderProgram,textures[0]);
+
+ return newCopy;
+}
+
+void ShapeRenderer3D::AsignSecondTexture(Texture *aTexture)
+{
+ textures.push_back(aTexture);
 }
 
 ShapeRenderer3D::~ShapeRenderer3D()
