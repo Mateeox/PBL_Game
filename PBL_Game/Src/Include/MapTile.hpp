@@ -1,17 +1,21 @@
 #pragma once
 #include "Texture.hpp"
-#include "Drawable.hpp"
-#include "ShapeRenderer3D.hpp"
+#include "Component/Drawable.hpp"
+#include "Component/ShapeRenderer3D.hpp"
+#include "SceneNode.hpp"
 #include <vector>
 
-class MapTile : public Drawable
+class MapTile 
 {
-    ShapeRenderer3D &mShapeRenderer3D;
-    std::string mName;
+    
+    Drawable * mDrawable;
+    
 
 public:
-    MapTile(ShapeRenderer3D &aShapeRenderer3D, Shader &ShaderProgram,std::string name);
-    void Draw(glm::mat4 &transform) override;
+    MapTile(Drawable *aDrawable,std::string name);
+    void Draw(glm::mat4 &transform);
 
+    std::string mName;
+    SceneNode  mSceneNode;
     std::vector<MapTile*> kids;
 };

@@ -20,6 +20,16 @@
         <Name>PlayerSpeed</Name>
         <Value>25</Value>
     </ConfigParameter>
+    <ConfigParameter>
+        <Type>F</Type>
+        <Name>FloorTranslation</Name>
+        <Value>-1.85</Value>
+    </ConfigParameter>
+        <ConfigParameter>
+        <Type>F</Type>
+        <Name>floorTileScale</Name>
+        <Value>4.5</Value>
+    </ConfigParameter>
 </Config>
 
 <!-- types I - int

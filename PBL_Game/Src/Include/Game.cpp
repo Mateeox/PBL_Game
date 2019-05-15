@@ -5,6 +5,8 @@
 #include "Component/AnimatedModel.hpp"
 #include "Shapes.hpp"
 
+#include <MapTileUtils.hpp>
+
 #include <fstream>
 #include <iterator>
 
@@ -19,10 +21,9 @@ void Game::InitializeConfig()
   movementSpeed = ConfigUtils::GetValueFromMap<float>("PlayerSpeed", ConfigMap);
 }
 
-Game::Game(Window &aOkno) : 
-okienko(aOkno),
-camera(Camera()),
-camera2(Camera())
+Game::Game(Window &aOkno) : okienko(aOkno),
+                            camera(Camera()),
+                            camera2(Camera())
 {
 
   LoadConfig();
@@ -41,7 +42,9 @@ camera2(Camera())
 void Game::Granko()
 {
   Texture *xD = new Texture("Textures/red.png", GL_LINEAR);
+  Texture *TileTexture = new Texture("Textures/Tile.png", GL_LINEAR);
   xD->Load();
+  TileTexture->Load();
 
   SceneNode scena1_new;
   SceneNode FloorNode_new;
@@ -64,7 +67,7 @@ void Game::Granko()
   GameObject *hexObj3 = new GameObject(box3.local);
 
   std::string BeeModelPath = "Models/enemy_model.obj";
-  std::string AnimatedEnemyPAth = "Models/"+ ConfigUtils::GetValueFromMap<std::string>("Enemy_Animated_Model",ConfigMap);
+  std::string AnimatedEnemyPAth = "Models/" + ConfigUtils::GetValueFromMap<std::string>("Enemy_Animated_Model", ConfigMap);
 
   Model *BeeModel = new Model(BeeModelPath, *shaderProgram_For_Model, false);
   AnimatedModel *animatedModel = new AnimatedModel(AnimatedEnemyPAth, *shaderAnimatedModel, false);
@@ -75,6 +78,13 @@ void Game::Granko()
                                                sizeof(Shapes::RB_Square_indices),
                                                *shaderProgram,
                                                xD);
+
+  ShapeRenderer3D *TileRenderer = new ShapeRenderer3D(Shapes::RainBow_Square,
+                                               Shapes::RB_Square_indices,
+                                               sizeof(Shapes::RainBow_Square),
+                                               sizeof(Shapes::RB_Square_indices),
+                                               *shaderProgram,
+                                               TileTexture);
 
   ShapeRenderer3D *trojkat = new ShapeRenderer3D(Shapes::RainBow_Triangle,
                                                  Shapes::RB_Triangle_indices,
@@ -122,6 +132,12 @@ void Game::Granko()
   box2.AddGameObject(hexObj2);
   box3.AddGameObject(hexObj3);
 
+  float floorTransform = ConfigUtils::GetValueFromMap<float>("FloorTranslation", ConfigMap);
+
+  float floorTileScale = ConfigUtils::GetValueFromMap<float>("floorTileScale", ConfigMap);
+  
+  FloorNode_new.Translate(0, floorTransform, 0);
+
   leftPlayerNode.Scale(0.01, 0.01, 0.01);
   rightPlayerNode.Scale(0.01, 0.01, 0.01);
   Enemy_Node.Scale(0.01, 0.01, 0.01);
@@ -133,11 +149,10 @@ void Game::Granko()
   Enemy_Node.Translate(5, 5, 0);
   box2.Translate(5, 0, 0);
   box3.Translate(-5, 0, 0);
-  FloorNode_new.Translate(0.0f, -1.0f, 0.1f);
-
+  FloorNode_new.Scale(floorTileScale, floorTileScale, floorTileScale);
   FloorNode_new.Rotate(90.0f, glm::vec3(1, 0, 0));
 
-  FloorNode_new.Scale(100, 100, 100);
+  
 
   sNodes.push_back(&Enemy_Node);
   sNodes.push_back(&leftPlayerNode);
@@ -148,6 +163,14 @@ void Game::Granko()
   //sNodes.push_back(&box1);
   sNodes.push_back(&box2);
   sNodes.push_back(&box3);
+
+  std::vector<MapTile *> mapOfTiles = MapTileUtils::GetMapInstance(9, 9, TileRenderer);
+
+  for (auto val : mapOfTiles)
+  {
+    sNodes.push_back(&val->mSceneNode);
+    std::cout << val->mName << "\n";
+  }
 
   shaderProgram->use();
 
@@ -204,11 +227,10 @@ void Game::Update(float interpolation)
     ProcessInput(interpolation, camera2);
   }
 
-    if (leftSideActive)
-      UpdatePlayer(leftPlayerNode, camera,interpolation);
-    else
-      UpdatePlayer(rightPlayerNode, camera2,interpolation);
-
+  if (leftSideActive)
+    UpdatePlayer(leftPlayerNode, camera, interpolation);
+  else
+    UpdatePlayer(rightPlayerNode, camera2, interpolation);
 }
 
 void Game::Render()
@@ -492,7 +514,7 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos)
   posy = ypos;
 }
 
-void Game::UpdatePlayer(SceneNode &player, Camera &camera,float interpolation)
+void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation)
 {
   Transform transformBeforeMove(player.gameObject->transform);
 

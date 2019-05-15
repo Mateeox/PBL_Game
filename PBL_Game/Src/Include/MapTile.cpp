@@ -1,14 +1,18 @@
 #include "MapTile.hpp"
 
-MapTile::MapTile(ShapeRenderer3D &aShapeRender, Shader &aShaderProgram,std::string aName) : 
-mShapeRenderer3D(aShapeRender),
- Drawable(aShaderProgram),
- mName(aName)
+MapTile::MapTile(Drawable * aDrawable,std::string aName) : 
+ mDrawable(aDrawable),
+ mName(aName),
+ mSceneNode(SceneNode())
 {
 
+    GameObject* gameObj = new GameObject(mSceneNode.local);
+    gameObj->AddComponent(mDrawable);
+    mSceneNode.AddGameObject(gameObj);
+    
 }
 
 void MapTile::Draw(glm::mat4 &  transform)
 {
-    mShapeRenderer3D.Draw(transform);
+    mDrawable->Draw(transform);
 }

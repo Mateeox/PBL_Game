@@ -1,16 +1,17 @@
 #pragma once
 #include "MapTile.hpp"
 #include <vector>
-#include "ShapeRenderer3D.hpp"
+#include "Component/Drawable.hpp"
 #include "Shader.hpp"
 
-class MapTileGenerator
+class MapTileUtils
 {
 public:
     static std::vector<MapTile *> GetMapInstance(const unsigned weight,
                                                  const unsigned height,
-                                                 ShapeRenderer3D &aShapeRenderer3D,
-                                                 Shader &ShaderProgram);
+                                                 Drawable *aDrawable);
 
+    std::vector<MapTile *> FindPath(MapTile*,MapTile*);
     
+
 };
