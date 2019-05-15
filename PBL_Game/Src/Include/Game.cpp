@@ -89,7 +89,6 @@ void Game::Granko()
                                                       *shaderProgram,
                                                       TileTexture);
 
-
   ShapeRenderer3D *trojkat = new ShapeRenderer3D(Shapes::RainBow_Triangle,
                                                  Shapes::RB_Triangle_indices,
                                                  sizeof(Shapes::RainBow_Triangle),
@@ -166,20 +165,26 @@ void Game::Granko()
   sNodes.push_back(&box2);
   sNodes.push_back(&box3);
 
-  std::vector<MapTile *> mapOfTiles = MapTileUtils::GetMapInstance(9, 9,
-                                                                   TileRenderer,
-                                                                   floorTileScale, floorTransform);
+  MapTile ***mapOfTiles = MapTileUtils::GetMapInstance(32, 32,
+                                                       TileRenderer,
+                                                       floorTileScale, floorTransform);
 
-  for (auto val : mapOfTiles)
+  for (unsigned x = 0; x < 32; x++)
   {
-    sNodes.push_back(&val->mSceneNode);
-    if (val->mName == "11" || val->mName =="22")
+    for (unsigned y = 0; y < 32; y++)
     {
-      printf("Color Changed \n");
-       val->mDrawable->AsignSecondTexture(TakenTileTexture);
-       std::cout<<"Pointer to drawable"<< val->mDrawable <<"\n";
-       val->ChangeMapTileColor();
+      sNodes.push_back(&mapOfTiles[x][y]->mSceneNode);
     }
+  }
+
+
+  std::vector<MapTile *>  xDDD = MapTileUtils::FindPath(mapOfTiles,mapOfTiles[16][16],mapOfTiles[0][0],32,32);
+
+  for(auto val : xDDD)
+  {
+    val->mDrawable->AsignSecondTexture(TakenTileTexture);
+    val->ChangeMapTileColor();
+    std::cout<<val->mName <<"\n";
   }
 
   shaderProgram->use();
