@@ -1,8 +1,12 @@
 #include "MapElement.hpp"
 
+MapElement::MapElement() {
+	this->Position = glm::vec2();
+}
+
 MapElement::MapElement(glm::vec2 pos, Shader* shaderProgram)
 {
-	this.Position = pos;
+	this->Position = glm::vec2(pos.x, pos.y);
 	this->shader = shaderProgram;
 }
 
@@ -19,19 +23,22 @@ void MapElement::SetDoor(glm::vec4 door)
 std::vector<glm::vec2> MapElement::GetNeighbours()
 {
 	std::vector<glm::vec2> neighbours;
-	neighbours.push_back(this.Position + glm::vec2(1.0f, 0));
-	neighbours.push_back(this.Position + glm::vec2(-1.0f, 0));
-	neighbours.push_back(this.Position + glm::vec2(0, 1.0f));
-	neighbours.push_back(this.Position + glm::vec2(0, -1.0f));
+	neighbours.push_back(this->Position + glm::vec2(1.0f, 0));
+	neighbours.push_back(this->Position + glm::vec2(-1.0f, 0));
+	neighbours.push_back(this->Position + glm::vec2(0, 1.0f));
+	neighbours.push_back(this->Position + glm::vec2(0, -1.0f));
 	return neighbours;
 }
 
 SceneNode* MapElement::GenerateNode(std::vector<SceneNode*>* nodes, SceneNode* parent)
 {
+	this->nodes = nodes;
 	SceneNode element;
 	element.AddParent(parent);
-	element.AddChild(AddFloor);
-
+	SceneNode* floor = AddFloor();
+	floor->AddParent(&element);
+	element.AddChild(floor);
+	nodes->push_back(&element);
 	return &element;
 }
 
@@ -45,12 +52,14 @@ SceneNode* MapElement::AddFloor()
 		Shapes::RB_Square_indices,
 		sizeof(Shapes::RainBow_Square),
 		sizeof(Shapes::RB_Square_indices),
-		*shaderProgram,
+		*shader,
 		xD);
 	oFloor.AddComponent(Floor);
-	floor.AddChild(floor);
+	floor.AddGameObject(&oFloor);
+	floor.AddChild(&floor);
 	floor.Translate(Position.x, Position.y, 0);
-	return floor;
+	nodes->push_back(&floor);
+	return &floor;
 }
 
 SceneNode* MapElement::CreateWall(SceneNode* parent, float direction_x, float direction_y)

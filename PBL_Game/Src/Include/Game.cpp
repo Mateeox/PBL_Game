@@ -4,7 +4,7 @@
 #include "Component/Model.hpp"
 #include "Component/AnimatedModel.hpp"
 #include "Shapes.hpp"
-#include "Component/MapGenerator.cpp"
+#include "Component/MapGenerator.hpp"
 
 #include <fstream>
 #include <iterator>

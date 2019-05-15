@@ -6,18 +6,19 @@
 #include "Shapes.hpp"
 class MapElement {
 	private:
-	std::vector<SceneNode>* nodes;
+	std::vector<SceneNode*>* nodes;
 	SceneNode* parent;
 	Shader* shader;
-	const float scale = 1.0f;
-	const float floor_offset = 1.0f;
-	const float wall_offset = 1.0f;
+	float scale = 1.0f;
+	float floor_offset = 1.0f;
+	float wall_offset = 1.0f;
 
 	public:
 	glm::vec2 Position;
 	glm::vec4 Walls;
 	glm::vec4 Doors;
 
+	MapElement();
 	MapElement(glm::vec2 pos, Shader* shaderProgram);
 	void SetWall(glm::vec4 wall);
 	void SetDoor(glm::vec4 door);

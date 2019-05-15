@@ -6,7 +6,15 @@
 class MapGenerator //: public Script
 {
 	private:
-	std::map <glm::vec2, MapElement> map;
+		struct Vec2Comp {
+			bool operator()(const glm::vec2& lhs, const glm::vec2& rhs) const
+			{
+				return lhs.x < rhs.x ||
+					lhs.x == rhs.x && (lhs.y < rhs.y || lhs.y == rhs.y);
+			}
+		};
+
+	std::map <glm::vec2, MapElement, Vec2Comp> map;
 	std::vector<SceneNode*>* nodes;
 	Shader* shader;
 
