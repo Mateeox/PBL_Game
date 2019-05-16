@@ -54,9 +54,13 @@ int Manhatan(int A_x, int A_y, int B_x, int B_y)
     return (std::abs(A_x - B_x) + std::abs(A_y - B_y));
 }
 
+float StraightLineDistance(int A_x, int A_y, int B_x, int B_y)
+{
+        return sqrt( (A_x+B_x)*(A_x+B_x) + (A_y+B_y)*(A_y+B_y));
+}
+
 std::vector<MapTile *> MapTileUtils::FindPath(MapTile ***map, MapTile *aStart, MapTile *aEnd, const int m, const int n)
 {
-
     std::vector<MapTile *> mapPath;
     unsigned StepNumber = 0;
     MapTile *currentMapTile = aStart;
@@ -105,7 +109,7 @@ MapTile *MapTileUtils::GetClosestMapTile(std::vector<MapTile *> children, MapTil
     for (int i = 0; i < children.size(); i++)
     {
         MapTile *tmp = children[i];
-        tmp->temporaryCost = Manhatan(tmp->x_cord, tmp->y_cord, map[target_x][target_y]->x_cord, map[target_x][target_y]->y_cord);
+        tmp->temporaryCost = StraightLineDistance(tmp->x_cord, tmp->y_cord, map[target_x][target_y]->x_cord, map[target_x][target_y]->y_cord);
         toSort.push_back(tmp);
     }
 
