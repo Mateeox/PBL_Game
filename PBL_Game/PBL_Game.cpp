@@ -4,12 +4,16 @@
 #include "Game.hpp"
 #include "Window.hpp"
 
+#include "PathFinding/PathFindingUtils.hpp"
+
 using namespace PBLGame;
+
 
 int main()
 {
     Window okienko(1280, 720, "37");
-    Game gierka(okienko);
+        Game gierka(okienko);
     gierka.Granko();
+
 }
 
