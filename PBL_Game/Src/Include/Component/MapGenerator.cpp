@@ -57,8 +57,9 @@ void MapGenerator::FinishGeneration()
 	SceneNode mapRoot;
 	for (std::map<glm::vec2, MapElement>::iterator element = map.begin(); element != map.end(); ++element)
 	{
-		element->second.GenerateNode(nodes, &mapRoot);
+		mapRoot.AddChild(element->second.GenerateNode(nodes, &mapRoot));
 	}
+	nodes->push_back(&mapRoot);
 }
 
 glm::vec2 MapGenerator::GetVector2(glm::vec2 pos)

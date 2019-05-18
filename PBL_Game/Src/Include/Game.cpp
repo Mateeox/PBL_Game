@@ -519,6 +519,7 @@ void Game::gatherCollidableObjects(std::vector<SceneNode *> &nodes)
 {
   for (auto node : nodes)
   {
+	if(node->gameObject != NULL)
     if (node->gameObject->getTag() != "player" && node->gameObject->getTag() != "enemy")
     {
       ComponentSystem::Component *possibleCollider = node->gameObject->GetComponent(ComponentSystem::ComponentType::Collider);
