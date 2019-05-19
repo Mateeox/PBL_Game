@@ -32,12 +32,11 @@ std::vector<MapTile> AssignMapTiles(const Graph &graph, int field_width,
 {
   std::vector<MapTile> mapTiles;
 
-
-std::cout<<"Cale Te"<<"\n";
   for (int i = 0; i < field_width; i++)
   {
     for (int j = 0; j < field_width; j++)
     {
+
       GridLocation id{i, j};
       MapTile mapTile(i, j, freeTex, aShaderProgram);
 
@@ -56,7 +55,6 @@ std::cout<<"Cale Te"<<"\n";
     }
   }
 
-std::cout<<"Cale Te"<<"\n";
   return mapTiles;
 }
 
@@ -228,16 +226,13 @@ void Game::Granko()
                                                  BlockedTileTexture,
                                                  *shaderProgram, &path);
 
-  for (int i = 0; i < 20; i++)
+  for (auto xd : mapTiles)
   {
-    for (int j = 0; j < 20; j++)
-    {
-      SceneNode * tileSceneNode = new SceneNode();
-      GameObject * gameObject = new GameObject(tileSceneNode->local); 
-      gameObject->AddComponent(&mapTiles[i+j]);
-  
-      sNodes.push_back(tileSceneNode);
-    }
+    SceneNode *tileSceneNode = new SceneNode();
+    GameObject *gameObject = new GameObject(tileSceneNode->local);
+    gameObject->AddComponent(&xd);
+    tileSceneNode->Translate(xd.x,0,xd.y);
+    sNodes.push_back(tileSceneNode);
   }
 
   shaderProgram->use();
@@ -247,6 +242,8 @@ void Game::Granko()
   float interpolation = 1.0;
 
   gatherCollidableObjects(sNodes);
+  std::cout << "AfterCollidableObjects"
+            << "\n";
   while (glfwGetKey(okienko.window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
          glfwWindowShouldClose(okienko.window) == 0)
   {
@@ -330,8 +327,6 @@ void Game::Render()
   glScissor(0, 0, (Game::WINDOW_WIDTH / 2) + offset, Game::WINDOW_HEIGHT);
   glClearColor(1, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT);
-  std::cout << "Thak"
-            << "\n";
   for (auto node : sNodes)
   {
     node->Render(originTransform, true);
@@ -621,14 +616,18 @@ void Game::gatherCollidableObjects(std::vector<SceneNode *> &nodes)
 {
   for (auto node : nodes)
   {
-    if (node->gameObject->getTag() != "player" && node->gameObject->getTag() != "enemy")
+    if (node->gameObject != nullptr)
     {
-      ComponentSystem::Component *possibleCollider = node->gameObject->GetComponent(ComponentSystem::ComponentType::Collider);
-      if (possibleCollider != nullptr)
+
+      if (node->gameObject->getTag() != "player" && node->gameObject->getTag() != "enemy")
       {
-        collidableObjects.push_back((Collider *)possibleCollider);
+        ComponentSystem::Component *possibleCollider = node->gameObject->GetComponent(ComponentSystem::ComponentType::Collider);
+        if (possibleCollider != nullptr)
+        {
+          collidableObjects.push_back((Collider *)possibleCollider);
+        }
+        gatherCollidableObjects(node->children);
       }
-      gatherCollidableObjects(node->children);
     }
   }
 }

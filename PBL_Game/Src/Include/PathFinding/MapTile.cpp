@@ -5,7 +5,7 @@ MapTile::MapTile(int x_cord, int y_cord, Texture *basicTexture, Shader &aShaderP
                                                                                                           Shapes::RB_Square_indices,
                                                                                                           sizeof(Shapes::RainBow_Square),
                                                                                                           sizeof(Shapes::RB_Square_indices),
-                                                                                                          aShaderProgram, basicTexture, activeProfile)
+                                                                                                          aShaderProgram, basicTexture, MapTileProfiles::Basic)
 {
 }
 
@@ -21,6 +21,7 @@ std::string MapTile::GetActiveProfile()
 
 void MapTile::Draw(glm::mat4 &transform)
 {
+    
     ShapeRenderer3D::Draw(transform);
 }
 
