@@ -14,7 +14,7 @@ class MapGenerator //: public Script
 			}
 		};
 
-	std::map <glm::vec2, MapElement, Vec2Comp> map;
+	std::map <glm::vec2, MapElement*, Vec2Comp> map;
 	std::vector<SceneNode*>* nodes;
 	Shader* shader;
 

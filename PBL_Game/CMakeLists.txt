@@ -62,6 +62,8 @@ add_executable(PBL_Game
 	  Src/Include/Component/Model.cpp
 	  Src/Include/Component/AnimatedModel.cpp
 	  Src/Include/Component/BoneUtils.cpp
+	  Src/Include/Component/MapGenerator.cpp
+	  Src/Include/Component/MapElement.cpp
 	  #Stb_image
 	  Src/Include/stb_image.cpp
 	  #ImGui

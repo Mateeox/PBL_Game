@@ -33,19 +33,19 @@ std::vector<glm::vec2> MapElement::GetNeighbours()
 SceneNode* MapElement::GenerateNode(std::vector<SceneNode*>* nodes, SceneNode* parent)
 {
 	this->nodes = nodes;
-	SceneNode element;
-	element.AddParent(parent);
+	SceneNode* element = new SceneNode();
+	element->AddParent(parent);
 	SceneNode* floor = AddFloor();
-	floor->AddParent(&element);
-	element.AddChild(floor);
-	nodes->push_back(&element);
-	return &element;
+	floor->AddParent(element);
+	element->AddChild(floor);
+	nodes->push_back(element);
+	return element;
 }
 
 SceneNode* MapElement::AddFloor()
 {
-	SceneNode floor;
-	GameObject oFloor(floor.local);
+	SceneNode* floor = new SceneNode();
+	GameObject* oFloor = new GameObject(floor->local);
 	Texture* xD = new Texture("Textures/red.png", GL_LINEAR);
 	xD->Load();
 	ShapeRenderer3D* Floor = new ShapeRenderer3D(Shapes::RainBow_Square,
@@ -54,12 +54,12 @@ SceneNode* MapElement::AddFloor()
 		sizeof(Shapes::RB_Square_indices),
 		*shader,
 		xD);
-	oFloor.AddComponent(Floor);
-	floor.AddGameObject(&oFloor);
-	floor.AddChild(&floor);
-	floor.Translate(Position.x, Position.y, 0);
-	nodes->push_back(&floor);
-	return &floor;
+	oFloor->AddComponent(Floor);
+	floor->AddGameObject(oFloor);
+	floor->AddChild(floor);
+	floor->Translate(Position.x, Position.y, 0);
+	nodes->push_back(floor);
+	return floor;
 }
 
 SceneNode* MapElement::CreateWall(SceneNode* parent, float direction_x, float direction_y)

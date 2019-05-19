@@ -22,13 +22,13 @@ MapGenerator::MapGenerator(std::vector<SceneNode*>* nodes, Shader* shaderProgram
 
 void MapGenerator::GenerateMap(int n)
 {
-	MapElement element(glm::vec2(0, 0), shader);
-	map.insert(std::pair<glm::vec2, MapElement>(element.Position, element));
+	MapElement* element = new MapElement(glm::vec2(0, 0), shader);
+	map.insert(std::pair<glm::vec2, MapElement*>(element->Position, element));
 	for (int i = 0; i < n-1; i++)
 	{
-		glm::vec2 pos = map[map.rbegin()->first].Position;
-		MapElement element(pos + GetVector2(pos), shader);
-		map.insert(std::pair<glm::vec2, MapElement>(element.Position, element));
+		glm::vec2 pos = map.at(map.rbegin()->first)->Position;
+		MapElement* temp = new MapElement(pos + GetVector2(pos), shader);
+		map.insert(std::pair<glm::vec2, MapElement*>(temp->Position, temp));
 	}
 }
 
@@ -39,27 +39,27 @@ int MapGenerator::GetDirection()
 
 void MapGenerator::CheckForWallsNDoors()
 {
-	for (std::map<glm::vec2, MapElement>::iterator it = map.begin(); it != map.end(); ++it)
+	for (std::map<glm::vec2, MapElement*>::iterator it = map.begin(); it != map.end(); ++it)
 	{
-		std::vector<glm::vec2> neighbours = it->second.GetNeighbours();
+		std::vector<glm::vec2> neighbours = it->second->GetNeighbours();
 		for (std::vector<glm::vec2>::iterator neighbour = neighbours.begin(); neighbour != neighbours.end(); neighbour++)
 		{
 			if (map.find(*neighbour) == map.end())
-				it->second.SetWall(GetVector4(it->second.Position - *neighbour));
+				it->second->SetWall(GetVector4(it->second->Position - *neighbour));
 			else
-				it->second.SetDoor(GetVector4(it->second.Position - *neighbour));
+				it->second->SetDoor(GetVector4(it->second->Position - *neighbour));
 		}
 	}
 }
 
 void MapGenerator::FinishGeneration()
 {
-	SceneNode mapRoot;
-	for (std::map<glm::vec2, MapElement>::iterator element = map.begin(); element != map.end(); ++element)
+	SceneNode* mapRoot = new SceneNode();
+	for (std::map<glm::vec2, MapElement*>::iterator element = map.begin(); element != map.end(); ++element)
 	{
-		mapRoot.AddChild(element->second.GenerateNode(nodes, &mapRoot));
+		mapRoot->AddChild(element->second->GenerateNode(nodes, mapRoot));
 	}
-	nodes->push_back(&mapRoot);
+	nodes->push_back(mapRoot);
 }
 
 glm::vec2 MapGenerator::GetVector2(glm::vec2 pos)
