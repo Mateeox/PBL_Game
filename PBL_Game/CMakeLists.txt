@@ -56,8 +56,6 @@ add_executable(PBL_Game
 	  Src/Include/SceneNode.cpp
 		Src/Include/Collider.cpp
 		Src/Include/ConfigUtils.cpp
-		Src/Include/MapTileUtils.cpp
-		Src/Include/MapTile.cpp
 		#PathFinding
 		Src/Include/PathFinding/PathFindingUtils.cpp
 	  #Component
