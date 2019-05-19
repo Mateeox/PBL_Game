@@ -105,8 +105,6 @@ struct SquareGrid
   }
 };
 
-SquareGrid make_diagram1();
-
 // This outputs a grid. Pass in a distances map if you want to print
 // the distances, or pass in a point_to map if you want to print
 // arrows that point to the parent location, or pass in a path vector
@@ -215,9 +213,9 @@ static void add_rect(SquareGrid &grid, int x1, int y1, int x2, int y2)
   }
 }
 
-static GridWithWeights make_diagram4()
+static GridWithWeights make_diagram4(int size_x,int size_y)
 {
-  GridWithWeights grid(20, 20);
+  GridWithWeights grid(size_x, size_y);
   add_rect(grid, 1, 7, 4, 9);
   typedef GridLocation L;
   grid.forests = std::unordered_set<GridLocation> {

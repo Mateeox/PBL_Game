@@ -5,8 +5,7 @@
 #include "Component/AnimatedModel.hpp"
 #include "Shapes.hpp"
 #include "PathFinding/PathFindingUtils.hpp"
-
-#include <MapTileUtils.hpp>
+#include "PathFinding/MapTile.hpp"
 
 #include <fstream>
 #include <iterator>
@@ -20,6 +19,45 @@ void Game::InitializeConfig()
   WINDOW_WIDTH = ConfigUtils::GetValueFromMap<unsigned>("WINDOW_WIDTH", ConfigMap);
   WINDOW_HEIGHT = ConfigUtils::GetValueFromMap<unsigned>("WINDOW_HEIGHT", ConfigMap);
   movementSpeed = ConfigUtils::GetValueFromMap<float>("PlayerSpeed", ConfigMap);
+}
+
+template <class Graph>
+std::vector<MapTile> AssignMapTiles(const Graph &graph, int field_width,
+                                    Texture *freeTex,
+                                    Texture *pathTex,
+                                    Texture *SlowerTex,
+                                    Texture *BlocedTex,
+                                    Shader &aShaderProgram,
+                                    std::vector<GridLocation> *path = nullptr)
+{
+  std::vector<MapTile> mapTiles;
+
+
+std::cout<<"Cale Te"<<"\n";
+  for (int i = 0; i < field_width; i++)
+  {
+    for (int j = 0; j < field_width; j++)
+    {
+      GridLocation id{i, j};
+      MapTile mapTile(i, j, freeTex, aShaderProgram);
+
+      if (graph.walls.find(id) != graph.walls.end())
+      {
+
+        mapTile.SelectTileProfile(MapTileProfiles::Blocked);
+      }
+
+      if (path != nullptr && find(path->begin(), path->end(), id) != path->end())
+      {
+        mapTile.SelectTileProfile(MapTileProfiles::Path);
+      }
+
+      mapTiles.push_back(mapTile);
+    }
+  }
+
+std::cout<<"Cale Te"<<"\n";
+  return mapTiles;
 }
 
 Game::Game(Window &aOkno) : okienko(aOkno),
@@ -42,13 +80,15 @@ Game::Game(Window &aOkno) : okienko(aOkno),
 
 void Game::Granko()
 {
-  Texture *xD = new Texture("Textures/red.png", GL_LINEAR);
-  Texture *TileTexture = new Texture("Textures/Tile.png", GL_LINEAR);
-  Texture *TakenTileTexture = new Texture("Textures/TakenTile.png", GL_LINEAR);
+  Texture *BlockedTileTexture = new Texture("Textures/BlockedTile.png", GL_LINEAR);
+  Texture *FreeTileTexture = new Texture("Textures/FreeTile.png", GL_LINEAR);
+  Texture *SlowerTileTexture = new Texture("Textures/SlowerTile.png", GL_LINEAR);
+  Texture *PathTileTexture = new Texture("Textures/PathTile.png", GL_LINEAR);
 
-  xD->Load();
-  TileTexture->Load();
-  TakenTileTexture->Load();
+  BlockedTileTexture->Load();
+  FreeTileTexture->Load();
+  SlowerTileTexture->Load();
+  PathTileTexture->Load();
 
   SceneNode scena1_new;
   SceneNode FloorNode_new;
@@ -81,28 +121,28 @@ void Game::Granko()
                                                sizeof(Shapes::RainBow_Square),
                                                sizeof(Shapes::RB_Square_indices),
                                                *shaderProgram,
-                                               xD);
+                                               BlockedTileTexture, "Basic");
 
   ShapeRenderer3D *TileRenderer = new ShapeRenderer3D(Shapes::RainBow_Square,
                                                       Shapes::RB_Square_indices,
                                                       sizeof(Shapes::RainBow_Square),
                                                       sizeof(Shapes::RB_Square_indices),
                                                       *shaderProgram,
-                                                      TileTexture);
+                                                      FreeTileTexture, "Basic");
 
   ShapeRenderer3D *trojkat = new ShapeRenderer3D(Shapes::RainBow_Triangle,
                                                  Shapes::RB_Triangle_indices,
                                                  sizeof(Shapes::RainBow_Triangle),
                                                  sizeof(Shapes::RB_Triangle_indices),
                                                  *shaderProgram,
-                                                 xD);
+                                                 BlockedTileTexture, "Basic");
 
   ShapeRenderer3D *szescian = new ShapeRenderer3D(Shapes::RainBow_Cube,
                                                   Shapes::RB_Cube_indices,
                                                   sizeof(Shapes::RainBow_Cube),
                                                   sizeof(Shapes::RB_Cube_indices),
                                                   *shaderProgram,
-                                                  xD);
+                                                  BlockedTileTexture, "Basic");
 
   leftPlayerObj->AddComponent(BeeModel);
   rightPlayerObj->AddComponent(BeeModel);
@@ -166,30 +206,7 @@ void Game::Granko()
   sNodes.push_back(&box2);
   sNodes.push_back(&box3);
 
-  MapTile ***mapOfTiles = MapTileUtils::GetMapInstance(32, 32,
-                                                       TileRenderer,
-                                                       floorTileScale, floorTransform);
-
-  for (unsigned x = 0; x < 32; x++)
-  {
-    for (unsigned y = 0; y < 32; y++)
-    {
-      sNodes.push_back(&mapOfTiles[x][y]->mSceneNode);
-    }
-  }
-
-
-  std::vector<MapTile *>  xDDD = MapTileUtils::FindPath(mapOfTiles,mapOfTiles[16][16],mapOfTiles[0][0],32,32);
-
-  for(auto val : xDDD)
-  {
-    val->mDrawable->AsignSecondTexture(TakenTileTexture);
-    val->ChangeMapTileColor();
-    std::cout<<val->mName <<"\n";
-  }
-
-
-  GridWithWeights grid = make_diagram4();
+  GridWithWeights grid = make_diagram4(20, 20);
   GridLocation start{1, 4};
   GridLocation goal{8, 5};
   std::unordered_map<GridLocation, GridLocation> came_from;
@@ -202,7 +219,26 @@ void Game::Granko()
   std::vector<GridLocation> path = reconstruct_path(start, goal, came_from);
   draw_grid(grid, 3, nullptr, nullptr, &path);
 
+  std::vector<SceneNode *> mapTileSceneNodes;
+  std::vector<MapTile> mapTiles = AssignMapTiles(grid,
+                                                 20,
+                                                 FreeTileTexture,
+                                                 PathTileTexture,
+                                                 SlowerTileTexture,
+                                                 BlockedTileTexture,
+                                                 *shaderProgram, &path);
 
+  for (int i = 0; i < 20; i++)
+  {
+    for (int j = 0; j < 20; j++)
+    {
+      SceneNode * tileSceneNode = new SceneNode();
+      GameObject * gameObject = new GameObject(tileSceneNode->local); 
+      gameObject->AddComponent(&mapTiles[i+j]);
+  
+      sNodes.push_back(tileSceneNode);
+    }
+  }
 
   shaderProgram->use();
 
@@ -294,6 +330,8 @@ void Game::Render()
   glScissor(0, 0, (Game::WINDOW_WIDTH / 2) + offset, Game::WINDOW_HEIGHT);
   glClearColor(1, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT);
+  std::cout << "Thak"
+            << "\n";
   for (auto node : sNodes)
   {
     node->Render(originTransform, true);
@@ -328,7 +366,7 @@ void Game::Render()
 
 void Game::Serialize()
 {
-  std::map<SceneNode *, unsigned> oidMap;
+  std::map<SceneNode *, unsigned long long> oidMap;
   SerializeFaza1(oidMap);
   std::vector<SceneNode> tempNodes;
   SerializeFaza2(oidMap, tempNodes);
@@ -337,20 +375,20 @@ void Game::Serialize()
   tempNodes.clear();
 }
 
-void Game::SerializeFaza1(std::map<SceneNode *, unsigned> &map)
+void Game::SerializeFaza1(std::map<SceneNode *, unsigned long long> &map)
 {
   this->sNodes[0]->AddChild(this->sNodes[1]);
   this->sNodes[1]->AddParent(this->sNodes[0]);
   for (SceneNode *scene : this->sNodes)
   {
-    unsigned n = map.size() + 1;
-    map.insert(std::pair<SceneNode *, unsigned>(scene, n));
+    unsigned long long n = map.size() + 1;
+    map.insert(std::pair<SceneNode *, unsigned long long>(scene, n));
   }
 }
 
-void Game::SerializeFaza2(std::map<SceneNode *, unsigned> &map, std::vector<SceneNode> &temp)
+void Game::SerializeFaza2(std::map<SceneNode *, unsigned long long> &map, std::vector<SceneNode> &temp)
 {
-  for (std::pair<SceneNode *, unsigned> scene : map)
+  for (std::pair<SceneNode *, unsigned long long> scene : map)
   {
     SceneNode tempNode;
     tempNode.AddParent((SceneNode *)map[scene.first->parent]);
@@ -392,15 +430,15 @@ void Game::SerializeZapisz(std::string serialized)
 void Game::Deserialize(std::string path)
 {
   std::ifstream in(path);
-  std::map<unsigned, SceneNode *> oidMap;
-  unsigned index = 1;
+  std::map<unsigned long long, SceneNode *> oidMap;
+  unsigned long long index = 1;
   std::string line;
   while (std::getline(in, line))
   {
     if (line.substr(0, 2) == "SN")
     {
       SceneNode *node = new SceneNode;
-      oidMap.insert(std::pair<unsigned, SceneNode *>(index, node));
+      oidMap.insert(std::pair<unsigned long long, SceneNode *>(index, node));
       index++;
     }
 
@@ -416,13 +454,13 @@ void Game::Deserialize(std::string path)
 
     if (line.substr(0, 3) == "\tP;")
     {
-      unsigned i_dec = atoi(line.substr(3).c_str());
+      unsigned long long i_dec = atoi(line.substr(3).c_str());
       oidMap[index - 1]->AddParent((SceneNode *)i_dec);
     }
 
     if (line.substr(0, 4) == "\tCH;")
     {
-      unsigned i_dec = atoi(line.substr(4).c_str());
+      unsigned long long i_dec = atoi(line.substr(4).c_str());
       oidMap[index - 1]->AddChild((SceneNode *)i_dec);
     }
 
@@ -447,14 +485,14 @@ void Game::Deserialize(std::string path)
   DeserializeOrderPointers(oidMap);
 }
 
-void Game::DeserializeOrderPointers(std::map<unsigned, SceneNode *> &map)
+void Game::DeserializeOrderPointers(std::map<unsigned long long, SceneNode *> &map)
 {
-  for (std::pair<unsigned, SceneNode *> node : map)
+  for (std::pair<unsigned long long, SceneNode *> node : map)
   {
     if (node.second->parent > 0 && node.second->parent != node.second)
-      node.second->parent = map[(unsigned)std::abs((intptr_t)node.second->parent)];
+      node.second->parent = map[(unsigned long long)std::abs((intptr_t)node.second->parent)];
     for (int i = 0; i < node.second->children.size(); i++)
-      node.second->children[i] = map[(unsigned)std::abs((intptr_t)node.second->children[i])];
+      node.second->children[i] = map[(unsigned long long)std::abs((intptr_t)node.second->children[i])];
     this->sNodes.push_back(node.second);
   }
   map.clear();

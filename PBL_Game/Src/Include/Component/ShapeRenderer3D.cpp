@@ -17,15 +17,15 @@ ShapeRenderer3D::ShapeRenderer3D(
 	int size,
 	int aindices_size,
 	Shader &aShaderProgram,
-	Texture *atexture) : Drawable(aShaderProgram),
-						 g_vertex_buffer_data(g_ver),
-						 g_vertex_buffer_data_size(size),
-						 indices_size(aindices_size),
-						 indices(aindices),
-						 textureNumberDisplayed(0)
-
+	Texture *atexture,
+	std::string textureName) : Drawable(aShaderProgram),
+							   g_vertex_buffer_data(g_ver),
+							   g_vertex_buffer_data_size(size),
+							   indices_size(aindices_size),
+							   indices(aindices),
+							   textureDisplayed(textureName)
 {
-	textures.push_back(atexture);
+	textures[textureName] = atexture;
 	what_Draw_use = 1;
 
 	glGenVertexArrays(1, &VAO);
@@ -55,12 +55,13 @@ ShapeRenderer3D::ShapeRenderer3D(
 ShapeRenderer3D::ShapeRenderer3D(
 	GLfloat *g_ver, int size,
 	Shader &aShaderProgram,
-	Texture *atexture) : Drawable(aShaderProgram),
-						 g_vertex_buffer_data(g_ver),
-						 g_vertex_buffer_data_size(size),
-						 textureNumberDisplayed(0)
+	Texture *atexture,
+	std::string textureName) : Drawable(aShaderProgram),
+							   g_vertex_buffer_data(g_ver),
+							   g_vertex_buffer_data_size(size),
+						       textureDisplayed(textureName)
 {
-	textures.push_back(atexture);
+	textures[textureName] = atexture;
 
 	what_Draw_use = 2;
 
@@ -90,9 +91,9 @@ void ShapeRenderer3D::Draw(glm::mat4 &transform)
 	ShaderProgram.use();
 	unsigned int transformLoc = glGetUniformLocation(ShaderProgram.shaderProgramID, "transform");
 	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
-	if (textures.size() != 0 )
+	if (textures.size() != 0)
 	{
-	   textures[textureNumberDisplayed]->Bind();
+		textures[textureDisplayed]->Bind();
 	}
 	if (what_Draw_use == 1)
 	{
@@ -124,21 +125,21 @@ void ShapeRenderer3D::Draw_Arrays()
 	glDrawArrays(GL_TRIANGLES, 0, g_vertex_buffer_data_size); // 3 indices starting at 0 -> 1 triangle
 }
 
-void ShapeRenderer3D::SwitchTexture(int textureNumber)
+void ShapeRenderer3D::SwitchTexture(std::string textureName)
 {
-	textureNumberDisplayed = textureNumber;
+	textureDisplayed = textureName;
 }
 
-ShapeRenderer3D * ShapeRenderer3D::GetCopy()
+ShapeRenderer3D *ShapeRenderer3D::GetCopy()
 {
- ShapeRenderer3D * newCopy = new  ShapeRenderer3D(g_vertex_buffer_data,indices,g_vertex_buffer_data_size,indices_size,ShaderProgram,textures[0]);
+	ShapeRenderer3D *newCopy = new ShapeRenderer3D(g_vertex_buffer_data, indices, g_vertex_buffer_data_size, indices_size, ShaderProgram, textures[0], textureDisplayed);
 
- return newCopy;
+	return newCopy;
 }
 
-void ShapeRenderer3D::AsignSecondTexture(Texture *aTexture)
+void ShapeRenderer3D::AsignTexture(Texture *aTexture, std::string aTextureName)
 {
- textures.push_back(aTexture);
+	textures[aTextureName] = aTexture;
 }
 
 ShapeRenderer3D::~ShapeRenderer3D()

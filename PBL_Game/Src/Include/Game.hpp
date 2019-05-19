@@ -86,11 +86,11 @@ public:
   GameObject * findByTagSingle(const std::vector<SceneNode*>& data, std::string tag);
 
 private:
-  void SerializeFaza1(std::map<SceneNode *, unsigned> &map);
-  void SerializeFaza2(std::map<SceneNode *, unsigned> &map, std::vector<SceneNode> &temp);
+  void SerializeFaza1(std::map<SceneNode *,unsigned long long> &map);
+  void SerializeFaza2(std::map<SceneNode *,unsigned long long> &map, std::vector<SceneNode> &temp);
   void SerializeFaza3(std::vector<SceneNode> &temp);
   void SerializeZapisz(std::string serialized);
-  void DeserializeOrderPointers(std::map<unsigned, SceneNode *> &map);
+  void DeserializeOrderPointers(std::map<unsigned long long, SceneNode *> &map);
 
   void SetViewAndPerspective(Camera &aCamera);
 };

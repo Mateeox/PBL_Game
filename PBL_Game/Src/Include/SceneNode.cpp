@@ -2,6 +2,7 @@
 #include "Component/ShapeRenderer3D.hpp"
 #include "Component/Model.hpp"
 #include "Component/AnimatedModel.hpp"
+#include "PathFinding/MapTile.hpp"
 
 SceneNode::SceneNode() : local(Transform::origin()), dirty_flag(true), gameObject(nullptr)
 {
@@ -54,6 +55,12 @@ void SceneNode::Render(Transform &parentWorld, bool aDirty_Flag)
     if (animModel != nullptr)
     {
       animModel->Draw(world.GetTransform());
+    }
+
+    MapTile *mapTile = (MapTile *)gameObject->GetComponent(ComponentSystem::MapTile);
+    if (mapTile != nullptr)
+    {
+      mapTile->Draw(world.GetTransform());
     }
 
   }
