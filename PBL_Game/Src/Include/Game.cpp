@@ -22,7 +22,7 @@ void Game::InitializeConfig()
 }
 
 template <class Graph>
-std::vector<MapTile> AssignMapTiles(const Graph &graph, int field_width,
+std::vector<MapTile*> AssignMapTiles(const Graph &graph, int field_width,
                                     Texture *freeTex,
                                     Texture *pathTex,
                                     Texture *SlowerTex,
@@ -30,7 +30,7 @@ std::vector<MapTile> AssignMapTiles(const Graph &graph, int field_width,
                                     Shader &aShaderProgram,
                                     std::vector<GridLocation> *path = nullptr)
 {
-  std::vector<MapTile> mapTiles;
+  std::vector<MapTile*> mapTiles;
 
   for (int i = 0; i < field_width; i++)
   {
@@ -38,17 +38,20 @@ std::vector<MapTile> AssignMapTiles(const Graph &graph, int field_width,
     {
 
       GridLocation id{i, j};
-      MapTile mapTile(i, j, freeTex, aShaderProgram);
+      MapTile *mapTile = new MapTile (i, j, freeTex, aShaderProgram);
+
+      mapTile->AsignTexture(BlocedTex, MapTileProfiles::Blocked);
+      mapTile->AsignTexture(pathTex, MapTileProfiles::Path);
+      mapTile->AsignTexture(SlowerTex, MapTileProfiles::Slower);
 
       if (graph.walls.find(id) != graph.walls.end())
       {
-
-        mapTile.SelectTileProfile(MapTileProfiles::Blocked);
+        mapTile->SwitchTexture(MapTileProfiles::Blocked);
       }
 
       if (path != nullptr && find(path->begin(), path->end(), id) != path->end())
       {
-        mapTile.SelectTileProfile(MapTileProfiles::Path);
+        mapTile->SwitchTexture( MapTileProfiles::Path);
       }
 
       mapTiles.push_back(mapTile);
@@ -175,8 +178,7 @@ void Game::Granko()
   box3.AddGameObject(hexObj3);
 
   float floorTransform = ConfigUtils::GetValueFromMap<float>("FloorTranslation", ConfigMap);
-
-  float floorTileScale = ConfigUtils::GetValueFromMap<float>("floorTileScale", ConfigMap);
+  float MapScale = ConfigUtils::GetValueFromMap<float>("MapScale", ConfigMap);
 
   FloorNode_new.Translate(0, floorTransform, 0);
 
@@ -191,7 +193,7 @@ void Game::Granko()
   Enemy_Node.Translate(5, 5, 0);
   box2.Translate(5, 0, 0);
   box3.Translate(-5, 0, 0);
-  FloorNode_new.Scale(floorTileScale, floorTileScale, floorTileScale);
+  FloorNode_new.Scale(MapScale, MapScale, MapScale);
   FloorNode_new.Rotate(90.0f, glm::vec3(1, 0, 0));
 
   sNodes.push_back(&Enemy_Node);
@@ -218,7 +220,7 @@ void Game::Granko()
   draw_grid(grid, 3, nullptr, nullptr, &path);
 
   std::vector<SceneNode *> mapTileSceneNodes;
-  std::vector<MapTile> mapTiles = AssignMapTiles(grid,
+  std::vector<MapTile*> mapTiles = AssignMapTiles(grid,
                                                  20,
                                                  FreeTileTexture,
                                                  PathTileTexture,
@@ -230,8 +232,13 @@ void Game::Granko()
   {
     SceneNode *tileSceneNode = new SceneNode();
     GameObject *gameObject = new GameObject(tileSceneNode->local);
-    gameObject->AddComponent(&xd);
-    tileSceneNode->Translate(xd.x,0,xd.y);
+    tileSceneNode->AddGameObject(gameObject);
+    gameObject->AddComponent(xd);
+
+    tileSceneNode->Translate((2 * MapScale) * xd->x, floorTransform, (2 * MapScale) * xd->y);
+    tileSceneNode->Scale(MapScale, 0, MapScale);
+    gameObject->setTag("MapTile");
+    std::cout << ((MapTile *)gameObject->GetComponent(ComponentSystem::MapTile))->textureDisplayed<< "\n";
     sNodes.push_back(tileSceneNode);
   }
 
@@ -242,8 +249,6 @@ void Game::Granko()
   float interpolation = 1.0;
 
   gatherCollidableObjects(sNodes);
-  std::cout << "AfterCollidableObjects"
-            << "\n";
   while (glfwGetKey(okienko.window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
          glfwWindowShouldClose(okienko.window) == 0)
   {

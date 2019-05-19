@@ -45,6 +45,12 @@ void SceneNode::Render(Transform &parentWorld, bool aDirty_Flag)
       shape->Draw(world.GetTransform());
     }
 
+     MapTile *mapTile = (MapTile *)gameObject->GetComponent(ComponentSystem::MapTile);
+    if (mapTile != nullptr)
+    {
+      mapTile->Draw(world.GetTransform());
+    }
+
     Model *model = (Model *)gameObject->GetComponent(ComponentSystem::Model);
     if (model != nullptr)
     {
@@ -55,12 +61,6 @@ void SceneNode::Render(Transform &parentWorld, bool aDirty_Flag)
     if (animModel != nullptr)
     {
       animModel->Draw(world.GetTransform());
-    }
-
-    MapTile *mapTile = (MapTile *)gameObject->GetComponent(ComponentSystem::MapTile);
-    if (mapTile != nullptr)
-    {
-      mapTile->Draw(world.GetTransform());
     }
 
   }

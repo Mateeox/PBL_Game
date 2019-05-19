@@ -22,13 +22,13 @@
     </ConfigParameter>
     <ConfigParameter>
         <Type>F</Type>
+        <Name>MapScale</Name>
+        <Value>2</Value>
+    </ConfigParameter>
+    <ConfigParameter>
+        <Type>F</Type>
         <Name>FloorTranslation</Name>
         <Value>-1.8</Value>
-    </ConfigParameter>
-        <ConfigParameter>
-        <Type>F</Type>
-        <Name>floorTileScale</Name>
-        <Value>3</Value>
     </ConfigParameter>
 </Config>
 

@@ -11,7 +11,7 @@ MapTile::MapTile(int x_cord, int y_cord, Texture *basicTexture, Shader &aShaderP
 
 void MapTile::SelectTileProfile(std::string aMapProfile)
 {
-    activeProfile = aMapProfile;
+    textureDisplayed = aMapProfile;
     this->SwitchTexture(activeProfile);
 }
 std::string MapTile::GetActiveProfile()
@@ -21,7 +21,6 @@ std::string MapTile::GetActiveProfile()
 
 void MapTile::Draw(glm::mat4 &transform)
 {
-    
     ShapeRenderer3D::Draw(transform);
 }
 

@@ -59,7 +59,7 @@ ShapeRenderer3D::ShapeRenderer3D(
 	std::string textureName) : Drawable(aShaderProgram),
 							   g_vertex_buffer_data(g_ver),
 							   g_vertex_buffer_data_size(size),
-						       textureDisplayed(textureName)
+							   textureDisplayed(textureName)
 {
 	textures[textureName] = atexture;
 
@@ -92,7 +92,7 @@ void ShapeRenderer3D::Draw(glm::mat4 &transform)
 	unsigned int transformLoc = glGetUniformLocation(ShaderProgram.shaderProgramID, "transform");
 	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
 	if (textures.size() != 0)
-	{
+	{ 
 		textures[textureDisplayed]->Bind();
 	}
 	if (what_Draw_use == 1)
