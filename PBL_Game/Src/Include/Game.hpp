@@ -82,6 +82,8 @@ public:
   void Deserialize(std::string path);
   void UpdatePlayer(SceneNode &player, Camera &camera,float interpolation);
   void gatherCollidableObjects(std::vector<SceneNode *> &nodes);
+  std::vector<GameObject*> findByTag(const std::vector<SceneNode*>& data, std::string tag);
+  GameObject * findByTagSingle(const std::vector<SceneNode*>& data, std::string tag);
 
 private:
   void SerializeFaza1(std::map<SceneNode *, unsigned> &map);

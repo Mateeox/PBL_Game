@@ -578,6 +578,41 @@ void Game::gatherCollidableObjects(std::vector<SceneNode *> &nodes)
   }
 }
 
+std::vector<GameObject*> Game::findByTag(const std::vector<SceneNode *> &data, std::string tag)
+{
+	std::vector<GameObject*> foundObjects;
+	for (auto node : data)
+	{
+		if (node->gameObject != nullptr && node->gameObject->getTag() == tag)
+		{
+			foundObjects.push_back(node->gameObject);
+		}
+		std::vector<GameObject*> foundChildObjects(findByTag(node->children, tag));
+		if (foundChildObjects.size() > 0)
+		{
+			foundObjects.insert(foundObjects.end(), foundChildObjects.begin(), foundChildObjects.end());
+		}
+	}
+	return foundObjects;
+}
+
+GameObject* Game::findByTagSingle(const std::vector<SceneNode*>& data, std::string tag)
+{
+	for (auto node : data)
+	{
+		if (node->gameObject != nullptr && node->gameObject->getTag() == tag)
+		{
+			return node->gameObject;
+		}
+		GameObject* foundChildObject = findByTagSingle(node->children, tag);
+		if (foundChildObject != nullptr)
+		{
+			return foundChildObject;
+		}
+	}
+	return nullptr;
+}
+
 void Game::LoadConfig()
 {
   tinyxml2::XMLDocument doc;
