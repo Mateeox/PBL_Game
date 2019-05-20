@@ -1,9 +1,7 @@
+#pragma once
 #include "Component/ShapeRenderer3D.hpp"
 #include "SceneNode.hpp"
 #include "Shapes.hpp"
-
-
-//map TileProfiles
 
 namespace MapTileProfiles
 {
@@ -11,7 +9,6 @@ namespace MapTileProfiles
  const std::string Blocked = "Blocked";
  const std::string Path = "Path";
  const std::string Slower = "Slower";
-
 }
 
 class MapTile :public ShapeRenderer3D

@@ -6,6 +6,7 @@
 #include "Shapes.hpp"
 #include "PathFinding/PathFindingUtils.hpp"
 #include "PathFinding/MapTile.hpp"
+#include "PathFinding/MapTileRenderUtils.cpp"
 
 #include <fstream>
 #include <iterator>
@@ -19,42 +20,6 @@ void Game::InitializeConfig()
   WINDOW_WIDTH = ConfigUtils::GetValueFromMap<unsigned>("WINDOW_WIDTH", ConfigMap);
   WINDOW_HEIGHT = ConfigUtils::GetValueFromMap<unsigned>("WINDOW_HEIGHT", ConfigMap);
   movementSpeed = ConfigUtils::GetValueFromMap<float>("PlayerSpeed", ConfigMap);
-}
-
-template <class Graph>
-void AssignMapTiles(std::vector<MapTile *> &mapTiles, const Graph &graph, int field_width,
-                     Texture* freeTex,
-                     Texture* pathTex,
-                     Texture* SlowerTex,
-                     Texture* BlocedTex,
-                    Shader& aShaderProgram,
-                    std::vector<GridLocation> *path = nullptr)
-{
-  for (int i = 0; i < field_width; i++)
-  {
-    for (int j = 0; j < field_width; j++)
-    {
-
-      GridLocation *id = new GridLocation{i, j};
-      MapTile  *mapTile = new MapTile(i, j, freeTex, aShaderProgram);
-
-      mapTile->AsignTexture(BlocedTex,MapTileProfiles::Blocked);
-      mapTile->AsignTexture(pathTex,MapTileProfiles::Path);
-      mapTile->AsignTexture(SlowerTex,MapTileProfiles::Slower);
-
-      if (graph.walls.find(*id) != graph.walls.end())
-      {
-        mapTile->SwitchTexture(MapTileProfiles::Blocked);
-      }
-
-      if (path != nullptr && find(path->begin(), path->end(), *id) != path->end())
-      {
-        mapTile->SwitchTexture(MapTileProfiles::Path);
-      }
-
-      mapTiles.push_back(std::move(mapTile));
-    }
-  }
 }
 
 Game::Game(Window &aOkno) : okienko(aOkno),
@@ -215,38 +180,18 @@ void Game::Granko()
   std::vector<GridLocation> path = reconstruct_path(start, goal, came_from);
   draw_grid(grid, 3, nullptr, nullptr, &path);
 
-  std::vector<SceneNode *> mapTileSceneNodes;
-  std::vector<MapTile *> mapTiles;
+  AddMapTilesToSceneNodes(sNodes,
+                          grid,
+                          FreeTileTexture,   //Texture 1
+                          PathTileTexture,   //Texture 2
+                          SlowerTileTexture,   //Texture 3
+                          BlockedTileTexture,   //Texture 4
+                          *shaderProgram,
+                          path,
+                          MapScale,
+                          floorTransform);
 
-  AssignMapTiles(mapTiles, grid,
-                 20,
-                 FreeTileTexture,
-                 PathTileTexture,
-                 SlowerTileTexture,
-                 BlockedTileTexture,
-                 *shaderProgram, &path);
-
-  for (auto xd : mapTiles)
-  {
-    SceneNode *tileSceneNode = new SceneNode();
-    GameObject *gameObject = new GameObject(tileSceneNode->local);
-    gameObject->AddComponent(xd);
-    tileSceneNode->AddGameObject(gameObject);
-
-    tileSceneNode->Translate((2 * MapScale) * xd->x, floorTransform, (2 * MapScale) * xd->y);
-    tileSceneNode->Scale(MapScale, 0, MapScale);
-    gameObject->setTag("MapTile");
-
-    MapTile *mapTile = (MapTile *)tileSceneNode->gameObject->GetComponent(ComponentSystem::MapTile);
-    if (mapTile != nullptr)
-    {
-      std::cout<<mapTile->textureDisplayed<<"\n";
-    }
-
-    sNodes.push_back(std::move(tileSceneNode));
-  }
-
-  shaderProgram->use();
+      shaderProgram->use();
 
   uint32 next_game_tick = (glfwGetTime() * 1000);
   int loops;

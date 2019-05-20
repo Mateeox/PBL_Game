@@ -11,6 +11,7 @@
 #include <tuple>
 #include <algorithm>
 #include <cstdlib>
+#include <functional>
 
 struct SimpleGraph
 {
