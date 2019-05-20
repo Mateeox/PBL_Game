@@ -50,6 +50,8 @@ ShapeRenderer3D::ShapeRenderer3D(
 	//texture
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
+
+	calculateExtrema(g_vertex_buffer_data, g_vertex_buffer_data_size);
 }
 
 ShapeRenderer3D::ShapeRenderer3D(
@@ -82,6 +84,8 @@ ShapeRenderer3D::ShapeRenderer3D(
 	//texture
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
+
+	calculateExtrema(g_vertex_buffer_data, g_vertex_buffer_data_size);
 }
 
 void ShapeRenderer3D::Draw(glm::mat4 &transform)
@@ -124,6 +128,21 @@ void ShapeRenderer3D::Draw_Arrays()
 	glDrawArrays(GL_TRIANGLES, 0, g_vertex_buffer_data_size); // 3 indices starting at 0 -> 1 triangle
 }
 
+void ShapeRenderer3D::calculateExtrema(float* vertexBufferData, int size)
+{
+	//3 for position, 3 for color and 2 for textures, hence 8
+	for (unsigned int i = 0; i < size; i += 8)
+	{
+		for (unsigned int columns = 0; columns < 3; ++columns)
+		{
+			if (vertexBufferData[i + columns] < extrema[0][columns])
+				extrema[0][columns] = vertexBufferData[i + columns];
+			else if (vertexBufferData[i + columns] > extrema[1][columns])
+				extrema[1][columns] = vertexBufferData[i + columns];
+		}
+	}
+}
+
 void ShapeRenderer3D::SwitchTexture(int textureNumber)
 {
 	textureNumberDisplayed = textureNumber;
@@ -139,6 +158,11 @@ ShapeRenderer3D * ShapeRenderer3D::GetCopy()
 void ShapeRenderer3D::AsignSecondTexture(Texture *aTexture)
 {
  textures.push_back(aTexture);
+}
+
+glm::mat3x2 ShapeRenderer3D::getExtrema()
+{
+	return extrema;
 }
 
 ShapeRenderer3D::~ShapeRenderer3D()

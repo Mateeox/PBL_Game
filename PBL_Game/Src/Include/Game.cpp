@@ -9,6 +9,7 @@
 
 #include <fstream>
 #include <iterator>
+#include <array>
 
 static bool leftSideActive = true;
 static bool swapButtonPressed = false;
@@ -20,7 +21,59 @@ void Game::InitializeConfig()
   WINDOW_HEIGHT = ConfigUtils::GetValueFromMap<unsigned>("WINDOW_HEIGHT", ConfigMap);
   movementSpeed = ConfigUtils::GetValueFromMap<float>("PlayerSpeed", ConfigMap);
 }
+bool isOnLeftSide(const glm::vec2 &startPoint, const glm::vec2 &endPoint, const glm::vec2 &pointToCheck) {
+	return ((endPoint.x - startPoint.x)*(pointToCheck.y - startPoint.y) - (endPoint.y - startPoint.y)*(pointToCheck.x - startPoint.x)) > 0;
+}
+std::vector<ShapeRenderer3D*> getObjectsInCone(const glm::vec2 &startPoint, const glm::vec2 &endPointLeft, const glm::vec2 &endPointRight, const std::vector<SceneNode*> &nodes, double radiusSquared = -1.0)
+{
+	std::vector<ShapeRenderer3D*> objectsInCone;
+	if (radiusSquared < 0)
+	{
+		//if the radius is negative it means it was not given, so we have to calculate it from points
+		radiusSquared = glm::distance2(endPointLeft, startPoint);
+	}
+	for (auto node : nodes)
+	{
+		if (node->gameObject != nullptr)// && node->gameObject->getTag() != "floor")
+		{
+			ShapeRenderer3D* shapeRenderer = (ShapeRenderer3D*)node->gameObject->GetComponent(ComponentSystem::ComponentType::ShapeRenderer3D);
+			if (shapeRenderer != nullptr)
+			{
+				auto extrema = shapeRenderer->getExtrema();
+				std::array<glm::vec2, 4> points = {
+					glm::vec2(extrema[0][0], extrema[0][2]),
+					glm::vec2(extrema[0][0], extrema[1][2]),
+					glm::vec2(extrema[1][0], extrema[0][2]),
+					glm::vec2(extrema[1][0], extrema[1][2])
+				};
 
+				for (auto point : points)
+				{
+					if (glm::distance2(point, startPoint) < radiusSquared)
+					{
+						//vertex of object is within cone radius, now lets check if it is between borders
+						if (!isOnLeftSide(startPoint, endPointLeft, point) && isOnLeftSide(startPoint, endPointRight, point))
+						{
+							objectsInCone.push_back(shapeRenderer);
+							break;
+						}
+					}
+				}
+			}
+		}
+		std::vector<ShapeRenderer3D*> foundChildObjects(getObjectsInCone(startPoint, endPointLeft, endPointRight, node->children, radiusSquared));
+		if (foundChildObjects.size() > 0)
+		{
+			objectsInCone.insert(objectsInCone.end(), foundChildObjects.begin(), foundChildObjects.end());
+		}
+	}
+
+	return objectsInCone;
+}
+void test(const std::vector<SceneNode*> &nodes)
+{
+
+}
 Game::Game(Window &aOkno) : okienko(aOkno),
                             camera(Camera()),
                             camera2(Camera())

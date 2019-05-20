@@ -16,9 +16,9 @@ class ShapeRenderer3D :public Drawable
     void Draw_Arrays();
     unsigned textureNumberDisplayed;
     std::vector<Texture *> textures;
-
+	glm::mat3x2 extrema;
     
-
+	void calculateExtrema(float* vertexBufferData, int size);
 
     public:
 
@@ -45,7 +45,7 @@ class ShapeRenderer3D :public Drawable
 		return Drawable::Serialize();
 	}
 
-    
+	glm::mat3x2 getExtrema();
     ~ShapeRenderer3D();
 
 
