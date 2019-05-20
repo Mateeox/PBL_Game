@@ -3,7 +3,6 @@
 #include "Component/Model.hpp"
 #include "Component/AnimatedModel.hpp"
 #include "PathFinding/MapTile.hpp"
-
 SceneNode::SceneNode() : local(Transform::origin()), dirty_flag(true), gameObject(nullptr)
 {
 }

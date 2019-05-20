@@ -1,22 +1,22 @@
 #include "MapTile.hpp"
 
-MapTile::MapTile(int x_cord, int y_cord, Texture *basicTexture, Shader &aShaderProgram) : x(x_cord), y(y_cord), activeProfile(MapTileProfiles::Basic),
+MapTile::MapTile(int x_cord, int y_cord, Texture *basicTexture, Shader &aShaderProgram) : x(x_cord), y(y_cord),
                                                                                           ShapeRenderer3D(Shapes::RainBow_Square,
                                                                                                           Shapes::RB_Square_indices,
                                                                                                           sizeof(Shapes::RainBow_Square),
                                                                                                           sizeof(Shapes::RB_Square_indices),
                                                                                                           aShaderProgram, basicTexture, MapTileProfiles::Basic)
 {
+    textures[MapTileProfiles::Basic] = basicTexture;
 }
 
 void MapTile::SelectTileProfile(std::string aMapProfile)
 {
     textureDisplayed = aMapProfile;
-    this->SwitchTexture(activeProfile);
 }
 std::string MapTile::GetActiveProfile()
 {
-    return activeProfile;
+    return textureDisplayed;
 }
 
 void MapTile::Draw(glm::mat4 &transform)

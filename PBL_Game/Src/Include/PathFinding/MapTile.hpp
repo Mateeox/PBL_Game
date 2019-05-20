@@ -16,15 +16,13 @@ namespace MapTileProfiles
 
 class MapTile :public ShapeRenderer3D
 {
-    std::string activeProfile;
 public:
-      MapTile(int x_cord, int y_cord,Texture * basicTexture,Shader & aShaderProgram);
-
+    MapTile(int x_cord, int y_cord,Texture * basicTexture,Shader & aShaderProgram);
     int x;
     int y;
     
     void SelectTileProfile(std::string mapProfile);
-     std::string GetActiveProfile();
+    std::string GetActiveProfile();
     
     void Draw(glm::mat4 &transform) override;
     ComponentSystem::ComponentType GetComponentType() override;
