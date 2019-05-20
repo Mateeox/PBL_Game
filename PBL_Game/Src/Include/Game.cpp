@@ -5,8 +5,6 @@
 #include "Component/AnimatedModel.hpp"
 #include "Shapes.hpp"
 #include "PathFinding/PathFindingUtils.hpp"
-#include "PathFinding/MapTile.hpp"
-#include "PathFinding/MapTileRenderUtils.cpp"
 
 #include <fstream>
 #include <iterator>
@@ -24,7 +22,8 @@ void Game::InitializeConfig()
 
 Game::Game(Window &aOkno) : okienko(aOkno),
                             camera(Camera()),
-                            camera2(Camera())
+                            camera2(Camera()),
+                            grid(make_diagram4(20, 20))
 {
 
   LoadConfig();
@@ -167,7 +166,6 @@ void Game::Granko()
   sNodes.push_back(&box2);
   sNodes.push_back(&box3);
 
-  GridWithWeights grid = make_diagram4(20, 20);
   GridLocation start{1, 4};
   GridLocation goal{8, 5};
   std::unordered_map<GridLocation, GridLocation> came_from;
@@ -177,10 +175,11 @@ void Game::Granko()
   std::cout << '\n';
   draw_grid(grid, 3, &cost_so_far, nullptr);
   std::cout << '\n';
-  std::vector<GridLocation> path = reconstruct_path(start, goal, came_from);
+  path = reconstruct_path(start, goal, came_from);
   draw_grid(grid, 3, nullptr, nullptr, &path);
 
-  AddMapTilesToSceneNodes(sNodes,
+
+  AddMapTilesToSceneNodes(mapTiles,sNodes,
                           grid,
                           FreeTileTexture,   //Texture 1
                           PathTileTexture,   //Texture 2
@@ -245,6 +244,8 @@ void Game::Update(float interpolation)
   {
     ProcessInput(interpolation, camera2);
   }
+
+printf("%f \n",leftPlayerNode.local.getPosition().x);
 
   if (leftSideActive)
     UpdatePlayer(leftPlayerNode, camera, interpolation);

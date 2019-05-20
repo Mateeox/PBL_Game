@@ -1,12 +1,9 @@
 #include "MapTileRenderUtils.hpp"
 
-static void AddMapTilesToSceneNodes(std::vector<SceneNode *> &sNodes, GridWithWeights &grid,
+static void AddMapTilesToSceneNodes(std::vector<MapTile *> mapTiles,std::vector<SceneNode *> &sNodes, GridWithWeights &grid,
                              Texture *FreeTileTexture, Texture *PathTileTexture, Texture *SlowerTileTexture, Texture *BlockedTileTexture,
                              Shader &shaderProgram, std::vector<GridLocation> &path,const float MapScale,const float floorTransform)
 {
-
- std::vector<MapTile *> mapTiles;
-
   AssignMapTiles(mapTiles, grid,
                  20,
                  FreeTileTexture,

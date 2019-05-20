@@ -4,6 +4,8 @@
 #include "SceneNode.hpp"
 #include "Collider.hpp"
 #include "ConfigUtils.hpp"
+#include "PathFinding/MapTile.hpp"
+#include "PathFinding/MapTileRenderUtils.cpp"
 
 const int TICKS_PER_SECOND = 32;
 const int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
@@ -30,6 +32,11 @@ class Game
   std::vector<SceneNode *> sNodes;
   std::vector<SceneNode *> rightNodes;
   std::vector<Collider *> collidableObjects;
+
+  //PathFinding
+  std::vector<MapTile *> mapTiles;
+  std::vector<GridLocation> path;
+   GridWithWeights grid;
 
   SceneNode leftPlayerNode;
   SceneNode rightPlayerNode;
