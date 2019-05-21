@@ -166,10 +166,7 @@ void Game::Granko()
   sNodes.push_back(&box2);
   sNodes.push_back(&box3);
 
-  GridLocation start{1, 4};
-  GridLocation goal{8, 5};
-  std::unordered_map<GridLocation, GridLocation> came_from;
-  std::unordered_map<GridLocation, double> cost_so_far;
+
   a_star_search(grid, start, goal, came_from, cost_so_far);
   draw_grid(grid, 2, nullptr, &came_from);
   std::cout << '\n';
@@ -245,7 +242,33 @@ void Game::Update(float interpolation)
     ProcessInput(interpolation, camera2);
   }
 
-printf("%f \n",leftPlayerNode.local.getPosition().x);
+int x = (int)leftPlayerNode.local.getPosition().x/200;
+if(x < 0)
+{
+  x = 0;
+}
+
+if(x > 39)
+{
+  x = 39;
+}
+int z = (int)leftPlayerNode.local.getPosition().z/200;
+
+if(z < 0)
+{
+  z = 0;
+}
+
+if(z > 39)
+{
+  z = 39;
+}
+
+std::cout << "x: " << x << "  z:" << z << "\n";
+start= GridLocation{1,1};
+a_star_search(grid, start, goal, came_from, cost_so_far);
+path = reconstruct_path(start, goal, came_from);
+//ResetMapTilePath(mapTiles,grid,20,&path);
 
   if (leftSideActive)
     UpdatePlayer(leftPlayerNode, camera, interpolation);

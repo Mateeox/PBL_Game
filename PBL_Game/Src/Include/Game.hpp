@@ -36,7 +36,7 @@ class Game
   //PathFinding
   std::vector<MapTile *> mapTiles;
   std::vector<GridLocation> path;
-   GridWithWeights grid;
+  GridWithWeights grid;
 
   SceneNode leftPlayerNode;
   SceneNode rightPlayerNode;
@@ -46,7 +46,11 @@ class Game
   //How to get value from config
   //ConfigUtils::GetValueFromMap<TYPE>(NAME,ConfigMap) 
   std::map<std::string,VariantType> ConfigMap;
-
+  
+  GridLocation start{0, 0};
+  GridLocation goal{8, 5};
+  std::unordered_map<GridLocation, GridLocation> came_from;
+  std::unordered_map<GridLocation, double> cost_so_far;
 
 
   float movementSpeed; //Move to PlayerData

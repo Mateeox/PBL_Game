@@ -44,9 +44,9 @@ void AssignMapTiles(std::vector<MapTile *> &mapTiles, const Graph &graph, int fi
 
 template <class Graph>
 void ResetMapTilePath(std::vector<MapTile *> &mapTiles,
-                    const Graph &graph,
-                    int field_width,
-                    std::vector<GridLocation> *path = nullptr)
+                      const Graph &graph,
+                      int field_width,
+                      std::vector<GridLocation> *path = nullptr)
 {
 
     for (int i = 0; i < field_width; i++)
@@ -57,11 +57,17 @@ void ResetMapTilePath(std::vector<MapTile *> &mapTiles,
 
             if (path != nullptr && find(path->begin(), path->end(), id) != path->end())
             {
-                mapTiles[i+i*j]->SwitchTexture(MapTileProfiles::Path);
+                mapTiles[i + i * j]->SwitchTexture(MapTileProfiles::Path);
                 continue;
             }
 
-            mapTiles[i+i*j]->SwitchTexture(MapTileProfiles::Basic);
+            if (graph.walls.find(id) != graph.walls.end())
+            {
+            }
+            else
+            {
+                mapTiles[i + i * j]->SwitchTexture(MapTileProfiles::Basic);
+            }
         }
     }
 }

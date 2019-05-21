@@ -23,6 +23,7 @@ struct SimpleGraph
 struct GridLocation
 {
   int x, y;
+
 };
 
 // Helpers for GridLocation
@@ -273,8 +274,15 @@ std::vector<Location> reconstruct_path(
 {
   std::vector<Location> path;
   Location current = goal;
+  int cale_te = 0 ;
   while (current != start)
   {
+      if(cale_te >50)
+      {
+        break;
+        std::cout<<cale_te<<"\n";
+      }
+	  std::cout << "start" << start << '\n';
     path.push_back(current);
     current = came_from[current];
   }
@@ -301,8 +309,10 @@ void a_star_search(Graph graph,
   came_from[start] = start;
   cost_so_far[start] = 0;
 
+  int stillINSearch =0;
   while (!frontier.empty())
   {
+	  std::cout <<"stillINSearch"<<stillINSearch++ << '\n';
     Location current = frontier.get();
 
     if (current == goal)

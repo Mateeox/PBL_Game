@@ -23,7 +23,7 @@
     <ConfigParameter>
         <Type>F</Type>
         <Name>MapScale</Name>
-        <Value>4</Value>
+        <Value>4.2</Value>
     </ConfigParameter>
     <ConfigParameter>
         <Type>F</Type>
