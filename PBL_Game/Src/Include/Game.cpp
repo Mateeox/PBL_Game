@@ -14,7 +14,7 @@ static bool swapButtonPressed = false;
 
 void Game::InitializeConfig()
 {
-
+  MapSize = ConfigUtils::GetValueFromMap<unsigned>("MapSize", ConfigMap);
   WINDOW_WIDTH = ConfigUtils::GetValueFromMap<unsigned>("WINDOW_WIDTH", ConfigMap);
   WINDOW_HEIGHT = ConfigUtils::GetValueFromMap<unsigned>("WINDOW_HEIGHT", ConfigMap);
   movementSpeed = ConfigUtils::GetValueFromMap<float>("PlayerSpeed", ConfigMap);
@@ -23,7 +23,7 @@ void Game::InitializeConfig()
 Game::Game(Window &aOkno) : okienko(aOkno),
                             camera(Camera()),
                             camera2(Camera()),
-                            grid(make_diagram4(20, 20))
+                            MapSize(0)                  
 {
 
   LoadConfig();
@@ -31,6 +31,8 @@ Game::Game(Window &aOkno) : okienko(aOkno),
 
   glfwSetWindowSize(okienko.window, WINDOW_WIDTH, WINDOW_HEIGHT);
   InitializeConfig();
+
+  grid = make_diagram4(MapSize, MapSize);
 
   shaderProgram = new Shader("Shaders/vertex4.txt", "Shaders/fragment3.txt");
   shaderProgram_For_Model = new Shader("Shaders/vertexModel.txt", "Shaders/fragmentModel.txt");
@@ -138,7 +140,7 @@ void Game::Granko()
   box3.AddGameObject(hexObj3);
 
   float floorTransform = ConfigUtils::GetValueFromMap<float>("FloorTranslation", ConfigMap);
-  float MapScale = ConfigUtils::GetValueFromMap<float>("MapScale", ConfigMap);
+  float TileScale = ConfigUtils::GetValueFromMap<float>("TileScale", ConfigMap);
 
   FloorNode_new.Translate(0, floorTransform, 0);
 
@@ -153,7 +155,7 @@ void Game::Granko()
   Enemy_Node.Translate(5, 5, 0);
   box2.Translate(5, 0, 0);
   box3.Translate(-5, 0, 0);
-  FloorNode_new.Scale(MapScale, MapScale, MapScale);
+  FloorNode_new.Scale(TileScale, TileScale, TileScale);
   FloorNode_new.Rotate(90.0f, glm::vec3(1, 0, 0));
 
   sNodes.push_back(&Enemy_Node);
@@ -166,7 +168,6 @@ void Game::Granko()
   sNodes.push_back(&box2);
   sNodes.push_back(&box3);
 
-
   a_star_search(grid, start, goal, came_from, cost_so_far);
   draw_grid(grid, 2, nullptr, &came_from);
   std::cout << '\n';
@@ -175,19 +176,19 @@ void Game::Granko()
   path = reconstruct_path(start, goal, came_from);
   draw_grid(grid, 3, nullptr, nullptr, &path);
 
-
-  AddMapTilesToSceneNodes(mapTiles,sNodes,
+  AddMapTilesToSceneNodes(mapTiles, sNodes,
                           grid,
-                          FreeTileTexture,   //Texture 1
-                          PathTileTexture,   //Texture 2
-                          SlowerTileTexture,   //Texture 3
-                          BlockedTileTexture,   //Texture 4
+                          FreeTileTexture,    //Texture 1
+                          PathTileTexture,    //Texture 2
+                          SlowerTileTexture,  //Texture 3
+                          BlockedTileTexture, //Texture 4
                           *shaderProgram,
                           path,
-                          MapScale,
-                          floorTransform);
+                          TileScale,
+                          floorTransform,
+                          MapSize);
 
-      shaderProgram->use();
+  shaderProgram->use();
 
   uint32 next_game_tick = (glfwGetTime() * 1000);
   int loops;
@@ -242,33 +243,34 @@ void Game::Update(float interpolation)
     ProcessInput(interpolation, camera2);
   }
 
-int x = (int)leftPlayerNode.local.getPosition().x/200;
-if(x < 0)
-{
-  x = 0;
-}
+  int x = (100 + (int)leftPlayerNode.local.getPosition().x) / 450;
+  if (x < 0)
+  {
+    x = 0;
+  }
 
-if(x > 39)
-{
-  x = 39;
-}
-int z = (int)leftPlayerNode.local.getPosition().z/200;
+  if (x >= 40)
+  {
+    x = 39;
+  }
+  int z = (100 + (int)leftPlayerNode.local.getPosition().z) / 450;
 
-if(z < 0)
-{
-  z = 0;
-}
+  if (z <= 0)
+  {
+    z = 0;
+  }
 
-if(z > 39)
-{
-  z = 39;
-}
+  if (z > 40)
+  {
+    z = 39;
+  }
 
-std::cout << "x: " << x << "  z:" << z << "\n";
-start= GridLocation{1,1};
-a_star_search(grid, start, goal, came_from, cost_so_far);
-path = reconstruct_path(start, goal, came_from);
-//ResetMapTilePath(mapTiles,grid,20,&path);
+  //std::cout << "x: " << x << "  z:" << z << "\n";
+  start.x = x;
+  start.y = z;
+  a_star_search(grid, start, goal, came_from, cost_so_far);
+  path = reconstruct_path(start, goal, came_from);
+  ResetMapTilePath(mapTiles, grid, MapSize, &path);
 
   if (leftSideActive)
     UpdatePlayer(leftPlayerNode, camera, interpolation);
@@ -293,6 +295,11 @@ void Game::Render()
                  &show_demo_window); // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
     ImGui::Text("Q - zmiana strony");
     ImGui::Text("Strzalki - ruch postaci");
+    if (ImGui::Button("Printf Path"))
+    {
+      draw_grid(grid, 3, nullptr, nullptr, &path);
+    }
+
     ImGui::End();
   }
   ImGui::Render();

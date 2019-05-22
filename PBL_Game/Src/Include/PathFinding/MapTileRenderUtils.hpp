@@ -7,7 +7,7 @@
 #include "SceneNode.hpp"
 
 template <class Graph>
-void AssignMapTiles(std::vector<MapTile *> &mapTiles, const Graph &graph, int field_width,
+void AssignMapTiles(std::vector<MapTile *> &mapTiles, const Graph &graph, int aMapSize,
                     Texture *freeTex,
                     Texture *pathTex,
                     Texture *SlowerTex,
@@ -15,9 +15,9 @@ void AssignMapTiles(std::vector<MapTile *> &mapTiles, const Graph &graph, int fi
                     Shader &aShaderProgram,
                     std::vector<GridLocation> *path = nullptr)
 {
-    for (int i = 0; i < field_width; i++)
+    for (int i = 0; i < aMapSize; i++)
     {
-        for (int j = 0; j < field_width; j++)
+        for (int j = 0; j < aMapSize; j++)
         {
 
             GridLocation id{i, j};
@@ -37,42 +37,74 @@ void AssignMapTiles(std::vector<MapTile *> &mapTiles, const Graph &graph, int fi
                 mapTile->SwitchTexture(MapTileProfiles::Path);
             }
 
-            mapTiles.push_back(std::move(mapTile));
+            mapTiles.push_back(mapTile);
         }
     }
 }
 
 template <class Graph>
-void ResetMapTilePath(std::vector<MapTile *> &mapTiles,
+void ResetMapTilePath(std::vector<MapTile *>& mapTiles,
                       const Graph &graph,
-                      int field_width,
+                      int aMapSize,
                       std::vector<GridLocation> *path = nullptr)
 {
 
-    for (int i = 0; i < field_width; i++)
+    for(auto xD :  mapTiles)
     {
-        for (int j = 0; j < field_width; j++)
-        {
-            GridLocation id{i, j};
 
-            if (path != nullptr && find(path->begin(), path->end(), id) != path->end())
-            {
-                mapTiles[i + i * j]->SwitchTexture(MapTileProfiles::Path);
-                continue;
-            }
+        GridLocation* id= new GridLocation{xD->x,xD->y};
+     if (graph.walls.find(*id) != graph.walls.end())
+      {
+        xD->SwitchTexture(MapTileProfiles::Blocked);
+      }
+       else if (path != nullptr && find(path->begin(), path->end(), *id) != path->end())
+      {
+        xD->SwitchTexture(MapTileProfiles::Path);
+      }
+      else if(graph.forests.find(*id) != graph.forests.end() )
+      {
+          xD->SwitchTexture(MapTileProfiles::Slower);
+      }
+      else
+      {
+        xD->SwitchTexture(MapTileProfiles::Basic);
+      }
 
-            if (graph.walls.find(id) != graph.walls.end())
-            {
-            }
-            else
-            {
-                mapTiles[i + i * j]->SwitchTexture(MapTileProfiles::Basic);
-            }
-        }
     }
+
+//     for (int i = 0; i < aMapSize; i++)
+//     {
+//         for (int j = 0; j < aMapSize; j++)
+//         {
+//             GridLocation id{i, j};
+
+//     //   if (graph.walls.find(id) != graph.walls.end())
+//     //   {
+//     //     mapTiles[j + i * j]->SwitchTexture(MapTileProfiles::Blocked);
+//     //   }
+//     //    else if (path != nullptr && find(path->begin(), path->end(), id) != path->end())
+//     //   {
+//     //     mapTiles[j + i * j]->SwitchTexture(MapTileProfiles::Path);
+//     //   }
+//     //   else
+//     //   {
+//     //     mapTiles[j + i * j]->SwitchTexture(MapTileProfiles::Basic);
+//     //   }
+// //mapTiles[i + i * j]->SwitchTexture(MapTileProfiles::Path);  
+
+//             // if (path != nullptr && find(path->begin(), path->end(), id) != path->end())
+//             // {
+//             //  //   mapTiles[j + i * j]->SwitchTexture(MapTileProfiles::Path);
+//             // }
+//             // else
+//             // {
+//             //   //   mapTiles[j+ i * j]->SwitchTexture(MapTileProfiles::Basic);
+//             // }
+//         }
+//     }
 }
 
-static void AddMapTilesToSceneNodes(std::vector<MapTile *> mapTiles, std::vector<SceneNode *> &sNodes,
+static void AddMapTilesToSceneNodes(std::vector<MapTile *> &mapTiles, std::vector<SceneNode *> &sNodes,
                                     GridWithWeights &grid,
                                     Texture *FreeTileTexture,
                                     Texture *PathTileTexture,

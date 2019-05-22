@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include <functional>
+#include <cmath>
 
 struct SimpleGraph
 {
@@ -171,7 +172,9 @@ void draw_grid(const Graph &graph, int field_width,
 struct GridWithWeights : SquareGrid
 {
   std::unordered_set<GridLocation> forests;
+  
   GridWithWeights(int w, int h) : SquareGrid(w, h) {}
+  GridWithWeights():SquareGrid(0,0){}
   double cost(GridLocation from_node, GridLocation to_node) const
   {
     return forests.find(to_node) != forests.end() ? 5 : 1;
@@ -274,15 +277,8 @@ std::vector<Location> reconstruct_path(
 {
   std::vector<Location> path;
   Location current = goal;
-  int cale_te = 0 ;
   while (current != start)
   {
-      if(cale_te >50)
-      {
-        break;
-        std::cout<<cale_te<<"\n";
-      }
-	  std::cout << "start" << start << '\n';
     path.push_back(current);
     current = came_from[current];
   }
@@ -293,7 +289,7 @@ std::vector<Location> reconstruct_path(
 
 inline double heuristic(GridLocation a, GridLocation b)
 {
-  return std::abs(a.x - b.x) + std::abs(a.y - b.y);
+  return sqrt((a.x - b.x)*(a.x - b.x) +(a.y - b.y)*(a.y - b.y));//std::abs(a.x - b.x) + std::abs(a.y - b.y);
 }
 
 template <typename Location, typename Graph>
@@ -303,16 +299,19 @@ void a_star_search(Graph graph,
                    std::unordered_map<Location, Location> &came_from,
                    std::unordered_map<Location, double> &cost_so_far)
 {
+came_from.clear();
+cost_so_far.clear();
+
   PriorityQueue<Location, double> frontier;
   frontier.put(start, 0);
 
   came_from[start] = start;
   cost_so_far[start] = 0;
 
-  int stillINSearch =0;
+
   while (!frontier.empty())
   {
-	  std::cout <<"stillINSearch"<<stillINSearch++ << '\n';
+
     Location current = frontier.get();
 
     if (current == goal)

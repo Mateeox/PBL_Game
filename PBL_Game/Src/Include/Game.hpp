@@ -34,9 +34,19 @@ class Game
   std::vector<Collider *> collidableObjects;
 
   //PathFinding
+  #pragma region PathFindingAndMapGenerationUtils
   std::vector<MapTile *> mapTiles;
   std::vector<GridLocation> path;
   GridWithWeights grid;
+  unsigned MapSize;
+
+  GridLocation start{0, 0};
+  GridLocation goal{8, 5};
+  std::unordered_map<GridLocation, GridLocation> came_from;
+  std::unordered_map<GridLocation, double> cost_so_far;
+
+  #pragma endregion PathFindingAndMapGenerationUtils
+
 
   SceneNode leftPlayerNode;
   SceneNode rightPlayerNode;
@@ -47,10 +57,7 @@ class Game
   //ConfigUtils::GetValueFromMap<TYPE>(NAME,ConfigMap) 
   std::map<std::string,VariantType> ConfigMap;
   
-  GridLocation start{0, 0};
-  GridLocation goal{8, 5};
-  std::unordered_map<GridLocation, GridLocation> came_from;
-  std::unordered_map<GridLocation, double> cost_so_far;
+
 
 
   float movementSpeed; //Move to PlayerData
@@ -69,6 +76,9 @@ class Game
 
   //Imgui
   bool show_demo_window = true;
+  bool printf_path = false;
+
+  //
   int offset = 125; // Jak bardzo maja sie roznic rozmiary kamery, szerokosc aktywnej to pol okna + offset, szerokosc nieaktywnej to pol okna - offset
 
 public:

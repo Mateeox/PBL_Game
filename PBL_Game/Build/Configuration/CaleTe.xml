@@ -21,8 +21,13 @@
         <Value>25</Value>
     </ConfigParameter>
     <ConfigParameter>
+        <Type>U</Type>
+        <Name>MapSize</Name>
+        <Value>40</Value>
+    </ConfigParameter>
+        <ConfigParameter>
         <Type>F</Type>
-        <Name>MapScale</Name>
+        <Name>TileScale</Name>
         <Value>4.2</Value>
     </ConfigParameter>
     <ConfigParameter>
