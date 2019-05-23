@@ -338,6 +338,12 @@ void Game::Render()
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT);
 
+
+  // Render grafik
+  Plot();
+
+
+
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
   // Swap buffers
@@ -684,4 +690,73 @@ void Game::SetViewAndPerspective(Camera &aCamera)
   shaderAnimatedModel->use();
   shaderAnimatedModel->setMat4("projection", projection);
   shaderAnimatedModel->setMat4("view", view);
+}
+
+// Funkcje do wyswietlania grafik
+void Game::Plot()
+{
+	if (plotNumber == 0)
+		return;
+
+	static int imageNumber = 1;
+	static bool keyPressed = false;
+	if (glfwGetKey(okienko.window, GLFW_KEY_ENTER) == GLFW_PRESS && !keyPressed)
+	{
+		imageNumber++;
+		keyPressed = true;
+	}
+	else if (!glfwGetKey(okienko.window, GLFW_KEY_ENTER) == GLFW_PRESS && keyPressed)
+		keyPressed = false;
+
+	switch (plotNumber)
+	{
+		case 1:
+			std::string path = "Textures/1_#.png";
+			
+			path[11] = imageNumber + 48;
+			if (FILE *file = fopen(path.c_str(), "r")) {
+				fclose(file);
+				DisplayImage(path.c_str());
+			}
+			else {
+				imageNumber = 0;
+				plotNumber = 0;
+			}
+
+			break;
+	}
+}
+void Game::DisplayImage(const char *path)
+{
+	glViewport(0, 0, Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT);
+	glScissor(0, 0, Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT);
+	glEnable(GL_SCISSOR_TEST);
+	glClearColor(0, 1, 0, 1);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	Texture *imageTex = new Texture(path, GL_NEAREST_MIPMAP_NEAREST);
+	imageTex->Load();
+
+	SceneNode imageNode;
+	GameObject *imageObj = new GameObject(imageNode.world);
+
+	ShapeRenderer3D *image = new ShapeRenderer3D(Shapes::RainBow_Square,
+		Shapes::RB_Square_indices,
+		sizeof(Shapes::RainBow_Square),
+		sizeof(Shapes::RB_Square_indices),
+		*shaderProgram_For_Model,
+		imageTex);
+
+	//std::string boxPath = "Models/box/box.obj";
+	//Model *image = new Model(boxPath, *shaderProgram_For_Model, false);
+
+	imageObj->AddComponent(image);
+	imageNode.AddGameObject(imageObj);
+
+	imageNode.Translate(0.0f, 2.4f, 4.0f);
+	imageNode.Rotate(camera.Pitch, glm::vec3(1, 0, 0));
+	imageNode.Scale(12.8f / 2.0f, 7.2f / 2.0f, 1);
+
+	Transform originTransform = Transform::origin();
+	imageNode.Render(originTransform, true);
 }
