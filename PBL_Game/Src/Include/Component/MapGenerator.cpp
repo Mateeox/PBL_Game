@@ -53,7 +53,7 @@ void MapGenerator::CheckForWallsNDoors(int doors, bool glass_door)
 	{
 		MapElement* it = maps[i];
 		std::vector<glm::vec2> neighbours = it->GetNeighbours();
-		for (int j = 0; j < positions.size() - 1; j++)
+		for (int j = 0; j < neighbours.size() - 1; j++)
 		{
 			if (GetElement(neighbours[j]) == nullptr)
 				it->SetWall(GetVector4(it->Position - neighbours[j]));

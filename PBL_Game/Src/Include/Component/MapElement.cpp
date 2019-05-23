@@ -57,7 +57,8 @@ SceneNode* MapElement::AddFloor()
 		xD);
 	oFloor->AddComponent(Floor);
 	floor->AddGameObject(oFloor);
-	floor->Translate(Position.x, Position.y, 0);
+	floor->Translate(Position.x, 0, Position.y);
+	floor->Rotate(90.0f, glm::vec3(1, 0, 0));
 	nodes->push_back(floor);
 	return floor;
 }
