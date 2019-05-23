@@ -41,7 +41,7 @@ camera2(Camera())
 
 void Game::Granko()
 {
-  MapGenerator generator(&sNodes, shaderProgram, 1, 0, false);
+  MapGenerator generator(&sNodes, shaderProgram, 10, 0, false);
 
   Texture *xD = new Texture("Textures/red.png", GL_LINEAR);
   xD->Load();

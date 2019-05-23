@@ -8,46 +8,57 @@ MapGenerator::MapGenerator(std::vector<SceneNode*>* nodes, Shader* shaderProgram
 	GenerateMap(4);
 	CheckForWallsNDoors();
 	FinishGeneration();
+	maps.clear();
+	positions.clear();
 }
 
 MapGenerator::MapGenerator(std::vector<SceneNode*>* nodes, Shader* shaderProgram, int squares, int doors, bool glass_doors)
 {
+	this->Squares = squares;
+	this->Doors = doors;
+	this->GlassDoor = glass_doors;
 	this->nodes = nodes;
 	this->shader = shaderProgram;
 	srand(time(NULL));
 	GenerateMap(squares);
-	CheckForWallsNDoors();
+	CheckForWallsNDoors(doors, glass_doors);
 	FinishGeneration();
+	maps.clear();
+	positions.clear();
 }
 
 void MapGenerator::GenerateMap(int n)
 {
 	MapElement* element = new MapElement(glm::vec2(0, 0), shader);
-	map.insert(std::pair<glm::vec2, MapElement*>(element->Position, element));
+	maps.push_back(element);
+	positions.push_back(element->Position);
+	int elementIteration = 0;
 	for (int i = 0; i < n-1; i++)
 	{
-		glm::vec2 pos = map.at(map.rbegin()->first)->Position;
-		MapElement* temp = new MapElement(pos + GetVector2(pos), shader);
-		map.insert(std::pair<glm::vec2, MapElement*>(temp->Position, temp));
+		MapElement* temp = new MapElement(GetVector2(&elementIteration), shader, elementIteration);
+		maps.push_back(temp);
+		positions.push_back(temp->Position);
+		elementIteration = positions.size() - 1;
 	}
 }
 
 int MapGenerator::GetDirection()
 {
-	return (rand() % 4 + 1);
+	return (rand() % 5);
 }
 
-void MapGenerator::CheckForWallsNDoors()
+void MapGenerator::CheckForWallsNDoors(int doors, bool glass_door)
 {
-	for (std::map<glm::vec2, MapElement*>::iterator it = map.begin(); it != map.end(); ++it)
+	for (int i = 0; i < maps.size() - 1; i++)
 	{
-		std::vector<glm::vec2> neighbours = it->second->GetNeighbours();
-		for (std::vector<glm::vec2>::iterator neighbour = neighbours.begin(); neighbour != neighbours.end(); neighbour++)
+		MapElement* it = maps[i];
+		std::vector<glm::vec2> neighbours = it->GetNeighbours();
+		for (int j = 0; j < positions.size() - 1; j++)
 		{
-			if (map.find(*neighbour) == map.end())
-				it->second->SetWall(GetVector4(it->second->Position - *neighbour));
+			if (GetElement(neighbours[j]) == nullptr)
+				it->SetWall(GetVector4(it->Position - neighbours[j]));
 			else
-				it->second->SetDoor(GetVector4(it->second->Position - *neighbour));
+				it->SetDoor(GetVector4(it->Position - neighbours[j]));
 		}
 	}
 }
@@ -55,20 +66,24 @@ void MapGenerator::CheckForWallsNDoors()
 void MapGenerator::FinishGeneration()
 {
 	SceneNode* mapRoot = new SceneNode();
-	for (std::map<glm::vec2, MapElement*>::iterator element = map.begin(); element != map.end(); ++element)
+	for (int i = 0; i < maps.size() - 1; i++)
 	{
-		mapRoot->AddChild(element->second->GenerateNode(nodes, mapRoot));
+		mapRoot->AddChild(maps[i]->GenerateNode(nodes, mapRoot));
 	}
 	nodes->push_back(mapRoot);
 }
 
-glm::vec2 MapGenerator::GetVector2(glm::vec2 pos)
+glm::vec2 MapGenerator::GetVector2(int* step)
 {
 	glm::vec2 pos_add;
-	while (!CheckIfAvailiable(pos + pos_add)) {
+	while (!CheckIfAvailiable(positions[*step] + pos_add)) {
 		int move = GetDirection();
 		switch (move)
 		{
+			case 0: {
+				*step = maps[*step]->ParentElement;
+				break;
+			}
 			case 1: {
 				pos_add = glm::vec2(0, 1.0f);
 				break;
@@ -87,7 +102,7 @@ glm::vec2 MapGenerator::GetVector2(glm::vec2 pos)
 			}
 		}
 	}
-	return pos_add;
+	return pos_add + this->positions[*step];
 }
 
 glm::vec4 MapGenerator::GetVector4(glm::vec2 direction)
@@ -117,7 +132,26 @@ glm::vec4 MapGenerator::GetVector4(glm::vec2 direction)
 	}
 }
 
+void MapGenerator::RandomizeKeysAndDoors()
+{
+	/*std::vector<glm::vec2> keys;
+	for (std::map<glm::vec2, MapElement*, Vec2Comp>::iterator iterator = map.begin(); iterator != map.end(); iterator++)
+	{
+		keys.push_back(iterator->first);
+	}*/
+}
+
+MapElement * MapGenerator::GetElement(glm::vec2 pos)
+{
+	for (int i = 0; i < maps.size() - 1; i++)
+	{
+		if (maps[i]->Position == pos)
+			return maps[i];
+	}
+	return nullptr;
+}
+
 bool MapGenerator::CheckIfAvailiable(glm::vec2 pos)
 {
-	return map.find(pos) == map.end();
+	return std::find(this->positions.begin(), this->positions.end(), pos) == this->positions.end();
 }

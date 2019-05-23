@@ -4,10 +4,11 @@ MapElement::MapElement() {
 	this->Position = glm::vec2();
 }
 
-MapElement::MapElement(glm::vec2 pos, Shader* shaderProgram)
+MapElement::MapElement(glm::vec2 pos, Shader* shaderProgram, int ParentElement)
 {
 	this->Position = glm::vec2(pos.x, pos.y);
 	this->shader = shaderProgram;
+	this->ParentElement = ParentElement;
 }
 
 void MapElement::SetWall(glm::vec4 wall)
@@ -100,11 +101,11 @@ void MapElement::AddWalls(SceneNode* node)
 void MapElement::AddDoors(SceneNode* node)
 {
 	if (Doors.x > 0)
-		this->CreateWall(node, 0, 1.0f);
+		this->CreateDoor(node, 0, 1.0f);
 	if (Doors.y > 0)
-		this->CreateWall(node, 1.0f, 0);
+		this->CreateDoor(node, 1.0f, 0);
 	if (Doors.z > 0)
-		this->CreateWall(node, 0, -1.0f);
+		this->CreateDoor(node, 0, -1.0f);
 	if (Doors.w > 0)
-		this->CreateWall(node, -1.0f, 0);
+		this->CreateDoor(node, -1.0f, 0);
 }

@@ -17,9 +17,9 @@ class MapElement {
 	glm::vec2 Position;
 	glm::vec4 Walls;
 	glm::vec4 Doors;
-
+	int ParentElement;
 	MapElement();
-	MapElement(glm::vec2 pos, Shader* shaderProgram);
+	MapElement(glm::vec2 pos, Shader* shaderProgram, int ParentElement = 0);
 	void SetWall(glm::vec4 wall);
 	void SetDoor(glm::vec4 door);
 	std::vector<glm::vec2> GetNeighbours();
