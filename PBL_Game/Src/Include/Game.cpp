@@ -25,7 +25,6 @@ Game::Game(Window &aOkno) : okienko(aOkno),
                             camera2(Camera()),
                             MapSize(0)                  
 {
-
   LoadConfig();
   InitializeConfig();
 
@@ -234,48 +233,51 @@ void Game::Granko()
 
 void Game::Update(float interpolation)
 {
-  if (leftSideActive)
-  {
-    ProcessInput(interpolation, camera);
-  }
-  else
-  {
-    ProcessInput(interpolation, camera2);
-  }
+	if (!inputBlockade)
+	{
+		if (leftSideActive)
+		{
+			ProcessInput(interpolation, camera);
+		}
+		else
+		{
+			ProcessInput(interpolation, camera2);
+		}
 
-  int x = (100 + (int)leftPlayerNode.local.getPosition().x) / 450;
-  if (x < 0)
-  {
-    x = 0;
-  }
+		int x = (100 + (int)leftPlayerNode.local.getPosition().x) / 450;
+		if (x < 0)
+		{
+			x = 0;
+		}
 
-  if (x >= 40)
-  {
-    x = 39;
-  }
-  int z = (100 + (int)leftPlayerNode.local.getPosition().z) / 450;
+		if (x >= 40)
+		{
+			x = 39;
+		}
+		int z = (100 + (int)leftPlayerNode.local.getPosition().z) / 450;
 
-  if (z <= 0)
-  {
-    z = 0;
-  }
+		if (z <= 0)
+		{
+			z = 0;
+		}
 
-  if (z > 40)
-  {
-    z = 39;
-  }
+		if (z > 40)
+		{
+			z = 39;
+		}
 
-  //std::cout << "x: " << x << "  z:" << z << "\n";
-  start.x = x;
-  start.y = z;
-  a_star_search(grid, start, goal, came_from, cost_so_far);
-  path = reconstruct_path(start, goal, came_from);
-  ResetMapTilePath(mapTiles, grid, MapSize, &path);
+		//std::cout << "x: " << x << "  z:" << z << "\n";
+		start.x = x;
+		start.y = z;
+		a_star_search(grid, start, goal, came_from, cost_so_far);
+		path = reconstruct_path(start, goal, came_from);
+		ResetMapTilePath(mapTiles, grid, MapSize, &path);
 
-  if (leftSideActive)
-    UpdatePlayer(leftPlayerNode, camera, interpolation);
-  else
-    UpdatePlayer(rightPlayerNode, camera2, interpolation);
+		if (leftSideActive)
+			UpdatePlayer(leftPlayerNode, camera, interpolation);
+		else
+			UpdatePlayer(rightPlayerNode, camera2, interpolation);
+	}
 }
 
 void Game::Render()
@@ -696,7 +698,11 @@ void Game::SetViewAndPerspective(Camera &aCamera)
 void Game::Plot()
 {
 	if (plotNumber == 0)
+	{
+		inputBlockade = false;
 		return;
+	}
+	inputBlockade = true;
 
 	static int imageNumber = 1;
 	static bool keyPressed = false;
@@ -716,17 +722,18 @@ void Game::Plot()
 			path[11] = imageNumber + 48;
 			if (FILE *file = fopen(path.c_str(), "r")) {
 				fclose(file);
-				DisplayImage(path.c_str());
+				DisplayImage(path.c_str(), "Napis");
 			}
 			else {
 				imageNumber = 0;
 				plotNumber = 0;
+				
 			}
 
 			break;
 	}
 }
-void Game::DisplayImage(const char *path)
+void Game::DisplayImage(const char *path, const char *text)
 {
 	glViewport(0, 0, Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT);
 	glScissor(0, 0, Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT);
@@ -745,10 +752,7 @@ void Game::DisplayImage(const char *path)
 		sizeof(Shapes::RainBow_Square),
 		sizeof(Shapes::RB_Square_indices),
 		*shaderProgram_For_Model,
-		imageTex);
-
-	//std::string boxPath = "Models/box/box.obj";
-	//Model *image = new Model(boxPath, *shaderProgram_For_Model, false);
+		imageTex, "PlotImage");
 
 	imageObj->AddComponent(image);
 	imageNode.AddGameObject(imageObj);
@@ -759,4 +763,18 @@ void Game::DisplayImage(const char *path)
 
 	Transform originTransform = Transform::origin();
 	imageNode.Render(originTransform, true);
+
+	
+	/*ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	
+	ImGui::NewFrame();
+	ImGui::SetNextWindowPos(ImVec2(100, 650));
+	ImGui::SetWindowFontScale(5);
+	ImGui::Begin("foobar", NULL, ImVec2(0, 0), 0.0f, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+	ImGui::Text("SAMPLE TEXT");
+
+	ImGui::End();
+	ImGui::Render();
+	*/
 }

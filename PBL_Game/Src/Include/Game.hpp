@@ -86,7 +86,7 @@ class Game
 
 
 public:
-  
+
   Game(Window &okienko);
 
   unsigned WINDOW_WIDTH = 0;
@@ -97,6 +97,7 @@ public:
   const float cameraAngle = 35;
 
   int plotNumber = 1;	// Zmienna wskazujaca na obecna wstawke fabularna
+  bool inputBlockade = true;	// Zmienna  blokujaca mozliwosci gracza (domyslnie na czas wstawek fabularnych)
 
   void SetCamera(Camera camera, int camera_nr);
   void ProcessMouse();
@@ -121,5 +122,5 @@ private:
 
   void SetViewAndPerspective(Camera &aCamera);
   void Plot();
-  void DisplayImage(const char * path);
+  void DisplayImage(const char * path, const char * text);
 };
