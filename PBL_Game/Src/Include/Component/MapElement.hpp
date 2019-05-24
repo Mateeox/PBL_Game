@@ -11,7 +11,7 @@ class MapElement {
 	Shader* shader;
 	float scale = 1.0f;
 	float floor_offset = 1.0f;
-	float wall_offset = 1.0f;
+	float wall_offset = 0.5f;
 
 	public:
 	glm::vec2 Position;
@@ -27,6 +27,6 @@ class MapElement {
 	SceneNode* AddFloor();
 	SceneNode* CreateWall(SceneNode* parent, float direction_x, float direction_y);
 	SceneNode* CreateDoor(SceneNode* parent, float direction_x, float direction_y);
-	void AddWalls(SceneNode* node);
+	std::vector<SceneNode*> AddWalls(SceneNode* node);
 	void AddDoors(SceneNode* node);
 };

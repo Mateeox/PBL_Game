@@ -111,11 +111,11 @@ glm::vec4 MapGenerator::GetVector4(glm::vec2 direction)
 	{
 		case 1:
 		{
-			return glm::vec4(0, 1.0f, 0, 0);
+			return glm::vec4(0, 0, 0, 1.0f);
 		}
 		case -1:
 		{
-			return glm::vec4(0, 0, 0, 1.0f);
+			return  glm::vec4(0, 1.0f, 0, 0);
 		}
 	}
 
@@ -123,11 +123,11 @@ glm::vec4 MapGenerator::GetVector4(glm::vec2 direction)
 	{
 		case 1:
 		{
-			return glm::vec4(1.0f, 0, 0, 0);
+			return glm::vec4(0, 0, 1.0f, 0);
 		}
 		case -1:
 		{
-			return glm::vec4(0, 0, 1.0f, 0);
+			return glm::vec4(1.0f, 0, 0, 0);
 		}
 	}
 }
