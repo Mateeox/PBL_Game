@@ -243,7 +243,7 @@ void Game::Update(float interpolation)
     ProcessInput(interpolation, camera2);
   }
 
-  int x = (100 + (int)leftPlayerNode.local.getPosition().x) / 450;
+  int x = (int)(250 +leftPlayerNode.local.getPosition().x) / 450;
   if (x < 0)
   {
     x = 0;
@@ -253,7 +253,7 @@ void Game::Update(float interpolation)
   {
     x = 39;
   }
-  int z = (100 + (int)leftPlayerNode.local.getPosition().z) / 450;
+  int z = (int)(250 +leftPlayerNode.local.getPosition().z) / 450;
 
   if (z <= 0)
   {
@@ -586,7 +586,7 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation)
     movementDir.x = 1;
 
   glm::vec3 move = movementDir * movementSpeed * interpolation;
-  player.Translate(move.x, move.y, move.z);
+  player.DynamicTranslate(move.x, move.y, move.z);
   Collider *playerCollider = ((Collider *)player.gameObject->GetComponent(ComponentSystem::ComponentType::Collider));
   //check if there are any collisions, if yes - abort the move
   for (Collider *collider : collidableObjects)
@@ -736,16 +736,21 @@ void Game::DisplayImage(const char *path)
 
 	Texture *imageTex = new Texture(path, GL_NEAREST_MIPMAP_NEAREST);
 	imageTex->Load();
+  
+
+
 
 	SceneNode imageNode;
 	GameObject *imageObj = new GameObject(imageNode.world);
 
-	ShapeRenderer3D *image = new ShapeRenderer3D(Shapes::RainBow_Square,
+	ShapeRenderer3D *image = new ShapeRenderer3D(
+    Shapes::RainBow_Square,
 		Shapes::RB_Square_indices,
 		sizeof(Shapes::RainBow_Square),
 		sizeof(Shapes::RB_Square_indices),
 		*shaderProgram_For_Model,
-		imageTex);
+		imageTex,
+    "ExampleName");
 
 	//std::string boxPath = "Models/box/box.obj";
 	//Model *image = new Model(boxPath, *shaderProgram_For_Model, false);
