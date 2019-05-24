@@ -243,7 +243,7 @@ void Game::Update(float interpolation)
     ProcessInput(interpolation, camera2);
   }
 
-  int x = (int)(250 +leftPlayerNode.local.getPosition().x) / 450;
+  int x = (int)(250 +leftPlayerNode.local.getPosition().x) / 400;
   if (x < 0)
   {
     x = 0;
@@ -253,7 +253,7 @@ void Game::Update(float interpolation)
   {
     x = 39;
   }
-  int z = (int)(250 +leftPlayerNode.local.getPosition().z) / 450;
+  int z = (int)(250 +leftPlayerNode.local.getPosition().z) / 400;
 
   if (z <= 0)
   {
@@ -586,7 +586,7 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation)
     movementDir.x = 1;
 
   glm::vec3 move = movementDir * movementSpeed * interpolation;
-  player.DynamicTranslate(move.x, move.y, move.z);
+  player.Translate(move.x, move.y, move.z);
   Collider *playerCollider = ((Collider *)player.gameObject->GetComponent(ComponentSystem::ComponentType::Collider));
   //check if there are any collisions, if yes - abort the move
   for (Collider *collider : collidableObjects)
