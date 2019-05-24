@@ -3,6 +3,9 @@
 #include "Shader.hpp"
 #include "SceneNode.hpp"
 #include "Collider.hpp"
+#include "Trigger.hpp"
+#include "Key.hpp"
+#include "Door.hpp"
 #include "ConfigUtils.hpp"
 #include "PathFinding/MapTile.hpp"
 #include "PathFinding/MapTileRenderUtils.cpp"
@@ -34,6 +37,7 @@ class Game
   std::vector<SceneNode *> rightNodes;
   
   std::vector<Collider *> collidableObjects;
+  std::vector<Trigger *> triggers;
 
   //PathFinding
   #pragma region PathFindingAndMapGenerationUtils
@@ -110,6 +114,7 @@ public:
   void Deserialize(std::string path);
   void UpdatePlayer(SceneNode &player, Camera &camera,float interpolation);
   void gatherCollidableObjects(std::vector<SceneNode *> &nodes);
+  void gatherTriggers(std::vector<SceneNode*>& nodes);
   std::vector<GameObject*> findByTag(const std::vector<SceneNode*>& data, std::string tag);
   GameObject * findByTagSingle(const std::vector<SceneNode*>& data, std::string tag);
 

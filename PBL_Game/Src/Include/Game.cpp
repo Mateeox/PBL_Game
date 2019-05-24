@@ -57,6 +57,8 @@ void Game::Granko()
   SceneNode box1;
   SceneNode box2;
   SceneNode box3;
+  SceneNode doorNode;
+  SceneNode keyNode;
 
   SceneNode Enemy_Node;
 
@@ -71,6 +73,9 @@ void Game::Granko()
   GameObject *FloorObj = new GameObject(FloorNode_new.world);
   GameObject *hexObj2 = new GameObject(box2.local);
   GameObject *hexObj3 = new GameObject(box3.local);
+
+  GameObject *doorObj = new GameObject(doorNode.local);
+  GameObject *keyObj = new GameObject(keyNode.local);
 
   std::string BeeModelPath = "Models/enemy_model.obj";
   std::string AnimatedEnemyPAth = "Models/" + ConfigUtils::GetValueFromMap<std::string>("Enemy_Animated_Model", ConfigMap);
@@ -115,8 +120,33 @@ void Game::Granko()
   hexObj2->AddComponent(szescian);
   hexObj3->AddComponent(szescian);
 
+  doorObj->AddComponent(szescian);
+  keyObj->AddComponent(szescian);
+
   Collider *leftPlayerCollider = new Collider(leftPlayerObj->transform);
   Collider *rightPlayerCollider = new Collider(rightPlayerObj->transform);
+
+  // Triggery
+  Door* sampleDoor = new Door(doorObj->transform, &doorNode);
+  Key* sampleKey = new Key(keyObj->transform, sampleDoor);
+
+  sampleDoor->setDimensions(0, 0, 0, 0.5, 1, 1);
+  sampleKey->setDimensions(0, 0, 0, 0.3, 0.3, 0.3);
+  doorObj->AddComponent(sampleDoor);
+  keyObj->AddComponent(sampleKey);
+  doorNode.AddGameObject(doorObj);
+  keyNode.AddGameObject(keyObj);
+
+  doorNode.Scale(0.5, 1, 1);
+  doorNode.Translate(30, 0, 0);
+
+  keyNode.Scale(0.3, 0.3, 0.3);
+  keyNode.Translate(80, 0, 0);
+
+  
+
+  // Koniec triggerow
+
   leftPlayerCollider->setDimensions(-0.12, 0, 0.25, 2.3, 2, 3.05);
   rightPlayerCollider->setDimensions(-0.12, 0, 0.25, 2.3, 2, 3.05);
 
@@ -167,6 +197,9 @@ void Game::Granko()
   sNodes.push_back(&box2);
   sNodes.push_back(&box3);
 
+  sNodes.push_back(&doorNode);
+  sNodes.push_back(&keyNode);
+
   a_star_search(grid, start, goal, came_from, cost_so_far);
   draw_grid(grid, 2, nullptr, &came_from);
   std::cout << '\n';
@@ -194,6 +227,7 @@ void Game::Granko()
   float interpolation = 1.0;
 
   gatherCollidableObjects(sNodes);
+  gatherTriggers(sNodes);
   while (glfwGetKey(okienko.window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
          glfwWindowShouldClose(okienko.window) == 0)
   {
@@ -599,6 +633,13 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation)
       break;
     }
   }
+  for (Trigger *trigger : triggers)
+  {
+	  if (playerCollider->checkCollision(trigger))
+	  {
+		  trigger->ActivateTrigger();
+	  }
+  }
 
   camera.Position.x = player.gameObject->transform.getPosition().x * player.gameObject->transform.getScale().x;
   camera.Position.z = player.gameObject->transform.getPosition().z * player.gameObject->transform.getScale().z + cameraZOffset;
@@ -622,6 +663,25 @@ void Game::gatherCollidableObjects(std::vector<SceneNode *> &nodes)
       }
     }
   }
+}
+void Game::gatherTriggers(std::vector<SceneNode *> &nodes)
+{
+	for (auto node : nodes)
+	{
+		if (node->gameObject != nullptr)
+		{
+
+			if (node->gameObject->getTag() != "player" && node->gameObject->getTag() != "enemy")
+			{
+				ComponentSystem::Component *possibleTrigger = node->gameObject->GetComponent(ComponentSystem::ComponentType::Trigger);
+				if (possibleTrigger != nullptr)
+				{
+					triggers.push_back((Trigger *)possibleTrigger);
+				}
+				gatherTriggers(node->children);
+			}
+		}
+	}
 }
 
 std::vector<GameObject*> Game::findByTag(const std::vector<SceneNode *> &data, std::string tag)
