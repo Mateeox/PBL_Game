@@ -249,6 +249,28 @@ void Game::Update(float interpolation)
 		{
 			x = 0;
 		}
+=======
+  if (leftSideActive)
+  {
+    ProcessInput(interpolation, camera);
+  }
+  else
+  {
+    ProcessInput(interpolation, camera2);
+  }
+
+  int x = (int)(250 +leftPlayerNode.local.getPosition().x) / 400;
+  if (x < 0)
+  {
+    x = 0;
+  }
+
+  if (x >= 40)
+  {
+    x = 39;
+  }
+  int z = (int)(250 +leftPlayerNode.local.getPosition().z) / 400;
+>>>>>>> 7faf48fc989b5f78fbf40c0d05192c5b55eac7d3
 
 		if (x >= 40)
 		{
@@ -743,16 +765,28 @@ void Game::DisplayImage(const char *path, const char *text)
 
 	Texture *imageTex = new Texture(path, GL_NEAREST_MIPMAP_NEAREST);
 	imageTex->Load();
+  
+
+
 
 	SceneNode imageNode;
 	GameObject *imageObj = new GameObject(imageNode.world);
 
-	ShapeRenderer3D *image = new ShapeRenderer3D(Shapes::RainBow_Square,
+	ShapeRenderer3D *image = new ShapeRenderer3D(
+    Shapes::RainBow_Square,
 		Shapes::RB_Square_indices,
 		sizeof(Shapes::RainBow_Square),
 		sizeof(Shapes::RB_Square_indices),
 		*shaderProgram_For_Model,
+<<<<<<< HEAD
 		imageTex, "PlotImage");
+=======
+		imageTex,
+    "ExampleName");
+
+	//std::string boxPath = "Models/box/box.obj";
+	//Model *image = new Model(boxPath, *shaderProgram_For_Model, false);
+>>>>>>> 7faf48fc989b5f78fbf40c0d05192c5b55eac7d3
 
 	imageObj->AddComponent(image);
 	imageNode.AddGameObject(imageObj);
