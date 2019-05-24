@@ -22,11 +22,16 @@ class MapElement {
 	MapElement(glm::vec2 pos, Shader* shaderProgram, int ParentElement = 0);
 	void SetWall(glm::vec4 wall);
 	void SetDoor(glm::vec4 door);
+	bool DoesHaveADoor();
+	int CountDoors();
+	void CleanDoors();
+	void RemoveDoor(glm::vec4 doors);
+	void RemoveDoor(int order);
 	std::vector<glm::vec2> GetNeighbours();
 	SceneNode* GenerateNode(std::vector<SceneNode*>* nodes, SceneNode* parent);
 	SceneNode* AddFloor();
 	SceneNode* CreateWall(SceneNode* parent, float direction_x, float direction_y);
 	SceneNode* CreateDoor(SceneNode* parent, float direction_x, float direction_y);
 	std::vector<SceneNode*> AddWalls(SceneNode* node);
-	void AddDoors(SceneNode* node);
+	std::vector<SceneNode*> MapElement::AddDoors(SceneNode* node);
 };

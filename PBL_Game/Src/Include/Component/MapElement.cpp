@@ -2,6 +2,7 @@
 
 MapElement::MapElement() {
 	this->Position = glm::vec2();
+	this->Doors = glm::vec4();
 }
 
 MapElement::MapElement(glm::vec2 pos, Shader* shaderProgram, int ParentElement)
@@ -9,6 +10,7 @@ MapElement::MapElement(glm::vec2 pos, Shader* shaderProgram, int ParentElement)
 	this->Position = glm::vec2(pos.x, pos.y);
 	this->shader = shaderProgram;
 	this->ParentElement = ParentElement;
+	this->Doors = glm::vec4();
 }
 
 void MapElement::SetWall(glm::vec4 wall)
@@ -40,10 +42,12 @@ SceneNode* MapElement::GenerateNode(std::vector<SceneNode*>* nodes, SceneNode* p
 	floor->AddParent(element);
 	element->AddChild(floor);
 	std::vector<SceneNode*> walls = AddWalls(floor);
-	int size = walls.size();
 	for (int i = 0; i < walls.size(); i++)
 		element->AddChild(walls[i]);
 	walls.clear();
+	std::vector<SceneNode*> doors = AddDoors(floor);
+	for (int i = 0; i < doors.size(); i++)
+		element->AddChild(doors[i]);
 	nodes->push_back(element);
 	return element;
 }
@@ -91,31 +95,99 @@ SceneNode* MapElement::CreateWall(SceneNode* parent, float direction_x, float di
 
 SceneNode* MapElement::CreateDoor(SceneNode* parent, float direction_x, float direction_y)
 {
-	return nullptr;
+	SceneNode* door = new SceneNode();
+	GameObject* doorObj = new GameObject(door->local);
+	Texture* xD = new Texture("Textures/red.png", GL_LINEAR);
+	xD->Load();
+	ShapeRenderer3D *szescian = new ShapeRenderer3D(Shapes::RainBow_Cube,
+		Shapes::RB_Cube_indices,
+		sizeof(Shapes::RainBow_Cube),
+		sizeof(Shapes::RB_Cube_indices),
+		*shader,
+		xD);
+	doorObj->AddComponent(szescian);
+	door->AddGameObject(doorObj);
+	door->Translate(Position.x + direction_x * wall_offset, 0, Position.y + direction_y * wall_offset);
+	door->Rotate(direction_y != 0 ? -90.0f : 0, glm::vec3(0, 1, 0));
+	door->Scale(0.1f, 0.2f, 0.2f);
+	door->AddParent(parent);
+	return door;
 }
 
 std::vector<SceneNode*> MapElement::AddWalls(SceneNode* node)
 {
 	std::vector<SceneNode*> temp;
 	if (Walls.x > 0)
-		temp.push_back(this->CreateWall(node, 0, 1.0f));
+		temp.push_back(CreateWall(node, 0, 1.0f));
 	if (Walls.y > 0)
-		temp.push_back(this->CreateWall(node, 1.0f, 0));
+		temp.push_back(CreateWall(node, 1.0f, 0));
 	if (Walls.z > 0)
-		temp.push_back(this->CreateWall(node, 0, -1.0f));
+		temp.push_back(CreateWall(node, 0, -1.0f));
 	if (Walls.w > 0)
-		temp.push_back(this->CreateWall(node, -1.0f, 0));
+		temp.push_back(CreateWall(node, -1.0f, 0));
 	return temp;
 }
 
-void MapElement::AddDoors(SceneNode* node)
+std::vector<SceneNode*> MapElement::AddDoors(SceneNode* node)
 {
+	std::vector<SceneNode*> temp;
 	if (Doors.x > 0)
-		this->CreateDoor(node, 0, 1.0f);
+		temp.push_back(CreateDoor(node, 0, 1.0f));
 	if (Doors.y > 0)
-		this->CreateDoor(node, 1.0f, 0);
+		temp.push_back(CreateDoor(node, 1.0f, 0));
 	if (Doors.z > 0)
-		this->CreateDoor(node, 0, -1.0f);
+		temp.push_back(CreateDoor(node, 0, -1.0f));
 	if (Doors.w > 0)
-		this->CreateDoor(node, -1.0f, 0);
+		temp.push_back(CreateDoor(node, -1.0f, 0));
+	return temp;
+}
+
+bool MapElement::DoesHaveADoor()
+{
+	if (Doors.x == 1.0f || Doors.y == 1.0f || Doors.z == 1.0f || Doors.w == 1.0f)
+		return true;
+}
+
+int MapElement::CountDoors()
+{
+	int count = 0;
+	if (Doors.x == 1.0f)
+		count++;
+	if (Doors.y == 1.0f)
+		count++;
+	if (Doors.z == 1.0f)
+		count++;
+	if (Doors.w == 1.0f)
+		count++;
+	return count;
+}
+
+void MapElement::RemoveDoor(glm::vec4 doors)
+{
+	Doors -= doors;
+	if (Doors.x == -1.0f)
+		Doors.x = 0;
+	if (Doors.y == -1.0f)
+		Doors.y = 0;
+	if (Doors.z == -1.0f)
+		Doors.z = 0;
+	if (Doors.w == -1.0f)
+		Doors.w = 0;
+}
+
+void MapElement::RemoveDoor(int order)
+{
+	if (Doors.x == 1.0f && order == 0)
+		Doors.x = 0;
+	if (Doors.y == 1.0f && order == 0)
+		Doors.y = 0;
+	if (Doors.z == 1.0f && order == 1)
+		Doors.z = 0;
+	if (Doors.w == 1.0f && order == 1)
+		Doors.w = 0;
+}
+
+void MapElement::CleanDoors()
+{
+	Doors = glm::vec4();
 }

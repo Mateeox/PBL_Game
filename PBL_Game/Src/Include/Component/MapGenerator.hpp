@@ -9,17 +9,23 @@ class MapGenerator //: public Script
 	std::vector <MapElement*> maps;
 	std::vector<glm::vec2> positions;
 	std::vector<SceneNode*>* nodes;
+	std::vector<MapElement*> doors;
 	Shader* shader;
 
 	int GetDirection();
-	void CheckForWallsNDoors(int doors = 0, bool glass_door = false);
+	void CheckForWalls();
+	void CheckForDoors();
+	void ValidateDoors();
+	void ClearDoors();
+	int CountDoors();
+	void PickDoors();
 	void GenerateMap(int n);
 	void FinishGeneration();
 	bool CheckIfAvailiable(glm::vec2 pos);
 	glm::vec2 GetVector2(int* step);
 	glm::vec4 GetVector4(glm::vec2 direction);
-	void RandomizeKeysAndDoors();
 	MapElement* GetElement(glm::vec2 pos);
+	int GetRandomIndex(int max);
 
 	public:
 	int Squares = 1;
