@@ -2,7 +2,7 @@
 #include "Component/ShapeRenderer3D.hpp"
 #include "Component/Model.hpp"
 #include "Component/AnimatedModel.hpp"
-
+#include "PathFinding/MapTile.hpp"
 SceneNode::SceneNode() : local(Transform::origin()), dirty_flag(true), gameObject(nullptr)
 {
 }
@@ -16,9 +16,9 @@ void SceneNode::AddGameObject(GameObject *aGameObject)
   aGameObject->transform = world;
   gameObject = aGameObject;
 }
-void SceneNode::AddParent(SceneNode * aSceneNode)
+void SceneNode::AddParent(SceneNode *aSceneNode)
 {
-	parent = aSceneNode;
+  parent = aSceneNode;
 }
 void SceneNode::AddChild(SceneNode *aSceneNode)
 {
@@ -44,23 +44,37 @@ void SceneNode::Render(Transform &parentWorld, bool aDirty_Flag)
       shape->Draw(world.GetTransform());
     }
 
+    MapTile *mapTile = (MapTile *)gameObject->GetComponent(ComponentSystem::MapTile);
+    if (mapTile != nullptr)
+    {
+      mapTile->Draw(world.GetTransform());
+    }
+
     Model *model = (Model *)gameObject->GetComponent(ComponentSystem::Model);
     if (model != nullptr)
     {
       model->Draw(world.GetTransform());
     }
 
-     AnimatedModel *animModel = (AnimatedModel *)gameObject->GetComponent(ComponentSystem::AnimatedModel);
+    AnimatedModel *animModel = (AnimatedModel *)gameObject->GetComponent(ComponentSystem::AnimatedModel);
     if (animModel != nullptr)
     {
       animModel->Draw(world.GetTransform());
     }
-
   }
   for (SceneNode *sn : children)
   {
     sn->Render(world, aDirty_Flag);
   }
+}
+
+void SceneNode::DynamicTranslate(float interpolation, float x, float y, float z)
+{
+  x = interpolation * x;
+  y = interpolation * y;
+  z = interpolation * z;
+
+  Translate(x, y, z);
 }
 
 void SceneNode::Scale(float x, float y, float z)
@@ -82,13 +96,13 @@ void SceneNode::Rotate(float value, glm::vec3 axis)
 
 std::string SceneNode::Serialize()
 {
-	std::string str = "SN\n\t";
-	str += "W;" + this->world.Serialize() + "\n\t";
-	str += "L;" + this->local.Serialize() + "\n\t";
-	if (this->parent)
-		str += "P;" + std::to_string((intptr_t)this->parent) + "\n\t";
-	for (SceneNode* child : this->children)
-		str += "CH;" + std::to_string((intptr_t)child) + "\n\t";
-	str += "O\n\t\t" + this->gameObject->Serialize() + "\n";
-	return str;
+  std::string str = "SN\n\t";
+  str += "W;" + this->world.Serialize() + "\n\t";
+  str += "L;" + this->local.Serialize() + "\n\t";
+  if (this->parent)
+    str += "P;" + std::to_string((intptr_t)this->parent) + "\n\t";
+  for (SceneNode *child : this->children)
+    str += "CH;" + std::to_string((intptr_t)child) + "\n\t";
+  str += "O\n\t\t" + this->gameObject->Serialize() + "\n";
+  return str;
 }

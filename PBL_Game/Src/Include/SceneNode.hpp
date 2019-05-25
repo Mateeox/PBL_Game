@@ -29,6 +29,7 @@ class SceneNode
 
     void Scale(float x, float y, float z);
     void Translate(float x, float y, float z);
+    void DynamicTranslate(float interpolation,float x,float y,float z);
     void Rotate(float x, glm::vec3 axis);
 	
 	std::string Serialize();

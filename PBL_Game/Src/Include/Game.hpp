@@ -4,6 +4,9 @@
 #include "SceneNode.hpp"
 #include "Collider.hpp"
 #include "ConfigUtils.hpp"
+#include "PathFinding/MapTile.hpp"
+#include "PathFinding/MapTileRenderUtils.cpp"
+
 
 const int TICKS_PER_SECOND = 32;
 const int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
@@ -29,7 +32,23 @@ class Game
   Shader *shaderAnimatedModel;
   std::vector<SceneNode *> sNodes;
   std::vector<SceneNode *> rightNodes;
+  
   std::vector<Collider *> collidableObjects;
+
+  //PathFinding
+  #pragma region PathFindingAndMapGenerationUtils
+  std::vector<MapTile *> mapTiles;
+  std::vector<GridLocation> path;
+  GridWithWeights grid;
+  unsigned MapSize;
+
+  GridLocation start{0, 0};
+  GridLocation goal{8, 5};
+  std::unordered_map<GridLocation, GridLocation> came_from;
+  std::unordered_map<GridLocation, double> cost_so_far;
+
+  #pragma endregion PathFindingAndMapGenerationUtils
+
 
   SceneNode leftPlayerNode;
   SceneNode rightPlayerNode;
@@ -39,6 +58,7 @@ class Game
   //How to get value from config
   //ConfigUtils::GetValueFromMap<TYPE>(NAME,ConfigMap) 
   std::map<std::string,VariantType> ConfigMap;
+  
 
 
 
@@ -58,10 +78,15 @@ class Game
 
   //Imgui
   bool show_demo_window = true;
+  bool printf_path = false;
+
+  //
   int offset = 125; // Jak bardzo maja sie roznic rozmiary kamery, szerokosc aktywnej to pol okna + offset, szerokosc nieaktywnej to pol okna - offset
 
+
+
 public:
-  
+
   Game(Window &okienko);
 
   unsigned WINDOW_WIDTH = 0;
@@ -70,6 +95,9 @@ public:
   const float cameraZOffset = 7;
   const float cameraYOffset = 2;
   const float cameraAngle = 35;
+
+  int plotNumber = 1;	// Zmienna wskazujaca na obecna wstawke fabularna
+  bool inputBlockade = true;	// Zmienna  blokujaca mozliwosci gracza (domyslnie na czas wstawek fabularnych)
 
   void SetCamera(Camera camera, int camera_nr);
   void ProcessMouse();
@@ -82,13 +110,17 @@ public:
   void Deserialize(std::string path);
   void UpdatePlayer(SceneNode &player, Camera &camera,float interpolation);
   void gatherCollidableObjects(std::vector<SceneNode *> &nodes);
+  std::vector<GameObject*> findByTag(const std::vector<SceneNode*>& data, std::string tag);
+  GameObject * findByTagSingle(const std::vector<SceneNode*>& data, std::string tag);
 
 private:
-  void SerializeFaza1(std::map<SceneNode *, unsigned> &map);
-  void SerializeFaza2(std::map<SceneNode *, unsigned> &map, std::vector<SceneNode> &temp);
+  void SerializeFaza1(std::map<SceneNode *,unsigned long long> &map);
+  void SerializeFaza2(std::map<SceneNode *,unsigned long long> &map, std::vector<SceneNode> &temp);
   void SerializeFaza3(std::vector<SceneNode> &temp);
   void SerializeZapisz(std::string serialized);
-  void DeserializeOrderPointers(std::map<unsigned, SceneNode *> &map);
+  void DeserializeOrderPointers(std::map<unsigned long long, SceneNode *> &map);
 
   void SetViewAndPerspective(Camera &aCamera);
+  void Plot();
+  void DisplayImage(const char * path, const char * text);
 };

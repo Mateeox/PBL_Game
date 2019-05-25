@@ -17,14 +17,15 @@ ShapeRenderer3D::ShapeRenderer3D(
 	int size,
 	int aindices_size,
 	Shader &aShaderProgram,
-	Texture *atexture) : Drawable(aShaderProgram),
-						 g_vertex_buffer_data(g_ver),
-						 g_vertex_buffer_data_size(size),
-						 indices_size(aindices_size),
-						 indices(aindices),
-						 texture(atexture)
-
+	Texture *atexture,
+	std::string textureName) : Drawable(aShaderProgram),
+							   g_vertex_buffer_data(g_ver),
+							   g_vertex_buffer_data_size(size),
+							   indices_size(aindices_size),
+							   indices(aindices),
+							   textureDisplayed(textureName)
 {
+	textures[textureName] = atexture;
 	what_Draw_use = 1;
 
 	glGenVertexArrays(1, &VAO);
@@ -54,10 +55,14 @@ ShapeRenderer3D::ShapeRenderer3D(
 ShapeRenderer3D::ShapeRenderer3D(
 	GLfloat *g_ver, int size,
 	Shader &aShaderProgram,
-	Texture *atexture) : Drawable(aShaderProgram),
-						 g_vertex_buffer_data(g_ver),
-						 g_vertex_buffer_data_size(size), texture(atexture)
+	Texture *atexture,
+	std::string textureName) : Drawable(aShaderProgram),
+							   g_vertex_buffer_data(g_ver),
+							   g_vertex_buffer_data_size(size),
+							   textureDisplayed(textureName)
 {
+	textures[textureName] = atexture;
+
 	what_Draw_use = 2;
 
 	glGenVertexArrays(1, &VAO);
@@ -80,15 +85,15 @@ ShapeRenderer3D::ShapeRenderer3D(
 	glEnableVertexAttribArray(2);
 }
 
-void ShapeRenderer3D::Draw(glm::mat4 &  transform)
+void ShapeRenderer3D::Draw(glm::mat4 &transform)
 {
 
 	ShaderProgram.use();
 	unsigned int transformLoc = glGetUniformLocation(ShaderProgram.shaderProgramID, "transform");
 	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
-	if (texture != nullptr)
-	{
-		texture->Bind();
+	if (textures.size() != 0)
+	{ 
+		textures[textureDisplayed]->Bind();
 	}
 	if (what_Draw_use == 1)
 	{
@@ -99,8 +104,7 @@ void ShapeRenderer3D::Draw(glm::mat4 &  transform)
 		Draw_Arrays();
 	}
 
-	 glActiveTexture(GL_TEXTURE0);
-
+	glActiveTexture(GL_TEXTURE0);
 }
 
 void ShapeRenderer3D::Draw_Elements()
@@ -119,6 +123,23 @@ void ShapeRenderer3D::Draw_Arrays()
 {
 	glBindVertexArray(VAO);
 	glDrawArrays(GL_TRIANGLES, 0, g_vertex_buffer_data_size); // 3 indices starting at 0 -> 1 triangle
+}
+
+void ShapeRenderer3D::SwitchTexture(std::string textureName)
+{
+	textureDisplayed = textureName;
+}
+
+ShapeRenderer3D *ShapeRenderer3D::GetCopy()
+{
+	ShapeRenderer3D *newCopy = new ShapeRenderer3D(g_vertex_buffer_data, indices, g_vertex_buffer_data_size, indices_size, ShaderProgram, textures[0], textureDisplayed);
+
+	return newCopy;
+}
+
+void ShapeRenderer3D::AsignTexture(Texture *aTexture, std::string aTextureName)
+{
+	textures[aTextureName] = aTexture;
 }
 
 ShapeRenderer3D::~ShapeRenderer3D()
