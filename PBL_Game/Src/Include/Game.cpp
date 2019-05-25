@@ -9,7 +9,7 @@
 
 #include <fstream>
 #include <iterator>
-#include <array>
+
 
 static bool leftSideActive = true;
 static bool swapButtonPressed = false;
@@ -21,59 +21,7 @@ void Game::InitializeConfig()
   WINDOW_HEIGHT = ConfigUtils::GetValueFromMap<unsigned>("WINDOW_HEIGHT", ConfigMap);
   movementSpeed = ConfigUtils::GetValueFromMap<float>("PlayerSpeed", ConfigMap);
 }
-bool isOnLeftSide(const glm::vec2 &startPoint, const glm::vec2 &endPoint, const glm::vec2 &pointToCheck) {
-	return ((endPoint.x - startPoint.x)*(pointToCheck.y - startPoint.y) - (endPoint.y - startPoint.y)*(pointToCheck.x - startPoint.x)) > 0;
-}
-std::vector<ShapeRenderer3D*> getObjectsInCone(const glm::vec2 &startPoint, const glm::vec2 &endPointLeft, const glm::vec2 &endPointRight, const std::vector<SceneNode*> &nodes, double radiusSquared = -1.0)
-{
-	std::vector<ShapeRenderer3D*> objectsInCone;
-	if (radiusSquared < 0)
-	{
-		//if the radius is negative it means it was not given, so we have to calculate it from points
-		radiusSquared = glm::distance2(endPointLeft, startPoint);
-	}
-	for (auto node : nodes)
-	{
-		if (node->gameObject != nullptr)// && node->gameObject->getTag() != "floor")
-		{
-			ShapeRenderer3D* shapeRenderer = (ShapeRenderer3D*)node->gameObject->GetComponent(ComponentSystem::ComponentType::ShapeRenderer3D);
-			if (shapeRenderer != nullptr)
-			{
-				auto extrema = shapeRenderer->getExtrema();
-				std::array<glm::vec2, 4> points = {
-					glm::vec2(extrema[0][0], extrema[0][2]),
-					glm::vec2(extrema[0][0], extrema[1][2]),
-					glm::vec2(extrema[1][0], extrema[0][2]),
-					glm::vec2(extrema[1][0], extrema[1][2])
-				};
 
-				for (auto point : points)
-				{
-					if (glm::distance2(point, startPoint) < radiusSquared)
-					{
-						//vertex of object is within cone radius, now lets check if it is between borders
-						if (!isOnLeftSide(startPoint, endPointLeft, point) && isOnLeftSide(startPoint, endPointRight, point))
-						{
-							objectsInCone.push_back(shapeRenderer);
-							break;
-						}
-					}
-				}
-			}
-		}
-		std::vector<ShapeRenderer3D*> foundChildObjects(getObjectsInCone(startPoint, endPointLeft, endPointRight, node->children, radiusSquared));
-		if (foundChildObjects.size() > 0)
-		{
-			objectsInCone.insert(objectsInCone.end(), foundChildObjects.begin(), foundChildObjects.end());
-		}
-	}
-
-	return objectsInCone;
-}
-void test(const std::vector<SceneNode*> &nodes)
-{
-
-}
 Game::Game(Window &aOkno) : okienko(aOkno),
                             camera(Camera()),
                             camera2(Camera())
@@ -88,6 +36,7 @@ Game::Game(Window &aOkno) : okienko(aOkno),
   shaderProgram = new Shader("Shaders/vertex4.txt", "Shaders/fragment3.txt");
   shaderProgram_For_Model = new Shader("Shaders/vertexModel.txt", "Shaders/fragmentModel.txt");
   shaderAnimatedModel = new Shader("Shaders/skinning.vs", "Shaders/skinning.fs");
+  shaderViewCone = new Shader("Shaders/viewCone.vs", "Shaders/viewCone.fs");
 
   glfwSetCursorPosCallback(okienko.window, mouse_callback);
 }
@@ -155,7 +104,9 @@ void Game::Granko()
                                                   sizeof(Shapes::RB_Cube_indices),
                                                   *shaderProgram,
                                                   xD);
+  ConeRenderer *coneRendererLeft = new ConeRenderer(*shaderViewCone, &sNodes);
 
+  leftPlayerObj->AddComponent(coneRendererLeft);
   leftPlayerObj->AddComponent(BeeModel);
   rightPlayerObj->AddComponent(BeeModel);
   enemyGameObject->AddComponent(animatedModel);
@@ -204,15 +155,14 @@ void Game::Granko()
 
   Enemy_Node.Translate(5, 5, 0);
   box2.Translate(5, 0, 0);
+ // box2.Scale(1,1,100);
   box3.Translate(-5, 0, 0);
   FloorNode_new.Scale(floorTileScale, floorTileScale, floorTileScale);
   FloorNode_new.Rotate(90.0f, glm::vec3(1, 0, 0));
 
-  sNodes.push_back(&Enemy_Node);
-  sNodes.push_back(&leftPlayerNode);
-  rightNodes.push_back(&rightPlayerNode);
+  //sNodes.push_back(&Enemy_Node);
   //sNodes.push_back(&scena1_new);
-  sNodes.push_back(&FloorNode_new);
+  //sNodes.push_back(&FloorNode_new);
 
   //sNodes.push_back(&box1);
   sNodes.push_back(&box2);
@@ -226,9 +176,15 @@ void Game::Granko()
   {
     for (unsigned y = 0; y < 32; y++)
     {
-      sNodes.push_back(&mapOfTiles[x][y]->mSceneNode);
+		if (mapOfTiles[x][y]->mSceneNode.gameObject != nullptr)
+		{
+			mapOfTiles[x][y]->mSceneNode.gameObject->setTag("floor");
+		}
+		sNodes.push_back(&mapOfTiles[x][y]->mSceneNode);
     }
   }
+  sNodes.push_back(&leftPlayerNode);
+  rightNodes.push_back(&rightPlayerNode);
 
 
   std::vector<MapTile *>  xDDD = MapTileUtils::FindPath(mapOfTiles,mapOfTiles[16][16],mapOfTiles[0][0],32,32);
@@ -250,7 +206,8 @@ void Game::Granko()
   while (glfwGetKey(okienko.window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
          glfwWindowShouldClose(okienko.window) == 0)
   {
-
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     loops = 0;
 
     while ((glfwGetTime() * 1000) > next_game_tick && loops < MAX_FRAMESKIP)
@@ -599,7 +556,7 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation)
 
   glm::vec3 move = movementDir * movementSpeed * interpolation;
   player.Translate(move.x, move.y, move.z);
-  Collider *playerCollider = ((Collider *)player.gameObject->GetComponent(ComponentSystem::ComponentType::Collider));
+  Collider *playerCollider = (Collider *)player.gameObject->GetComponent(ComponentSystem::ComponentType::Collider);
   //check if there are any collisions, if yes - abort the move
   for (Collider *collider : collidableObjects)
   {
@@ -611,6 +568,15 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation)
     }
   }
 
+  //view cone
+  auto coneRenderer = (ConeRenderer*) player.gameObject->GetComponent(ComponentSystem::ComponentType::ConeRenderer);
+  if (coneRenderer != nullptr)
+  {
+	  if (glfwGetKey(okienko.window, GLFW_KEY_LEFT) == GLFW_PRESS)
+		  coneRenderer->rotateLeft();
+	  if (glfwGetKey(okienko.window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+		  coneRenderer->rotateRight();
+  }
   camera.Position.x = player.gameObject->transform.getPosition().x * player.gameObject->transform.getScale().x;
   camera.Position.z = player.gameObject->transform.getPosition().z * player.gameObject->transform.getScale().z + cameraZOffset;
 }
@@ -694,6 +660,10 @@ void Game::SetViewAndPerspective(Camera &aCamera)
   shaderProgram_For_Model->use();
   shaderProgram_For_Model->setMat4("projection", projection);
   shaderProgram_For_Model->setMat4("view", view);
+  
+  shaderViewCone->use();
+  shaderViewCone->setMat4("projection", projection);
+  shaderViewCone->setMat4("view", view);
 
   shaderAnimatedModel->use();
   shaderAnimatedModel->setMat4("projection", projection);

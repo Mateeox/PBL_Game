@@ -4,6 +4,7 @@
 #include "SceneNode.hpp"
 #include "Collider.hpp"
 #include "ConfigUtils.hpp"
+#include "Component/ConeRenderer.hpp"
 
 const int TICKS_PER_SECOND = 32;
 const int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
@@ -27,6 +28,7 @@ class Game
   Shader *shaderProgram;
   Shader *shaderProgram_For_Model;
   Shader *shaderAnimatedModel;
+  Shader *shaderViewCone;
   std::vector<SceneNode *> sNodes;
   std::vector<SceneNode *> rightNodes;
   std::vector<Collider *> collidableObjects;

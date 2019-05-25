@@ -51,7 +51,8 @@ ShapeRenderer3D::ShapeRenderer3D(
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
 
-	calculateExtrema(g_vertex_buffer_data, g_vertex_buffer_data_size);
+	//g_vertex_buffer_data_size is in bytes
+	calculateExtrema(g_vertex_buffer_data, g_vertex_buffer_data_size / sizeof(decltype(g_vertex_buffer_data_size)));
 }
 
 ShapeRenderer3D::ShapeRenderer3D(
@@ -85,7 +86,8 @@ ShapeRenderer3D::ShapeRenderer3D(
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
 
-	calculateExtrema(g_vertex_buffer_data, g_vertex_buffer_data_size);
+	//g_vertex_buffer_data_size is in bytes
+	calculateExtrema(g_vertex_buffer_data, g_vertex_buffer_data_size / sizeof(decltype(g_vertex_buffer_data_size)));
 }
 
 void ShapeRenderer3D::Draw(glm::mat4 &transform)
@@ -130,17 +132,44 @@ void ShapeRenderer3D::Draw_Arrays()
 
 void ShapeRenderer3D::calculateExtrema(float* vertexBufferData, int size)
 {
+	
+	glm::mat2x3 extremaTmp{
+		vertexBufferData[0], vertexBufferData[0], vertexBufferData[0],
+		vertexBufferData[0], vertexBufferData[0], vertexBufferData[0]
+	};
+	glm::vec3 maxPoint{
+		vertexBufferData[0], vertexBufferData[1], vertexBufferData[2]
+	};
+	glm::vec3 minPoint{
+		vertexBufferData[0], vertexBufferData[1], vertexBufferData[2]
+	};
 	//3 for position, 3 for color and 2 for textures, hence 8
 	for (unsigned int i = 0; i < size; i += 8)
 	{
-		for (unsigned int columns = 0; columns < 3; ++columns)
+		if (vertexBufferData[i] <= minPoint.x && vertexBufferData[i + 1] <= minPoint.y && vertexBufferData[i + 2] <= minPoint.z)
 		{
-			if (vertexBufferData[i + columns] < extrema[0][columns])
-				extrema[0][columns] = vertexBufferData[i + columns];
-			else if (vertexBufferData[i + columns] > extrema[1][columns])
-				extrema[1][columns] = vertexBufferData[i + columns];
+			minPoint.x = vertexBufferData[i];
+			minPoint.y = vertexBufferData[i + 1];
+			minPoint.z = vertexBufferData[i + 2];
+		}
+		else if (vertexBufferData[i] >= minPoint.x && vertexBufferData[i + 1] >= minPoint.y && vertexBufferData[i + 2] >= minPoint.z)
+		{
+			maxPoint.x = vertexBufferData[i];
+			maxPoint.y = vertexBufferData[i + 1];
+			maxPoint.z = vertexBufferData[i + 2];
 		}
 	}
+
+	extrema = {
+		glm::vec4(minPoint.x, minPoint.y, minPoint.z, 1),
+		glm::vec4(minPoint.x, minPoint.y, maxPoint.z, 1),
+		glm::vec4(minPoint.x, maxPoint.y, minPoint.z, 1),
+		glm::vec4(minPoint.x, maxPoint.y, maxPoint.z, 1),
+		glm::vec4(maxPoint.x, minPoint.y, minPoint.z, 1),
+		glm::vec4(maxPoint.x, minPoint.y, maxPoint.z, 1),
+		glm::vec4(maxPoint.x, maxPoint.y, minPoint.z, 1),
+		glm::vec4(maxPoint.x, maxPoint.y, maxPoint.z, 1)
+	};
 }
 
 void ShapeRenderer3D::SwitchTexture(int textureNumber)
@@ -160,9 +189,34 @@ void ShapeRenderer3D::AsignSecondTexture(Texture *aTexture)
  textures.push_back(aTexture);
 }
 
-glm::mat3x2 ShapeRenderer3D::getExtrema()
+std::array<glm::vec4, 8> ShapeRenderer3D::getExtrema()
 {
 	return extrema;
+}
+
+float* ShapeRenderer3D::getVertexData()
+{
+	return g_vertex_buffer_data;
+}
+
+int ShapeRenderer3D::getVertexDataSize()
+{
+	return g_vertex_buffer_data_size / sizeof(decltype(g_vertex_buffer_data_size));
+}
+
+int ShapeRenderer3D::getVerticesPositionStride()
+{
+	return 8;
+}
+
+unsigned int * ShapeRenderer3D::getIndices()
+{
+	return indices;
+}
+
+int ShapeRenderer3D::getIndicesSize()
+{
+	return indices_size / sizeof(decltype(indices_size));
 }
 
 ShapeRenderer3D::~ShapeRenderer3D()

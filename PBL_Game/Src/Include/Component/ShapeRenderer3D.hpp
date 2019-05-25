@@ -2,6 +2,7 @@
 #include "Drawable.hpp"
 #include "Texture.hpp"
 #include <vector>
+#include <array>
 
 class ShapeRenderer3D :public Drawable 
 {
@@ -16,7 +17,7 @@ class ShapeRenderer3D :public Drawable
     void Draw_Arrays();
     unsigned textureNumberDisplayed;
     std::vector<Texture *> textures;
-	glm::mat3x2 extrema;
+	std::array<glm::vec4, 8> extrema;
     
 	void calculateExtrema(float* vertexBufferData, int size);
 
@@ -45,7 +46,12 @@ class ShapeRenderer3D :public Drawable
 		return Drawable::Serialize();
 	}
 
-	glm::mat3x2 getExtrema();
+	std::array<glm::vec4, 8> getExtrema();
+	float* getVertexData();
+	int getVertexDataSize();
+	int getVerticesPositionStride();
+	unsigned int *getIndices();
+	int getIndicesSize();
     ~ShapeRenderer3D();
 
 
