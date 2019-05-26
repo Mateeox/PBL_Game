@@ -13,7 +13,8 @@ enum ComponentType
 	ShapeRenderer3D,
 	Model,
 	AnimatedModel,
-	ConeRenderer
+	ModelMesh,
+	ConeRenderer,
 	MapTile
 };
 

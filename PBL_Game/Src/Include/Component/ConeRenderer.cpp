@@ -198,7 +198,7 @@ void ConeRenderer::collectObjectsInCone(const glm::vec2 &startPoint, const glm::
 							break;
 						}
 						//check middle line (for an object intersecting with the curved area of the cone) 
-						if (areLinesIntersecting(startPoint, glm::vec2(startPoint.x, startPoint.y + radius), pointsAfterTransfomration[i], pointsAfterTransfomration[nextPointIndex]))
+						if (areLinesIntersecting(startPoint, rotatePointAroundPoint(endPointLeft, startPoint, angle / 2.0), pointsAfterTransfomration[i], pointsAfterTransfomration[nextPointIndex]))
 						{
 							objectsInCone.push_back(std::make_pair(shapeRenderer, combinedTransform.GetTransform()));
 							break;
