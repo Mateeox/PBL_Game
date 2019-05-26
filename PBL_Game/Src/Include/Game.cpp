@@ -4,8 +4,7 @@
 #include "Component/Model.hpp"
 #include "Component/AnimatedModel.hpp"
 #include "Shapes.hpp"
-
-#include <MapTileUtils.hpp>
+#include "PathFinding/PathFindingUtils.hpp"
 
 #include <fstream>
 #include <iterator>
@@ -16,7 +15,7 @@ static bool swapButtonPressed = false;
 
 void Game::InitializeConfig()
 {
-
+  MapSize = ConfigUtils::GetValueFromMap<unsigned>("MapSize", ConfigMap);
   WINDOW_WIDTH = ConfigUtils::GetValueFromMap<unsigned>("WINDOW_WIDTH", ConfigMap);
   WINDOW_HEIGHT = ConfigUtils::GetValueFromMap<unsigned>("WINDOW_HEIGHT", ConfigMap);
   movementSpeed = ConfigUtils::GetValueFromMap<float>("PlayerSpeed", ConfigMap);
@@ -24,14 +23,16 @@ void Game::InitializeConfig()
 
 Game::Game(Window &aOkno) : okienko(aOkno),
                             camera(Camera()),
-                            camera2(Camera())
+                            camera2(Camera()),
+                            MapSize(0)                  
 {
-
   LoadConfig();
   InitializeConfig();
 
   glfwSetWindowSize(okienko.window, WINDOW_WIDTH, WINDOW_HEIGHT);
   InitializeConfig();
+
+  grid = make_diagram4(MapSize, MapSize);
 
   shaderProgram = new Shader("Shaders/vertex4.txt", "Shaders/fragment3.txt");
   shaderProgram_For_Model = new Shader("Shaders/vertexModel.txt", "Shaders/fragmentModel.txt");
@@ -43,13 +44,15 @@ Game::Game(Window &aOkno) : okienko(aOkno),
 
 void Game::Granko()
 {
-  Texture *xD = new Texture("Textures/red.png", GL_LINEAR);
-  Texture *TileTexture = new Texture("Textures/Tile.png", GL_LINEAR);
-  Texture *TakenTileTexture = new Texture("Textures/TakenTile.png", GL_LINEAR);
+  Texture *BlockedTileTexture = new Texture("Textures/BlockedTile.png", GL_LINEAR);
+  Texture *FreeTileTexture = new Texture("Textures/FreeTile.png", GL_LINEAR);
+  Texture *SlowerTileTexture = new Texture("Textures/SlowerTile.png", GL_LINEAR);
+  Texture *PathTileTexture = new Texture("Textures/PathTile.png", GL_LINEAR);
 
-  xD->Load();
-  TileTexture->Load();
-  TakenTileTexture->Load();
+  BlockedTileTexture->Load();
+  FreeTileTexture->Load();
+  SlowerTileTexture->Load();
+  PathTileTexture->Load();
 
   SceneNode scena1_new;
   SceneNode FloorNode_new;
@@ -82,28 +85,28 @@ void Game::Granko()
                                                sizeof(Shapes::RainBow_Square),
                                                sizeof(Shapes::RB_Square_indices),
                                                *shaderProgram,
-                                               xD);
+                                               BlockedTileTexture, "Basic");
 
   ShapeRenderer3D *TileRenderer = new ShapeRenderer3D(Shapes::RainBow_Square,
                                                       Shapes::RB_Square_indices,
                                                       sizeof(Shapes::RainBow_Square),
                                                       sizeof(Shapes::RB_Square_indices),
                                                       *shaderProgram,
-                                                      TileTexture);
+                                                      FreeTileTexture, "Basic");
 
   ShapeRenderer3D *trojkat = new ShapeRenderer3D(Shapes::RainBow_Triangle,
                                                  Shapes::RB_Triangle_indices,
                                                  sizeof(Shapes::RainBow_Triangle),
                                                  sizeof(Shapes::RB_Triangle_indices),
                                                  *shaderProgram,
-                                                 xD);
+                                                 BlockedTileTexture, "Basic");
 
   ShapeRenderer3D *szescian = new ShapeRenderer3D(Shapes::RainBow_Cube,
                                                   Shapes::RB_Cube_indices,
                                                   sizeof(Shapes::RainBow_Cube),
                                                   sizeof(Shapes::RB_Cube_indices),
                                                   *shaderProgram,
-                                                  xD);
+                                                  BlockedTileTexture, "Basic");
   ConeRenderer *coneRendererLeft = new ConeRenderer(*shaderViewCone, &sNodes);
 
   leftPlayerObj->AddComponent(coneRendererLeft);
@@ -140,8 +143,7 @@ void Game::Granko()
   box3.AddGameObject(hexObj3);
 
   float floorTransform = ConfigUtils::GetValueFromMap<float>("FloorTranslation", ConfigMap);
-
-  float floorTileScale = ConfigUtils::GetValueFromMap<float>("floorTileScale", ConfigMap);
+  float TileScale = ConfigUtils::GetValueFromMap<float>("TileScale", ConfigMap);
 
   FloorNode_new.Translate(0, floorTransform, 0);
 
@@ -157,7 +159,7 @@ void Game::Granko()
   box2.Translate(5, 0, 0);
  // box2.Scale(1,1,100);
   box3.Translate(-5, 0, 0);
-  FloorNode_new.Scale(floorTileScale, floorTileScale, floorTileScale);
+  FloorNode_new.Scale(TileScale, TileScale, TileScale);
   FloorNode_new.Rotate(90.0f, glm::vec3(1, 0, 0));
 
   //sNodes.push_back(&Enemy_Node);
@@ -168,33 +170,27 @@ void Game::Granko()
   sNodes.push_back(&box2);
   sNodes.push_back(&box3);
 
-  MapTile ***mapOfTiles = MapTileUtils::GetMapInstance(32, 32,
-                                                       TileRenderer,
-                                                       floorTileScale, floorTransform);
+  a_star_search(grid, start, goal, came_from, cost_so_far);
+  draw_grid(grid, 2, nullptr, &came_from);
+  std::cout << '\n';
+  draw_grid(grid, 3, &cost_so_far, nullptr);
+  std::cout << '\n';
+  path = reconstruct_path(start, goal, came_from);
+  draw_grid(grid, 3, nullptr, nullptr, &path);
 
-  for (unsigned x = 0; x < 32; x++)
-  {
-    for (unsigned y = 0; y < 32; y++)
-    {
-		if (mapOfTiles[x][y]->mSceneNode.gameObject != nullptr)
-		{
-			mapOfTiles[x][y]->mSceneNode.gameObject->setTag("floor");
-		}
-		sNodes.push_back(&mapOfTiles[x][y]->mSceneNode);
-    }
-  }
+  AddMapTilesToSceneNodes(mapTiles, sNodes,
+                          grid,
+                          FreeTileTexture,    //Texture 1
+                          PathTileTexture,    //Texture 2
+                          SlowerTileTexture,  //Texture 3
+                          BlockedTileTexture, //Texture 4
+                          *shaderProgram,
+                          path,
+                          TileScale,
+                          floorTransform,
+                          MapSize);
   sNodes.push_back(&leftPlayerNode);
   rightNodes.push_back(&rightPlayerNode);
-
-
-  std::vector<MapTile *>  xDDD = MapTileUtils::FindPath(mapOfTiles,mapOfTiles[16][16],mapOfTiles[0][0],32,32);
-
-  for(auto val : xDDD)
-  {
-    val->mDrawable->AsignSecondTexture(TakenTileTexture);
-    val->ChangeMapTileColor();
-    std::cout<<val->mName <<"\n";
-  }
 
   shaderProgram->use();
 
@@ -243,19 +239,50 @@ void Game::Granko()
 
 void Game::Update(float interpolation)
 {
-  if (leftSideActive)
-  {
-    ProcessInput(interpolation, camera);
-  }
-  else
-  {
-    ProcessInput(interpolation, camera2);
-  }
+	if (!inputBlockade)
+	{
+		if (leftSideActive)
+		{
+			ProcessInput(interpolation, camera);
+		}
+		else
+		{
+			ProcessInput(interpolation, camera2);
+		}
 
-  if (leftSideActive)
-    UpdatePlayer(leftPlayerNode, camera, interpolation);
-  else
-    UpdatePlayer(rightPlayerNode, camera2, interpolation);
+		int x = (100 + (int)leftPlayerNode.local.getPosition().x) / 450;
+		if (x < 0)
+		{
+			x = 0;
+		}
+		if (x >= 40)
+		{
+			x = 39;
+		}
+		int z = (100 + (int)leftPlayerNode.local.getPosition().z) / 450;
+
+		if (z <= 0)
+		{
+			z = 0;
+		}
+
+		if (z > 40)
+		{
+			z = 39;
+		}
+
+		//std::cout << "x: " << x << "  z:" << z << "\n";
+		start.x = x;
+		start.y = z;
+		a_star_search(grid, start, goal, came_from, cost_so_far);
+		path = reconstruct_path(start, goal, came_from);
+		ResetMapTilePath(mapTiles, grid, MapSize, &path);
+
+		if (leftSideActive)
+			UpdatePlayer(leftPlayerNode, camera, interpolation);
+		else
+			UpdatePlayer(rightPlayerNode, camera2, interpolation);
+	}
 }
 
 void Game::Render()
@@ -275,6 +302,11 @@ void Game::Render()
                  &show_demo_window); // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
     ImGui::Text("Q - zmiana strony");
     ImGui::Text("Strzalki - ruch postaci");
+    if (ImGui::Button("Printf Path"))
+    {
+      draw_grid(grid, 3, nullptr, nullptr, &path);
+    }
+
     ImGui::End();
   }
   ImGui::Render();
@@ -313,6 +345,12 @@ void Game::Render()
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT);
 
+
+  // Render grafik
+  Plot();
+
+
+
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
   // Swap buffers
@@ -321,7 +359,7 @@ void Game::Render()
 
 void Game::Serialize()
 {
-  std::map<SceneNode *, unsigned> oidMap;
+  std::map<SceneNode *, unsigned long long> oidMap;
   SerializeFaza1(oidMap);
   std::vector<SceneNode> tempNodes;
   SerializeFaza2(oidMap, tempNodes);
@@ -330,20 +368,20 @@ void Game::Serialize()
   tempNodes.clear();
 }
 
-void Game::SerializeFaza1(std::map<SceneNode *, unsigned> &map)
+void Game::SerializeFaza1(std::map<SceneNode *, unsigned long long> &map)
 {
   this->sNodes[0]->AddChild(this->sNodes[1]);
   this->sNodes[1]->AddParent(this->sNodes[0]);
   for (SceneNode *scene : this->sNodes)
   {
-    unsigned n = map.size() + 1;
-    map.insert(std::pair<SceneNode *, unsigned>(scene, n));
+    unsigned long long n = map.size() + 1;
+    map.insert(std::pair<SceneNode *, unsigned long long>(scene, n));
   }
 }
 
-void Game::SerializeFaza2(std::map<SceneNode *, unsigned> &map, std::vector<SceneNode> &temp)
+void Game::SerializeFaza2(std::map<SceneNode *, unsigned long long> &map, std::vector<SceneNode> &temp)
 {
-  for (std::pair<SceneNode *, unsigned> scene : map)
+  for (std::pair<SceneNode *, unsigned long long> scene : map)
   {
     SceneNode tempNode;
     tempNode.AddParent((SceneNode *)map[scene.first->parent]);
@@ -385,15 +423,15 @@ void Game::SerializeZapisz(std::string serialized)
 void Game::Deserialize(std::string path)
 {
   std::ifstream in(path);
-  std::map<unsigned, SceneNode *> oidMap;
-  unsigned index = 1;
+  std::map<unsigned long long, SceneNode *> oidMap;
+  unsigned long long index = 1;
   std::string line;
   while (std::getline(in, line))
   {
     if (line.substr(0, 2) == "SN")
     {
       SceneNode *node = new SceneNode;
-      oidMap.insert(std::pair<unsigned, SceneNode *>(index, node));
+      oidMap.insert(std::pair<unsigned long long, SceneNode *>(index, node));
       index++;
     }
 
@@ -409,13 +447,13 @@ void Game::Deserialize(std::string path)
 
     if (line.substr(0, 3) == "\tP;")
     {
-      unsigned i_dec = atoi(line.substr(3).c_str());
+      unsigned long long i_dec = atoi(line.substr(3).c_str());
       oidMap[index - 1]->AddParent((SceneNode *)i_dec);
     }
 
     if (line.substr(0, 4) == "\tCH;")
     {
-      unsigned i_dec = atoi(line.substr(4).c_str());
+      unsigned long long i_dec = atoi(line.substr(4).c_str());
       oidMap[index - 1]->AddChild((SceneNode *)i_dec);
     }
 
@@ -440,14 +478,14 @@ void Game::Deserialize(std::string path)
   DeserializeOrderPointers(oidMap);
 }
 
-void Game::DeserializeOrderPointers(std::map<unsigned, SceneNode *> &map)
+void Game::DeserializeOrderPointers(std::map<unsigned long long, SceneNode *> &map)
 {
-  for (std::pair<unsigned, SceneNode *> node : map)
+  for (std::pair<unsigned long long, SceneNode *> node : map)
   {
     if (node.second->parent > 0 && node.second->parent != node.second)
-      node.second->parent = map[(unsigned)std::abs((intptr_t)node.second->parent)];
+      node.second->parent = map[(unsigned long long)std::abs((intptr_t)node.second->parent)];
     for (int i = 0; i < node.second->children.size(); i++)
-      node.second->children[i] = map[(unsigned)std::abs((intptr_t)node.second->children[i])];
+      node.second->children[i] = map[(unsigned long long)std::abs((intptr_t)node.second->children[i])];
     this->sNodes.push_back(node.second);
   }
   map.clear();
@@ -585,14 +623,18 @@ void Game::gatherCollidableObjects(std::vector<SceneNode *> &nodes)
 {
   for (auto node : nodes)
   {
-    if (node->gameObject->getTag() != "player" && node->gameObject->getTag() != "enemy")
+    if (node->gameObject != nullptr)
     {
-      ComponentSystem::Component *possibleCollider = node->gameObject->GetComponent(ComponentSystem::ComponentType::Collider);
-      if (possibleCollider != nullptr)
+
+      if (node->gameObject->getTag() != "player" && node->gameObject->getTag() != "enemy")
       {
-        collidableObjects.push_back((Collider *)possibleCollider);
+        ComponentSystem::Component *possibleCollider = node->gameObject->GetComponent(ComponentSystem::ComponentType::Collider);
+        if (possibleCollider != nullptr)
+        {
+          collidableObjects.push_back((Collider *)possibleCollider);
+        }
+        gatherCollidableObjects(node->children);
       }
-      gatherCollidableObjects(node->children);
     }
   }
 }
@@ -668,4 +710,96 @@ void Game::SetViewAndPerspective(Camera &aCamera)
   shaderAnimatedModel->use();
   shaderAnimatedModel->setMat4("projection", projection);
   shaderAnimatedModel->setMat4("view", view);
+}
+
+// Funkcje do wyswietlania grafik
+void Game::Plot()
+{
+	if (plotNumber == 0)
+	{
+		inputBlockade = false;
+		return;
+	}
+	inputBlockade = true;
+
+	static int imageNumber = 1;
+	static bool keyPressed = false;
+	if (glfwGetKey(okienko.window, GLFW_KEY_ENTER) == GLFW_PRESS && !keyPressed)
+	{
+		imageNumber++;
+		keyPressed = true;
+	}
+	else if (!glfwGetKey(okienko.window, GLFW_KEY_ENTER) == GLFW_PRESS && keyPressed)
+		keyPressed = false;
+
+	switch (plotNumber)
+	{
+		case 1:
+			std::string path = "Textures/1_#.png";
+			
+			path[11] = imageNumber + 48;
+			if (FILE *file = fopen(path.c_str(), "r")) {
+				fclose(file);
+				DisplayImage(path.c_str(), "Napis");
+			}
+			else {
+				imageNumber = 0;
+				plotNumber = 0;
+				
+			}
+
+			break;
+	}
+}
+void Game::DisplayImage(const char *path, const char *text)
+{
+	glViewport(0, 0, Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT);
+	glScissor(0, 0, Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT);
+	glEnable(GL_SCISSOR_TEST);
+	glClearColor(0, 1, 0, 1);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	Texture *imageTex = new Texture(path, GL_NEAREST_MIPMAP_NEAREST);
+	imageTex->Load();
+  
+
+
+
+	SceneNode imageNode;
+	GameObject *imageObj = new GameObject(imageNode.world);
+
+	ShapeRenderer3D *image = new ShapeRenderer3D(
+    Shapes::RainBow_Square,
+		Shapes::RB_Square_indices,
+		sizeof(Shapes::RainBow_Square),
+		sizeof(Shapes::RB_Square_indices),
+		*shaderProgram_For_Model,
+		imageTex, "PlotImage");
+
+	//std::string boxPath = "Models/box/box.obj";
+	//Model *image = new Model(boxPath, *shaderProgram_For_Model, false);
+
+	imageObj->AddComponent(image);
+	imageNode.AddGameObject(imageObj);
+
+	imageNode.Translate(0.0f, 2.4f, 4.0f);
+	imageNode.Rotate(camera.Pitch, glm::vec3(1, 0, 0));
+	imageNode.Scale(12.8f / 2.0f, 7.2f / 2.0f, 1);
+
+	Transform originTransform = Transform::origin();
+	imageNode.Render(originTransform, true);
+
+	
+	/*ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	
+	ImGui::NewFrame();
+	ImGui::SetNextWindowPos(ImVec2(100, 650));
+	ImGui::SetWindowFontScale(5);
+	ImGui::Begin("foobar", NULL, ImVec2(0, 0), 0.0f, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+	ImGui::Text("SAMPLE TEXT");
+
+	ImGui::End();
+	ImGui::Render();
+	*/
 }

@@ -21,14 +21,19 @@
         <Value>25</Value>
     </ConfigParameter>
     <ConfigParameter>
-        <Type>F</Type>
-        <Name>FloorTranslation</Name>
-        <Value>-1.8</Value>
+        <Type>U</Type>
+        <Name>MapSize</Name>
+        <Value>40</Value>
     </ConfigParameter>
         <ConfigParameter>
         <Type>F</Type>
-        <Name>floorTileScale</Name>
-        <Value>3</Value>
+        <Name>TileScale</Name>
+        <Value>4.2</Value>
+    </ConfigParameter>
+    <ConfigParameter>
+        <Type>F</Type>
+        <Name>FloorTranslation</Name>
+        <Value>-1.8</Value>
     </ConfigParameter>
 </Config>
 
