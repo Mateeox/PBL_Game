@@ -2,7 +2,7 @@
 #include <glm/glm.hpp>
 #include <vector>
 #include "../SceneNode.hpp"
-#include "ShapeRenderer3D.hpp"
+#include "../Component/ShapeRenderer3D.hpp"
 #include "Shapes.hpp"
 class MapElement {
 	private:

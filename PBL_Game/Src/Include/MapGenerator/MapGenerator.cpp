@@ -1,4 +1,4 @@
-#include "Component/MapGenerator.hpp"
+#include "MapGenerator.hpp"
 
 MapGenerator::MapGenerator(std::vector<SceneNode*>* nodes, Shader* shaderProgram)
 {
@@ -9,7 +9,8 @@ MapGenerator::MapGenerator(std::vector<SceneNode*>* nodes, Shader* shaderProgram
 	CheckForWalls();
 	CheckForDoors();
 	FinishGeneration();
-	maps.clear();
+	MapConverter conv = MapConverter(&maps);
+	mapped = conv.Convert();
 	positions.clear();
 	this->doors.clear();
 }
@@ -26,9 +27,15 @@ MapGenerator::MapGenerator(std::vector<SceneNode*>* nodes, Shader* shaderProgram
 	CheckForWalls();
 	CheckForDoors();
 	FinishGeneration();
-	maps.clear();
+	MapConverter conv = MapConverter(&maps);
+	mapped = conv.Convert();
 	positions.clear();
 	this->doors.clear();
+}
+
+std::map<MapKey*, MapKey::MapType> MapGenerator::GetConverted()
+{
+	return mapped;
 }
 
 void MapGenerator::GenerateMap(int n)

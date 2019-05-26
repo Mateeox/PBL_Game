@@ -63,7 +63,7 @@ SceneNode* MapElement::AddFloor()
 		sizeof(Shapes::RainBow_Square),
 		sizeof(Shapes::RB_Square_indices),
 		*shader,
-		xD);
+		xD, "Basic");
 	oFloor->AddComponent(Floor);
 	floor->AddGameObject(oFloor);
 	floor->Translate(Position.x, 0, Position.y);
@@ -83,7 +83,7 @@ SceneNode* MapElement::CreateWall(SceneNode* parent, float direction_x, float di
 		sizeof(Shapes::RainBow_Cube),
 		sizeof(Shapes::RB_Cube_indices),
 		*shader,
-		xD);
+		xD, "Basic");
 	wallObj->AddComponent(szescian);
 	wall->AddGameObject(wallObj);
 	wall->Translate(Position.x + direction_x * wall_offset, 0, Position.y + direction_y * wall_offset);
@@ -104,7 +104,7 @@ SceneNode* MapElement::CreateDoor(SceneNode* parent, float direction_x, float di
 		sizeof(Shapes::RainBow_Cube),
 		sizeof(Shapes::RB_Cube_indices),
 		*shader,
-		xD);
+		xD, "Basic");
 	doorObj->AddComponent(szescian);
 	door->AddGameObject(doorObj);
 	door->Translate(Position.x + direction_x * wall_offset, 0, Position.y + direction_y * wall_offset);
@@ -146,6 +146,8 @@ bool MapElement::DoesHaveADoor()
 {
 	if (Doors.x == 1.0f || Doors.y == 1.0f || Doors.z == 1.0f || Doors.w == 1.0f)
 		return true;
+	else
+		return false;
 }
 
 int MapElement::CountDoors()

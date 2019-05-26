@@ -1,8 +1,6 @@
 #pragma once
-#include "MapElement.hpp"
-#include <map>
 #include <time.h>
-
+#include "MapConverter.hpp"
 class MapGenerator //: public Script
 {
 	private:
@@ -10,6 +8,7 @@ class MapGenerator //: public Script
 	std::vector<glm::vec2> positions;
 	std::vector<SceneNode*>* nodes;
 	std::vector<MapElement*> doors;
+	std::map<MapKey*, MapKey::MapType> mapped;
 	Shader* shader;
 
 	int GetDirection();
@@ -33,4 +32,5 @@ class MapGenerator //: public Script
 	bool GlassDoor = false;
 	MapGenerator(std::vector<SceneNode*>* nodes, Shader* shaderProgram);
 	MapGenerator(std::vector<SceneNode*>* nodes, Shader* shaderProgram, int squares, int doors, bool glass_door);
+	std::map<MapKey*, MapKey::MapType> GetConverted();
 };

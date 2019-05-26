@@ -4,7 +4,7 @@
 #include "Component/Model.hpp"
 #include "Component/AnimatedModel.hpp"
 #include "Shapes.hpp"
-#include "Component/MapGenerator.hpp"
+#include "MapGenerator/MapGenerator.hpp"
 #include "PathFinding/PathFindingUtils.hpp"
 
 #include <fstream>
@@ -44,6 +44,7 @@ Game::Game(Window &aOkno) : okienko(aOkno),
 void Game::Granko()
 {
   MapGenerator generator(&sNodes, shaderProgram, 100, 5, false);
+  std::map<MapKey*, MapKey::MapType> mapped = generator.GetConverted();
 
   Texture *xD = new Texture("Textures/red.png", GL_LINEAR);
   xD->Load();
@@ -137,7 +138,7 @@ void Game::Granko()
   float floorTransform = ConfigUtils::GetValueFromMap<float>("FloorTranslation", ConfigMap);
   float TileScale = ConfigUtils::GetValueFromMap<float>("TileScale", ConfigMap);
 
-  FloorNode_new.Translate(0, floorTransform, 0);
+//  FloorNode_new.Translate(0, floorTransform, 0);
 
   leftPlayerNode.Scale(0.01, 0.01, 0.01);
   rightPlayerNode.Scale(0.01, 0.01, 0.01);
