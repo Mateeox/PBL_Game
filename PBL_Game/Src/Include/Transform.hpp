@@ -24,6 +24,7 @@ public:
   Transform();
 
   void ScaleTransform(GLfloat x, GLfloat y, GLfloat z);
+  void SetTransform(glm::mat4 transform);
 
   static Transform origin();
 

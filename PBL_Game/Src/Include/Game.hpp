@@ -27,6 +27,12 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 class Game
 {
 
+  //DebugHelpers
+
+  glm::vec2 vector2DHelper{0,0};
+
+
+  //
   Window &okienko;
   Shader *shaderProgram;
   Shader *shaderProgram_For_Model;
@@ -54,6 +60,8 @@ class Game
 
   SceneNode leftPlayerNode;
   SceneNode rightPlayerNode;
+  SceneNode Enemy_Node; //Rotation + scale
+  SceneNode Enemy_Node_For_Model;
 
   void LoadConfig();
   void InitializeConfig();
@@ -121,6 +129,8 @@ private:
   void SerializeFaza3(std::vector<SceneNode> &temp);
   void SerializeZapisz(std::string serialized);
   void DeserializeOrderPointers(std::map<unsigned long long, SceneNode *> &map);
+
+  void MoveNodeToMapTile(SceneNode * sceneNode,GridLocation mapTile,float interpolation,float speed );
 
   void SetViewAndPerspective(Camera &aCamera);
   void Plot();

@@ -35,7 +35,6 @@ void Transform::ScaleTransform(GLfloat x, GLfloat y, GLfloat z)
 
 void Transform::Translate(glm::vec3 Value)
 {
-
   Position += Value;
   transform = glm::translate(transform, Value);
 }
@@ -51,6 +50,10 @@ void Transform::Rotate(float value, glm::vec3 axis)
   transform = glm::rotate(transform, glm::radians(value), axis);
 }
 
+void Transform::SetTransform(glm::mat4 aTransform)
+{
+	transform = aTransform;
+}
 
 glm::vec3 Transform::getPosition()
 {
