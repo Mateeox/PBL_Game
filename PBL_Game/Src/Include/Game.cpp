@@ -831,24 +831,8 @@ void Game::MoveNodeToMapTile(SceneNode *sceneNode, GridLocation mapTile, float i
   float value = interpolation * speed;
   diffVec *= value;
 
-  float calte_te = glm::angle(Anormalized, Bnormalized)*180;
+  float calte_te = glm::angle(Anormalized, Bnormalized)*180/3.14;
 
-  calte_te = calte_te;
   SceneNode *roationChild = sceneNode->children[0];
-
-  std::cout << calte_te << "\n";
-
-  //if (calte_te > 0.01)
- // {
-   // if (calte_te >= 0.5f)
-  //  {
-      roationChild->Rotate(1, glm::vec3(0, 1, 0));
-   // }
-    //else if (calte_te < 0.5f)
-    //{
-    //  roationChild->Rotate(1, glm::vec3(0, 1, 0));
-  //  }
- // }
-
   sceneNode->Translate(diffVec.x, 0, diffVec.y);
 }
