@@ -62,6 +62,7 @@ add_executable(PBL_Game
 		Src/Include/PathFinding/MapTileRenderUtils.cpp
 	  #Component
 	  Src/Include/Component/ShapeRenderer3D.cpp
+	  Src/Include/Component/ConeRenderer.cpp
 	  Src/Include/Component/Mesh.cpp
 	  Src/Include/Component/Model.cpp
 	  Src/Include/Component/AnimatedModel.cpp

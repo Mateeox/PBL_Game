@@ -9,6 +9,7 @@
 #include <fstream>
 #include <iterator>
 
+
 static bool leftSideActive = true;
 static bool swapButtonPressed = false;
 
@@ -36,6 +37,7 @@ Game::Game(Window &aOkno) : okienko(aOkno),
   shaderProgram = new Shader("Shaders/vertex4.txt", "Shaders/fragment3.txt");
   shaderProgram_For_Model = new Shader("Shaders/vertexModel.txt", "Shaders/fragmentModel.txt");
   shaderAnimatedModel = new Shader("Shaders/skinning.vs", "Shaders/skinning.fs");
+  shaderViewCone = new Shader("Shaders/viewCone.vs", "Shaders/viewCone.fs");
 
   glfwSetCursorPosCallback(okienko.window, mouse_callback);
 }
@@ -105,7 +107,9 @@ void Game::Granko()
                                                   sizeof(Shapes::RB_Cube_indices),
                                                   *shaderProgram,
                                                   BlockedTileTexture, "Basic");
+  ConeRenderer *coneRendererLeft = new ConeRenderer(*shaderViewCone, &sNodes);
 
+  leftPlayerObj->AddComponent(coneRendererLeft);
   leftPlayerObj->AddComponent(BeeModel);
   rightPlayerObj->AddComponent(BeeModel);
   enemyGameObject->AddComponent(animatedModel);
@@ -153,15 +157,14 @@ void Game::Granko()
 
   Enemy_Node.Translate(5, 5, 0);
   box2.Translate(5, 0, 0);
+ // box2.Scale(1,1,100);
   box3.Translate(-5, 0, 0);
   FloorNode_new.Scale(TileScale, TileScale, TileScale);
   FloorNode_new.Rotate(90.0f, glm::vec3(1, 0, 0));
 
-  sNodes.push_back(&Enemy_Node);
-  sNodes.push_back(&leftPlayerNode);
-  rightNodes.push_back(&rightPlayerNode);
+  //sNodes.push_back(&Enemy_Node);
   //sNodes.push_back(&scena1_new);
-  sNodes.push_back(&FloorNode_new);
+  //sNodes.push_back(&FloorNode_new);
 
   //sNodes.push_back(&box1);
   sNodes.push_back(&box2);
@@ -186,6 +189,8 @@ void Game::Granko()
                           TileScale,
                           floorTransform,
                           MapSize);
+  sNodes.push_back(&leftPlayerNode);
+  rightNodes.push_back(&rightPlayerNode);
 
   shaderProgram->use();
 
@@ -197,7 +202,8 @@ void Game::Granko()
   while (glfwGetKey(okienko.window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
          glfwWindowShouldClose(okienko.window) == 0)
   {
-
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     loops = 0;
 
     while ((glfwGetTime() * 1000) > next_game_tick && loops < MAX_FRAMESKIP)
@@ -588,7 +594,7 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation)
 
   glm::vec3 move = movementDir * movementSpeed * interpolation;
   player.Translate(move.x, move.y, move.z);
-  Collider *playerCollider = ((Collider *)player.gameObject->GetComponent(ComponentSystem::ComponentType::Collider));
+  Collider *playerCollider = (Collider *)player.gameObject->GetComponent(ComponentSystem::ComponentType::Collider);
   //check if there are any collisions, if yes - abort the move
   for (Collider *collider : collidableObjects)
   {
@@ -600,6 +606,15 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation)
     }
   }
 
+  //view cone
+  auto coneRenderer = (ConeRenderer*) player.gameObject->GetComponent(ComponentSystem::ComponentType::ConeRenderer);
+  if (coneRenderer != nullptr)
+  {
+	  if (glfwGetKey(okienko.window, GLFW_KEY_LEFT) == GLFW_PRESS)
+		  coneRenderer->rotateLeft();
+	  if (glfwGetKey(okienko.window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+		  coneRenderer->rotateRight();
+  }
   camera.Position.x = player.gameObject->transform.getPosition().x * player.gameObject->transform.getScale().x;
   camera.Position.z = player.gameObject->transform.getPosition().z * player.gameObject->transform.getScale().z + cameraZOffset;
 }
@@ -687,6 +702,10 @@ void Game::SetViewAndPerspective(Camera &aCamera)
   shaderProgram_For_Model->use();
   shaderProgram_For_Model->setMat4("projection", projection);
   shaderProgram_For_Model->setMat4("view", view);
+  
+  shaderViewCone->use();
+  shaderViewCone->setMat4("projection", projection);
+  shaderViewCone->setMat4("view", view);
 
   shaderAnimatedModel->use();
   shaderAnimatedModel->setMat4("projection", projection);

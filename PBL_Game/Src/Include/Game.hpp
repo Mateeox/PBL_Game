@@ -4,6 +4,7 @@
 #include "SceneNode.hpp"
 #include "Collider.hpp"
 #include "ConfigUtils.hpp"
+#include "Component/ConeRenderer.hpp"
 #include "PathFinding/MapTile.hpp"
 #include "PathFinding/MapTileRenderUtils.cpp"
 
@@ -30,6 +31,7 @@ class Game
   Shader *shaderProgram;
   Shader *shaderProgram_For_Model;
   Shader *shaderAnimatedModel;
+  Shader *shaderViewCone;
   std::vector<SceneNode *> sNodes;
   std::vector<SceneNode *> rightNodes;
   

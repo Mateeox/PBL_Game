@@ -3,6 +3,8 @@
 #include "Component/Model.hpp"
 #include "Component/AnimatedModel.hpp"
 #include "PathFinding/MapTile.hpp"
+#include "Component/ConeRenderer.hpp"
+
 SceneNode::SceneNode() : local(Transform::origin()), dirty_flag(true), gameObject(nullptr)
 {
 }
@@ -61,6 +63,13 @@ void SceneNode::Render(Transform &parentWorld, bool aDirty_Flag)
     {
       animModel->Draw(world.GetTransform());
     }
+
+	ConeRenderer *coneRenderer = (ConeRenderer *)gameObject->GetComponent(ComponentSystem::ConeRenderer);
+	if (coneRenderer != nullptr)
+	{
+		coneRenderer->Draw(world.GetTransform());
+	}
+
   }
   for (SceneNode *sn : children)
   {
