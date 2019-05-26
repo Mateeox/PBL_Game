@@ -140,8 +140,10 @@ bool ConeRenderer::findLinesIntersectionPoint(glm::vec2 &intersectionPoint, cons
 	return false;
 }
 
-void ConeRenderer::collectObjectsInCone(const glm::vec2 &startPoint, const glm::vec2 &endPointLeft, const glm::vec2 &endPointRight, std::vector<SceneNode*> *nodes, Transform &transform, double radiusSquared)
+void ConeRenderer::collectObjectsInCone(const glm::vec2 &startPoint, const glm::vec2 &endPointLeft, const glm::vec2 &endPointRight, std::vector<SceneNode*> *nodes, Transform transform, double radiusSquared)
 {
+
+
 	if (radiusSquared < 0)
 	{
 		//if the radius is negative it means it was not given, so we have to calculate it from points

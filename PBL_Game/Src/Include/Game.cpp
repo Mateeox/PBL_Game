@@ -164,7 +164,7 @@ void Game::Granko()
 
 
 Enemy_Node.AddChild(&Enemy_Node_For_Model);
-  //sNodes.push_back(&Enemy_Node);
+sNodes.push_back(&Enemy_Node);
   //sNodes.push_back(&scena1_new);
   //sNodes.push_back(&FloorNode_new);
 

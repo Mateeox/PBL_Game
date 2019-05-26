@@ -26,7 +26,7 @@ public:
   void ScaleTransform(GLfloat x, GLfloat y, GLfloat z);
   void SetTransform(glm::mat4 transform);
 
-  static Transform origin();
+  static  Transform origin();
 
   Transform combine(Transform &other);
   void Translate(glm::vec3 Value);
