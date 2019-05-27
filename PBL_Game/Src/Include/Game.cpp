@@ -6,11 +6,8 @@
 #include "Shapes.hpp"
 #include "PathFinding/PathFindingUtils.hpp"
 
-#include <glm/gtx/vector_angle.hpp>
-
 #include <fstream>
 #include <iterator>
-
 
 static bool leftSideActive = true;
 static bool swapButtonPressed = false;
@@ -157,14 +154,13 @@ void Game::Granko()
 
   Enemy_Node.Translate(5, 5, 0);
   box2.Translate(5, 0, 0);
- // box2.Scale(1,1,100);
+  // box2.Scale(1,1,100);
   box3.Translate(-5, 0, 0);
   FloorNode_new.Scale(TileScale, TileScale, TileScale);
   FloorNode_new.Rotate(90.0f, glm::vec3(1, 0, 0));
 
-
-Enemy_Node.AddChild(&Enemy_Node_For_Model);
-sNodes.push_back(&Enemy_Node);
+  Enemy_Node.AddChild(&Enemy_Node_For_Model);
+  sNodes.push_back(&Enemy_Node);
   //sNodes.push_back(&scena1_new);
   //sNodes.push_back(&FloorNode_new);
 
@@ -204,8 +200,8 @@ sNodes.push_back(&Enemy_Node);
   while (glfwGetKey(okienko.window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
          glfwWindowShouldClose(okienko.window) == 0)
   {
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     loops = 0;
 
     while ((glfwGetTime() * 1000) > next_game_tick && loops < MAX_FRAMESKIP)
@@ -613,13 +609,13 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation)
   }
 
   //view cone
-  auto coneRenderer = (ConeRenderer*) player.gameObject->GetComponent(ComponentSystem::ComponentType::ConeRenderer);
+  auto coneRenderer = (ConeRenderer *)player.gameObject->GetComponent(ComponentSystem::ComponentType::ConeRenderer);
   if (coneRenderer != nullptr)
   {
-	  if (glfwGetKey(okienko.window, GLFW_KEY_LEFT) == GLFW_PRESS)
-		  coneRenderer->rotateLeft();
-	  if (glfwGetKey(okienko.window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-		  coneRenderer->rotateRight();
+    if (glfwGetKey(okienko.window, GLFW_KEY_LEFT) == GLFW_PRESS)
+      coneRenderer->rotateLeft();
+    if (glfwGetKey(okienko.window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+      coneRenderer->rotateRight();
   }
   camera.Position.x = player.gameObject->transform.getPosition().x * player.gameObject->transform.getScale().x;
   camera.Position.z = player.gameObject->transform.getPosition().z * player.gameObject->transform.getScale().z + cameraZOffset;
@@ -708,7 +704,7 @@ void Game::SetViewAndPerspective(Camera &aCamera)
   shaderProgram_For_Model->use();
   shaderProgram_For_Model->setMat4("projection", projection);
   shaderProgram_For_Model->setMat4("view", view);
-  
+
   shaderViewCone->use();
   shaderViewCone->setMat4("projection", projection);
   shaderViewCone->setMat4("view", view);
@@ -810,13 +806,13 @@ void Game::DisplayImage(const char *path, const char *text)
 void Game::MoveNodeToMapTile(SceneNode *sceneNode, GridLocation mapTile, float interpolation, float speed)
 {
   glm::vec2 positionA{sceneNode->local.getPosition().x, sceneNode->local.getPosition().z};
-  glm::vec2 positionB{150 + mapTile.x * 420, 200 + mapTile.y * 420};
+  glm::vec2 positionB{125 + mapTile.x * 420, 150 + mapTile.y * 420};
   glm::vec2 diffVec = positionB - positionA;
-
-  glm::vec2 Anormalized{glm::normalize(positionA)};
-  glm::vec2 Bnormalized{glm::normalize(positionB)};
+  glm::vec3 diffVec3D = {diffVec.x, sceneNode->local.getPosition().y, diffVec.y};
 
   double veclenght = sqrt(diffVec.x * diffVec.x + diffVec.y * diffVec.y);
+  float angle = atan(diffVec3D.y, diffVec3D.x) * 180.0f/3.14f;
+
 
   if (veclenght != 0)
   {
@@ -831,9 +827,9 @@ void Game::MoveNodeToMapTile(SceneNode *sceneNode, GridLocation mapTile, float i
   float value = interpolation * speed;
   diffVec *= value;
 
-  float calte_te = glm::angle(Anormalized, Bnormalized)*180/3.14;
+  std::cout<<angle<<"\n";
 
   SceneNode *roationChild = sceneNode->children[0];
-  roationChild->local.SetRotation(0,90,0);
   sceneNode->Translate(diffVec.x, 0, diffVec.y);
+  roationChild->local.SetRotation(0,angle,0);
 }

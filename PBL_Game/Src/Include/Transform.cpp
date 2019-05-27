@@ -48,7 +48,7 @@ void Transform::Rotate(float value, glm::vec3 axis)
   Rotation.y = fmod(Rotation.y, 360.0f);
   Rotation.z = fmod(Rotation.z, 360.0f);
 
-  transform = glm::rotate(transform, glm::radians(value), axis);\
+  transform = glm::rotate(transform, glm::radians(value), axis);
   Quaterion = glm::toQuat(transform);
 
 }
