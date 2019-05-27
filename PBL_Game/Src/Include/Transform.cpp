@@ -1,5 +1,6 @@
 #include "Transform.hpp"
 #include <iostream>
+#include <glm/gtx/euler_angles.hpp>
 
 Transform::Transform()
 {
@@ -47,8 +48,16 @@ void Transform::Rotate(float value, glm::vec3 axis)
   Rotation.y = fmod(Rotation.y, 360.0f);
   Rotation.z = fmod(Rotation.z, 360.0f);
 
-  transform = glm::rotate(transform, glm::radians(value), axis);
+  transform = glm::rotate(transform, glm::radians(value), axis);\
+  Quaterion = glm::toQuat(transform);
+
 }
+
+ void Transform::SetRotation(float x, float y, float z)
+ {
+	 glm::mat4 rotation = glm::eulerAngleXYZ(x/180*3.14f, y/180*3.14f, z/180*3.14f);
+	 transform = origin().transform*rotation;
+ }
 
 void Transform::SetTransform(glm::mat4 aTransform)
 {

@@ -834,5 +834,6 @@ void Game::MoveNodeToMapTile(SceneNode *sceneNode, GridLocation mapTile, float i
   float calte_te = glm::angle(Anormalized, Bnormalized)*180/3.14;
 
   SceneNode *roationChild = sceneNode->children[0];
+  roationChild->local.SetRotation(0,90,0);
   sceneNode->Translate(diffVec.x, 0, diffVec.y);
 }

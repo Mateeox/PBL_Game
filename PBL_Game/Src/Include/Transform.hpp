@@ -23,8 +23,9 @@ class Transform
 public:
   Transform();
 
-  void ScaleTransform(GLfloat x, GLfloat y, GLfloat z);
+  void ScaleTransform(float x, float y, float z);
   void SetTransform(glm::mat4 transform);
+  void SetRotation(float x, float y, float z);
 
   static  Transform origin();
 
