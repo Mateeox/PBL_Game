@@ -3,7 +3,7 @@
 namespace ConfigUtils
 {
 
-void GetVariantValueAndInsertToMap(tinyxml2::XMLElement *xmlelemnt,std::map<std::string,VariantType> & aConfigMap)
+void GetVariantValueAndInsertToMap(tinyxml2::XMLElement *xmlelemnt,std::unordered_map<std::string,VariantType> & aConfigMap)
 {
   VariantType value;
   std::string elementType = xmlelemnt->FirstChildElement("Type")->GetText();

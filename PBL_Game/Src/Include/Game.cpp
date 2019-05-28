@@ -18,6 +18,15 @@ void Game::InitializeConfig()
   WINDOW_WIDTH = ConfigUtils::GetValueFromMap<unsigned>("WINDOW_WIDTH", ConfigMap);
   WINDOW_HEIGHT = ConfigUtils::GetValueFromMap<unsigned>("WINDOW_HEIGHT", ConfigMap);
   movementSpeed = ConfigUtils::GetValueFromMap<float>("PlayerSpeed", ConfigMap);
+
+   EnemyBaseSpeed = ConfigUtils::GetValueFromMap<float>("EnemyBaseSpeed", ConfigMap);
+   EnemyXoffset = ConfigUtils::GetValueFromMap<float>("EnemyXoffset", ConfigMap);
+   EnemyZoffset = ConfigUtils::GetValueFromMap<float>("EnemyZoffset", ConfigMap);
+
+  floorTransform = ConfigUtils::GetValueFromMap<float>("FloorTranslation", ConfigMap);
+  TileScale = ConfigUtils::GetValueFromMap<float>("TileScale", ConfigMap);
+  TileScaleTimes100 = TileScale*100;
+
 }
 
 Game::Game(Window &aOkno) : okienko(aOkno),
@@ -139,9 +148,6 @@ void Game::Granko()
   box2.AddGameObject(hexObj2);
   box3.AddGameObject(hexObj3);
 
-  float floorTransform = ConfigUtils::GetValueFromMap<float>("FloorTranslation", ConfigMap);
-  float TileScale = ConfigUtils::GetValueFromMap<float>("TileScale", ConfigMap);
-
   FloorNode_new.Translate(0, floorTransform, 0);
 
   leftPlayerNode.Scale(0.01, 0.01, 0.01);
@@ -169,12 +175,7 @@ void Game::Granko()
   sNodes.push_back(&box3);
 
   a_star_search(grid, start, goal, came_from, cost_so_far);
-  draw_grid(grid, 2, nullptr, &came_from);
-  std::cout << '\n';
-  draw_grid(grid, 3, &cost_so_far, nullptr);
-  std::cout << '\n';
   path = reconstruct_path(start, goal, came_from);
-  draw_grid(grid, 3, nullptr, nullptr, &path);
 
   AddMapTilesToSceneNodes(mapTiles, sNodes,
                           grid,
@@ -187,6 +188,7 @@ void Game::Granko()
                           TileScale,
                           floorTransform,
                           MapSize);
+                          
   sNodes.push_back(&leftPlayerNode);
   rightNodes.push_back(&rightPlayerNode);
 
@@ -248,11 +250,11 @@ void Game::Update(float interpolation)
       ProcessInput(interpolation, camera2);
     }
 
-    glm::vec2 start_poz = GetPositionOfset(Enemy_Node, 40, 150, 200, 420); //TODO add to Config
+    glm::vec2 start_poz = GetPositionOfset(Enemy_Node, MapSize, EnemyXoffset, EnemyZoffset, TileScaleTimes100);
     start.x = start_poz.x;
     start.y = start_poz.y;
 
-     glm::vec2 end_poz = GetPositionOfset(leftPlayerNode, 40, 150, 200, 420); //TODO add to Config
+     glm::vec2 end_poz = GetPositionOfset(leftPlayerNode, MapSize, EnemyXoffset, EnemyZoffset, TileScaleTimes100);
     goal.x = end_poz.x;
     goal.y = end_poz.y;
 
@@ -261,7 +263,7 @@ void Game::Update(float interpolation)
     ResetMapTilePath(mapTiles, grid, MapSize, &path);
 
     if (path.size() > 1)
-      MoveNodeToMapTile(&Enemy_Node, path[1], interpolation, 25);
+      MoveNodeToMapTile(&Enemy_Node, path[1], interpolation, EnemyBaseSpeed);  // TODO Add BaseSpeed
 
     if (leftSideActive)
       UpdatePlayer(leftPlayerNode, camera, interpolation);
