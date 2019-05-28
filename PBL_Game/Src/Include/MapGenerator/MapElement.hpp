@@ -32,5 +32,5 @@ class MapElement {
 	SceneNode* CreateWall(SceneNode* parent, Model* model, float direction_x, float direction_y);
 	SceneNode* CreateDoor(SceneNode* parent, Model* model, float direction_x, float direction_y);
 	std::vector<SceneNode*> AddWalls(SceneNode* node, Model* model);
-	std::vector<SceneNode*> MapElement::AddDoors(SceneNode* node, Model* model);
+	std::vector<SceneNode*> AddDoors(SceneNode* node, Model* model);
 };

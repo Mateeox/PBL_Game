@@ -26,7 +26,7 @@ MapGenerator::MapGenerator(std::vector<SceneNode*>* nodes, Shader* shaderProgram
 	this->nodes = nodes;
 	this->shader = shaderProgram;
 	floor = new Model("Models/House/normal_floor.FBX", *shader, false);
-	wall = new Model("simpleDestroyedWall.FBX", *shader, false);
+	wall = new Model("Models/House/simpleDestroyedWall.FBX", *shader, false);
 	door = new Model("Models/House/door.FBX", *shader, false);
 	srand(time(NULL));
 	GenerateMap(squares);
@@ -52,7 +52,7 @@ void MapGenerator::GenerateMap(int n)
 	int elementIteration = 0;
 	for (int i = 0; i < n-1; i++)
 	{
-		MapElement* temp = new MapElement(GetVector2(&elementIteration), elementIteration);
+		MapElement* temp = new MapElement(GetVector2(elementIteration), elementIteration);
 		maps.push_back(temp);
 		positions.push_back(temp->Position);
 		elementIteration = positions.size() - 1;
@@ -118,15 +118,15 @@ void MapGenerator::FinishGeneration()
 	nodes->push_back(mapRoot);
 }
 
-glm::vec2 MapGenerator::GetVector2(int* step)
+glm::vec2 MapGenerator::GetVector2(int step)
 {
 	glm::vec2 pos_add;
-	while (!CheckIfAvailiable(positions[*step] + pos_add)) {
+	while (!CheckIfAvailiable(positions[step] + pos_add)) {
 		int move = GetDirection();
 		switch (move)
 		{
 			default: {
-				*step = maps[*step]->ParentElement;
+				step = maps[step]->ParentElement;
 				break;
 			}
 			case 1: {
@@ -147,7 +147,7 @@ glm::vec2 MapGenerator::GetVector2(int* step)
 			}
 		}
 	}
-	return pos_add + this->positions[*step];
+	return pos_add + this->positions[step];
 }
 
 glm::vec4 MapGenerator::GetVector4(glm::vec2 direction)
