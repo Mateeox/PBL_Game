@@ -14,6 +14,8 @@
 #include <functional>
 #include <cmath>
 
+#include "../SceneNode.hpp"
+
 struct SimpleGraph
 {
   std::unordered_map<char, std::vector<char>> edges;
@@ -333,3 +335,5 @@ cost_so_far.clear();
     }
   }
 }
+
+glm::vec2 GetPositionOfset(SceneNode& node,int maxMapSize,float X_offSet,float Z_offset,float mapScale);

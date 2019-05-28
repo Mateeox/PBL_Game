@@ -248,36 +248,20 @@ void Game::Update(float interpolation)
       ProcessInput(interpolation, camera2);
     }
 
-    int x = (150 + (int)Enemy_Node.local.getPosition().x) / 420;
-    if (x < 0)
-    {
-      x = 0;
-    }
-    if (x >= 40)
-    {
-      x = 39;
-    }
-    int z = (200 + (int)Enemy_Node.local.getPosition().z) / 420;
+    glm::vec2 start_poz = GetPositionOfset(Enemy_Node, 40, 150, 200, 420); //TODO add to Config
+    start.x = start_poz.x;
+    start.y = start_poz.y;
 
-    if (z <= 0)
-    {
-      z = 0;
-    }
+     glm::vec2 end_poz = GetPositionOfset(leftPlayerNode, 40, 150, 200, 420); //TODO add to Config
+    goal.x = end_poz.x;
+    goal.y = end_poz.y;
 
-    if (z > 40)
-    {
-      z = 39;
-    }
-
-    //std::cout << "x: " << x << "  z:" << z << "\n";
-    start.x = x;
-    start.y = z;
     a_star_search(grid, start, goal, came_from, cost_so_far);
     path = reconstruct_path(start, goal, came_from);
     ResetMapTilePath(mapTiles, grid, MapSize, &path);
 
     if (path.size() > 1)
-      MoveNodeToMapTile(&Enemy_Node, path[1], interpolation, 10);
+      MoveNodeToMapTile(&Enemy_Node, path[1], interpolation, 25);
 
     if (leftSideActive)
       UpdatePlayer(leftPlayerNode, camera, interpolation);
@@ -811,8 +795,7 @@ void Game::MoveNodeToMapTile(SceneNode *sceneNode, GridLocation mapTile, float i
   glm::vec3 diffVec3D = {diffVec.x, sceneNode->local.getPosition().y, diffVec.y};
 
   double veclenght = sqrt(diffVec.x * diffVec.x + diffVec.y * diffVec.y);
-  float angle = atan(diffVec3D.y, diffVec3D.x) * 180.0f/3.14f;
-
+  float angle = atan(diffVec3D.y, diffVec3D.x) * 180.0f / 3.14f;
 
   if (veclenght != 0)
   {
@@ -831,5 +814,5 @@ void Game::MoveNodeToMapTile(SceneNode *sceneNode, GridLocation mapTile, float i
 
   SceneNode *roationChild = sceneNode->children[0];
   sceneNode->Translate(diffVec.x, 0, diffVec.y);
-  roationChild->local.SetRotation(0,angle,0);
+  roationChild->local.SetRotation(0, angle, 0);
 }
