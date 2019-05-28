@@ -71,7 +71,7 @@ void Game::Granko()
   GameObject *hexObj2 = new GameObject(box2.local);
   GameObject *hexObj3 = new GameObject(box3.local);
 
-  std::string BeeModelPath = "Models/enemy_model.obj";
+  std::string BeeModelPath = "Models/House/simpleDestroyedWall.FBX.obj";
   std::string AnimatedEnemyPAth = "Models/" + ConfigUtils::GetValueFromMap<std::string>("Enemy_Animated_Model", ConfigMap);
 
   Model *BeeModel = new Model(BeeModelPath, *shaderProgram_For_Model, false);
@@ -827,7 +827,7 @@ void Game::MoveNodeToMapTile(SceneNode *sceneNode, GridLocation mapTile, float i
   float value = interpolation * speed;
   diffVec *= value;
 
-  std::cout<<angle<<"\n";
+  //std::cout<<angle<<"\n";
 
   SceneNode *roationChild = sceneNode->children[0];
   sceneNode->Translate(diffVec.x, 0, diffVec.y);
