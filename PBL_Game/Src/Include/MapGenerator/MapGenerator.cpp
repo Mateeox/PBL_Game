@@ -26,7 +26,7 @@ MapGenerator::MapGenerator(std::vector<SceneNode*>* nodes, Shader* shaderProgram
 	this->nodes = nodes;
 	this->shader = shaderProgram;
 	floor = new Model("Models/House/normal_floor.FBX", *shader, false);
-	wall = new Model("simpleDestroyedWall.FBX", *shader, false);
+	wall = new Model("Models/House/simpleDestroyedWall.FBX", *shader, false);
 	door = new Model("Models/House/door.FBX", *shader, false);
 	srand(time(NULL));
 	GenerateMap(squares);
