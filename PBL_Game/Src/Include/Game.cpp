@@ -71,7 +71,7 @@ void Game::Granko()
   GameObject *hexObj2 = new GameObject(box2.local);
   GameObject *hexObj3 = new GameObject(box3.local);
 
-  std::string BeeModelPath = "Models/House/simpleDestroyedWall.FBX.obj";
+  std::string BeeModelPath = "Models/House/StaticSimpleDestroyedWall.obj";
   std::string AnimatedEnemyPAth = "Models/" + ConfigUtils::GetValueFromMap<std::string>("Enemy_Animated_Model", ConfigMap);
 
   Model *BeeModel = new Model(BeeModelPath, *shaderProgram_For_Model, false);
