@@ -71,37 +71,6 @@ void ResetMapTilePath(std::vector<MapTile *>& mapTiles,
       }
 
     }
-
-//     for (int i = 0; i < aMapSize; i++)
-//     {
-//         for (int j = 0; j < aMapSize; j++)
-//         {
-//             GridLocation id{i, j};
-
-//     //   if (graph.walls.find(id) != graph.walls.end())
-//     //   {
-//     //     mapTiles[j + i * j]->SwitchTexture(MapTileProfiles::Blocked);
-//     //   }
-//     //    else if (path != nullptr && find(path->begin(), path->end(), id) != path->end())
-//     //   {
-//     //     mapTiles[j + i * j]->SwitchTexture(MapTileProfiles::Path);
-//     //   }
-//     //   else
-//     //   {
-//     //     mapTiles[j + i * j]->SwitchTexture(MapTileProfiles::Basic);
-//     //   }
-// //mapTiles[i + i * j]->SwitchTexture(MapTileProfiles::Path);  
-
-//             // if (path != nullptr && find(path->begin(), path->end(), id) != path->end())
-//             // {
-//             //  //   mapTiles[j + i * j]->SwitchTexture(MapTileProfiles::Path);
-//             // }
-//             // else
-//             // {
-//             //   //   mapTiles[j+ i * j]->SwitchTexture(MapTileProfiles::Basic);
-//             // }
-//         }
-//     }
 }
 
 static void AddMapTilesToSceneNodes(std::vector<MapTile *> &mapTiles, std::vector<SceneNode *> &sNodes,
