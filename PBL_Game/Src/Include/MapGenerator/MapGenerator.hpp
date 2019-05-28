@@ -1,6 +1,7 @@
 #pragma once
 #include <time.h>
 #include "MapConverter.hpp"
+
 class MapGenerator //: public Script
 {
 	private:
@@ -10,6 +11,11 @@ class MapGenerator //: public Script
 	std::vector<MapElement*> doors;
 	std::map<MapKey*, MapKey::MapType> mapped;
 	Shader* shader;
+
+	//models
+	Model* floor;
+	Model* wall;
+	Model* door;
 
 	int GetDirection();
 	void CheckForWalls();

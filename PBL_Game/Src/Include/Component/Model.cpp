@@ -10,7 +10,7 @@
 
 unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma = false);
 
-Model::Model(std::string &path, Shader &aShaderProgram, bool gammaCor = false) : Component(nullptr),
+Model::Model(std::string path, Shader &aShaderProgram, bool gammaCor = false) : Component(nullptr),
                                                                                  ShaderProgram(aShaderProgram),
                                                                                  gammaCorrection(gammaCor)
 {
