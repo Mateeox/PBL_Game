@@ -67,12 +67,17 @@ class Game
   void InitializeConfig();
   //How to get value from config
   //ConfigUtils::GetValueFromMap<TYPE>(NAME,ConfigMap) 
-  std::map<std::string,VariantType> ConfigMap;
+  std::unordered_map<std::string,VariantType> ConfigMap;
   
 
-
+  float floorTransform;
+  float TileScale;
+  float TileScaleTimes100;
 
   float movementSpeed; //Move to PlayerData
+  float EnemyBaseSpeed;
+  float EnemyXoffset;
+  float EnemyZoffset;
 
   bool mouseCallBack = true;
   bool firstMouse = true;

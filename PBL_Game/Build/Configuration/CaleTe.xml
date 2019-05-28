@@ -35,6 +35,25 @@
         <Name>FloorTranslation</Name>
         <Value>-1.8</Value>
     </ConfigParameter>
+
+    <ConfigParameter>
+        <Type>F</Type>
+        <Name>EnemyXoffset</Name>
+        <Value>150</Value>
+    </ConfigParameter>
+
+        <ConfigParameter>
+        <Type>F</Type>
+        <Name>EnemyZoffset</Name>
+        <Value>200</Value>
+    </ConfigParameter>
+
+        <ConfigParameter>
+        <Type>F</Type>
+        <Name>EnemyBaseSpeed</Name>
+        <Value>25</Value>
+    </ConfigParameter>
+
 </Config>
 
 <!-- types I - int
