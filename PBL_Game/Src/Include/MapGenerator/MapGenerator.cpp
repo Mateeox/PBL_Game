@@ -4,9 +4,9 @@ MapGenerator::MapGenerator(std::vector<SceneNode*>* nodes, Shader* shaderProgram
 {
 	this->nodes = nodes;
 	this->shader = shaderProgram;
-	floor = new Model("Models/House/normal_floor.FBX", *shader, false);
-	wall = new Model("simpleDestroyedWall.FBX", *shader, false);
-	door = new Model("Models/House/door.FBX", *shader, false);
+	floor = new Model("Models/House/StaticNormal_Floor.obj", *shader, false);
+	wall = new Model("Models/House/StaticSimpleDestroyedWall.obj", *shader, false);
+	door = new Model("Models/House/StaticDoor.obj", *shader, false);
 	srand(time(NULL));
 	GenerateMap(4);
 	CheckForWalls();
@@ -25,9 +25,9 @@ MapGenerator::MapGenerator(std::vector<SceneNode*>* nodes, Shader* shaderProgram
 	this->GlassDoor = glass_doors;
 	this->nodes = nodes;
 	this->shader = shaderProgram;
-	floor = new Model("Models/House/normal_floor.FBX", *shader, false);
-	wall = new Model("Models/House/simpleDestroyedWall.FBX", *shader, false);
-	door = new Model("Models/House/door.FBX", *shader, false);
+	floor = new Model("Models/House/StaticNormal_Floor.obj", *shader, false);
+	wall = new Model("Models/House/StaticSimpleDestroyedWall.obj", *shader, false);
+	door = new Model("Models/House/StaticDoor.obj", *shader, false);
 	srand(time(NULL));
 	GenerateMap(squares);
 	CheckForWalls();

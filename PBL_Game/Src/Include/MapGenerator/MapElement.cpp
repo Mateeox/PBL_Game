@@ -58,8 +58,8 @@ SceneNode* MapElement::AddFloor(Model* model)
 	oFloor->AddComponent(model);
 	floor->AddGameObject(oFloor);
 	floor->Translate(Position.x, 0, Position.y);
-	floor->Rotate(-90.0f, glm::vec3(1, 0, 0));
-	floor->Scale(0.01f, 0.01f, 0.01f);
+	//floor->Rotate(-90.0f, glm::vec3(1, 0, 0));
+	floor->Scale(0.0254f, 0.0254f, 0.0254f);
 	nodes->push_back(floor);
 	return floor;
 }
@@ -71,8 +71,9 @@ SceneNode* MapElement::CreateWall(SceneNode* parent, Model* model, float directi
 	wallObj->AddComponent(model);
 	wall->AddGameObject(wallObj);
 	wall->Translate(Position.x + direction_x * wall_offset, 0, Position.y + direction_y * wall_offset);
-	wall->Rotate(direction_y != 0 ? 90.0f : 0, glm::vec3(0, 1, 0));
-	wall->Scale(0.01f, 0.01f, 0.01f);
+	wall->Rotate(direction_y == 0 ? 90.0f : 0, glm::vec3(0, 1, 0));
+	wall->Scale(0.0254f, 0.0254f, 0.01f);
+	
 	wall->AddParent(parent);
 	return wall;
 }
@@ -84,8 +85,8 @@ SceneNode* MapElement::CreateDoor(SceneNode* parent, Model* model, float directi
 	doorObj->AddComponent(model);
 	door->AddGameObject(doorObj);
 	door->Translate(Position.x + direction_x * wall_offset, 0, Position.y + direction_y * wall_offset);
-	door->Rotate(direction_y != 0 ? -90.0f : 0, glm::vec3(0, 1, 0));
-	door->Scale(0.01f, 0.01f, 0.01f);
+	door->Rotate(direction_y == 0 ? -90.0f : 0, glm::vec3(0, 1, 0));
+	door->Scale(0.0254f, 0.0254f, 0.01f);
 	door->AddParent(parent);
 	return door;
 }
