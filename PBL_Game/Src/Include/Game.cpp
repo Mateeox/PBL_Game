@@ -61,7 +61,6 @@ void Game::Granko()
 
 
   SceneNode scena1_new;
-  SceneNode box1;
   SceneNode box2;
   SceneNode box3;
 
@@ -145,7 +144,6 @@ void Game::Granko()
   leftPlayerNode.Scale(0.01, 0.01, 0.01);
   rightPlayerNode.Scale(0.01, 0.01, 0.01);
   Enemy_Node.Scale(0.01, 0.01, 0.01);
-  box1.Scale(0.1f, 0.6f, 1.0f);
 
   leftPlayerNode.Translate(-150.0, 0, 0);
   rightPlayerNode.Translate(150.0, 0, 0);
@@ -160,18 +158,11 @@ void Game::Granko()
   //sNodes.push_back(&scena1_new);
 
   //sNodes.push_back(&FloorNode_new);
-
-  //sNodes.push_back(&box1);
   sNodes.push_back(&box2);
   sNodes.push_back(&box3);
 
   a_star_search(grid, start, goal, came_from, cost_so_far);
-  draw_grid(grid, 2, nullptr, &came_from);
-  std::cout << '\n';
-  draw_grid(grid, 3, &cost_so_far, nullptr);
-  std::cout << '\n';
   path = reconstruct_path(start, goal, came_from);
-  draw_grid(grid, 3, nullptr, nullptr, &path);
 
   AddMapTilesToSceneNodes(mapTiles, sNodes,
                           grid,
@@ -184,6 +175,7 @@ void Game::Granko()
                           TileScale,
                           floorTransform,
                           MapSize);
+                          
   sNodes.push_back(&leftPlayerNode);
   rightNodes.push_back(&rightPlayerNode);
 
@@ -770,9 +762,6 @@ void Game::DisplayImage(const char *path, const char *text)
       *shaderProgram_For_Model,
       imageTex, "PlotImage");
 
-  //std::string boxPath = "Models/box/box.obj";
-  //Model *image = new Model(boxPath, *shaderProgram_For_Model, false);
-
   imageObj->AddComponent(image);
   imageNode.AddGameObject(imageObj);
 
@@ -783,18 +772,6 @@ void Game::DisplayImage(const char *path, const char *text)
   Transform originTransform = Transform::origin();
   imageNode.Render(originTransform, true);
 
-  /*ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplGlfw_NewFrame();
-	
-	ImGui::NewFrame();
-	ImGui::SetNextWindowPos(ImVec2(100, 650));
-	ImGui::SetWindowFontScale(5);
-	ImGui::Begin("foobar", NULL, ImVec2(0, 0), 0.0f, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
-	ImGui::Text("SAMPLE TEXT");
-
-	ImGui::End();
-	ImGui::Render();
-	*/
 }
 
 void Game::MoveNodeToMapTile(SceneNode *sceneNode, GridLocation mapTile, float interpolation, float speed)
@@ -821,7 +798,7 @@ void Game::MoveNodeToMapTile(SceneNode *sceneNode, GridLocation mapTile, float i
   float value = interpolation * speed;
   diffVec *= value;
 
-  std::cout<<angle<<"\n";
+ // std::cout<<angle<<"\n";
 
   SceneNode *roationChild = sceneNode->children[0];
   sceneNode->Translate(diffVec.x, 0, diffVec.y);
