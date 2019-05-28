@@ -4,6 +4,7 @@
 #include "Component/Model.hpp"
 #include "Component/AnimatedModel.hpp"
 #include "Shapes.hpp"
+#include "MapGenerator/MapGenerator.hpp"
 #include "PathFinding/PathFindingUtils.hpp"
 
 #include <fstream>
@@ -52,6 +53,11 @@ Game::Game(Window &aOkno) : okienko(aOkno),
 
 void Game::Granko()
 {
+  MapGenerator generator(&sNodes, shaderProgram, 100, 5, false);
+  std::map<MapKey*, MapKey::MapType> mapped = generator.GetConverted();
+
+  Texture *xD = new Texture("Textures/red.png", GL_LINEAR);
+  xD->Load();
   Texture *BlockedTileTexture = new Texture("Textures/BlockedTile.png", GL_LINEAR);
   Texture *FreeTileTexture = new Texture("Textures/FreeTile.png", GL_LINEAR);
   Texture *SlowerTileTexture = new Texture("Textures/SlowerTile.png", GL_LINEAR);
@@ -62,9 +68,8 @@ void Game::Granko()
   SlowerTileTexture->Load();
   PathTileTexture->Load();
 
+
   SceneNode scena1_new;
-  SceneNode FloorNode_new;
-  SceneNode box1;
   SceneNode box2;
   SceneNode box3;
 
@@ -76,7 +81,7 @@ void Game::Granko()
   rightPlayerObj->setTag("player");
 
   GameObject *trojObj = new GameObject(scena1_new.world);
-  GameObject *FloorObj = new GameObject(FloorNode_new.world);
+
   GameObject *hexObj2 = new GameObject(box2.local);
   GameObject *hexObj3 = new GameObject(box3.local);
 
@@ -86,12 +91,6 @@ void Game::Granko()
   Model *BeeModel = new Model(BeeModelPath, *shaderProgram_For_Model, false);
   AnimatedModel *animatedModel = new AnimatedModel(AnimatedEnemyPAth, *shaderAnimatedModel, false);
 
-  ShapeRenderer3D *Floor = new ShapeRenderer3D(Shapes::RainBow_Square,
-                                               Shapes::RB_Square_indices,
-                                               sizeof(Shapes::RainBow_Square),
-                                               sizeof(Shapes::RB_Square_indices),
-                                               *shaderProgram,
-                                               BlockedTileTexture, "Basic");
 
   ShapeRenderer3D *TileRenderer = new ShapeRenderer3D(Shapes::RainBow_Square,
                                                       Shapes::RB_Square_indices,
@@ -121,7 +120,6 @@ void Game::Granko()
   enemyGameObject->AddComponent(animatedModel);
 
   trojObj->AddComponent(trojkat);
-  FloorObj->AddComponent(Floor);
   hexObj2->AddComponent(szescian);
   hexObj3->AddComponent(szescian);
 
@@ -144,16 +142,18 @@ void Game::Granko()
 
   Enemy_Node_For_Model.AddGameObject(enemyGameObject);
   scena1_new.AddGameObject(trojObj);
-  FloorNode_new.AddGameObject(FloorObj);
   box2.AddGameObject(hexObj2);
   box3.AddGameObject(hexObj3);
 
-  FloorNode_new.Translate(0, floorTransform, 0);
+  float floorTransform = ConfigUtils::GetValueFromMap<float>("FloorTranslation", ConfigMap);
+  float TileScale = ConfigUtils::GetValueFromMap<float>("TileScale", ConfigMap);
+
+//  FloorNode_new.Translate(0, floorTransform, 0);
+
 
   leftPlayerNode.Scale(0.01, 0.01, 0.01);
   rightPlayerNode.Scale(0.01, 0.01, 0.01);
   Enemy_Node.Scale(0.01, 0.01, 0.01);
-  box1.Scale(0.1f, 0.6f, 1.0f);
 
   leftPlayerNode.Translate(-150.0, 0, 0);
   rightPlayerNode.Translate(150.0, 0, 0);
@@ -162,15 +162,12 @@ void Game::Granko()
   box2.Translate(5, 0, 0);
   // box2.Scale(1,1,100);
   box3.Translate(-5, 0, 0);
-  FloorNode_new.Scale(TileScale, TileScale, TileScale);
-  FloorNode_new.Rotate(90.0f, glm::vec3(1, 0, 0));
 
   Enemy_Node.AddChild(&Enemy_Node_For_Model);
   sNodes.push_back(&Enemy_Node);
   //sNodes.push_back(&scena1_new);
-  //sNodes.push_back(&FloorNode_new);
 
-  //sNodes.push_back(&box1);
+  //sNodes.push_back(&FloorNode_new);
   sNodes.push_back(&box2);
   sNodes.push_back(&box3);
 
@@ -222,12 +219,11 @@ void Game::Granko()
   }
 
   delete trojObj;
-  delete FloorObj;
   delete hexObj2;
   delete hexObj3;
 
   delete trojkat;
-  delete Floor;
+  //delete Floor;
   delete szescian;
 
   ImGui_ImplOpenGL3_Shutdown();
@@ -358,9 +354,7 @@ void Game::Serialize()
 
 void Game::SerializeFaza1(std::map<SceneNode *, unsigned long long> &map)
 {
-  this->sNodes[0]->AddChild(this->sNodes[1]);
-  this->sNodes[1]->AddParent(this->sNodes[0]);
-  for (SceneNode *scene : this->sNodes)
+  for (SceneNode* scene : this->sNodes)
   {
     unsigned long long n = map.size() + 1;
     map.insert(std::pair<SceneNode *, unsigned long long>(scene, n));
@@ -762,9 +756,6 @@ void Game::DisplayImage(const char *path, const char *text)
       *shaderProgram_For_Model,
       imageTex, "PlotImage");
 
-  //std::string boxPath = "Models/box/box.obj";
-  //Model *image = new Model(boxPath, *shaderProgram_For_Model, false);
-
   imageObj->AddComponent(image);
   imageNode.AddGameObject(imageObj);
 
@@ -775,18 +766,6 @@ void Game::DisplayImage(const char *path, const char *text)
   Transform originTransform = Transform::origin();
   imageNode.Render(originTransform, true);
 
-  /*ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplGlfw_NewFrame();
-	
-	ImGui::NewFrame();
-	ImGui::SetNextWindowPos(ImVec2(100, 650));
-	ImGui::SetWindowFontScale(5);
-	ImGui::Begin("foobar", NULL, ImVec2(0, 0), 0.0f, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
-	ImGui::Text("SAMPLE TEXT");
-
-	ImGui::End();
-	ImGui::Render();
-	*/
 }
 
 void Game::MoveNodeToMapTile(SceneNode *sceneNode, GridLocation mapTile, float interpolation, float speed)
@@ -811,8 +790,6 @@ void Game::MoveNodeToMapTile(SceneNode *sceneNode, GridLocation mapTile, float i
   vector2DHelper = glm::vec2(positionB.x, positionB.y);
   float value = interpolation * speed;
   diffVec *= value;
-
-  //std::cout<<angle<<"\n";
 
   SceneNode *roationChild = sceneNode->children[0];
   sceneNode->Translate(diffVec.x, 0, diffVec.y);
