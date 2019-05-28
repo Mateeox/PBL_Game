@@ -44,7 +44,7 @@ Game::Game(Window &aOkno) : okienko(aOkno),
 
 void Game::Granko()
 {
-  MapGenerator generator(&sNodes, shaderProgram, 2, 0, false);
+  MapGenerator generator(&sNodes, shaderProgram, 100, 5, false);
   std::map<MapKey*, MapKey::MapType> mapped = generator.GetConverted();
 
   Texture *xD = new Texture("Textures/red.png", GL_LINEAR);
@@ -76,7 +76,7 @@ void Game::Granko()
   GameObject *hexObj2 = new GameObject(box2.local);
   GameObject *hexObj3 = new GameObject(box3.local);
 
-  std::string BeeModelPath = "Models/enemy_model.obj";
+  std::string BeeModelPath = "Models/House/simpleDestroyedWall.FBX.obj";
   std::string AnimatedEnemyPAth = "Models/" + ConfigUtils::GetValueFromMap<std::string>("Enemy_Animated_Model", ConfigMap);
 
   Model *BeeModel = new Model(BeeModelPath, *shaderProgram_For_Model, false);
@@ -797,8 +797,6 @@ void Game::MoveNodeToMapTile(SceneNode *sceneNode, GridLocation mapTile, float i
   vector2DHelper = glm::vec2(positionB.x, positionB.y);
   float value = interpolation * speed;
   diffVec *= value;
-
- // std::cout<<angle<<"\n";
 
   SceneNode *roationChild = sceneNode->children[0];
   sceneNode->Translate(diffVec.x, 0, diffVec.y);
