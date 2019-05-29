@@ -1,6 +1,6 @@
 #include "MapGenerator.hpp"
 
-MapGenerator::MapGenerator(Shader* shaderProgram)
+MapGenerator::MapGenerator(Shader *shaderProgram)
 {
 	this->shader = shaderProgram;
 	floor = new Model("Models/House/StaticNormal_Floor.obj", *shader, false);
@@ -17,7 +17,7 @@ MapGenerator::MapGenerator(Shader* shaderProgram)
 	this->doors.clear();
 }
 
-MapGenerator::MapGenerator(Shader* shaderProgram, int squares, int doors, bool glass_doors)
+MapGenerator::MapGenerator(Shader *shaderProgram, int squares, int doors, bool glass_doors)
 {
 	this->Squares = squares;
 	this->Doors = doors;
@@ -30,27 +30,50 @@ MapGenerator::MapGenerator(Shader* shaderProgram, int squares, int doors, bool g
 	GenerateMap(squares);
 	CheckForWalls();
 	CheckForDoors();
+
+	TransformToPositive();
 	FinishGeneration();
 	MapConverter conv = MapConverter(&maps);
+
 	mapped = conv.Convert();
+
+	int max = 0;
+	for (auto element : mapped)
+	{
+		if (element.first->x > max)
+			max = element.first->x;
+		if (element.first->y > max)
+			max = element.first->y;
+	}
+	maxSize = max;
+	FillWithNull(max);
+
+	std::cout << "Mapped size: " << mapped.size() << "   max: " << max << "\n";
+
+	for (auto elemnt : mapped)
+	{
+
+		std::cout <<elemnt.first->x<<" "<<elemnt.first->y<<"\n";
+	}
+
 	positions.clear();
 	this->doors.clear();
 }
 
-std::map<MapKey*, MapKey::MapType> MapGenerator::GetConverted()
+std::map<MapKey *, MapKey::MapType> MapGenerator::GetConverted()
 {
 	return mapped;
 }
 
 void MapGenerator::GenerateMap(int n)
 {
-	MapElement* element = new MapElement(glm::vec2(0, 0),nodes);
+	MapElement *element = new MapElement(glm::vec2(0, 0), nodes);
 	maps.push_back(element);
 	positions.push_back(element->Position);
 	int elementIteration = 0;
-	for (int i = 0; i < n-1; i++)
+	for (int i = 0; i < n - 1; i++)
 	{
-		MapElement* temp = new MapElement(GetVector2(elementIteration),nodes,elementIteration);
+		MapElement *temp = new MapElement(GetVector2(elementIteration), nodes, elementIteration);
 		maps.push_back(temp);
 		positions.push_back(temp->Position);
 		elementIteration = positions.size() - 1;
@@ -61,7 +84,7 @@ void MapGenerator::CheckForWalls()
 {
 	for (int i = 0; i < maps.size(); i++)
 	{
-		MapElement* it = maps[i];
+		MapElement *it = maps[i];
 		std::vector<glm::vec2> neighbours = it->GetNeighbours();
 		for (int j = 0; j < neighbours.size(); j++)
 		{
@@ -75,26 +98,31 @@ void MapGenerator::CheckForDoors()
 {
 	for (int i = 0; i < maps.size(); i++)
 	{
-		MapElement* element = maps[i];
+		MapElement *element = maps[i];
 		glm::vec4 walls = element->Walls;
 		bool flag_door = false;
-		if (walls.x == 1.0f && walls.z == 1.0f) {
+		if (walls.x == 1.0f && walls.z == 1.0f)
+		{
 			flag_door = true;
-			if (walls.y == 0) {
+			if (walls.y == 0)
+			{
 				element->SetDoor(glm::vec4(0, 1.0f, 0, 0));
 			}
-			if (walls.w == 0) {
+			if (walls.w == 0)
+			{
 				element->SetDoor(glm::vec4(0, 0, 0, 1.0f));
 			}
 		}
 
-		if(element->Walls.y == 1.0f && element->Walls.w == 1.0f)
+		if (element->Walls.y == 1.0f && element->Walls.w == 1.0f)
 		{
 			flag_door = true;
-			if (walls.x == 0) {
+			if (walls.x == 0)
+			{
 				element->SetDoor(glm::vec4(1.0f, 0, 0, 0));
 			}
-			if (walls.z == 0) {
+			if (walls.z == 0)
+			{
 				element->SetDoor(glm::vec4(0, 0, 1.0f, 0));
 			}
 		}
@@ -108,7 +136,7 @@ void MapGenerator::CheckForDoors()
 
 void MapGenerator::FinishGeneration()
 {
-	SceneNode* mapRoot = new SceneNode();
+	SceneNode *mapRoot = new SceneNode();
 	for (int i = 0; i < maps.size(); i++)
 	{
 		mapRoot->AddChild(maps[i]->GenerateNode(nodes, mapRoot, floor, wall, door));
@@ -119,30 +147,36 @@ void MapGenerator::FinishGeneration()
 glm::vec2 MapGenerator::GetVector2(int step)
 {
 	glm::vec2 pos_add;
-	while (!CheckIfAvailiable(positions[step] + pos_add)) {
+	while (!CheckIfAvailiable(positions[step] + pos_add))
+	{
 		int move = GetDirection();
 		switch (move)
 		{
-			default: {
-				step = maps[step]->ParentElement;
-				break;
-			}
-			case 1: {
-				pos_add = glm::vec2(0, 1.0f);
-				break;
-			}
-			case 2: {
-				pos_add = glm::vec2(1.0f, 0);
-				break;
-			}
-			case 3: {
-				pos_add = glm::vec2(0, -1.0f);
-				break;
-			}
-			case 4: {
-				pos_add = glm::vec2(-1.0f, 0);
-				break;
-			}
+		default:
+		{
+			step = maps[step]->ParentElement;
+			break;
+		}
+		case 1:
+		{
+			pos_add = glm::vec2(0, 1.0f);
+			break;
+		}
+		case 2:
+		{
+			pos_add = glm::vec2(1.0f, 0);
+			break;
+		}
+		case 3:
+		{
+			pos_add = glm::vec2(0, -1.0f);
+			break;
+		}
+		case 4:
+		{
+			pos_add = glm::vec2(-1.0f, 0);
+			break;
+		}
 		}
 	}
 	return pos_add + this->positions[step];
@@ -152,30 +186,30 @@ glm::vec4 MapGenerator::GetVector4(glm::vec2 direction)
 {
 	switch ((int)direction.x)
 	{
-		case 1:
-		{
-			return glm::vec4(0, 0, 0, 1.0f);
-		}
-		case -1:
-		{
-			return  glm::vec4(0, 1.0f, 0, 0);
-		}
+	case 1:
+	{
+		return glm::vec4(0, 0, 0, 1.0f);
+	}
+	case -1:
+	{
+		return glm::vec4(0, 1.0f, 0, 0);
+	}
 	}
 
 	switch ((int)direction.y)
 	{
-		case 1:
-		{
-			return glm::vec4(0, 0, 1.0f, 0);
-		}
-		case -1:
-		{
-			return glm::vec4(1.0f, 0, 0, 0);
-		}
+	case 1:
+	{
+		return glm::vec4(0, 0, 1.0f, 0);
+	}
+	case -1:
+	{
+		return glm::vec4(1.0f, 0, 0, 0);
+	}
 	}
 }
 
-MapElement * MapGenerator::GetElement(glm::vec2 pos)
+MapElement *MapGenerator::GetElement(glm::vec2 pos)
 {
 	for (int i = 0; i < maps.size(); i++)
 	{
@@ -197,16 +231,17 @@ bool MapGenerator::CheckIfAvailiable(glm::vec2 pos)
 
 void MapGenerator::ValidateDoors()
 {
-	for (std::vector<MapElement*>::iterator door = doors.begin(); door != doors.end(); door++)
+	for (std::vector<MapElement *>::iterator door = doors.begin(); door != doors.end(); door++)
 	{
-		MapElement* element = *door;
-		if (element->DoesHaveADoor()) {
+		MapElement *element = *door;
+		if (element->DoesHaveADoor())
+		{
 			std::vector<glm::vec2> neighbours = element->GetNeighbours();
 			for (int j = 0; j < neighbours.size(); j++)
 			{
-				for (std::vector<MapElement*>::iterator it = doors.begin(); it != doors.end(); it++)
+				for (std::vector<MapElement *>::iterator it = doors.begin(); it != doors.end(); it++)
 				{
-					MapElement* neighbour = *it;
+					MapElement *neighbour = *it;
 					if (neighbour->Position == neighbours[j] && neighbour->DoesHaveADoor())
 						neighbour->RemoveDoor(element->Doors);
 				}
@@ -217,10 +252,10 @@ void MapGenerator::ValidateDoors()
 
 void MapGenerator::ClearDoors()
 {
-	std::vector<MapElement*>::iterator it = doors.begin();
+	std::vector<MapElement *>::iterator it = doors.begin();
 	do
 	{
-		MapElement* temp = *it;
+		MapElement *temp = *it;
 		if (!temp->DoesHaveADoor())
 			it = doors.erase(it);
 		else
@@ -231,9 +266,9 @@ void MapGenerator::ClearDoors()
 int MapGenerator::CountDoors()
 {
 	int count = 0;
-	for (std::vector<MapElement*>::iterator door = doors.begin(); door != doors.end(); door++)
+	for (std::vector<MapElement *>::iterator door = doors.begin(); door != doors.end(); door++)
 	{
-		MapElement* el = *door;
+		MapElement *el = *door;
 		count += el->CountDoors();
 	}
 	return count;
@@ -246,11 +281,13 @@ void MapGenerator::PickDoors()
 	{
 		int index = GetRandomIndex(doors.size());
 		int count = doors[index]->CountDoors();
-		if (doorsCount - count >= Doors) {
+		if (doorsCount - count >= Doors)
+		{
 			doors[index]->CleanDoors();
 			doorsCount -= count;
 		}
-		else {
+		else
+		{
 			doors[index]->RemoveDoor(GetRandomIndex(1));
 			doorsCount--;
 		}
@@ -265,4 +302,44 @@ int MapGenerator::GetDirection()
 int MapGenerator::GetRandomIndex(int max)
 {
 	return (rand() % max);
+}
+
+void MapGenerator::FillWithNull(int max)
+{
+	for (int i = 0; i < max; i++)
+	{
+		for (int j = 0; j < max; j++)
+		{
+			MapKey *mapkey = new MapKey(i, j);
+
+			if (mapped.find(mapkey) == mapped.end())
+			{
+				mapped.insert(std::pair<MapKey *, MapKey::MapType>(mapkey, MapKey::MapType::Null));
+			}
+		}
+	}
+}
+
+void MapGenerator::TransformToPositive()
+{
+
+	int minX = 0;
+	int minY = 0;
+
+	for (auto pos : positions)
+	{
+		if (pos.x < minX)
+			minX = pos.x;
+		if (pos.y < minY)
+			minY = pos.y;
+	}
+
+	if (minX <= 0 && minY <= 0)
+	{
+		for (auto &pos : positions)
+		{
+			pos.x += abs(minX);
+			pos.y += abs(minY);
+		}
+	}
 }

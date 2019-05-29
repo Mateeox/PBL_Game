@@ -31,13 +31,16 @@ class MapGenerator //: public Script
 	glm::vec4 GetVector4(glm::vec2 direction);
 	MapElement* GetElement(glm::vec2 pos);
 	int GetRandomIndex(int max);
+	void FillWithNull(int max );
 
 	public:
 	int Squares = 1;
 	int Doors = 0;
+	int maxSize;
 	bool GlassDoor = false;
 	std::vector<SceneNode*> nodes;
 	MapGenerator(Shader* shaderProgram);
 	MapGenerator(Shader* shaderProgram, int squares, int doors, bool glass_door);
+	void TransformToPositive();
 	std::map<MapKey*, MapKey::MapType> GetConverted();
 };
