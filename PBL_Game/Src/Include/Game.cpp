@@ -175,8 +175,6 @@ void Game::Granko()
                           floorTransform,
                           MapSize);
 
-  sNodes.push_back(&leftPlayerNode);
-  rightNodes.push_back(&rightPlayerNode);
 
   for (auto &node : generator.nodes)
   {
@@ -189,6 +187,9 @@ void Game::Granko()
   int loops;
   float interpolation = 1.0;
 
+
+  sNodes.push_back(&leftPlayerNode);
+  rightNodes.push_back(&rightPlayerNode);
   gatherCollidableObjects(sNodes);
   while (glfwGetKey(okienko.window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
          glfwWindowShouldClose(okienko.window) == 0)

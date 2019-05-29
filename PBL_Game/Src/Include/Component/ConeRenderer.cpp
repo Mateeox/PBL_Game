@@ -6,8 +6,8 @@ ConeRenderer::ConeRenderer(Shader &shaderProgram, std::vector<SceneNode*> *nodes
 	Drawable(shaderProgram), nodes(nodes)
 {
 	anglePerSegment = angle / segmentsNumber;
-	finalVertices.reserve(segmentsNumber + 2);
-	finalVertices.push_back(0);
+	const int pointsInfinalVerticesNum = (segmentsNumber + 2) * 3;
+	finalVertices.reserve(pointsInfinalVerticesNum);
 
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
@@ -16,6 +16,10 @@ ConeRenderer::ConeRenderer(Shader &shaderProgram, std::vector<SceneNode*> *nodes
 	glBindVertexArray(VAO);
 	//bind buffer
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+	glBufferData(GL_ARRAY_BUFFER, pointsInfinalVerticesNum * sizeof(float), finalVertices.data(), GL_DYNAMIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+	glEnableVertexAttribArray(0);
 }
 
 ComponentSystem::ComponentType ConeRenderer::GetComponentType()
@@ -72,10 +76,10 @@ void ConeRenderer::Draw(glm::mat4 &transform)
 	addToFinalVertices(right);
 
 
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, finalVertices.size() * sizeof(float), finalVertices.data());
+
 	glBindVertexArray(VAO);
-	glBufferData(GL_ARRAY_BUFFER, finalVertices.size() * sizeof(float), &finalVertices.front(), GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
-	glEnableVertexAttribArray(0);
 	glDrawArrays(GL_TRIANGLE_FAN, 0, finalVertices.size() / 3);
 }
 
