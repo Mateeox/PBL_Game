@@ -57,13 +57,13 @@
     <ConfigParameter>
         <Type>F</Type>
         <Name>PlayerXOffset</Name>
-        <Value>40</Value>
+        <Value>0</Value>
     </ConfigParameter>
 
     <ConfigParameter>
         <Type>F</Type>
         <Name>PlayerZOffset</Name>
-        <Value>40</Value>
+        <Value>0</Value>
     </ConfigParameter>
 
 </Config>

@@ -241,7 +241,7 @@ void Game::Update(float interpolation)
     start.y = start_poz.y;
 
 
-    glm::vec2 end_poz = GetPositionOfset(leftPlayerNode, MapSize, 0, 0, TileScaleTimes100);
+    glm::vec2 end_poz = GetPositionOfset(leftPlayerNode, MapSize, PlayerXOffset, PlayerZOffset, TileScaleTimes100);
     goal.x = end_poz.x;
     goal.y = end_poz.y;
 
