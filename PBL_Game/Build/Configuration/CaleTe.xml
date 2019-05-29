@@ -28,30 +28,30 @@
         <ConfigParameter>
         <Type>F</Type>
         <Name>TileScale</Name>
-        <Value>4.2</Value>
+        <Value>1</Value>
     </ConfigParameter>
     <ConfigParameter>
         <Type>F</Type>
         <Name>FloorTranslation</Name>
-        <Value>-1.8</Value>
+        <Value>0.1</Value>
     </ConfigParameter>
 
     <ConfigParameter>
         <Type>F</Type>
         <Name>EnemyXoffset</Name>
-        <Value>150</Value>
+        <Value>0</Value>
     </ConfigParameter>
 
         <ConfigParameter>
         <Type>F</Type>
         <Name>EnemyZoffset</Name>
-        <Value>200</Value>
+        <Value>0</Value>
     </ConfigParameter>
 
         <ConfigParameter>
         <Type>F</Type>
         <Name>EnemyBaseSpeed</Name>
-        <Value>25</Value>
+        <Value>5</Value>
     </ConfigParameter>
 
 </Config>

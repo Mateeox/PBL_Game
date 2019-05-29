@@ -783,7 +783,7 @@ void Game::DisplayImage(const char *path, const char *text)
 void Game::MoveNodeToMapTile(SceneNode *sceneNode, GridLocation mapTile, float interpolation, float speed)
 {
   glm::vec2 positionA{sceneNode->local.getPosition().x, sceneNode->local.getPosition().z};
-  glm::vec2 positionB{125 + mapTile.x * 420, 150 + mapTile.y * 420};
+  glm::vec2 positionB{ mapTile.x * 100, mapTile.y * 100};
   glm::vec2 diffVec = positionB - positionA;
   glm::vec3 diffVec3D = {diffVec.x, sceneNode->local.getPosition().y, diffVec.y};
 
@@ -805,5 +805,5 @@ void Game::MoveNodeToMapTile(SceneNode *sceneNode, GridLocation mapTile, float i
 
   SceneNode *roationChild = sceneNode->children[0];
   sceneNode->Translate(diffVec.x, 0, diffVec.y);
-  roationChild->local.SetRotation(0, angle, 0);
+  //roationChild->local.SetRotation(0, angle, 0);
 }
