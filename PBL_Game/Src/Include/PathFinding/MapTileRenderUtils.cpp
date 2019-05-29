@@ -3,7 +3,6 @@
 static void AddMapTilesToSceneNodes(std::vector<MapTile *>& mapTiles,std::vector<SceneNode *> &sNodes, GridWithWeights &grid,
                              Texture *FreeTileTexture, Texture *PathTileTexture, Texture *SlowerTileTexture, Texture *BlockedTileTexture,
                              Shader &shaderProgram,
-                              std::vector<GridLocation> &path,
                               const float MapScale,
                               const float floorTransform,
                               const float MapSize)
@@ -14,7 +13,7 @@ static void AddMapTilesToSceneNodes(std::vector<MapTile *>& mapTiles,std::vector
                  PathTileTexture,
                  SlowerTileTexture,
                  BlockedTileTexture,
-                 shaderProgram, &path);
+                 shaderProgram);
 
   for (auto xd : mapTiles)
   {

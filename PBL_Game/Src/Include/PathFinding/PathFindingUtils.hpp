@@ -16,6 +16,7 @@
 #include <map>
 #include "MapGenerator/MapGenerator.hpp"
 #include "../SceneNode.hpp"
+#include "MapTile.hpp"
 
 struct SimpleGraph
 {
@@ -258,8 +259,6 @@ for(int i = 0; i < map.size(); i++)
   
 }
 
-
-
   // //add_rect(grid, 1, 7, 4, 9);
   // typedef GridLocation L;
   // grid.forests = std::unordered_set<GridLocation> {
@@ -375,3 +374,5 @@ cost_so_far.clear();
 }
 
 glm::vec2 GetPositionOfset(SceneNode& node,int maxMapSize,float X_offSet,float Z_offset,float mapScale);
+
+glm::vec2 FindFirstEmptyFloor(std::vector<MapKey*>& map);

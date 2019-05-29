@@ -50,7 +50,6 @@ class Game
   GridWithWeights grid;
   unsigned MapSize;
 
-  
 
   GridLocation start{0, 0};
   GridLocation goal{8, 5};
@@ -97,6 +96,7 @@ class Game
   bool show_demo_window = true;
   bool printf_path = false;
 
+
   //
   int offset = 125; // Jak bardzo maja sie roznic rozmiary kamery, szerokosc aktywnej to pol okna + offset, szerokosc nieaktywnej to pol okna - offset
 
@@ -129,6 +129,12 @@ public:
   void gatherCollidableObjects(std::vector<SceneNode *> &nodes);
   std::vector<GameObject*> findByTag(const std::vector<SceneNode*>& data, std::string tag);
   GameObject * findByTagSingle(const std::vector<SceneNode*>& data, std::string tag);
+
+  //Impgui
+  void ImGuiFunctions();
+  void ImguiStartEndDraw();
+  void ImguiDrawData();
+  void ImguiClear();
 
 private:
   void SerializeFaza1(std::map<SceneNode *,unsigned long long> &map);

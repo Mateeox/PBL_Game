@@ -39,13 +39,13 @@
     <ConfigParameter>
         <Type>F</Type>
         <Name>EnemyXoffset</Name>
-        <Value>5</Value>
+        <Value>3</Value>
     </ConfigParameter>
 
         <ConfigParameter>
         <Type>F</Type>
         <Name>EnemyZoffset</Name>
-        <Value>7</Value>
+        <Value>5</Value>
     </ConfigParameter>
 
         <ConfigParameter>

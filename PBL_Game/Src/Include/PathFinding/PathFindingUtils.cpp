@@ -38,3 +38,15 @@ glm::vec2 GetPositionOfset(SceneNode& node,int maxMapSize,float X_offSet,float Z
     return glm::vec2(x,z);
   
 }
+
+glm::vec2 FindFirstEmptyFloor(std::vector<MapKey*>& map)
+{
+  for(auto pair : map)
+  {
+    if(pair->type == MapType::Floor)
+    {
+      std::cout<<"x:"<<pair->x<<"y:"<<pair->y<<"\n";
+     return glm::vec2(pair->x,pair->y);
+    }
+  }
+}

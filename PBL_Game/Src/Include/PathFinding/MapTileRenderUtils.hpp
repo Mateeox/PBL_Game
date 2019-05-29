@@ -12,8 +12,7 @@ void AssignMapTiles(std::vector<MapTile *> &mapTiles, const Graph &graph, int aM
                     Texture *pathTex,
                     Texture *SlowerTex,
                     Texture *BlocedTex,
-                    Shader &aShaderProgram,
-                    std::vector<GridLocation> *path = nullptr)
+                    Shader &aShaderProgram)
 {
     for (int i = 0; i < aMapSize; i++)
     {
@@ -30,11 +29,6 @@ void AssignMapTiles(std::vector<MapTile *> &mapTiles, const Graph &graph, int aM
             if (graph.walls.find(id) != graph.walls.end())
             {
                 mapTile->SwitchTexture(MapTileProfiles::Blocked);
-            }
-
-            if (path != nullptr && find(path->begin(), path->end(), id) != path->end())
-            {
-                mapTile->SwitchTexture(MapTileProfiles::Path);
             }
 
             mapTiles.push_back(mapTile);
@@ -80,5 +74,4 @@ static void AddMapTilesToSceneNodes(std::vector<MapTile *> &mapTiles, std::vecto
                                     Texture *SlowerTileTexture,
                                     Texture *BlockedTileTexture,
                                     Shader &shaderProgram,
-                                    std::vector<GridLocation> &path,
                                     const float MapScale, const float floorTransform);

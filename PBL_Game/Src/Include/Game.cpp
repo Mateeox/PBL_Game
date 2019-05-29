@@ -19,14 +19,13 @@ void Game::InitializeConfig()
   WINDOW_HEIGHT = ConfigUtils::GetValueFromMap<unsigned>("WINDOW_HEIGHT", ConfigMap);
   movementSpeed = ConfigUtils::GetValueFromMap<float>("PlayerSpeed", ConfigMap);
 
-   EnemyBaseSpeed = ConfigUtils::GetValueFromMap<float>("EnemyBaseSpeed", ConfigMap);
-   EnemyXoffset = ConfigUtils::GetValueFromMap<float>("EnemyXoffset", ConfigMap);
-   EnemyZoffset = ConfigUtils::GetValueFromMap<float>("EnemyZoffset", ConfigMap);
+  EnemyBaseSpeed = ConfigUtils::GetValueFromMap<float>("EnemyBaseSpeed", ConfigMap);
+  EnemyXoffset = ConfigUtils::GetValueFromMap<float>("EnemyXoffset", ConfigMap);
+  EnemyZoffset = ConfigUtils::GetValueFromMap<float>("EnemyZoffset", ConfigMap);
 
   floorTransform = ConfigUtils::GetValueFromMap<float>("FloorTranslation", ConfigMap);
   TileScale = ConfigUtils::GetValueFromMap<float>("TileScale", ConfigMap);
-  TileScaleTimes100 = TileScale*100;
-
+  TileScaleTimes100 = TileScale * 100;
 }
 
 Game::Game(Window &aOkno) : okienko(aOkno),
@@ -52,13 +51,11 @@ Game::Game(Window &aOkno) : okienko(aOkno),
 
 void Game::Granko()
 {
-  MapGenerator generator(shaderProgram, 10, 0, false);
-  std::vector<MapKey*> mapped = generator.GetConverted();
+  MapGenerator generator(shaderProgram, 100, 0, false);
+  std::vector<MapKey *> mapped = generator.GetConverted();
 
-   MapSize = generator.maxSize;
-   grid = make_diagramFromGeneratedMap(mapped,MapSize);
-
-   
+  MapSize = generator.maxSize;
+  grid = make_diagramFromGeneratedMap(mapped, MapSize);
 
   Texture *xD = new Texture("Textures/red.png", GL_LINEAR);
   xD->Load();
@@ -72,8 +69,6 @@ void Game::Granko()
   SlowerTileTexture->Load();
   PathTileTexture->Load();
 
-
-  SceneNode scena1_new;
   SceneNode box2;
   SceneNode box3;
 
@@ -84,8 +79,6 @@ void Game::Granko()
   GameObject *rightPlayerObj = new GameObject(rightPlayerNode.local);
   rightPlayerObj->setTag("player");
 
-  GameObject *trojObj = new GameObject(scena1_new.world);
-
   GameObject *hexObj2 = new GameObject(box2.local);
   GameObject *hexObj3 = new GameObject(box3.local);
 
@@ -95,20 +88,12 @@ void Game::Granko()
   Model *BeeModel = new Model(BeeModelPath, *shaderProgram_For_Model, false);
   AnimatedModel *animatedModel = new AnimatedModel(AnimatedEnemyPAth, *shaderAnimatedModel, false);
 
-
   ShapeRenderer3D *TileRenderer = new ShapeRenderer3D(Shapes::RainBow_Square,
                                                       Shapes::RB_Square_indices,
                                                       sizeof(Shapes::RainBow_Square),
                                                       sizeof(Shapes::RB_Square_indices),
                                                       *shaderProgram,
                                                       FreeTileTexture, "Basic");
-
-  ShapeRenderer3D *trojkat = new ShapeRenderer3D(Shapes::RainBow_Triangle,
-                                                 Shapes::RB_Triangle_indices,
-                                                 sizeof(Shapes::RainBow_Triangle),
-                                                 sizeof(Shapes::RB_Triangle_indices),
-                                                 *shaderProgram,
-                                                 BlockedTileTexture, "Basic");
 
   ShapeRenderer3D *szescian = new ShapeRenderer3D(Shapes::RainBow_Cube,
                                                   Shapes::RB_Cube_indices,
@@ -123,7 +108,6 @@ void Game::Granko()
   rightPlayerObj->AddComponent(BeeModel);
   enemyGameObject->AddComponent(animatedModel);
 
-  trojObj->AddComponent(trojkat);
   hexObj2->AddComponent(szescian);
   hexObj3->AddComponent(szescian);
 
@@ -145,15 +129,13 @@ void Game::Granko()
   hexObj3->AddComponent(box3Collider);
 
   Enemy_Node_For_Model.AddGameObject(enemyGameObject);
-  scena1_new.AddGameObject(trojObj);
   box2.AddGameObject(hexObj2);
   box3.AddGameObject(hexObj3);
 
   float floorTransform = ConfigUtils::GetValueFromMap<float>("FloorTranslation", ConfigMap);
   float TileScale = ConfigUtils::GetValueFromMap<float>("TileScale", ConfigMap);
 
-//  FloorNode_new.Translate(0, floorTransform, 0);
-
+  //  FloorNode_new.Translate(0, floorTransform, 0);
 
   leftPlayerNode.Scale(0.01, 0.01, 0.01);
   rightPlayerNode.Scale(0.01, 0.01, 0.01);
@@ -169,14 +151,18 @@ void Game::Granko()
 
   Enemy_Node.AddChild(&Enemy_Node_For_Model);
   sNodes.push_back(&Enemy_Node);
-  //sNodes.push_back(&scena1_new);
 
   //sNodes.push_back(&FloorNode_new);
   sNodes.push_back(&box2);
   sNodes.push_back(&box3);
 
-  a_star_search(grid, start, goal, came_from, cost_so_far);
-  path = reconstruct_path(start, goal, came_from);
+  glm::vec2 startLocation = FindFirstEmptyFloor(mapped);
+  std::cout << "First Free Tile:" << startLocation.x << startLocation.y << "\n";
+  start.x = startLocation.x;
+  start.y = startLocation.y;
+
+  Enemy_Node.Translate(start.x * 100, 0, start.y * 100);
+  leftPlayerNode.Translate(start.x * 100, 0, start.y * 100);
 
   AddMapTilesToSceneNodes(mapTiles, sNodes,
                           grid,
@@ -185,21 +171,17 @@ void Game::Granko()
                           SlowerTileTexture,  //Texture 3
                           BlockedTileTexture, //Texture 4
                           *shaderProgram,
-                          path,
                           TileScale,
                           floorTransform,
                           MapSize);
-                          
+
   sNodes.push_back(&leftPlayerNode);
   rightNodes.push_back(&rightPlayerNode);
 
-
-  for(auto& node: generator.nodes)
+  for (auto &node : generator.nodes)
   {
     sNodes.push_back(node);
   }
-
-
 
   shaderProgram->use();
 
@@ -230,17 +212,11 @@ void Game::Granko()
     Render();
   }
 
-  delete trojObj;
   delete hexObj2;
   delete hexObj3;
-
-  delete trojkat;
-  //delete Floor;
   delete szescian;
 
-  ImGui_ImplOpenGL3_Shutdown();
-  ImGui_ImplGlfw_Shutdown();
-  ImGui::DestroyContext();
+  ImguiClear();
   glDeleteProgram(shaderProgram->shaderProgramID);
   glfwTerminate();
 }
@@ -262,16 +238,14 @@ void Game::Update(float interpolation)
     start.x = start_poz.x;
     start.y = start_poz.y;
 
-     glm::vec2 end_poz = GetPositionOfset(leftPlayerNode, MapSize, EnemyXoffset, EnemyZoffset, TileScaleTimes100);
+    glm::vec2 end_poz = GetPositionOfset(leftPlayerNode, MapSize, EnemyXoffset, EnemyZoffset, TileScaleTimes100);
     goal.x = end_poz.x;
     goal.y = end_poz.y;
 
-    a_star_search(grid, start, goal, came_from, cost_so_far);
-    path = reconstruct_path(start, goal, came_from);
     ResetMapTilePath(mapTiles, grid, MapSize, &path);
 
     if (path.size() > 1)
-      MoveNodeToMapTile(&Enemy_Node, path[1], interpolation, EnemyBaseSpeed, EnemyXoffset, EnemyZoffset);  // TODO Add BaseSpeed
+      MoveNodeToMapTile(&Enemy_Node, path[1], interpolation, EnemyBaseSpeed, EnemyXoffset, EnemyZoffset); // TODO Add BaseSpeed
 
     if (leftSideActive)
       UpdatePlayer(leftPlayerNode, camera, interpolation);
@@ -287,30 +261,7 @@ void Game::Render()
   glEnable(GL_SCISSOR_TEST);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  ImGui_ImplOpenGL3_NewFrame();
-  ImGui_ImplGlfw_NewFrame();
-  ImGui::NewFrame();
-
-  if (show_demo_window)
-  {
-    ImGui::Begin("Klawiszologia",
-                 &show_demo_window); // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-    ImGui::Text("Q - zmiana strony");
-    ImGui::Text("Strzalki - ruch postaci");
-    
-    if (path.size() > 1)
-      ImGui::Text("Next MapTile ID = %i, %i", path[1].x, path[1].y);
-    ImGui::Text("Vector to move = %f, %f", vector2DHelper.x, vector2DHelper.y);
-    ImGui::Text("Enemy position = %f, %f", vector2DHelper2.x, vector2DHelper2.y);
-    ImGui::Text("Player position = %f, %f", leftPlayerNode.local.getPosition().x, leftPlayerNode.local.getPosition().z);
-    if (ImGui::Button("Printf Path"))
-    {
-      draw_grid(grid, 3, nullptr, nullptr, &path);
-    }
-
-    ImGui::End();
-  }
-  ImGui::Render();
+  ImguiStartEndDraw();
 
   Transform originTransform = Transform::origin();
 
@@ -349,7 +300,7 @@ void Game::Render()
   // Render grafik
   Plot();
 
-  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+  ImguiDrawData();
 
   // Swap buffers
   glfwSwapBuffers(okienko.window);
@@ -368,7 +319,7 @@ void Game::Serialize()
 
 void Game::SerializeFaza1(std::map<SceneNode *, unsigned long long> &map)
 {
-  for (SceneNode* scene : this->sNodes)
+  for (SceneNode *scene : this->sNodes)
   {
     unsigned long long n = map.size() + 1;
     map.insert(std::pair<SceneNode *, unsigned long long>(scene, n));
@@ -779,13 +730,12 @@ void Game::DisplayImage(const char *path, const char *text)
 
   Transform originTransform = Transform::origin();
   imageNode.Render(originTransform, true);
-
 }
 
-void Game::MoveNodeToMapTile(SceneNode *sceneNode, GridLocation mapTile, float interpolation, float speed,float NodeXOffset,float NodeZOffset)
+void Game::MoveNodeToMapTile(SceneNode *sceneNode, GridLocation mapTile, float interpolation, float speed, float NodeXOffset, float NodeZOffset)
 {
   glm::vec2 positionA{sceneNode->local.getPosition().x, sceneNode->local.getPosition().z};
-  glm::vec2 positionB{NodeXOffset + mapTile.x * 100,NodeZOffset + mapTile.y * 100};
+  glm::vec2 positionB{NodeXOffset + mapTile.x * 100, NodeZOffset + mapTile.y * 100};
   glm::vec2 diffVec = positionB - positionA;
   glm::vec3 diffVec3D = {diffVec.x, sceneNode->local.getPosition().y, diffVec.y};
 
@@ -810,3 +760,53 @@ void Game::MoveNodeToMapTile(SceneNode *sceneNode, GridLocation mapTile, float i
   sceneNode->Translate(diffVec.x, 0, diffVec.y);
   //roationChild->local.SetRotation(0, angle, 0);
 }
+
+void Game::ImguiDrawData()
+{
+  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+void Game::ImguiStartEndDraw()
+{
+  ImGui_ImplOpenGL3_NewFrame();
+  ImGui_ImplGlfw_NewFrame();
+  ImGui::NewFrame();
+  ImGuiFunctions();
+  ImGui::Render();
+}
+void Game::ImGuiFunctions()
+{
+
+  if (show_demo_window)
+  {
+    ImGui::Begin("Klawiszologia",
+                 &show_demo_window); // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+    ImGui::Text("Q - zmiana strony");
+    ImGui::Text("Strzalki - ruch postaci");
+
+    if (path.size() > 1)
+      ImGui::Text("Next MapTile ID = %i, %i", path[1].x, path[1].y);
+    ImGui::Text("Vector to move = %f, %f", vector2DHelper.x, vector2DHelper.y);
+    ImGui::Text("Enemy position = %f, %f", vector2DHelper2.x, vector2DHelper2.y);
+    ImGui::Text("Player position = %f, %f", leftPlayerNode.local.getPosition().x, leftPlayerNode.local.getPosition().z);
+    if (ImGui::Button("Printf Path"))
+    {
+      draw_grid(grid, 3, nullptr, nullptr, &path);
+    }
+
+    if (ImGui::Button("Update Path and use A_Star_Search"))
+    {
+      a_star_search(grid, start, goal, came_from, cost_so_far);
+      path = reconstruct_path(start, goal, came_from);
+    }
+
+    ImGui::End();
+  }
+}
+void Game::ImguiClear()
+{
+  ImGui_ImplOpenGL3_Shutdown();
+  ImGui_ImplGlfw_Shutdown();
+  ImGui::DestroyContext();
+}
+ 
