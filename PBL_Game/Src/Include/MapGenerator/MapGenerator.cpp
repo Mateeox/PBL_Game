@@ -11,7 +11,7 @@ MapGenerator::MapGenerator(Shader *shaderProgram)
 	CheckForWalls();
 	CheckForDoors();
 	FinishGeneration();
-	MapConverter conv = MapConverter(maps.begin(), maps.end());
+	MapConverter conv = MapConverter(&maps);
 	mapped = conv.Convert();
 	positions.clear();
 	this->doors.clear();
@@ -33,17 +33,17 @@ MapGenerator::MapGenerator(Shader *shaderProgram, int squares, int doors, bool g
 
 	TransformToPositive();
 	FinishGeneration();
-	MapConverter conv = MapConverter(maps.begin(), maps.end());
+	MapConverter conv = MapConverter(&maps);
 
 	mapped = conv.Convert();
 
 	int max = 0;
-	for (std::pair<MapKey, MapType> element : mapped)
+	for (MapKey* element : mapped)
 	{
-		if (element.first.x > max)
-			max = element.first.x;
-		if (element.first.y > max)
-			max = element.first.y;
+		if (element->x > max)
+			max = element->x;
+		if (element->y > max)
+			max = element->y;
 	}
 	maxSize = max;
 	FillWithNull(max);
@@ -53,7 +53,7 @@ MapGenerator::MapGenerator(Shader *shaderProgram, int squares, int doors, bool g
 	this->doors.clear();
 }
 
-std::map<MapKey, MapType> MapGenerator::GetConverted()
+std::vector<MapKey*> MapGenerator::GetConverted()
 {
 	return mapped;
 }
@@ -303,11 +303,9 @@ void MapGenerator::FillWithNull(int max)
 	{
 		for (int j = 0; j < max; j++)
 		{
-			MapKey mapkey = { i, j };
-
-			if (mapped.at(mapkey) == NULL)
+			if (CheckIfNull(i, j))
 			{
-				mapped.insert(std::pair<MapKey, MapType>(mapkey, MapType::Null));
+				mapped.push_back(new MapKey(i, j, MapType::Null));
 			}
 		}
 	}
@@ -335,4 +333,14 @@ void MapGenerator::TransformToPositive()
 			pos->Position.y += abs(minY);
 		}
 	}
+}
+
+bool MapGenerator::CheckIfNull(int x, int y)
+{
+	for (int i = 0; i < mapped.size(); i++)
+	{
+		if (mapped[i]->x == x && mapped[i]->y == y)
+			return false;
+	}
+	return true;
 }

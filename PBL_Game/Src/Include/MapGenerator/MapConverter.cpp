@@ -1,18 +1,16 @@
 #include "MapConverter.hpp"
 
-MapConverter::MapConverter(std::vector<MapElement*>::iterator begin, std::vector<MapElement*>::iterator end)
+MapConverter::MapConverter(std::vector<MapElement*>* elements)
 {
-	this->begin = begin;
-	this->end = end;
+	this->elements = elements;
 }
 
-std::map<MapKey, MapType> MapConverter::Convert()
+std::vector<MapKey*> MapConverter::Convert()
 {
-	for (std::vector<MapElement*>::iterator it = begin; it != end; it++)
+	for (int i = 0; i < elements->size(); i++)
 	{
-		MapElement* element = *it;
-		MapKey key = { element->Position.x, element->Position.y };
-		MapType type;
+		MapElement* element = elements->at(i);
+		MapType type = MapType::Null;
 
 		//Check what type of this element is
 
@@ -25,8 +23,8 @@ std::map<MapKey, MapType> MapConverter::Convert()
 		//Adding walls if not exist yet
 		
 		CheckWalls(element);
-
-		mapped.insert(std::pair<MapKey, MapType>(key, type));
+		MapKey* key = new MapKey(element->Position.x, element->Position.y, type);
+		mapped.push_back(key);
 	}
 	return mapped;
 }
@@ -50,7 +48,18 @@ void MapConverter::CheckWalls(MapElement* element)
 
 void MapConverter::AddWall(glm::vec2 pos)
 {
-	MapKey key = { pos.x, pos.y };
-	if (mapped.find(key) == mapped.end())
-		mapped.insert(std::pair<MapKey, MapType>(key, MapType::Wall));
+	if (!CheckIfExists(pos)) {
+		MapKey* key = new MapKey(pos.x, pos.y, MapType::Wall);
+		mapped.push_back(key);
+	}
+}
+
+bool MapConverter::CheckIfExists(glm::vec2 pos)
+{
+	for (int i = 0; i < mapped.size(); i++)
+	{
+		if (pos.x == mapped.at(i)->x && pos.y == mapped.at(i)->y)
+			return true;
+	}
+	return false;
 }

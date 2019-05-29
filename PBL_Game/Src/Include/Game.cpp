@@ -53,7 +53,7 @@ Game::Game(Window &aOkno) : okienko(aOkno),
 void Game::Granko()
 {
   MapGenerator generator(shaderProgram, 10, 0, false);
-  std::map<MapKey, MapType> mapped = generator.GetConverted();
+  std::vector<MapKey*> mapped = generator.GetConverted();
 
    MapSize = generator.maxSize;
    grid = make_diagramFromGeneratedMap(mapped,MapSize);

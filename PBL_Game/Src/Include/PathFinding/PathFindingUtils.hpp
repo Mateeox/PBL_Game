@@ -244,16 +244,16 @@ static GridWithWeights make_diagram4(int size_x,int size_y)
 }
 
 
-static GridWithWeights make_diagramFromGeneratedMap(std::map<MapKey, MapType>& map,int size)
+static GridWithWeights make_diagramFromGeneratedMap(std::vector<MapKey*>& map,int size)
 {
   GridWithWeights grid(size, size);
 
-for(std::map<MapKey, MapType>::iterator it = map.begin(); it != map.end(); it++)
+for(int i = 0; i < map.size(); i++)
 {
-  std::pair<MapKey, MapType> pair = *it;
-  if(pair.second == MapType::Null || pair.second == MapType::Wall)
+  MapKey* pair = map[i];
+  if(pair->type == MapType::Null || pair->type == MapType::Wall)
   {
-    add_Wall(grid,pair.first.x,pair.first.y);
+    add_Wall(grid, pair->x, pair->y);
   }
   
 }

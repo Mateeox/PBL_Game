@@ -1,14 +1,4 @@
 #pragma once
-
-struct MapKey {
-	int x;
-	int y;
-
-	inline bool operator<(const MapKey& a) const {
-		return (x < a.x && y < a.y) || (x < a.x && y > a.y);
-	}
-};
-
 enum MapType {
 	Null,
 	Floor,
@@ -16,4 +6,13 @@ enum MapType {
 	Blocked, //this is for floors with at least one door
 	Box,
 	Slower
+};
+
+class MapKey {
+	public:
+		int x;
+		int y;
+		MapType type;
+		MapKey(int x, int y);
+		MapKey(int x, int y, MapType type);
 };

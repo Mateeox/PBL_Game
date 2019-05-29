@@ -5,12 +5,12 @@
 
 class MapConverter {
 	private:
-		std::vector<MapElement*>::iterator begin;
-		std::vector<MapElement*>::iterator end;
-		std::map<MapKey, MapType> mapped;
+		std::vector<MapElement*>* elements;
+		std::vector<MapKey*> mapped;
 		void CheckWalls(MapElement* element);
 		void AddWall(glm::vec2 pos);
+		bool CheckIfExists(glm::vec2 pos);
 	public:
-		MapConverter(std::vector<MapElement*>::iterator begin, std::vector<MapElement*>::iterator end);
-		std::map<MapKey, MapType> Convert();
+		MapConverter(std::vector<MapElement*>* elements);
+		std::vector<MapKey*> Convert();
 };
