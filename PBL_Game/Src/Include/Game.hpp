@@ -30,7 +30,7 @@ class Game
   //DebugHelpers
 
   glm::vec2 vector2DHelper{0,0};
-
+  glm::vec2 vector2DHelper2{0,0};
 
   //
   Window &okienko;
@@ -137,7 +137,7 @@ private:
   void SerializeZapisz(std::string serialized);
   void DeserializeOrderPointers(std::map<unsigned long long, SceneNode *> &map);
 
-  void MoveNodeToMapTile(SceneNode * sceneNode,GridLocation mapTile,float interpolation,float speed );
+  void MoveNodeToMapTile(SceneNode * sceneNode,GridLocation mapTile,float interpolation,float speed,float NodeXOffset,float NodeZOffset);
 
   void SetViewAndPerspective(Camera &aCamera);
   void Plot();

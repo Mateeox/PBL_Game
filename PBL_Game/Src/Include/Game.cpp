@@ -272,7 +272,7 @@ void Game::Update(float interpolation)
     ResetMapTilePath(mapTiles, grid, MapSize, &path);
 
     if (path.size() > 1)
-      MoveNodeToMapTile(&Enemy_Node, path[1], interpolation, EnemyBaseSpeed);  // TODO Add BaseSpeed
+      MoveNodeToMapTile(&Enemy_Node, path[1], interpolation, EnemyBaseSpeed, EnemyXoffset, EnemyZoffset);  // TODO Add BaseSpeed
 
     if (leftSideActive)
       UpdatePlayer(leftPlayerNode, camera, interpolation);
@@ -298,10 +298,12 @@ void Game::Render()
                  &show_demo_window); // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
     ImGui::Text("Q - zmiana strony");
     ImGui::Text("Strzalki - ruch postaci");
-    ImGui::Text("Position = %f, %f", leftPlayerNode.local.getPosition().x, leftPlayerNode.local.getPosition().z);
+    
     if (path.size() > 1)
       ImGui::Text("Next MapTile ID = %i, %i", path[1].x, path[1].y);
     ImGui::Text("Vector to move = %f, %f", vector2DHelper.x, vector2DHelper.y);
+    ImGui::Text("Enemy position = %f, %f", vector2DHelper2.x, vector2DHelper2.y);
+    ImGui::Text("Player position = %f, %f", leftPlayerNode.local.getPosition().x, leftPlayerNode.local.getPosition().z);
     if (ImGui::Button("Printf Path"))
     {
       draw_grid(grid, 3, nullptr, nullptr, &path);
@@ -781,10 +783,10 @@ void Game::DisplayImage(const char *path, const char *text)
 
 }
 
-void Game::MoveNodeToMapTile(SceneNode *sceneNode, GridLocation mapTile, float interpolation, float speed)
+void Game::MoveNodeToMapTile(SceneNode *sceneNode, GridLocation mapTile, float interpolation, float speed,float NodeXOffset,float NodeZOffset)
 {
   glm::vec2 positionA{sceneNode->local.getPosition().x, sceneNode->local.getPosition().z};
-  glm::vec2 positionB{ mapTile.x * 100, mapTile.y * 100};
+  glm::vec2 positionB{NodeXOffset + mapTile.x * 100,NodeZOffset + mapTile.y * 100};
   glm::vec2 diffVec = positionB - positionA;
   glm::vec3 diffVec3D = {diffVec.x, sceneNode->local.getPosition().y, diffVec.y};
 
@@ -801,6 +803,7 @@ void Game::MoveNodeToMapTile(SceneNode *sceneNode, GridLocation mapTile, float i
     diffVec = glm::vec2(0, 0);
   }
   vector2DHelper = glm::vec2(positionB.x, positionB.y);
+  vector2DHelper2 = glm::vec2(positionA.x, positionA.y);
   float value = interpolation * speed;
   diffVec *= value;
 
