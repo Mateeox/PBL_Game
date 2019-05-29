@@ -6,10 +6,10 @@
 class MapConverter {
 	private:
 		std::vector<MapElement*>* elements;
-		std::map<MapKey*, MapKey::MapType> mapped;
+		std::map<MapKey, MapKey::MapType> mapped;
 		void CheckWalls(MapElement* element);
 		void AddWall(glm::vec2 pos);
 	public:
 		MapConverter(std::vector<MapElement*>* elements);		
-		std::map<MapKey*, MapKey::MapType> Convert();
+		std::map<MapKey, MapKey::MapType> Convert();
 };

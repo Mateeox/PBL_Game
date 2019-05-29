@@ -12,7 +12,7 @@ newmtl normal_floor
 	Kd 0.5882 0.5882 0.5882
 	Ks 0.0000 0.0000 0.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka maps\normal_floor.jpg
-	map_Kd maps\normal_floor.jpg
-	map_bump maps\normal_floor_bump.png
-	bump maps\normal_floor_bump.png
+	map_Ka maps/normal_floor.jpg
+	map_Kd maps/normal_floor.jpg
+	map_bump maps/normal_floor_bump.png
+	bump maps/normal_floor_bump.png

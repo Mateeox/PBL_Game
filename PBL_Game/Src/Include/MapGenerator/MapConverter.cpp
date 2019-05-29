@@ -5,12 +5,12 @@ MapConverter::MapConverter(std::vector<MapElement*>* elements)
 	this->elements = elements;
 }
 
-std::map<MapKey*, MapKey::MapType> MapConverter::Convert()
+std::map<MapKey, MapKey::MapType> MapConverter::Convert()
 {
 	for (std::vector<MapElement*>::iterator it = elements->begin(); it != elements->end(); it++)
 	{
 		MapElement* element = *it;
-		MapKey* key = new MapKey(element->Position.x, element->Position.y);
+		MapKey key(element->Position.x, element->Position.y);
 		MapKey::MapType type;
 
 		//Check what type of this element is
@@ -24,7 +24,7 @@ std::map<MapKey*, MapKey::MapType> MapConverter::Convert()
 		
 		CheckWalls(element);
 
-		mapped.insert(std::pair<MapKey*, MapKey::MapType>(key, type));
+		mapped.insert(std::pair<MapKey, MapKey::MapType>(key, type));
 	}
 	return mapped;
 }
@@ -48,7 +48,7 @@ void MapConverter::CheckWalls(MapElement* element)
 
 void MapConverter::AddWall(glm::vec2 pos)
 {
-	MapKey* key = new MapKey(pos.x, pos.y);
+	MapKey key(pos.x, pos.y);
 	if (mapped.find(key) == mapped.end())
-		mapped.insert(std::pair<MapKey*, MapKey::MapType>(key, MapKey::MapType::Wall));
+		mapped.insert(std::pair<MapKey, MapKey::MapType>(key, MapKey::MapType::Wall));
 }

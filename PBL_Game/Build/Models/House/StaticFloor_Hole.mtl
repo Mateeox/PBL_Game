@@ -12,10 +12,10 @@ newmtl floor_hole
 	Kd 0.5882 0.5882 0.5882
 	Ks 0.0000 0.0000 0.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka maps\floor_hole.png
-	map_Kd maps\floor_hole.png
-	map_bump maps\floor_hole_bump.png
-	bump maps\floor_hole_bump.png
+	map_Ka maps/floor_hole.png
+	map_Kd maps/floor_hole.png
+	map_bump maps/floor_hole_bump.png
+	bump maps/floor_hole_bump.png
 
 newmtl plank_1
 	Ns 10.0000
@@ -28,10 +28,10 @@ newmtl plank_1
 	Kd 0.5882 0.5882 0.5882
 	Ks 0.0000 0.0000 0.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka maps\plank_1.png
-	map_Kd maps\plank_1.png
-	map_bump maps\plank_1_bump.png
-	bump maps\plank_1_bump.png
+	map_Ka maps/plank_1.png
+	map_Kd maps/plank_1.png
+	map_bump maps/plank_1_bump.png
+	bump maps/plank_1_bump.png
 
 newmtl plank_2
 	Ns 10.0000
@@ -44,10 +44,10 @@ newmtl plank_2
 	Kd 0.5882 0.5882 0.5882
 	Ks 0.0000 0.0000 0.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka maps\plank_2.png
-	map_Kd maps\plank_2.png
-	map_bump maps\plank_2_bump.png
-	bump maps\plank_2_bump.png
+	map_Ka maps/plank_2.png
+	map_Kd maps/plank_2.png
+	map_bump maps/plank_2_bump.png
+	bump maps/plank_2_bump.png
 
 newmtl plank_4
 	Ns 10.0000
@@ -60,7 +60,7 @@ newmtl plank_4
 	Kd 0.5882 0.5882 0.5882
 	Ks 0.0000 0.0000 0.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka maps\plank_4.png
-	map_Kd maps\plank_4.png
-	map_bump maps\plank_1_bump.png
-	bump maps\plank_1_bump.png
+	map_Ka maps/plank_4.png
+	map_Kd maps/plank_4.png
+	map_bump maps/plank_1_bump.png
+	bump maps/plank_1_bump.png

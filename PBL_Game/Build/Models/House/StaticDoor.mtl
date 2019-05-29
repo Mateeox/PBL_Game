@@ -12,7 +12,7 @@ newmtl door
 	Kd 0.5882 0.5882 0.5882
 	Ks 0.0000 0.0000 0.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka maps\door_texture.png
-	map_Kd maps\door_texture.png
-	map_bump maps\door_texture_bump.png
-	bump maps\door_texture_bump.png
+	map_Ka maps/door_texture.png
+	map_Kd maps/door_texture.png
+	map_bump maps/door_texture_bump.png
+	bump maps/door_texture_bump.png

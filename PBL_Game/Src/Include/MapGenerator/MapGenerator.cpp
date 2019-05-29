@@ -38,29 +38,22 @@ MapGenerator::MapGenerator(Shader *shaderProgram, int squares, int doors, bool g
 	mapped = conv.Convert();
 
 	int max = 0;
-	for (auto element : mapped)
+	for (auto element : maps)
 	{
-		if (element.first->x > max)
-			max = element.first->x;
-		if (element.first->y > max)
-			max = element.first->y;
+		if (element->Position.x > max)
+			max = element->Position.x;
+		if (element->Position.y > max)
+			max = element->Position.y;
 	}
 	maxSize = max;
 	FillWithNull(max);
 
 	std::cout << "Mapped size: " << mapped.size() << "   max: " << max << "\n";
-
-	for (auto elemnt : mapped)
-	{
-
-		std::cout <<elemnt.first->x<<" "<<elemnt.first->y<<"\n";
-	}
-
 	positions.clear();
 	this->doors.clear();
 }
 
-std::map<MapKey *, MapKey::MapType> MapGenerator::GetConverted()
+std::map<MapKey, MapKey::MapType> MapGenerator::GetConverted()
 {
 	return mapped;
 }
@@ -310,11 +303,11 @@ void MapGenerator::FillWithNull(int max)
 	{
 		for (int j = 0; j < max; j++)
 		{
-			MapKey *mapkey = new MapKey(i, j);
+			MapKey mapkey(i, j);
 
 			if (mapped.find(mapkey) == mapped.end())
 			{
-				mapped.insert(std::pair<MapKey *, MapKey::MapType>(mapkey, MapKey::MapType::Null));
+				mapped.insert(std::pair<MapKey, MapKey::MapType>(mapkey, MapKey::MapType::Null));
 			}
 		}
 	}
@@ -326,20 +319,20 @@ void MapGenerator::TransformToPositive()
 	int minX = 0;
 	int minY = 0;
 
-	for (auto pos : positions)
+	for (auto map : maps)
 	{
-		if (pos.x < minX)
-			minX = pos.x;
-		if (pos.y < minY)
-			minY = pos.y;
+		if (map->Position.x < minX)
+			minX = map->Position.x;
+		if (map->Position.y < minY)
+			minY = map->Position.y;
 	}
 
 	if (minX <= 0 && minY <= 0)
 	{
-		for (auto &pos : positions)
+		for (auto &pos : maps)
 		{
-			pos.x += abs(minX);
-			pos.y += abs(minY);
+			pos->Position.x += abs(minX);
+			pos->Position.y += abs(minY);
 		}
 	}
 }
