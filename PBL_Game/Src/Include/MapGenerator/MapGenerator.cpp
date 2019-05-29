@@ -45,7 +45,7 @@ MapGenerator::MapGenerator(Shader *shaderProgram, int squares, int doors, bool g
 		if (element->y > max)
 			max = element->y;
 	}
-	maxSize = max;
+	maxSize = max+1;// ewentualna sciana na koncu
 	FillWithNull(max);
 
 	std::cout << "Mapped size: " << mapped.size() << "   max: " << max << "\n";
@@ -329,8 +329,8 @@ void MapGenerator::TransformToPositive()
 	{
 		for (auto &pos : maps)
 		{
-			pos->Position.x += abs(minX);
-			pos->Position.y += abs(minY);
+			pos->Position.x += abs(minX)+1; //+1 zeby zostało miejsce na sciane
+			pos->Position.y += abs(minY)+1; //tak samo
 		}
 	}
 }
