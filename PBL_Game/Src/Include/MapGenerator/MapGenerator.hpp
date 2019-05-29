@@ -4,10 +4,10 @@
 
 class MapGenerator //: public Script
 {
+	
 	private:
 	std::vector <MapElement*> maps;
 	std::vector<glm::vec2> positions;
-	std::vector<SceneNode*>* nodes;
 	std::vector<MapElement*> doors;
 	std::map<MapKey*, MapKey::MapType> mapped;
 	Shader* shader;
@@ -36,7 +36,8 @@ class MapGenerator //: public Script
 	int Squares = 1;
 	int Doors = 0;
 	bool GlassDoor = false;
-	MapGenerator(std::vector<SceneNode*>* nodes, Shader* shaderProgram);
-	MapGenerator(std::vector<SceneNode*>* nodes, Shader* shaderProgram, int squares, int doors, bool glass_door);
+	std::vector<SceneNode*> nodes;
+	MapGenerator(Shader* shaderProgram);
+	MapGenerator(Shader* shaderProgram, int squares, int doors, bool glass_door);
 	std::map<MapKey*, MapKey::MapType> GetConverted();
 };

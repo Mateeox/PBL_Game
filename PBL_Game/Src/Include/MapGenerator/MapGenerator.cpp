@@ -1,8 +1,7 @@
 #include "MapGenerator.hpp"
 
-MapGenerator::MapGenerator(std::vector<SceneNode*>* nodes, Shader* shaderProgram)
+MapGenerator::MapGenerator(Shader* shaderProgram)
 {
-	this->nodes = nodes;
 	this->shader = shaderProgram;
 	floor = new Model("Models/House/StaticNormal_Floor.obj", *shader, false);
 	wall = new Model("Models/House/StaticSimpleDestroyedWall.obj", *shader, false);
@@ -18,12 +17,11 @@ MapGenerator::MapGenerator(std::vector<SceneNode*>* nodes, Shader* shaderProgram
 	this->doors.clear();
 }
 
-MapGenerator::MapGenerator(std::vector<SceneNode*>* nodes, Shader* shaderProgram, int squares, int doors, bool glass_doors)
+MapGenerator::MapGenerator(Shader* shaderProgram, int squares, int doors, bool glass_doors)
 {
 	this->Squares = squares;
 	this->Doors = doors;
 	this->GlassDoor = glass_doors;
-	this->nodes = nodes;
 	this->shader = shaderProgram;
 	floor = new Model("Models/House/StaticNormal_Floor.obj", *shader, false);
 	wall = new Model("Models/House/StaticSimpleDestroyedWall.obj", *shader, false);
@@ -46,13 +44,13 @@ std::map<MapKey*, MapKey::MapType> MapGenerator::GetConverted()
 
 void MapGenerator::GenerateMap(int n)
 {
-	MapElement* element = new MapElement(glm::vec2(0, 0));
+	MapElement* element = new MapElement(glm::vec2(0, 0),nodes);
 	maps.push_back(element);
 	positions.push_back(element->Position);
 	int elementIteration = 0;
 	for (int i = 0; i < n-1; i++)
 	{
-		MapElement* temp = new MapElement(GetVector2(elementIteration), elementIteration);
+		MapElement* temp = new MapElement(GetVector2(elementIteration),nodes,elementIteration);
 		maps.push_back(temp);
 		positions.push_back(temp->Position);
 		elementIteration = positions.size() - 1;
@@ -115,7 +113,7 @@ void MapGenerator::FinishGeneration()
 	{
 		mapRoot->AddChild(maps[i]->GenerateNode(nodes, mapRoot, floor, wall, door));
 	}
-	nodes->push_back(mapRoot);
+	nodes.push_back(mapRoot);
 }
 
 glm::vec2 MapGenerator::GetVector2(int step)

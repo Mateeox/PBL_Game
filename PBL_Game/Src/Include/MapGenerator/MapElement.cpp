@@ -1,11 +1,11 @@
 #include "MapGenerator/MapElement.hpp"
 
-MapElement::MapElement() {
+MapElement::MapElement(std::vector<SceneNode*>&aNodes):nodes(aNodes) {
 	this->Position = glm::vec2();
 	this->Doors = glm::vec4();
 }
 
-MapElement::MapElement(glm::vec2 pos, int ParentElement)
+MapElement::MapElement(glm::vec2 pos,std::vector<SceneNode*>& aNodes,int ParentElement):nodes(aNodes)
 {
 	this->Position = glm::vec2(pos.x, pos.y);
 	this->ParentElement = ParentElement;
@@ -32,9 +32,8 @@ std::vector<glm::vec2> MapElement::GetNeighbours()
 	return neighbours;
 }
 
-SceneNode* MapElement::GenerateNode(std::vector<SceneNode*>* nodes, SceneNode* parent, Model* floorMod, Model* wallMod, Model* doorMod)
+SceneNode* MapElement::GenerateNode(std::vector<SceneNode*>& aNodes, SceneNode* parent, Model* floorMod, Model* wallMod, Model* doorMod)
 {
-	this->nodes = nodes;
 	SceneNode* element = new SceneNode();
 	element->AddParent(parent);
 	SceneNode* floor = AddFloor(floorMod);
@@ -47,7 +46,7 @@ SceneNode* MapElement::GenerateNode(std::vector<SceneNode*>* nodes, SceneNode* p
 	std::vector<SceneNode*> doors = AddDoors(floor, doorMod);
 	for (int i = 0; i < doors.size(); i++)
 		element->AddChild(doors[i]);
-	nodes->push_back(element);
+	nodes.push_back(element);
 	return element;
 }
 
@@ -60,7 +59,7 @@ SceneNode* MapElement::AddFloor(Model* model)
 	floor->Translate(Position.x, 0, Position.y);
 	//floor->Rotate(-90.0f, glm::vec3(1, 0, 0));
 	floor->Scale(0.0254f, 0.0254f, 0.0254f);
-	nodes->push_back(floor);
+	nodes.push_back(floor);
 	return floor;
 }
 
