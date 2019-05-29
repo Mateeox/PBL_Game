@@ -51,6 +51,7 @@ class Game
   unsigned MapSize;
 
 
+
   GridLocation start{0, 0};
   GridLocation goal{8, 5};
   std::unordered_map<GridLocation, GridLocation> came_from;
@@ -79,6 +80,8 @@ class Game
   float EnemyBaseSpeed;
   float EnemyXoffset;
   float EnemyZoffset;
+  float PlayerXOffset;
+  float PlayerZOffset;
 
   bool mouseCallBack = true;
   bool firstMouse = true;
@@ -95,7 +98,7 @@ class Game
   //Imgui
   bool show_demo_window = true;
   bool printf_path = false;
-
+  GridLocation LastPathNode{0, 0};
 
   //
   int offset = 125; // Jak bardzo maja sie roznic rozmiary kamery, szerokosc aktywnej to pol okna + offset, szerokosc nieaktywnej to pol okna - offset

@@ -23,6 +23,9 @@ void Game::InitializeConfig()
   EnemyXoffset = ConfigUtils::GetValueFromMap<float>("EnemyXoffset", ConfigMap);
   EnemyZoffset = ConfigUtils::GetValueFromMap<float>("EnemyZoffset", ConfigMap);
 
+  PlayerXOffset = ConfigUtils::GetValueFromMap<float>("PlayerXOffset", ConfigMap);
+  PlayerZOffset = ConfigUtils::GetValueFromMap<float>("PlayerZOffset", ConfigMap);
+
   floorTransform = ConfigUtils::GetValueFromMap<float>("FloorTranslation", ConfigMap);
   TileScale = ConfigUtils::GetValueFromMap<float>("TileScale", ConfigMap);
   TileScaleTimes100 = TileScale * 100;
@@ -194,8 +197,6 @@ void Game::Granko()
   while (glfwGetKey(okienko.window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
          glfwWindowShouldClose(okienko.window) == 0)
   {
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     loops = 0;
 
     while ((glfwGetTime() * 1000) > next_game_tick && loops < MAX_FRAMESKIP)
@@ -239,7 +240,8 @@ void Game::Update(float interpolation)
     start.x = start_poz.x;
     start.y = start_poz.y;
 
-    glm::vec2 end_poz = GetPositionOfset(leftPlayerNode, MapSize, EnemyXoffset, EnemyZoffset, TileScaleTimes100);
+
+    glm::vec2 end_poz = GetPositionOfset(leftPlayerNode, MapSize, 0, 0, TileScaleTimes100);
     goal.x = end_poz.x;
     goal.y = end_poz.y;
 
@@ -247,6 +249,16 @@ void Game::Update(float interpolation)
 
     if (path.size() > 1)
       MoveNodeToMapTile(&Enemy_Node, path[1], interpolation, EnemyBaseSpeed, EnemyXoffset, EnemyZoffset); // TODO Add BaseSpeed
+
+      if(grid.passable(goal))
+      {
+      a_star_search(grid, start, goal, came_from, cost_so_far);
+      path = reconstruct_path(start, goal, came_from);
+      }
+
+    LastPathNode.x = start_poz.x;
+    LastPathNode.y = start_poz.y;
+    
 
     if (leftSideActive)
       UpdatePlayer(leftPlayerNode, camera, interpolation);
@@ -735,8 +747,9 @@ void Game::DisplayImage(const char *path, const char *text)
 
 void Game::MoveNodeToMapTile(SceneNode *sceneNode, GridLocation mapTile, float interpolation, float speed, float NodeXOffset, float NodeZOffset)
 {
-  glm::vec2 positionA{sceneNode->local.getPosition().x, sceneNode->local.getPosition().z};
-  glm::vec2 positionB{NodeXOffset + mapTile.x * 100, NodeZOffset + mapTile.y * 100};
+  glm::vec2 positionA{ sceneNode->local.getPosition().x, sceneNode->local.getPosition().z };
+  glm::vec2 positionB{ NodeXOffset + mapTile.x * 100, NodeZOffset + mapTile.y * 100 };
+
   glm::vec2 diffVec = positionB - positionA;
   glm::vec3 diffVec3D = {diffVec.x, sceneNode->local.getPosition().y, diffVec.y};
 
@@ -797,8 +810,16 @@ void Game::ImGuiFunctions()
 
     if (ImGui::Button("Update Path and use A_Star_Search"))
     {
+      if(grid.passable(goal))
+      {
       a_star_search(grid, start, goal, came_from, cost_so_far);
       path = reconstruct_path(start, goal, came_from);
+      }
+      else
+      {
+        std::cout<<"Target not passable"<<"\n";
+        //TODO find closest pasable
+      }
     }
 
     ImGui::End();

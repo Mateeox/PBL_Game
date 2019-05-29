@@ -25,7 +25,7 @@
         <Name>MapSize</Name>
         <Value>40</Value>
     </ConfigParameter>
-        <ConfigParameter>
+    <ConfigParameter>
         <Type>F</Type>
         <Name>TileScale</Name>
         <Value>1</Value>
@@ -42,16 +42,28 @@
         <Value>3</Value>
     </ConfigParameter>
 
-        <ConfigParameter>
+    <ConfigParameter>
         <Type>F</Type>
         <Name>EnemyZoffset</Name>
         <Value>5</Value>
     </ConfigParameter>
 
-        <ConfigParameter>
+    <ConfigParameter>
         <Type>F</Type>
         <Name>EnemyBaseSpeed</Name>
         <Value>5</Value>
+    </ConfigParameter>
+
+    <ConfigParameter>
+        <Type>F</Type>
+        <Name>PlayerXOffset</Name>
+        <Value>40</Value>
+    </ConfigParameter>
+
+    <ConfigParameter>
+        <Type>F</Type>
+        <Name>PlayerZOffset</Name>
+        <Value>40</Value>
     </ConfigParameter>
 
 </Config>
