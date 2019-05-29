@@ -220,6 +220,11 @@ static void add_rect(SquareGrid &grid, int x1, int y1, int x2, int y2)
   }
 }
 
+static void add_Wall(SquareGrid &grid, int x, int y)
+{
+   grid.walls.insert(GridLocation{x, y});  
+}
+
 static GridWithWeights make_diagram4(int size_x,int size_y)
 {
   GridWithWeights grid(size_x, size_y);
@@ -236,6 +241,25 @@ static GridWithWeights make_diagram4(int size_x,int size_y)
   };
   return grid;
 }
+
+
+static GridWithWeights make_diagramFromGeneratedMap(int size_x,int size_y)
+{
+  GridWithWeights grid(size_x, size_y);
+  add_rect(grid, 1, 7, 4, 9);
+  typedef GridLocation L;
+  grid.forests = std::unordered_set<GridLocation> {
+    L{3, 4}, L{3, 5}, L{4, 1}, L{4, 2},
+    L{4, 3}, L{4, 4}, L{4, 5}, L{4, 6},
+    L{4, 7}, L{4, 8}, L{5, 1}, L{5, 2},
+    L{5, 3}, L{5, 4}, L{5, 5}, L{5, 6},
+    L{5, 7}, L{5, 8}, L{6, 2}, L{6, 3},
+    L{6, 4}, L{6, 5}, L{6, 6}, L{6, 7},
+    L{7, 3}, L{7, 4}, L{7, 5}
+  };
+  return grid;
+}
+
 
 template <typename Location, typename Graph>
 void dijkstra_search(Graph graph,
