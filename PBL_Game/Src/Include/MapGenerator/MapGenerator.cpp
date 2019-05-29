@@ -11,7 +11,7 @@ MapGenerator::MapGenerator(Shader *shaderProgram)
 	CheckForWalls();
 	CheckForDoors();
 	FinishGeneration();
-	MapConverter conv = MapConverter(&maps);
+	MapConverter conv = MapConverter(maps);
 	mapped = conv.Convert();
 	positions.clear();
 	this->doors.clear();
@@ -33,7 +33,7 @@ MapGenerator::MapGenerator(Shader *shaderProgram, int squares, int doors, bool g
 
 	TransformToPositive();
 	FinishGeneration();
-	MapConverter conv = MapConverter(&maps);
+	MapConverter conv = MapConverter(maps);
 
 	mapped = conv.Convert();
 

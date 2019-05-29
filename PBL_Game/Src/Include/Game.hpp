@@ -50,6 +50,8 @@ class Game
   GridWithWeights grid;
   unsigned MapSize;
 
+  
+
   GridLocation start{0, 0};
   GridLocation goal{8, 5};
   std::unordered_map<GridLocation, GridLocation> came_from;

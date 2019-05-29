@@ -257,6 +257,9 @@ for(auto pair : map)
   }
   
 }
+
+
+
   // //add_rect(grid, 1, 7, 4, 9);
   // typedef GridLocation L;
   // grid.forests = std::unordered_set<GridLocation> {

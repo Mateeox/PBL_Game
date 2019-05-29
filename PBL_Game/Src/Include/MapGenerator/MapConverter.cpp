@@ -1,13 +1,13 @@
 #include "MapConverter.hpp"
 
-MapConverter::MapConverter(std::vector<MapElement*>* elements)
+MapConverter::MapConverter(std::vector<MapElement*>& aElements):elements(aElements)
 {
 	this->elements = elements;
 }
 
 std::map<MapKey, MapKey::MapType> MapConverter::Convert()
 {
-	for (std::vector<MapElement*>::iterator it = elements->begin(); it != elements->end(); it++)
+	for (std::vector<MapElement*>::iterator it = elements.begin(); it != elements.end(); it++)
 	{
 		MapElement* element = *it;
 		MapKey key(element->Position.x, element->Position.y);
@@ -19,6 +19,7 @@ std::map<MapKey, MapKey::MapType> MapConverter::Convert()
 			type = MapKey::MapKey::Blocked;
 		else
 			type = MapKey::MapKey::Floor;
+
 
 		//Adding walls if not exist yet
 		
