@@ -1,31 +1,32 @@
 #include "MapConverter.hpp"
 
-MapConverter::MapConverter(std::vector<MapElement*>& aElements):elements(aElements)
+MapConverter::MapConverter(std::vector<MapElement*>::iterator begin, std::vector<MapElement*>::iterator end)
 {
-	this->elements = elements;
+	this->begin = begin;
+	this->end = end;
 }
 
-std::map<MapKey, MapKey::MapType> MapConverter::Convert()
+std::map<MapKey, MapType> MapConverter::Convert()
 {
-	for (std::vector<MapElement*>::iterator it = elements.begin(); it != elements.end(); it++)
+	for (std::vector<MapElement*>::iterator it = begin; it != end; it++)
 	{
 		MapElement* element = *it;
-		MapKey key(element->Position.x, element->Position.y);
-		MapKey::MapType type;
+		MapKey key = { element->Position.x, element->Position.y };
+		MapType type;
 
 		//Check what type of this element is
 
 		if (element->DoesHaveADoor())
-			type = MapKey::MapKey::Blocked;
+			type = MapType::Blocked;
 		else
-			type = MapKey::MapKey::Floor;
+			type = MapType::Floor;
 
 
 		//Adding walls if not exist yet
 		
 		CheckWalls(element);
 
-		mapped.insert(std::pair<MapKey, MapKey::MapType>(key, type));
+		mapped.insert(std::pair<MapKey, MapType>(key, type));
 	}
 	return mapped;
 }
@@ -49,7 +50,7 @@ void MapConverter::CheckWalls(MapElement* element)
 
 void MapConverter::AddWall(glm::vec2 pos)
 {
-	MapKey key(pos.x, pos.y);
+	MapKey key = { pos.x, pos.y };
 	if (mapped.find(key) == mapped.end())
-		mapped.insert(std::pair<MapKey, MapKey::MapType>(key, MapKey::MapType::Wall));
+		mapped.insert(std::pair<MapKey, MapType>(key, MapType::Wall));
 }

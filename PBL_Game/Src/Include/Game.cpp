@@ -4,7 +4,6 @@
 #include "Component/Model.hpp"
 #include "Component/AnimatedModel.hpp"
 #include "Shapes.hpp"
-#include "MapGenerator/MapGenerator.hpp"
 #include "PathFinding/PathFindingUtils.hpp"
 
 #include <fstream>
@@ -53,8 +52,8 @@ Game::Game(Window &aOkno) : okienko(aOkno),
 
 void Game::Granko()
 {
-  MapGenerator generator(shaderProgram, 100, 5, false);
-  std::map<MapKey, MapKey::MapType> mapped = generator.GetConverted();
+  MapGenerator generator(shaderProgram, 10, 0, false);
+  std::map<MapKey, MapType> mapped = generator.GetConverted();
 
    MapSize = generator.maxSize;
    grid = make_diagramFromGeneratedMap(mapped,MapSize);

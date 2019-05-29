@@ -14,8 +14,7 @@
 #include <functional>
 #include <cmath>
 #include <map>
-#include <MapGenerator/MapGenerator.hpp>
-
+#include "MapGenerator/MapGenerator.hpp"
 #include "../SceneNode.hpp"
 
 struct SimpleGraph
@@ -245,13 +244,14 @@ static GridWithWeights make_diagram4(int size_x,int size_y)
 }
 
 
-static GridWithWeights make_diagramFromGeneratedMap(std::map<MapKey, MapKey::MapType>& map,int size)
+static GridWithWeights make_diagramFromGeneratedMap(std::map<MapKey, MapType>& map,int size)
 {
   GridWithWeights grid(size, size);
 
-for(auto pair : map)
+for(std::map<MapKey, MapType>::iterator it = map.begin(); it != map.end(); it++)
 {
-  if(pair.first.Null ||  pair.first.Wall)
+  std::pair<MapKey, MapType> pair = *it;
+  if(pair.second == MapType::Null || pair.second == MapType::Wall)
   {
     add_Wall(grid,pair.first.x,pair.first.y);
   }
