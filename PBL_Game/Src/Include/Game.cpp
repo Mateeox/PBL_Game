@@ -54,7 +54,7 @@ Game::Game(Window &aOkno) : okienko(aOkno),
 void Game::Granko()
 {
   MapGenerator generator(shaderProgram, 100, 5, false);
-  //std::map<MapKey*, MapKey::MapType> mapped = generator.GetConverted();
+  std::map<MapKey*, MapKey::MapType> mapped = generator.GetConverted();
 
   Texture *xD = new Texture("Textures/red.png", GL_LINEAR);
   xD->Load();
