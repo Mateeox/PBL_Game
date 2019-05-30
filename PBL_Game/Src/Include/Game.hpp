@@ -7,7 +7,7 @@
 #include "Component/ConeRenderer.hpp"
 #include "PathFinding/MapTile.hpp"
 #include "PathFinding/MapTileRenderUtils.cpp"
-
+#include "Component/AnimatedModel.hpp"
 
 const int TICKS_PER_SECOND = 32;
 const int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
@@ -103,6 +103,8 @@ class Game
   //
   int offset = 125; // Jak bardzo maja sie roznic rozmiary kamery, szerokosc aktywnej to pol okna + offset, szerokosc nieaktywnej to pol okna - offset
 
+//ModelPtrs
+AnimatedModel *animatedModel = nullptr;
 
 
 public:
@@ -151,4 +153,5 @@ private:
   void SetViewAndPerspective(Camera &aCamera);
   void Plot();
   void DisplayImage(const char * path, const char * text);
+  void DisplayAnimationInfo(AnimatedModel * model);
 };

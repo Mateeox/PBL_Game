@@ -2,7 +2,6 @@
 #include "Game.hpp"
 #include "Component/ShapeRenderer3D.hpp"
 #include "Component/Model.hpp"
-#include "Component/AnimatedModel.hpp"
 #include "Shapes.hpp"
 #include "PathFinding/PathFindingUtils.hpp"
 
@@ -89,7 +88,7 @@ void Game::Granko()
   std::string AnimatedEnemyPAth = "Models/" + ConfigUtils::GetValueFromMap<std::string>("Enemy_Animated_Model", ConfigMap);
 
   Model *BeeModel = new Model(BeeModelPath, *shaderProgram_For_Model, false);
-  AnimatedModel *animatedModel = new AnimatedModel(AnimatedEnemyPAth, *shaderAnimatedModel, false);
+  animatedModel = new AnimatedModel(AnimatedEnemyPAth, *shaderAnimatedModel, false);
 
   ShapeRenderer3D *TileRenderer = new ShapeRenderer3D(Shapes::RainBow_Square,
                                                       Shapes::RB_Square_indices,
@@ -178,7 +177,6 @@ void Game::Granko()
                           floorTransform,
                           MapSize);
 
-
   for (auto &node : generator.nodes)
   {
     sNodes.push_back(node);
@@ -189,7 +187,6 @@ void Game::Granko()
   uint32 next_game_tick = (glfwGetTime() * 1000);
   int loops;
   float interpolation = 1.0;
-
 
   sNodes.push_back(&leftPlayerNode);
   rightNodes.push_back(&rightPlayerNode);
@@ -240,7 +237,6 @@ void Game::Update(float interpolation)
     start.x = start_poz.x;
     start.y = start_poz.y;
 
-
     glm::vec2 end_poz = GetPositionOfset(leftPlayerNode, MapSize, PlayerXOffset, PlayerZOffset, TileScaleTimes100);
     goal.x = end_poz.x;
     goal.y = end_poz.y;
@@ -250,15 +246,14 @@ void Game::Update(float interpolation)
     if (path.size() > 1)
       MoveNodeToMapTile(&Enemy_Node, path[1], interpolation, EnemyBaseSpeed, EnemyXoffset, EnemyZoffset); // TODO Add BaseSpeed
 
-      if(grid.passable(goal))
-      {
+    if (grid.passable(goal))
+    {
       a_star_search(grid, start, goal, came_from, cost_so_far);
       path = reconstruct_path(start, goal, came_from);
-      }
+    }
 
     LastPathNode.x = start_poz.x;
     LastPathNode.y = start_poz.y;
-    
 
     if (leftSideActive)
       UpdatePlayer(leftPlayerNode, camera, interpolation);
@@ -747,8 +742,8 @@ void Game::DisplayImage(const char *path, const char *text)
 
 void Game::MoveNodeToMapTile(SceneNode *sceneNode, GridLocation mapTile, float interpolation, float speed, float NodeXOffset, float NodeZOffset)
 {
-  glm::vec2 positionA{ sceneNode->local.getPosition().x, sceneNode->local.getPosition().z };
-  glm::vec2 positionB{ NodeXOffset + mapTile.x * 100, NodeZOffset + mapTile.y * 100 };
+  glm::vec2 positionA{sceneNode->local.getPosition().x, sceneNode->local.getPosition().z};
+  glm::vec2 positionB{NodeXOffset + mapTile.x * 100, NodeZOffset + mapTile.y * 100};
 
   glm::vec2 diffVec = positionB - positionA;
   glm::vec3 diffVec3D = {diffVec.x, sceneNode->local.getPosition().y, diffVec.y};
@@ -807,17 +802,37 @@ void Game::ImGuiFunctions()
     {
       draw_grid(grid, 3, nullptr, nullptr, &path);
     }
+    if (ImGui::Button("List Model AnimationNames"))
+    {
+      if (animatedModel != nullptr)
+        DisplayAnimationInfo(animatedModel);
+    }
 
+    if (ImGui::Button("Swtich Enemy Animation"))
+    {
+      if (animatedModel != nullptr)
+      {
+        if (animatedModel->GetAnimationNR() == 1)
+        {
+          animatedModel->SelectAnimation(0);
+        }
+        else
+        {
+          animatedModel->SelectAnimation(1);
+        }
+      }
+    }
     if (ImGui::Button("Update Path and use A_Star_Search"))
     {
-      if(grid.passable(goal))
+      if (grid.passable(goal))
       {
-      a_star_search(grid, start, goal, came_from, cost_so_far);
-      path = reconstruct_path(start, goal, came_from);
+        a_star_search(grid, start, goal, came_from, cost_so_far);
+        path = reconstruct_path(start, goal, came_from);
       }
       else
       {
-        std::cout<<"Target not passable"<<"\n";
+        std::cout << "Target not passable"
+                  << "\n";
         //TODO find closest pasable
       }
     }
@@ -831,4 +846,8 @@ void Game::ImguiClear()
   ImGui_ImplGlfw_Shutdown();
   ImGui::DestroyContext();
 }
- 
+
+void Game::DisplayAnimationInfo(AnimatedModel *model)
+{
+  model->ListAnimationNames();
+}

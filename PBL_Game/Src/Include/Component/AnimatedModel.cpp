@@ -485,11 +485,19 @@ void AnimatedModel::SelectAnimation(const std::string &aName)
 {
 	for (unsigned i = 0; i < m_pScene->mNumAnimations; i++)
 	{
-		if(aName == m_pScene->mAnimations[i]->mName.C_Str() )
+		if (aName == m_pScene->mAnimations[i]->mName.C_Str())
 		{
 			m_AnimationNubmer = i;
 			return;
 		}
+	}
+}
+
+void AnimatedModel::ListAnimationNames()
+{
+	for (unsigned i = 0; i < m_pScene->mNumAnimations; i++)
+	{
+		std::cout << "Animation : " << i << " Name: " << m_pScene->mAnimations[i]->mName.C_Str() << "\n";
 	}
 }
 void AnimatedModel::SelectAnimation(unsigned aNumber)
@@ -575,4 +583,13 @@ void AnimatedModel::Clear()
 		glDeleteVertexArrays(1, &m_VAO);
 		m_VAO = 0;
 	}
+}
+
+unsigned AnimatedModel::GetAnimationNR()
+{
+	return m_AnimationNubmer;
+}
+std::string AnimatedModel::GetAnimationName()
+{
+	return m_pScene->mAnimations[m_AnimationNubmer]->mName.C_Str();
 }

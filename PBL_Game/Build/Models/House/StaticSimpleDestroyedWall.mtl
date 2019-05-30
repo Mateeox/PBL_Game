@@ -12,7 +12,7 @@ newmtl 01___Default
 	Kd 0.5882 0.5882 0.5882
 	Ks 0.0000 0.0000 0.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka maps\wallPaint__leftSeam.png
-	map_Kd maps\wallPaint__leftSeam.png
-	map_bump maps\wallPaint__leftSeam_bump.png
-	bump maps\wallPaint__leftSeam_bump.png
+	map_Ka maps/wallPaint__leftSeam.png
+	map_Kd maps/wallPaint__leftSeam.png
+	map_bump maps/wallPaint__leftSeam_bump.png
+	bump maps/wallPaint__leftSeam_bump.png
