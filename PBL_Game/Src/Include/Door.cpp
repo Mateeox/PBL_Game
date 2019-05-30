@@ -10,5 +10,5 @@ Door::Door(Transform & transform, SceneNode* node) : Collider(transform)
 
 void Door::Open()
 {
-	node->Scale(2, 1, 0.5);
+	node->Scale(3, 1, 0.2);
 }

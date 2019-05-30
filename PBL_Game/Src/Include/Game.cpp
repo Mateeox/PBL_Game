@@ -231,9 +231,9 @@ void Game::Granko()
   while (glfwGetKey(okienko.window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
          glfwWindowShouldClose(okienko.window) == 0)
   {
-
+  
     loops = 0;
-
+  
     while ((glfwGetTime() * 1000) > next_game_tick && loops < MAX_FRAMESKIP)
     {
       Update(interpolation);
