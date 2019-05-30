@@ -8,7 +8,7 @@ namespace ModelMesh
 Mesh::Mesh(vector<Vertex> aVertices,
            vector<unsigned int> aIndices,
            vector<Texture> aTextures,
-           Shader &aShaderProgram) : Drawable(aShaderProgram),
+           Shader &aShaderProgram) : ConeRenderable(aShaderProgram, reinterpret_cast<float*>(aVertices.data()), aVertices.size()*getVerticesPositionStride(), getVerticesPositionStride()),
                                      Vertices(aVertices),
                                      Indices(aIndices),
                                      Textures(aTextures)
@@ -87,6 +87,30 @@ void Mesh::Draw(glm::mat4 &transform)
     glActiveTexture(GL_TEXTURE0);
 
  
+}
+float* Mesh::getVertexData()
+{
+	return reinterpret_cast<float*>(Vertices.data());
+}
+
+int Mesh::getVertexDataSize()
+{
+	return Vertices.size() * getVerticesPositionStride();
+}
+
+int Mesh::getVerticesPositionStride()
+{
+	return 14;
+}
+
+unsigned int * Mesh::getIndices()
+{
+	return Indices.data();
+}
+
+int Mesh::getIndicesSize()
+{
+	return Indices.size();
 }
 
   ComponentSystem::ComponentType Mesh::GetComponentType()
