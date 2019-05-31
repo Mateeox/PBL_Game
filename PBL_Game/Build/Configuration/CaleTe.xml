@@ -65,12 +65,11 @@
         <Name>PlayerZOffset</Name>
         <Value>0</Value>
     </ConfigParameter>
-
-</Config>
-
-<!-- types I - int
+    <!-- types I - int
            U - unsigned
            F - float
            D - dobule
-           S - std::string>
+           S - std::string /!-->
+</Config>
+
 

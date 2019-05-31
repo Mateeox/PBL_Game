@@ -23,9 +23,20 @@ AnimatedModel::AnimatedModel(std::string &path, Shader &aShaderProgram, bool gam
 																								 ShaderProgram(aShaderProgram),
 																								 m_Animate(true),
 																								 m_AnimationNubmer(0),
+																								 _rotation(0.0f),
 																								 gammaCorrection(gammaCor)
 {
 	m_NumBones = 0;
+	_updateBoth = true;
+	_temporary = false;
+	_playTime = 0.0f;
+	_blendingTime = 0.0f;
+	_blendingTimeMul = 1.0f;
+    //_rotation = 0.0f ; init list
+	 _prevAnimIndex = -1;
+
+	_curScene = 0;
+
 	loadAnimatedModel(path);
 }
 
@@ -85,6 +96,9 @@ bool AnimatedModel::InitFromScene(const aiScene *pScene, const std::string &File
 	std::vector<Vector2f> TexCoords;
 	std::vector<VertexBoneData> Bones;
 	std::vector<unsigned> Indices;
+
+	m_lastTime = -1;
+	_animationTime0 = 0.f;
 
 	unsigned NumVertices = 0;
 	unsigned NumIndices = 0;
@@ -391,8 +405,11 @@ void AnimatedModel::CalcInterpolatedPosition(aiVector3D &Out, float AnimationTim
 	Out = Start + Factor * Delta;
 }
 
-void AnimatedModel::ReadNodeHeirarchy(float AnimationTime, const aiNode *pNode, const Matrix4f &ParentTransform)
+void AnimatedModel::ReadNodeHeirarchy(const aiScene * scene,float AnimationTime, const aiNode *pNode, const Matrix4f &ParentTransform, int stopAnimLevel)
 {
+
+	float time(AnimationTime);
+
 	std::string NodeName(pNode->mName.data);
 
 	const aiAnimation *pAnimation = m_pScene->mAnimations[m_AnimationNubmer];
@@ -416,13 +433,17 @@ void AnimatedModel::ReadNodeHeirarchy(float AnimationTime, const aiNode *pNode, 
 
 		// Interpolate translation and generate translation transformation matrix
 		aiVector3D Translation;
-		CalcInterpolatedPosition(Translation, AnimationTime, pNodeAnim);
+		{
+			float time(stopAnimLevel <= 0 ? AnimationTime : 0.f);
+			CalcInterpolatedPosition(Translation, AnimationTime, pNodeAnim);
+		}
 		Matrix4f TranslationM;
 		TranslationM.InitTranslationTransform(Translation.x, Translation.y, Translation.z);
 
 		// Combine the above transformations
 		NodeTransformation = TranslationM * RotationM * ScalingM;
 	}
+	stopAnimLevel--;
 
 	Matrix4f GlobalTransformation = ParentTransform * NodeTransformation;
 
@@ -434,7 +455,7 @@ void AnimatedModel::ReadNodeHeirarchy(float AnimationTime, const aiNode *pNode, 
 
 	for (unsigned int i = 0; i < pNode->mNumChildren; i++)
 	{
-		ReadNodeHeirarchy(AnimationTime, pNode->mChildren[i], GlobalTransformation);
+		ReadNodeHeirarchy(scene,AnimationTime, pNode->mChildren[i], GlobalTransformation,stopAnimLevel);
 	}
 }
 
@@ -505,16 +526,110 @@ void AnimatedModel::SelectAnimation(unsigned aNumber)
 	m_AnimationNubmer = aNumber;
 }
 
+ void AnimatedModel::ReadNodeHeirarchy(const aiScene * scene0, const aiScene * scene1
+							, float AnimationTime0, float AnimationTime1
+							, const aiNode* pNode0, const aiNode* pNode1
+							, const aiMatrix4x4& ParentTransform, int stopAnimLevel)
+	{ 
+		float time0(AnimationTime0);
+		float time1(AnimationTime1);
+
+		std::string NodeName0(pNode0->mName.data);
+		std::string NodeName1(pNode1->mName.data);
+		assert(NodeName0 == NodeName1);
+
+		const aiAnimation* pAnimation0 = scene0->mAnimations[0];
+		const aiAnimation* pAnimation1 = scene1->mAnimations[0];
+
+		aiMatrix4x4 NodeTransformation0(pNode0->mTransformation);
+		aiMatrix4x4 NodeTransformation1(pNode1->mTransformation);
+
+		const aiNodeAnim* pNodeAnim0 = FindNodeAnim(pAnimation0, NodeName0);
+		const aiNodeAnim* pNodeAnim1 = FindNodeAnim(pAnimation1, NodeName0);
+
+		if (pNodeAnim0 && pNodeAnim1) {
+			// Interpolate scaling and generate scaling transformation matrix
+			aiVector3D Scaling0;
+			CalcInterpolatedScaling(Scaling0, time0, pNodeAnim0);
+			aiVector3D Scaling1;
+			CalcInterpolatedScaling(Scaling1, time1, pNodeAnim1);
+			aiMatrix4x4 ScalingM;
+			aiMatrix4x4::Scaling(Scaling0 * _blendingTime + Scaling1 * (1.f - _blendingTime), ScalingM);
+
+			// Interpolate rotation and generate rotation transformation matrix
+			aiQuaternion RotationQ0;
+			CalcInterpolatedRotation(RotationQ0, time0, pNodeAnim0); 
+			aiQuaternion RotationQ1;
+			CalcInterpolatedRotation(RotationQ1, time1, pNodeAnim1); 
+			aiMatrix4x4 RotationM;
+			aiQuaternion RotationQ;
+			aiQuaternion::Interpolate(RotationQ, RotationQ1, RotationQ0, _blendingTime);
+			InitM4FromM3(RotationM, RotationQ.GetMatrix());
+
+			// Interpolate translation and generate translation transformation matrix
+			aiVector3D Translation0;
+			{
+				float time(stopAnimLevel <= 0 ? AnimationTime0 : 0.f);
+				CalcInterpolatedPosition(Translation0, time, pNodeAnim0);
+			}
+			aiVector3D Translation1;
+			{
+				float time(stopAnimLevel <= 0 ? AnimationTime1 : 0.f);
+				CalcInterpolatedPosition(Translation1, time, pNodeAnim1);
+			}
+			aiMatrix4x4 TranslationM;
+			aiMatrix4x4::Translation(Translation0 * _blendingTime + Translation1 * (1.f - _blendingTime), TranslationM);
+
+			// Combine the above transformations
+			NodeTransformation0 = TranslationM * RotationM * ScalingM;
+		}
+
+		stopAnimLevel--;
+
+		aiMatrix4x4 GlobalTransformation = ParentTransform * NodeTransformation0;
+
+		if (m_BoneMapping.find(NodeName0) != m_BoneMapping.end()) {
+			uint BoneIndex = m_BoneMapping[NodeName0];
+			m_BoneInfo[BoneIndex].FinalTransformation = m_GlobalInverseTransform * GlobalTransformation * 
+				m_BoneInfo[BoneIndex].BoneOffset;
+		}
+
+		uint n = std::min(pNode0->mNumChildren, pNode1->mNumChildren);
+		for (uint i = 0 ; i < n ; i++) {
+			ReadNodeHeirarchy(scene0, scene1, AnimationTime0, AnimationTime1, pNode0->mChildren[i], pNode1->mChildren[i], GlobalTransformation, stopAnimLevel);
+		}
+	} 
+
+
 void AnimatedModel::BoneTransform(float TimeInSeconds, std::vector<Matrix4f> &Transforms)
 {
-	Matrix4f Identity;
-	Identity.InitIdentity();
+	aiMatrix4x4 Identity;
+	InitIdentityM4(Identity);
 
-	float TicksPerSecond = (float)(m_pScene->mAnimations[m_AnimationNubmer]->mTicksPerSecond != 0 ? m_pScene->mAnimations[m_AnimationNubmer]->mTicksPerSecond : 25.0f);
-	float TimeInTicks = TimeInSeconds * TicksPerSecond;
-	float AnimationTime = fmod(TimeInTicks, (float)m_pScene->mAnimations[m_AnimationNubmer]->mDuration);
+	if (_blendingTime > 0.f)
+	{
+		float TicksPerSecond = _scenes[_prevAnimIndex]->mAnimations[0]->mTicksPerSecond != 0 ? _scenes[_prevAnimIndex]->mAnimations[0]->mTicksPerSecond : 25.0f;
+		float TimeInTicks = _animationTime0 * TicksPerSecond;
+		float AnimationTime0 = fmod(TimeInTicks, _scenes[_prevAnimIndex]->mAnimations[0]->mDuration);
 
-	ReadNodeHeirarchy(AnimationTime, m_pScene->mRootNode, Identity);
+		TicksPerSecond = _scenes[_curScene]->mAnimations[0]->mTicksPerSecond != 0 ? _scenes[_curScene]->mAnimations[0]->mTicksPerSecond : 25.0f;
+		TimeInTicks = _animationTime1 * TicksPerSecond;
+		float AnimationTime1 = fmod(TimeInTicks, _scenes[_curScene]->mAnimations[0]->mDuration);
+
+	
+		ReadNodeHeirarchy(_scenes[_prevAnimIndex], _scenes[_curScene],
+		 AnimationTime0, AnimationTime1,
+		  _scenes[_prevAnimIndex]->mRootNode, _scenes[_curScene]->mRootNode,
+		   Identity, 2);
+	}
+	else
+	{
+		float TicksPerSecond = (float)(m_pScene->mAnimations[m_AnimationNubmer]->mTicksPerSecond != 0 ? m_pScene->mAnimations[m_AnimationNubmer]->mTicksPerSecond : 25.0f);
+		float TimeInTicks = TimeInSeconds * TicksPerSecond;
+		float AnimationTime = fmod(TimeInTicks, (float)m_pScene->mAnimations[m_AnimationNubmer]->mDuration);
+
+		ReadNodeHeirarchy(_scenes[_curScene], AnimationTime, _scenes[_curScene]->mRootNode, Identity, 2);
+	}
 
 	Transforms.resize(m_NumBones);
 
@@ -585,6 +700,46 @@ void AnimatedModel::Clear()
 	}
 }
 
+void AnimatedModel::Update()
+{
+	if (m_lastTime == -1)
+		{
+			m_lastTime = GetCurrentTimeMillis();
+		}
+		long long newTime = GetCurrentTimeMillis();
+		float dt = (float)((double)newTime - (double)m_lastTime) / 1000.0f;
+		m_lastTime = newTime;
+
+
+		_animationTime0 += dt;
+		if (_blendingTime > 0.f)
+		{
+			_blendingTime -= dt * _blendingTimeMul;
+			if (_blendingTime <= 0.f)
+			{
+				_animationTime0 = _animationTime1;
+			}
+			if (_updateBoth)
+			{
+				_animationTime1 += dt;
+			}
+		}
+		else
+		{
+			_animationTime1 += dt;
+		}
+
+		if (_temporary)
+		{
+			_playTime -= dt;
+			if (_playTime <= 0.f)
+			{
+				_temporary = false;
+				SetAnimIndex(_prevAnimIndex);
+			}
+}
+}
+
 unsigned AnimatedModel::GetAnimationNR()
 {
 	return m_AnimationNubmer;
@@ -592,4 +747,21 @@ unsigned AnimatedModel::GetAnimationNR()
 std::string AnimatedModel::GetAnimationName()
 {
 	return m_pScene->mAnimations[m_AnimationNubmer]->mName.C_Str();
+}
+
+bool AnimatedModel::SetAnimIndex(uint index, bool updateBoth , float blendDuration , bool temporary , float time )
+	{
+		if (index == _curScene || index >= _scenes.size())
+		{
+			return false;
+		}
+		_prevAnimIndex = _curScene;
+		_curScene = index;
+		_blendingTime = 1.f;
+		_blendingTimeMul = 1.f / blendDuration;
+		_animationTime1 = 0.f;
+		_updateBoth = updateBoth;
+		_temporary = temporary;
+		_playTime = time;
+		return true;
 }

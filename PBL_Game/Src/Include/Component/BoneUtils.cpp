@@ -2,6 +2,9 @@
 #include <math.h>
 #include <cassert>
 
+#ifdef __linux__
+#include <sys/time.h>
+#endif
 
 
 Vector3f Vector3f::Cross(const Vector3f& v) const
@@ -279,3 +282,33 @@ Vector3f Quaternion::ToDegrees()
     return Vector3f(f);
 }
 
+void InitIdentityM4(aiMatrix4x4 &m)
+{
+	m.a1 = 1.f; m.a2 = 0.f; m.a3 = 0.f; m.a4 = 0.f;
+	m.b1 = 0.f; m.b2 = 1.f; m.b3 = 0.f; m.b4 = 0.f;
+	m.c1 = 0.f; m.c2 = 0.f; m.c3 = 1.f; m.c4 = 0.f;
+	m.d1 = 0.f; m.d2 = 0.f; m.d3 = 0.f; m.d4 = 1.f;
+	assert(m.IsIdentity());
+}
+
+void InitM4FromM3(aiMatrix4x4& out, const aiMatrix3x3& in)
+{
+	out.a1 = in.a1; out.a2 = in.a2; out.a3 = in.a3; out.a4 = 0.f;
+	out.b1 = in.b1; out.b2 = in.b2; out.b3 = in.b3; out.b4 = 0.f;
+	out.c1 = in.c1; out.c2 = in.c2; out.c3 = in.c3; out.c4 = 0.f;
+	out.d1 = 0.f;   out.d2 = 0.f;   out.d3 = 0.f;   out.d4 = 1.f;
+}
+
+
+long long GetCurrentTimeMillis()
+{
+#ifdef WIN32    
+	return GetTickCount();
+#else
+	timeval t;
+	gettimeofday(&t, NULL);
+
+	long long ret = t.tv_sec * 1000 + t.tv_usec / 1000;
+	return ret;
+#endif    
+}

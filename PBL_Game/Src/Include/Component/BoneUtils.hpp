@@ -328,3 +328,10 @@ public:
 Quaternion operator*(const Quaternion& l, const Quaternion& r);
 
 Quaternion operator*(const Quaternion& q, const Vector3f& v);
+
+
+void InitM4FromM3(aiMatrix4x4& out, const aiMatrix3x3& in);
+
+void InitIdentityM4(aiMatrix4x4 &m);
+
+long long GetCurrentTimeMillis();

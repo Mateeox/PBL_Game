@@ -12,10 +12,10 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+
 #include "BoneUtils.hpp"
 #include "Texture.hpp"
 #include <map>
-
 
 #ifdef WIN32
 #define SNPRINTF _snprintf_s
@@ -55,7 +55,6 @@ enum VB_TYPES
   BONE_VB,
   NUM_VBs
 };
-
 
 struct BoneInfo
 {
@@ -110,21 +109,32 @@ class AnimatedModel : public ComponentSystem::Component
   unsigned m_Buffers[NUM_VBs];
   bool m_Animate;
   unsigned m_AnimationNubmer;
-  
+
+  float _animationTime0;
+  float _animationTime1;
+
+  float _blendingTime;
+  float _blendingTimeMul;
+  uint _prevAnimIndex;
+
+  long long m_lastTime;
+  bool _updateBoth;
+  bool _temporary;
+  float _playTime;
+
+  void Update();
+
 public:
   void Clear();
   AnimatedModel(std::string &path, Shader &aShaderProgram, bool gammaCorrection);
   void Draw(glm::mat4 &transform);
   Shader &ShaderProgram;
-  void SelectAnimation(const std::string & aName);
+  void SelectAnimation(const std::string &aName);
   void SelectAnimation(unsigned aNumer);
   unsigned GetAnimationNR();
   std::string GetAnimationName();
-  
-
+  bool SetAnimIndex(uint index, bool updateBoth = true, float blendDuration = 0.3f, bool temporary = false, float time = 0.f);
   void ListAnimationNames();
-
-  
 
   unsigned NumBones() const
   {
@@ -132,6 +142,7 @@ public:
   }
 
 private:
+  aiVector3D _rotation;
   std::map<std::string, unsigned> m_BoneMapping;
   std::vector<BoneInfo> m_BoneInfo;
   std::vector<MeshEntry> m_Entries;
@@ -142,18 +153,34 @@ private:
   std::string directory;
   bool gammaCorrection;
 
-  void BoneTransform(float TimeInSeconds, std::vector<Matrix4f>& Transforms);
-  void ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const Matrix4f& ParentTransform);
-  const aiNodeAnim* FindNodeAnim(const aiAnimation* pAnimation, const std::string NodeName);
-  void CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
-  void CalcInterpolatedScaling(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
-  void CalcInterpolatedPosition(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);  
+  void BoneTransform(float TimeInSeconds, std::vector<Matrix4f> &Transforms);
+
+   void ReadNodeHeirarchy(const aiScene *scene0,
+                         const aiScene *scene1,
+                         float AnimationTime0,
+                         float AnimationTime1,
+                         const aiNode *pNode0,
+                         const aiNode *pNode1,
+                         const aiMatrix4x4 &ParentTransform,
+                         int stopAnimLevel);
+                         
+  void ReadNodeHeirarchy(const aiScene *scene,
+                         float AnimationTime,
+                         const aiNode *pNode,
+                         const Matrix4f &ParentTransform,
+                         int stopAnimLevel);
+
+  const aiNodeAnim *FindNodeAnim(const aiAnimation *pAnimation, const std::string NodeName);
+ 
+  void CalcInterpolatedRotation(aiQuaternion &Out, float AnimationTime, const aiNodeAnim *pNodeAnim);
+  void CalcInterpolatedScaling(aiVector3D &Out, float AnimationTime, const aiNodeAnim *pNodeAnim);
+  void CalcInterpolatedPosition(aiVector3D &Out, float AnimationTime, const aiNodeAnim *pNodeAnim);
   bool loadAnimatedModel(std::string &path);
   bool InitMaterials(const aiScene *pScene, const std::string &Filename);
 
-  unsigned FindRotation(float AnimationTime, const aiNodeAnim* pNodeAnim);
-  unsigned FindScaling(float AnimationTime, const aiNodeAnim* pNodeAnim);
-  unsigned FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim);
+  unsigned FindRotation(float AnimationTime, const aiNodeAnim *pNodeAnim);
+  unsigned FindScaling(float AnimationTime, const aiNodeAnim *pNodeAnim);
+  unsigned FindPosition(float AnimationTime, const aiNodeAnim *pNodeAnim);
 
   void InitMesh(unsigned MeshIndex,
                 const aiMesh *paiMesh,
@@ -169,9 +196,13 @@ private:
 
   void SetBoneTransform(unsigned Index, const Matrix4f &Transform);
 
+  void SetRotation(const aiVector3D &r) { _rotation = r; }
   Matrix4f m_GlobalInverseTransform;
   const aiScene *m_pScene;
   Assimp::Importer m_Importer;
+
+  std::vector<const aiScene *> _scenes;
+  uint _curScene;
 
   ComponentSystem::ComponentType GetComponentType() override;
   std::string Serialize()
