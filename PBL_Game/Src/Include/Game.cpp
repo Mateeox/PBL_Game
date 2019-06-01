@@ -17,6 +17,7 @@ void Game::InitializeConfig()
   WINDOW_WIDTH = ConfigUtils::GetValueFromMap<unsigned>("WINDOW_WIDTH", ConfigMap);
   WINDOW_HEIGHT = ConfigUtils::GetValueFromMap<unsigned>("WINDOW_HEIGHT", ConfigMap);
   movementSpeed = ConfigUtils::GetValueFromMap<float>("PlayerSpeed", ConfigMap);
+  debugPathFinding = ConfigUtils::GetValueFromMap<int>("debugPathFinding", ConfigMap);
 
   EnemyBaseSpeed = ConfigUtils::GetValueFromMap<float>("EnemyBaseSpeed", ConfigMap);
   EnemyXoffset = ConfigUtils::GetValueFromMap<float>("EnemyXoffset", ConfigMap);
@@ -165,6 +166,8 @@ void Game::Granko()
   Enemy_Node.Translate(start.x * 100, 0, start.y * 100);
   leftPlayerNode.Translate(start.x * 100, 0, start.y * 100);
 
+  if(debugPathFinding)
+  {
   AddMapTilesToSceneNodes(mapTiles, sNodes,
                           grid,
                           FreeTileTexture,    //Texture 1
@@ -175,6 +178,7 @@ void Game::Granko()
                           TileScale,
                           floorTransform,
                           MapSize);
+  }
 
   for (auto &node : generator.nodes)
   {

@@ -23,7 +23,7 @@
     <ConfigParameter>
         <Type>U</Type>
         <Name>MapScale</Name>
-        <Value>200</Value>
+        <Value>400</Value>
     </ConfigParameter>
     <ConfigParameter>
         <Type>F</Type>
@@ -65,6 +65,14 @@
         <Name>PlayerZOffset</Name>
         <Value>0</Value>
     </ConfigParameter>
+
+       <ConfigParameter>
+        <Type>I</Type>
+        <Name>debugPathFinding</Name>
+        <Value>0</Value>
+    </ConfigParameter>
+
+    
 
 </Config>
 

@@ -50,6 +50,7 @@ class Game
   GridWithWeights grid;
   unsigned MapSize = 0;
   unsigned MapScale = 0;
+  bool debugPathFinding = false;
 
 
 
