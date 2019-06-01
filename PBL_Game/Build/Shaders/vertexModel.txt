@@ -4,13 +4,16 @@ layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 aTexCoords;
 
 out vec2 TexCoords;
+out vec4 viewSpace;
 
 uniform mat4 transform;
 uniform mat4 view;
 uniform mat4 projection;
 
+
 void main()
 {
-    TexCoords = aTexCoords;    
+    TexCoords = aTexCoords;
     gl_Position = projection * view * transform * vec4(aPos, 1.0);
+    viewSpace = gl_Position;  
 }
