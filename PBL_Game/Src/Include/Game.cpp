@@ -4,6 +4,7 @@
 #include "Component/Model.hpp"
 #include "Shapes.hpp"
 #include "PathFinding/PathFindingUtils.hpp"
+#include "KeyDoorFactory.hpp"
 
 #include <fstream>
 #include <iterator>
@@ -65,6 +66,8 @@ void Game::Granko()
   Texture *FreeTileTexture = new Texture("Textures/FreeTile.png", GL_LINEAR);
   Texture *SlowerTileTexture = new Texture("Textures/SlowerTile.png", GL_LINEAR);
   Texture *PathTileTexture = new Texture("Textures/PathTile.png", GL_LINEAR);
+
+  
 
   BlockedTileTexture->Load();
   FreeTileTexture->Load();
@@ -143,7 +146,7 @@ void Game::Granko()
   keyNode.Scale(0.3, 0.3, 0.3);
   keyNode.Translate(-80, 0, 0);
 
-  
+  auto caleTe = KeyDoorFactory::Create(0,BeeModel,BeeModel);
 
   // Koniec triggerow
 

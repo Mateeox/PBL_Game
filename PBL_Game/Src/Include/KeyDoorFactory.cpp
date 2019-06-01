@@ -2,7 +2,7 @@
 #include "Key.hpp"
 #include "Door.hpp"
 
-std::pair<SceneNode *, SceneNode *> Create(int aNumber, std::string aTag, ComponentSystem::Component *aKeyModel, ComponentSystem::Component *aDoorModel)
+std::pair<SceneNode*,SceneNode*>  KeyDoorFactory::Create(int aNumber, ComponentSystem::Component * aKeyModel,ComponentSystem::Component * aDoorModel)
 {
     //Create nodes
     SceneNode *KeyNode = new SceneNode();
