@@ -32,6 +32,7 @@ void Game::InitializeConfig()
   TileScale = ConfigUtils::GetValueFromMap<float>("TileScale", ConfigMap);
   EnemyScale = ConfigUtils::GetValueFromMap<float>("EnemyScale", ConfigMap);
   TileScaleTimes100 = TileScale * 100;
+  EnemyScaleInverse = 1 / EnemyScale;
 }
 
 Game::Game(Window &aOkno) : okienko(aOkno),
