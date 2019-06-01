@@ -44,6 +44,12 @@
 
     <ConfigParameter>
         <Type>F</Type>
+        <Name>EnemyYoffset</Name>
+        <Value>1.8</Value>
+    </ConfigParameter>
+
+    <ConfigParameter>
+        <Type>F</Type>
         <Name>EnemyZoffset</Name>
         <Value>5</Value>
     </ConfigParameter>
@@ -66,14 +72,19 @@
         <Value>0</Value>
     </ConfigParameter>
 
-       <ConfigParameter>
+    <ConfigParameter>
         <Type>I</Type>
         <Name>debugPathFinding</Name>
-        <Value>0</Value>
+        <Value>1</Value>
     </ConfigParameter>
 
-    
+    <!--- Enemy Scale/-->
 
+    <ConfigParameter>
+        <Type>F</Type>
+        <Name>EnemyScale</Name>
+        <Value>0.005</Value>
+    </ConfigParameter>
 </Config>
 
 <!-- types I - int
