@@ -7,9 +7,11 @@ std::pair<SceneNode *, SceneNode *> KeyDoorFactory::Create(int aNumber, Componen
     //Create nodes
     SceneNode *KeyNode = new SceneNode();
     GameObject *KeyGamObj = new GameObject(KeyNode->local);
+	KeyNode->gameObject = std::move(KeyGamObj);
 
     SceneNode *DoorNode = new SceneNode();
     GameObject *DoorGamObj = new GameObject(DoorNode->local);
+	DoorNode->gameObject = std::move(DoorGamObj);
 
     KeyGamObj->setTag("Key" + aNumber);
     KeyGamObj->AddComponent(aKeyModel);
