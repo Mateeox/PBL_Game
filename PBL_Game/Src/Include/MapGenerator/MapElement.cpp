@@ -33,7 +33,7 @@ std::vector<glm::vec2> MapElement::GetNeighbours()
 	return neighbours;
 }
 
-SceneNode* MapElement::GenerateNode(std::vector<SceneNode*>& aNodes, SceneNode* parent, Model* floorMod, Model* wallMod, Model* doorMod, Model* keyMod, int& door_index, bool mirror)
+SceneNode* MapElement::GenerateNode(std::vector<SceneNode*>& aNodes, SceneNode* parent, Model* floorMod, Model* wallMod, Model* doorMod, Model* keyMod, Model* chest,  int& door_index, bool mirror)
 {
 	SceneNode* element = new SceneNode();
 	element->AddParent(parent);
@@ -47,7 +47,11 @@ SceneNode* MapElement::GenerateNode(std::vector<SceneNode*>& aNodes, SceneNode* 
 	std::vector<SceneNode*> doors = AddDoors(floor, doorMod, keyMod, door_index);
 	for (int i = 0; i < doors.size(); i++)
 		element->AddChild(doors[i]);
-	nodes.push_back(element);
+	if (Chest) {
+		SceneNode* chestNode = CreateChest(floor, chest);
+		element->AddChild(chestNode);
+		nodes.push_back(element);
+	}
 	return element;
 }
 
@@ -178,4 +182,16 @@ void MapElement::RemoveDoor(int order)
 void MapElement::CleanDoors()
 {
 	Doors = glm::vec4();
+}
+
+SceneNode* MapElement::CreateChest(SceneNode* parent, Model* model)
+{
+	SceneNode* chest = new SceneNode();
+	GameObject* oFloor = new GameObject(chest->local);
+	oFloor->AddComponent(model);
+	chest->AddGameObject(oFloor);
+	chest->Translate(Position.x, 0, Position.y);
+	chest->Scale(0.007f, 0.007f, 0.007f);
+	nodes.push_back(chest);
+	return chest;
 }

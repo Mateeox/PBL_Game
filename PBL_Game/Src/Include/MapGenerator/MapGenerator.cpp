@@ -15,10 +15,11 @@ MapGenerator::MapGenerator(Shader *shaderProgram)
 	this->doors.clear();
 }
 
-MapGenerator::MapGenerator(Shader *shaderProgram, int squares, int doors, bool glass_doors)
+MapGenerator::MapGenerator(Shader *shaderProgram, int squares, int doors, int chests, bool glass_doors)
 {
 	this->Squares = squares;
 	this->Doors = doors;
+	this->Chests = chests;
 	this->GlassDoor = glass_doors;
 	this->shader = shaderProgram;
 	DefineModels();
@@ -26,7 +27,7 @@ MapGenerator::MapGenerator(Shader *shaderProgram, int squares, int doors, bool g
 	GenerateMap(squares);
 	CheckForWalls();
 	CheckForDoors();
-
+	GenerateChests(chests);
 	TransformToPositive();
 	FinishGeneration();
 	MapConverter conv = MapConverter(&maps);
@@ -131,13 +132,13 @@ void MapGenerator::FinishGeneration()
 	int door_index = 0;
 	for (int i = 0; i < maps.size(); i++)
 	{
-		mapRoot->AddChild(maps[i]->GenerateNode(nodes, mapRoot, floor, wall, door, key, door_index));
+		mapRoot->AddChild(maps[i]->GenerateNode(nodes, mapRoot, floor, wall, door, key, chest, door_index));
 	}
 	nodes.push_back(mapRoot);
 	SceneNode *mapRoot2 = new SceneNode();
 	for (int i = 0; i < maps.size(); i++)
 	{
-		mapRoot2->AddChild(maps[i]->GenerateNode(nodes, mapRoot, floor, wall, door, key, door_index, true));
+		mapRoot2->AddChild(maps[i]->GenerateNode(nodes, mapRoot, floor, wall, door, key, chest, door_index, true));
 	}
 	nodes.push_back(mapRoot2);
 }
@@ -386,4 +387,18 @@ void MapGenerator::DefineModels()
 	wall = new Model("Models/House/StaticSimpleDestroyedWall.obj", *shader, false);
 	door = new Model("Models/House/StaticDoor.obj", *shader, false);
 	key = new Model("Models/House/StaticDoor.obj", *shader, false);
+	chest = new Model("Models/Chest/Chest.obj", *shader, false);
+}
+
+void MapGenerator::GenerateChests(int amount)
+{
+	int chest = amount;
+	while(chest != 0)
+	{
+		int index = GetRandomIndex(maps.size());
+		if (!maps[index]->Chest) {
+			maps[index]->Chest = true;
+			chest--;
+		}
+	}
 }

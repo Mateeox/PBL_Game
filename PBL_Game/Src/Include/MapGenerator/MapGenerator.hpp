@@ -17,6 +17,7 @@ class MapGenerator //: public Script
 	Model* wall;
 	Model* door;
 	Model* key;
+	Model* chest;
 
 	int GetDirection();
 	void CheckForWalls();
@@ -36,15 +37,17 @@ class MapGenerator //: public Script
 	bool CheckIfNull(int x, int y);
 	int FindAnyNeighbour(int boundry, int& move);
 	void DefineModels();
+	void GenerateChests(int amount);
 
 	public:
 	int Squares = 1;
 	int Doors = 0;
+	int Chests = 0;
 	int maxSize;
 	bool GlassDoor = false;
 	std::vector<SceneNode*> nodes;
 	MapGenerator(Shader* shaderProgram);
-	MapGenerator(Shader* shaderProgram, int squares, int doors, bool glass_door);
+	MapGenerator(Shader* shaderProgram, int squares, int doors, int chests, bool glass_door);
 	void TransformToPositive();
 	std::vector<MapKey*> GetConverted();
 };
