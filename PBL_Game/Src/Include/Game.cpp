@@ -226,7 +226,7 @@ void Game::Granko()
                           MapSize);
   }
 
-  for (auto &node : generator.nodes)
+  for (auto &node : generator.leftnodes)
   { 
 	  if(node != NULL)
 		sNodes.push_back(node);

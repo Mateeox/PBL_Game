@@ -55,9 +55,10 @@ std::vector<MapKey*> MapGenerator::GetConverted()
 	return mapped;
 }
 
+
 void MapGenerator::GenerateMap(int n)
 {
-	MapElement *element = new MapElement(glm::vec2(0, 0), nodes);
+	MapElement *element = new MapElement(glm::vec2(0, 0), leftnodes);
 	maps.push_back(element);
 	positions.push_back(element->Position);
 	int elementIteration = 0;
@@ -65,7 +66,7 @@ void MapGenerator::GenerateMap(int n)
 	for (int i = 0; i < n - 1; i++)
 	{
 		int parent = 0;
-		MapElement *temp = new MapElement(GetVector2(elementIteration, boundry, parent), nodes, parent);
+		MapElement *temp = new MapElement(GetVector2(elementIteration, boundry, parent), leftnodes, parent);
 		maps.push_back(temp);
 		positions.push_back(temp->Position);
 		elementIteration = positions.size() - 1;
@@ -132,15 +133,15 @@ void MapGenerator::FinishGeneration()
 	int door_index = 0;
 	for (int i = 0; i < maps.size(); i++)
 	{
-		mapRoot->AddChild(maps[i]->GenerateNode(nodes, mapRoot, floor, wall, door, key, chest, door_index));
+		mapRoot->AddChild(maps[i]->GenerateNode(leftnodes, mapRoot, floor, wall, door, key, chest, door_index));
 	}
-	nodes.push_back(mapRoot);
+	leftnodes.push_back(mapRoot);
 	SceneNode *mapRoot2 = new SceneNode();
 	for (int i = 0; i < maps.size(); i++)
 	{
-		mapRoot2->AddChild(maps[i]->GenerateNode(nodes, mapRoot, floor, wall, door, key, chest, door_index, true));
+		mapRoot2->AddChild(maps[i]->GenerateNode(rightnodes, mapRoot, floor, wall, door, key, chest, door_index, true));
 	}
-	nodes.push_back(mapRoot2);
+	rightnodes.push_back(mapRoot2);
 }
 
 glm::vec2 MapGenerator::GetVector2(int step, int boundry, int &parent)
