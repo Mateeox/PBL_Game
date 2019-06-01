@@ -59,7 +59,6 @@ add_executable(PBL_Game
 		  Src/Include/Key.cpp
 		  Src/Include/Door.cpp
 		Src/Include/ConfigUtils.cpp
-		Src/Include/KeyDoorFactory.cpp
 		#PathFinding
 		Src/Include/PathFinding/PathFindingUtils.cpp
 		Src/Include/PathFinding/MapTile.cpp
@@ -76,6 +75,9 @@ add_executable(PBL_Game
 	  Src/Include/Component/Model.cpp
 	  Src/Include/Component/AnimatedModel.cpp
 		Src/Include/Component/BoneUtils.cpp
+
+		#KeyChestFactory
+		Src/Include/KeyDoorFactory.cpp
 	  #Stb_image
 	  Src/Include/stb_image.cpp
 	  #ImGui

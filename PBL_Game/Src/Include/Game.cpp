@@ -4,6 +4,7 @@
 #include "Component/Model.hpp"
 #include "Shapes.hpp"
 #include "PathFinding/PathFindingUtils.hpp"
+#include "KeyDoorFactory.hpp"
 
 #include <fstream>
 #include <iterator>
@@ -44,7 +45,7 @@ Game::Game(Window &aOkno) : okienko(aOkno),
 
 
   shaderProgram = new Shader("Shaders/vertex4.txt", "Shaders/fragment3.txt");
-  shaderProgram_For_Model = new Shader("Shaders/vertexModel.txt", "Shaders/fragmentModel.txt");
+  shaderProgram_For_Model = new Shader("Shaders/vertexModel.vs", "Shaders/fragmentModel.fs");
   shaderAnimatedModel = new Shader("Shaders/skinning.vs", "Shaders/skinning.fs");
   shaderViewCone = new Shader("Shaders/viewCone.vs", "Shaders/viewCone.fs");
 
@@ -53,7 +54,7 @@ Game::Game(Window &aOkno) : okienko(aOkno),
 
 void Game::Granko()
 {
-  MapGenerator generator(shaderProgram, MapScale, 0, false);
+  MapGenerator generator(shaderProgram_For_Model, MapScale, 0, false);
   std::vector<MapKey *> mapped = generator.GetConverted();
 
   MapSize = generator.maxSize;
@@ -65,6 +66,8 @@ void Game::Granko()
   Texture *FreeTileTexture = new Texture("Textures/FreeTile.png", GL_LINEAR);
   Texture *SlowerTileTexture = new Texture("Textures/SlowerTile.png", GL_LINEAR);
   Texture *PathTileTexture = new Texture("Textures/PathTile.png", GL_LINEAR);
+
+  
 
   BlockedTileTexture->Load();
   FreeTileTexture->Load();
@@ -143,7 +146,7 @@ void Game::Granko()
   keyNode.Scale(0.3, 0.3, 0.3);
   keyNode.Translate(-80, 0, 0);
 
-  
+  auto caleTe = KeyDoorFactory::Create(0,BeeModel,BeeModel);
 
   // Koniec triggerow
 
@@ -224,8 +227,9 @@ void Game::Granko()
   }
 
   for (auto &node : generator.nodes)
-  {
-    sNodes.push_back(node);
+  { 
+	  if(node != NULL)
+		sNodes.push_back(node);
   }
 
   shaderProgram->use();
@@ -324,7 +328,7 @@ void Game::Render()
   // RENDER LEWEJ STRONY
   glViewport(0, 0, (Game::WINDOW_WIDTH / 2) + 125, Game::WINDOW_HEIGHT);
   glScissor(0, 0, (Game::WINDOW_WIDTH / 2) + offset, Game::WINDOW_HEIGHT);
-  glClearColor(1, 0, 0, 1);
+  glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT);
   for (auto node : sNodes)
   {

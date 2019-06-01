@@ -148,31 +148,31 @@ glm::vec2 MapGenerator::GetVector2(int step)
 		int move = GetDirection();
 		switch (move)
 		{
-		default:
-		{
-			step = maps[step]->ParentElement;
-			break;
-		}
-		case 1:
-		{
-			pos_add = glm::vec2(0, 1.0f);
-			break;
-		}
-		case 2:
-		{
-			pos_add = glm::vec2(1.0f, 0);
-			break;
-		}
-		case 3:
-		{
-			pos_add = glm::vec2(0, -1.0f);
-			break;
-		}
-		case 4:
-		{
-			pos_add = glm::vec2(-1.0f, 0);
-			break;
-		}
+			default:
+			{
+				step = maps[step]->ParentElement;
+				break;
+			}
+			case 1: case 10:
+			{
+				pos_add = glm::vec2(0, 1.0f);
+				break;
+			}
+			case 2: case 11:
+			{
+				pos_add = glm::vec2(1.0f, 0);
+				break;
+			}
+			case 3: case 12:
+			{
+				pos_add = glm::vec2(0, -1.0f);
+				break;
+			}
+			case 4: case 13:
+			{
+				pos_add = glm::vec2(-1.0f, 0);
+				break;
+			}
 		}
 	}
 	return pos_add + this->positions[step];
@@ -292,7 +292,7 @@ void MapGenerator::PickDoors()
 
 int MapGenerator::GetDirection()
 {
-	return (rand() % 6);
+	return (rand() % 10);
 }
 
 int MapGenerator::GetRandomIndex(int max)
