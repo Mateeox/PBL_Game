@@ -87,6 +87,7 @@ SceneNode* MapElement::CreateDoor(SceneNode* parent, Model* model, Model* key, i
 		door->Rotate(direction_y == 0 ? -90.0f : 0, glm::vec3(0, 1, 0));
 		door->Scale(0.0254f, 0.0254f, 0.01f);
 		door->AddParent(parent);
+		door_index++;
 		return door;
 	}
 	else
