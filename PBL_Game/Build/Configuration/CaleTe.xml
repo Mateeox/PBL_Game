@@ -18,12 +18,12 @@
     <ConfigParameter>
         <Type>F</Type>
         <Name>PlayerSpeed</Name>
-        <Value>25</Value>
+        <Value>10</Value>
     </ConfigParameter>
     <ConfigParameter>
         <Type>U</Type>
-        <Name>MapSize</Name>
-        <Value>40</Value>
+        <Name>MapScale</Name>
+        <Value>200</Value>
     </ConfigParameter>
     <ConfigParameter>
         <Type>F</Type>
@@ -33,7 +33,7 @@
     <ConfigParameter>
         <Type>F</Type>
         <Name>FloorTranslation</Name>
-        <Value>-0.3</Value>
+        <Value>-0.001</Value>
     </ConfigParameter>
 
     <ConfigParameter>

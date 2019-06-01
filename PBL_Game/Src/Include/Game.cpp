@@ -13,7 +13,7 @@ static bool swapButtonPressed = false;
 
 void Game::InitializeConfig()
 {
-  //MapSize = ConfigUtils::GetValueFromMap<unsigned>("MapSize", ConfigMap);
+  MapScale = ConfigUtils::GetValueFromMap<unsigned>("MapScale", ConfigMap);
   WINDOW_WIDTH = ConfigUtils::GetValueFromMap<unsigned>("WINDOW_WIDTH", ConfigMap);
   WINDOW_HEIGHT = ConfigUtils::GetValueFromMap<unsigned>("WINDOW_HEIGHT", ConfigMap);
   movementSpeed = ConfigUtils::GetValueFromMap<float>("PlayerSpeed", ConfigMap);
@@ -41,7 +41,6 @@ Game::Game(Window &aOkno) : okienko(aOkno),
   glfwSetWindowSize(okienko.window, WINDOW_WIDTH, WINDOW_HEIGHT);
   InitializeConfig();
 
-  //grid = make_diagram4(MapSize, MapSize);
 
   shaderProgram = new Shader("Shaders/vertex4.txt", "Shaders/fragment3.txt");
   shaderProgram_For_Model = new Shader("Shaders/vertexModel.txt", "Shaders/fragmentModel.txt");
@@ -53,7 +52,7 @@ Game::Game(Window &aOkno) : okienko(aOkno),
 
 void Game::Granko()
 {
-  MapGenerator generator(shaderProgram, 100, 0, false);
+  MapGenerator generator(shaderProgram, MapScale, 0, false);
   std::vector<MapKey *> mapped = generator.GetConverted();
 
   MapSize = generator.maxSize;
