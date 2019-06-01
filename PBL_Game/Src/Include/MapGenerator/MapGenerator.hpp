@@ -27,12 +27,13 @@ class MapGenerator //: public Script
 	void GenerateMap(int n);
 	void FinishGeneration();
 	bool CheckIfAvailiable(glm::vec2 pos);
-	glm::vec2 GetVector2(int step);
+	glm::vec2 GetVector2(int step, int boundry, int &parent);
 	glm::vec4 GetVector4(glm::vec2 direction);
 	MapElement* GetElement(glm::vec2 pos);
 	int GetRandomIndex(int max);
 	void FillWithNull(int max);
 	bool CheckIfNull(int x, int y);
+	int FindAnyNeighbour(int boundry, int& move);
 
 	public:
 	int Squares = 1;

@@ -64,9 +64,11 @@ void MapGenerator::GenerateMap(int n)
 	maps.push_back(element);
 	positions.push_back(element->Position);
 	int elementIteration = 0;
+	const int boundry = sqrt(n) * 3 / 4;
 	for (int i = 0; i < n - 1; i++)
 	{
-		MapElement *temp = new MapElement(GetVector2(elementIteration), nodes, elementIteration);
+		int parent = 0;
+		MapElement *temp = new MapElement(GetVector2(elementIteration, boundry, parent), nodes, parent);
 		maps.push_back(temp);
 		positions.push_back(temp->Position);
 		elementIteration = positions.size() - 1;
@@ -137,41 +139,53 @@ void MapGenerator::FinishGeneration()
 	nodes.push_back(mapRoot);
 }
 
-glm::vec2 MapGenerator::GetVector2(int step)
+glm::vec2 MapGenerator::GetVector2(int step, int boundry, int &parent)
 {
 	glm::vec2 pos_add;
-	while (!CheckIfAvailiable(positions[step] + pos_add))
+	int iterator = 0;
+	bool stuck = false;
+	while (!CheckIfAvailiable(positions[step] + pos_add) || !(abs(positions[step].x + pos_add.x) <= boundry && abs(positions[step].y + pos_add.y) <= boundry))
 	{
 		int move = GetDirection();
+		if (iterator > 10)
+		{
+			stuck = true;
+			step = FindAnyNeighbour(boundry, move);
+		}
+		
 		switch (move)
 		{
-			default:
+			/*default:
 			{
-				step = maps[step]->ParentElement;
+				if (!stuck) {
+					step = maps[step]->ParentElement;
+				}
 				break;
-			}
-			case 1: case 10:
+			}*/
+			case 1:
 			{
 				pos_add = glm::vec2(0, 1.0f);
 				break;
 			}
-			case 2: case 11:
+			case 2:
 			{
 				pos_add = glm::vec2(1.0f, 0);
 				break;
 			}
-			case 3: case 12:
+			case 3:
 			{
 				pos_add = glm::vec2(0, -1.0f);
 				break;
 			}
-			case 4: case 13:
+			case 4:
 			{
 				pos_add = glm::vec2(-1.0f, 0);
 				break;
 			}
 		}
+		iterator++;
 	}
+	parent = step;
 	return pos_add + this->positions[step];
 }
 
@@ -289,7 +303,7 @@ void MapGenerator::PickDoors()
 
 int MapGenerator::GetDirection()
 {
-	return (rand() % 10);
+	return (rand() % 6);
 }
 
 int MapGenerator::GetRandomIndex(int max)
@@ -343,4 +357,20 @@ bool MapGenerator::CheckIfNull(int x, int y)
 			return false;
 	}
 	return true;
+}
+
+int MapGenerator::FindAnyNeighbour(int boundry, int& move)
+{
+	for (int i = 0; i < maps.size(); i++)
+	{
+		std::vector<glm::vec2> neighbours = maps[i]->GetNeighbours();
+		for (int j = 0; j < neighbours.size(); j++)
+		{
+			if (CheckIfAvailiable(neighbours[j]) && abs(neighbours[j].x) <= boundry && abs(neighbours[j].y) <= boundry) {
+				move = j + 1;
+				return i;
+			}
+		}
+	}
+	return 0;
 }
