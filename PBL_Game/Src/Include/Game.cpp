@@ -22,6 +22,7 @@ void Game::InitializeConfig()
 
   EnemyBaseSpeed = ConfigUtils::GetValueFromMap<float>("EnemyBaseSpeed", ConfigMap);
   EnemyXoffset = ConfigUtils::GetValueFromMap<float>("EnemyXoffset", ConfigMap);
+  EnemyYoffset = ConfigUtils::GetValueFromMap<float>("EnemyYoffset", ConfigMap);
   EnemyZoffset = ConfigUtils::GetValueFromMap<float>("EnemyZoffset", ConfigMap);
 
   PlayerXOffset = ConfigUtils::GetValueFromMap<float>("PlayerXOffset", ConfigMap);
@@ -29,7 +30,9 @@ void Game::InitializeConfig()
 
   floorTransform = ConfigUtils::GetValueFromMap<float>("FloorTranslation", ConfigMap);
   TileScale = ConfigUtils::GetValueFromMap<float>("TileScale", ConfigMap);
+  EnemyScale = ConfigUtils::GetValueFromMap<float>("EnemyScale", ConfigMap);
   TileScaleTimes100 = TileScale * 100;
+  EnemyScaleInverse = 1 / EnemyScale;
 }
 
 Game::Game(Window &aOkno) : okienko(aOkno),
@@ -174,16 +177,15 @@ void Game::Granko()
 
   //  FloorNode_new.Translate(0, floorTransform, 0);
 
-  leftPlayerNode.Scale(0.01, 0.01, 0.01);
-  rightPlayerNode.Scale(0.01, 0.01, 0.01);
-  Enemy_Node.Scale(0.01, 0.01, 0.01);
+  leftPlayerNode.Scale(0.01);
+  rightPlayerNode.Scale(0.01);
+
+  Enemy_Node.Scale(EnemyScale);
 
   leftPlayerNode.Translate(-150.0, 0, 0);
   rightPlayerNode.Translate(150.0, 0, 0);
 
-  Enemy_Node.Translate(5, 5, 0);
   box2.Translate(5, 0, 0);
-  // box2.Scale(1,1,100);
   box3.Translate(-5, 0, 0);
 
   Enemy_Node.AddChild(&Enemy_Node_For_Model);
@@ -196,20 +198,15 @@ void Game::Granko()
   sNodes.push_back(&doorNode);
   sNodes.push_back(&keyNode);
 
-  a_star_search(grid, start, goal, came_from, cost_so_far);
-  draw_grid(grid, 2, nullptr, &came_from);
-  std::cout << '\n';
-  draw_grid(grid, 3, &cost_so_far, nullptr);
-  std::cout << '\n';
-  path = reconstruct_path(start, goal, came_from);
-  draw_grid(grid, 3, nullptr, nullptr, &path);
+  //a_star_search(grid, start, goal, came_from, cost_so_far);
+  //path = reconstruct_path(start, goal, came_from);
 
   glm::vec2 startLocation = FindFirstEmptyFloor(mapped);
   std::cout << "First Free Tile:" << startLocation.x << startLocation.y << "\n";
   start.x = startLocation.x;
   start.y = startLocation.y;
 
-  Enemy_Node.Translate(start.x * 100, 0, start.y * 100);
+  Enemy_Node.Translate(start.x * EnemyScaleInverse, EnemyYoffset*100, start.y * EnemyScaleInverse);
   leftPlayerNode.Translate(start.x * 100, 0, start.y * 100);
 
   if(debugPathFinding)
@@ -284,7 +281,7 @@ void Game::Update(float interpolation)
       ProcessInput(interpolation, camera2);
     }
 
-    glm::vec2 start_poz = GetPositionOfset(Enemy_Node, MapSize, EnemyXoffset, EnemyZoffset, TileScaleTimes100);
+    glm::vec2 start_poz = GetPositionOfset(Enemy_Node, MapSize, EnemyXoffset, EnemyZoffset, EnemyScaleInverse);
     start.x = start_poz.x;
     start.y = start_poz.y;
 
@@ -302,9 +299,6 @@ void Game::Update(float interpolation)
       a_star_search(grid, start, goal, came_from, cost_so_far);
       path = reconstruct_path(start, goal, came_from);
     }
-
-    LastPathNode.x = start_poz.x;
-    LastPathNode.y = start_poz.y;
 
     if (leftSideActive)
       UpdatePlayer(leftPlayerNode, camera, interpolation);
@@ -629,6 +623,7 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation)
       coneRenderer->rotateRight();
   }
   camera.Position.x = player.gameObject->transform.getPosition().x * player.gameObject->transform.getScale().x;
+  camera.Position.y = cameraYOffset;
   camera.Position.z = player.gameObject->transform.getPosition().z * player.gameObject->transform.getScale().z + cameraZOffset;
 }
 
@@ -734,6 +729,7 @@ void Game::SetViewAndPerspective(Camera &aCamera)
   shaderProgram_For_Model->use();
   shaderProgram_For_Model->setMat4("projection", projection);
   shaderProgram_For_Model->setMat4("view", view);
+  shaderProgram_For_Model->setFloat("FogDensity",FogDensity);
 
   shaderViewCone->use();
   shaderViewCone->setMat4("projection", projection);
@@ -822,7 +818,7 @@ void Game::DisplayImage(const char *path, const char *text)
 void Game::MoveNodeToMapTile(SceneNode *sceneNode, GridLocation mapTile, float interpolation, float speed, float NodeXOffset, float NodeZOffset)
 {
   glm::vec2 positionA{sceneNode->local.getPosition().x, sceneNode->local.getPosition().z};
-  glm::vec2 positionB{NodeXOffset + mapTile.x * 100, NodeZOffset + mapTile.y * 100};
+  glm::vec2 positionB{NodeXOffset + mapTile.x * EnemyScaleInverse, NodeZOffset + mapTile.y * EnemyScaleInverse};
 
   glm::vec2 diffVec = positionB - positionA;
   glm::vec3 diffVec3D = {diffVec.x, sceneNode->local.getPosition().y, diffVec.y};
@@ -875,8 +871,12 @@ void Game::ImGuiFunctions()
     if (path.size() > 1)
       ImGui::Text("Next MapTile ID = %i, %i", path[1].x, path[1].y);
     ImGui::Text("Vector to move = %f, %f", vector2DHelper.x, vector2DHelper.y);
-    ImGui::Text("Enemy position = %f, %f", vector2DHelper2.x, vector2DHelper2.y);
+    ImGui::Text("Enemy position = %f, %f", Enemy_Node.local.getPosition().x, Enemy_Node.local.getPosition().z);
     ImGui::Text("Player position = %f, %f", leftPlayerNode.local.getPosition().x, leftPlayerNode.local.getPosition().z);
+    ImGui::SliderFloat("CameraZOffset", &cameraZOffset, 0,5);
+    ImGui::SliderFloat("CameraYOffset", &cameraYOffset, 0,5);
+    ImGui::SliderFloat("FogDensity", &FogDensity, 0,1);
+    
     if (ImGui::Button("Printf Path"))
     {
       draw_grid(grid, 3, nullptr, nullptr, &path);

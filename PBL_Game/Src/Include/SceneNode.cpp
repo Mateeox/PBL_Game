@@ -92,6 +92,12 @@ void SceneNode::Scale(float x, float y, float z)
   dirty_flag = true;
 }
 
+void SceneNode::Scale(float value)
+{
+  local.ScaleTransform(value, value, value);
+  dirty_flag = true;
+}
+
 void SceneNode::Translate(float x, float y, float z)
 {
   local.Translate(glm::vec3(x, y, z));

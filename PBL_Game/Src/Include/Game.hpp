@@ -36,6 +36,7 @@ class Game
   glm::vec2 vector2DHelper{0,0};
   glm::vec2 vector2DHelper2{0,0};
 
+
   //
   Window &okienko;
   Shader *shaderProgram;
@@ -85,9 +86,14 @@ class Game
   float movementSpeed; //Move to PlayerData
   float EnemyBaseSpeed;
   float EnemyXoffset;
+  float EnemyYoffset;
   float EnemyZoffset;
   float PlayerXOffset;
   float PlayerZOffset;
+  float EnemyScale;
+  float EnemyScaleInverse;
+
+  float FogDensity = 0.35;
 
   bool mouseCallBack = true;
   bool firstMouse = true;
@@ -120,9 +126,9 @@ public:
   unsigned WINDOW_WIDTH = 0;
   unsigned WINDOW_HEIGHT = 0;
 
-  const float cameraZOffset = 7;
-  const float cameraYOffset = 2;
-  const float cameraAngle = 35;
+  float cameraZOffset = 5;
+  float cameraYOffset = 2;
+  float cameraAngle = 35;
 
   int plotNumber = 1;	// Zmienna wskazujaca na obecna wstawke fabularna
   bool inputBlockade = true;	// Zmienna  blokujaca mozliwosci gracza (domyslnie na czas wstawek fabularnych)
@@ -155,7 +161,8 @@ private:
   void SerializeZapisz(std::string serialized);
   void DeserializeOrderPointers(std::map<unsigned long long, SceneNode *> &map);
 
-  void MoveNodeToMapTile(SceneNode * sceneNode,GridLocation mapTile,float interpolation,float speed,float NodeXOffset,float NodeZOffset);
+  void MoveNodeToMapTile(SceneNode * sceneNode,GridLocation mapTile,float interpolation,float speed,float NodeXOffset,
+  float NodeZOffset);
 
   void SetViewAndPerspective(Camera &aCamera);
   void Plot();

@@ -13,13 +13,13 @@ float dist = 0;
 float fogFactor = 0;
  
 const vec3 fogColor = vec3(0.5, 0.5,0.5);
-const float FogDensity = 0.15;
+uniform float FogDensity = 0.15;
 
 vec3 finalColor = vec3(0, 0, 0);
 
 void main()
 {    
-    dist = abs(viewSpace.z);
+    dist = abs(viewSpace.z-5);
 
     fogFactor = (80 - dist)/(80 - 20);
    fogFactor = clamp( fogFactor, 0.0, 1.0 );
