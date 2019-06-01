@@ -54,7 +54,7 @@ Game::Game(Window &aOkno) : okienko(aOkno),
 
 void Game::Granko()
 {
-  MapGenerator generator(shaderProgram_For_Model, MapScale, 0, false);
+  MapGenerator generator(shaderProgram_For_Model, MapScale, 3, false);
   std::vector<MapKey *> mapped = generator.GetConverted();
 
   MapSize = generator.maxSize;

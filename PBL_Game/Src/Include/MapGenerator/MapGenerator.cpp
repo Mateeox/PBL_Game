@@ -287,6 +287,8 @@ int MapGenerator::CountDoors()
 void MapGenerator::PickDoors()
 {
 	int doorsCount = CountDoors();
+	if (Doors > doorsCount)
+		Doors = doorsCount;
 	do
 	{
 		int index = GetRandomIndex(doors.size());
