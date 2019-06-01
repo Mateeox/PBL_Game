@@ -44,7 +44,7 @@ Game::Game(Window &aOkno) : okienko(aOkno),
 
 
   shaderProgram = new Shader("Shaders/vertex4.txt", "Shaders/fragment3.txt");
-  shaderProgram_For_Model = new Shader("Shaders/vertexModel.txt", "Shaders/fragmentModel.txt");
+  shaderProgram_For_Model = new Shader("Shaders/vertexModel.vs", "Shaders/fragmentModel.fs");
   shaderAnimatedModel = new Shader("Shaders/skinning.vs", "Shaders/skinning.fs");
   shaderViewCone = new Shader("Shaders/viewCone.vs", "Shaders/viewCone.fs");
 
@@ -281,7 +281,7 @@ void Game::Render()
   // RENDER LEWEJ STRONY
   glViewport(0, 0, (Game::WINDOW_WIDTH / 2) + 125, Game::WINDOW_HEIGHT);
   glScissor(0, 0, (Game::WINDOW_WIDTH / 2) + offset, Game::WINDOW_HEIGHT);
-  glClearColor(1, 0, 0, 1);
+  glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT);
   for (auto node : sNodes)
   {

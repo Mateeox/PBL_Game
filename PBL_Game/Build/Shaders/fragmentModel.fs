@@ -13,7 +13,7 @@ float dist = 0;
 float fogFactor = 0;
  
 const vec3 fogColor = vec3(0.5, 0.5,0.5);
-const float FogDensity = 0.05;
+const float FogDensity = 0.15;
 
 vec3 finalColor = vec3(0, 0, 0);
 
@@ -24,10 +24,11 @@ void main()
     fogFactor = (80 - dist)/(80 - 20);
    fogFactor = clamp( fogFactor, 0.0, 1.0 );
  
-   //if you inverse color in glsl mix function you have to
-   //put 1.0 - fogFactor
-   finalColor = fogColor * fogFactor;
+    fogFactor = 1.0 /exp( (dist * FogDensity)* (dist * FogDensity));
+   fogFactor = clamp( fogFactor, 0.0, 1.0 );
+ 
+   finalColor = (fogColor * fogFactor);
 
     //finalColor = finalColor * texture(texture_diffuse1, TexCoords);
-    FragColor = vec4(finalColor, 1);
+    FragColor = texture(texture_diffuse1, TexCoords) * vec4(finalColor,1);
 }
