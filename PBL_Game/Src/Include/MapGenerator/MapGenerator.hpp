@@ -16,6 +16,7 @@ class MapGenerator //: public Script
 	Model* floor;
 	Model* wall;
 	Model* door;
+	Model* key;
 
 	int GetDirection();
 	void CheckForWalls();
@@ -34,6 +35,7 @@ class MapGenerator //: public Script
 	void FillWithNull(int max);
 	bool CheckIfNull(int x, int y);
 	int FindAnyNeighbour(int boundry, int& move);
+	void DefineModels();
 
 	public:
 	int Squares = 1;

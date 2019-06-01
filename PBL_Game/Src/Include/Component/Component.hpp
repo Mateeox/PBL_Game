@@ -10,6 +10,7 @@ enum ComponentType
 	Error,
 	Renderer,
 	Collider,
+	Trigger,
 	ShapeRenderer3D,
 	Model,
 	AnimatedModel,

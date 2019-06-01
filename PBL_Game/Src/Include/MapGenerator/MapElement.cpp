@@ -5,11 +5,12 @@ MapElement::MapElement(std::vector<SceneNode*>&aNodes):nodes(aNodes) {
 	this->Doors = glm::vec4();
 }
 
-MapElement::MapElement(glm::vec2 pos,std::vector<SceneNode*>& aNodes,int ParentElement):nodes(aNodes)
+MapElement::MapElement(glm::vec2 pos, std::vector<SceneNode*>& aNodes, int ParentElement) : nodes(aNodes)
 {
 	this->Position = glm::vec2(pos.x, pos.y);
 	this->ParentElement = ParentElement;
 	this->Doors = glm::vec4();
+	this->mirror = mirror;
 }
 
 void MapElement::SetWall(glm::vec4 wall)
@@ -32,7 +33,7 @@ std::vector<glm::vec2> MapElement::GetNeighbours()
 	return neighbours;
 }
 
-SceneNode* MapElement::GenerateNode(std::vector<SceneNode*>& aNodes, SceneNode* parent, Model* floorMod, Model* wallMod, Model* doorMod)
+SceneNode* MapElement::GenerateNode(std::vector<SceneNode*>& aNodes, SceneNode* parent, Model* floorMod, Model* wallMod, Model* doorMod, Model* keyMod, int& door_index, bool mirror)
 {
 	SceneNode* element = new SceneNode();
 	element->AddParent(parent);
@@ -43,7 +44,7 @@ SceneNode* MapElement::GenerateNode(std::vector<SceneNode*>& aNodes, SceneNode* 
 	for (int i = 0; i < walls.size(); i++)
 		element->AddChild(walls[i]);
 	walls.clear();
-	std::vector<SceneNode*> doors = AddDoors(floor, doorMod);
+	std::vector<SceneNode*> doors = AddDoors(floor, doorMod, keyMod, door_index);
 	for (int i = 0; i < doors.size(); i++)
 		element->AddChild(doors[i]);
 	nodes.push_back(element);
@@ -77,17 +78,25 @@ SceneNode* MapElement::CreateWall(SceneNode* parent, Model* model, float directi
 	return wall;
 }
 
-SceneNode* MapElement::CreateDoor(SceneNode* parent, Model* model, float direction_x, float direction_y)
+SceneNode* MapElement::CreateDoor(SceneNode* parent, Model* model, Model* key, int& door_index, float direction_x, float direction_y)
 {
-	SceneNode* door = new SceneNode();
-	GameObject* doorObj = new GameObject(door->local);
-	doorObj->AddComponent(model);
-	door->AddGameObject(doorObj);
-	door->Translate(Position.x + direction_x * wall_offset, 0, Position.y + direction_y * wall_offset);
-	door->Rotate(direction_y == 0 ? -90.0f : 0, glm::vec3(0, 1, 0));
-	door->Scale(0.0254f, 0.0254f, 0.01f);
-	door->AddParent(parent);
-	return door;
+	if (!mirror) {
+		keydoor = KeyDoorFactory::Create(door_index, model, key);
+		SceneNode* door = keydoor.second;
+		door->Translate(Position.x + direction_x * wall_offset, 0, Position.y + direction_y * wall_offset);
+		door->Rotate(direction_y == 0 ? -90.0f : 0, glm::vec3(0, 1, 0));
+		door->Scale(0.0254f, 0.0254f, 0.01f);
+		door->AddParent(parent);
+		return door;
+	}
+	else
+	{
+		SceneNode* key = keydoor.first;
+		key->Translate(Position.x, 0, Position.y);
+		key->Scale(0.0254f, 0.0254f, 0.01f);
+		key->AddParent(parent);
+		return key;
+	}
 }
 
 std::vector<SceneNode*> MapElement::AddWalls(SceneNode* node, Model* model)
@@ -104,17 +113,17 @@ std::vector<SceneNode*> MapElement::AddWalls(SceneNode* node, Model* model)
 	return temp;
 }
 
-std::vector<SceneNode*> MapElement::AddDoors(SceneNode* node, Model* model)
+std::vector<SceneNode*> MapElement::AddDoors(SceneNode* node, Model* model, Model* key, int& index_door)
 {
 	std::vector<SceneNode*> temp;
 	if (Doors.x > 0)
-		temp.push_back(CreateDoor(node, model, 0, 1.0f));
+		temp.push_back(CreateDoor(node, model, key, index_door, 0, 1.0f));
 	if (Doors.y > 0)
-		temp.push_back(CreateDoor(node, model, 1.0f, 0));
+		temp.push_back(CreateDoor(node, model, key, index_door, 1.0f, 0));
 	if (Doors.z > 0)
-		temp.push_back(CreateDoor(node, model, 0, -1.0f));
+		temp.push_back(CreateDoor(node, model, key, index_door, 0, -1.0f));
 	if (Doors.w > 0)
-		temp.push_back(CreateDoor(node, model, -1.0f, 0));
+		temp.push_back(CreateDoor(node, model, key, index_door, -1.0f, 0));
 	return temp;
 }
 

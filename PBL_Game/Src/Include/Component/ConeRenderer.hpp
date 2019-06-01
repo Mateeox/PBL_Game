@@ -13,7 +13,7 @@ class ConeRenderer : public Drawable
 	double directionAngle = 3;
 	const int segmentsNumber = 100;
 	const double angle = 1.5;
-	const double coneHeight = 0;
+	const double coneHeight = 0.2;
 	const double rotationSpeed = 0.1;
 	std::vector<float> finalVertices;
 	std::vector<std::pair<ShapeRenderer3D*, glm::mat4 >> objectsInCone;

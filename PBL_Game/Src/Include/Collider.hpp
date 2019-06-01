@@ -7,6 +7,7 @@ class GameObject;
 
 class Collider : public ComponentSystem::Component {
 
+protected:
 	glm::vec3 coords;
 	glm::vec3 dimensions;
 

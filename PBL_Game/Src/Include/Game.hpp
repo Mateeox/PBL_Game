@@ -3,6 +3,9 @@
 #include "Shader.hpp"
 #include "SceneNode.hpp"
 #include "Collider.hpp"
+#include "Trigger.hpp"
+#include "Key.hpp"
+#include "Door.hpp"
 #include "ConfigUtils.hpp"
 #include "Component/ConeRenderer.hpp"
 #include "PathFinding/MapTile.hpp"
@@ -24,6 +27,7 @@ static bool Tab_Pressed = false;
 
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 
+
 class Game
 {
 
@@ -40,8 +44,10 @@ class Game
   Shader *shaderViewCone;
   std::vector<SceneNode *> sNodes;
   std::vector<SceneNode *> rightNodes;
-  
   std::vector<Collider *> collidableObjects;
+  std::vector<Trigger *> triggers;
+  std::map<int,bool> KeyInEq;
+
 
   //PathFinding
   #pragma region PathFindingAndMapGenerationUtils
@@ -51,8 +57,6 @@ class Game
   unsigned MapSize = 0;
   unsigned MapScale = 0;
   bool debugPathFinding = false;
-
-
 
   GridLocation start{0, 0};
   GridLocation goal{8, 5};
@@ -134,6 +138,7 @@ public:
   void Deserialize(std::string path);
   void UpdatePlayer(SceneNode &player, Camera &camera,float interpolation);
   void gatherCollidableObjects(std::vector<SceneNode *> &nodes);
+  void gatherTriggers(std::vector<SceneNode*>& nodes);
   std::vector<GameObject*> findByTag(const std::vector<SceneNode*>& data, std::string tag);
   GameObject * findByTagSingle(const std::vector<SceneNode*>& data, std::string tag);
 

@@ -4,6 +4,7 @@
 #include "Component/Model.hpp"
 #include "Shapes.hpp"
 #include "PathFinding/PathFindingUtils.hpp"
+#include "KeyDoorFactory.hpp"
 
 #include <fstream>
 #include <iterator>
@@ -44,7 +45,7 @@ Game::Game(Window &aOkno) : okienko(aOkno),
 
 
   shaderProgram = new Shader("Shaders/vertex4.txt", "Shaders/fragment3.txt");
-  shaderProgram_For_Model = new Shader("Shaders/vertexModel.txt", "Shaders/fragmentModel.txt");
+  shaderProgram_For_Model = new Shader("Shaders/vertexModel.vs", "Shaders/fragmentModel.fs");
   shaderAnimatedModel = new Shader("Shaders/skinning.vs", "Shaders/skinning.fs");
   shaderViewCone = new Shader("Shaders/viewCone.vs", "Shaders/viewCone.fs");
 
@@ -53,7 +54,7 @@ Game::Game(Window &aOkno) : okienko(aOkno),
 
 void Game::Granko()
 {
-  MapGenerator generator(shaderProgram, MapScale, 0, false);
+  MapGenerator generator(shaderProgram_For_Model, MapScale, 0, false);
   std::vector<MapKey *> mapped = generator.GetConverted();
 
   MapSize = generator.maxSize;
@@ -66,6 +67,8 @@ void Game::Granko()
   Texture *SlowerTileTexture = new Texture("Textures/SlowerTile.png", GL_LINEAR);
   Texture *PathTileTexture = new Texture("Textures/PathTile.png", GL_LINEAR);
 
+  
+
   BlockedTileTexture->Load();
   FreeTileTexture->Load();
   SlowerTileTexture->Load();
@@ -73,6 +76,8 @@ void Game::Granko()
 
   SceneNode box2;
   SceneNode box3;
+  SceneNode doorNode;
+  SceneNode keyNode;
 
   GameObject *enemyGameObject = new GameObject(Enemy_Node_For_Model.local);
 
@@ -84,10 +89,15 @@ void Game::Granko()
   GameObject *hexObj2 = new GameObject(box2.local);
   GameObject *hexObj3 = new GameObject(box3.local);
 
+  GameObject *doorObj = new GameObject(doorNode.local);
+  GameObject *keyObj = new GameObject(keyNode.local);
+
+  std::string ChestModelPath = "Models/Chest/Chest.obj";
   std::string BeeModelPath = "Models/House/StaticSimpleDestroyedWall.obj";
   std::string AnimatedEnemyPAth = "Models/" + ConfigUtils::GetValueFromMap<std::string>("Enemy_Animated_Model", ConfigMap);
 
   Model *BeeModel = new Model(BeeModelPath, *shaderProgram_For_Model, false);
+  Model *ChestModel = new Model(ChestModelPath, *shaderProgram_For_Model, false);
   animatedModel = new AnimatedModel(AnimatedEnemyPAth, *shaderAnimatedModel, false);
 
   ShapeRenderer3D *TileRenderer = new ShapeRenderer3D(Shapes::RainBow_Square,
@@ -113,8 +123,33 @@ void Game::Granko()
   hexObj2->AddComponent(szescian);
   hexObj3->AddComponent(szescian);
 
+  doorObj->AddComponent(szescian);
+  keyObj->AddComponent(szescian);
+
   Collider *leftPlayerCollider = new Collider(leftPlayerObj->transform);
   Collider *rightPlayerCollider = new Collider(rightPlayerObj->transform);
+
+  // Triggery
+  Door* sampleDoor = new Door(doorObj->transform, &doorNode);
+  Key* sampleKey = new Key(keyObj->transform, sampleDoor);
+
+  sampleDoor->setDimensions(0, 0, 0, 0.5, 1, 1);
+  sampleKey->setDimensions(0, 0, 0, 0.3, 0.3, 0.3);
+  doorObj->AddComponent(sampleDoor);
+  keyObj->AddComponent(sampleKey);
+  doorNode.AddGameObject(doorObj);
+  keyNode.AddGameObject(keyObj);
+
+  doorNode.Scale(0.5, 1, 1);
+  doorNode.Translate(-30, 0, 0);
+
+  keyNode.Scale(0.3, 0.3, 0.3);
+  keyNode.Translate(-80, 0, 0);
+
+  auto caleTe = KeyDoorFactory::Create(0,BeeModel,BeeModel);
+
+  // Koniec triggerow
+
   leftPlayerCollider->setDimensions(-0.12, 0, 0.25, 2.3, 2, 3.05);
   rightPlayerCollider->setDimensions(-0.12, 0, 0.25, 2.3, 2, 3.05);
 
@@ -158,6 +193,17 @@ void Game::Granko()
   sNodes.push_back(&box2);
   sNodes.push_back(&box3);
 
+  sNodes.push_back(&doorNode);
+  sNodes.push_back(&keyNode);
+
+  a_star_search(grid, start, goal, came_from, cost_so_far);
+  draw_grid(grid, 2, nullptr, &came_from);
+  std::cout << '\n';
+  draw_grid(grid, 3, &cost_so_far, nullptr);
+  std::cout << '\n';
+  path = reconstruct_path(start, goal, came_from);
+  draw_grid(grid, 3, nullptr, nullptr, &path);
+
   glm::vec2 startLocation = FindFirstEmptyFloor(mapped);
   std::cout << "First Free Tile:" << startLocation.x << startLocation.y << "\n";
   start.x = startLocation.x;
@@ -195,11 +241,12 @@ void Game::Granko()
   sNodes.push_back(&leftPlayerNode);
   rightNodes.push_back(&rightPlayerNode);
   gatherCollidableObjects(sNodes);
+  gatherTriggers(sNodes);
   while (glfwGetKey(okienko.window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
          glfwWindowShouldClose(okienko.window) == 0)
   {
     loops = 0;
-
+  
     while ((glfwGetTime() * 1000) > next_game_tick && loops < MAX_FRAMESKIP)
     {
       Update(interpolation);
@@ -281,7 +328,7 @@ void Game::Render()
   // RENDER LEWEJ STRONY
   glViewport(0, 0, (Game::WINDOW_WIDTH / 2) + 125, Game::WINDOW_HEIGHT);
   glScissor(0, 0, (Game::WINDOW_WIDTH / 2) + offset, Game::WINDOW_HEIGHT);
-  glClearColor(1, 0, 0, 1);
+  glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT);
   for (auto node : sNodes)
   {
@@ -564,6 +611,13 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation)
       break;
     }
   }
+  for (Trigger *trigger : triggers)
+  {
+	  if (playerCollider->checkCollision(trigger))
+	  {
+		  trigger->ActivateTrigger();
+	  }
+  }
 
   //view cone
   auto coneRenderer = (ConeRenderer *)player.gameObject->GetComponent(ComponentSystem::ComponentType::ConeRenderer);
@@ -596,6 +650,25 @@ void Game::gatherCollidableObjects(std::vector<SceneNode *> &nodes)
       }
     }
   }
+}
+void Game::gatherTriggers(std::vector<SceneNode *> &nodes)
+{
+	for (auto node : nodes)
+	{
+		if (node->gameObject != nullptr)
+		{
+
+			if (node->gameObject->getTag() != "player" && node->gameObject->getTag() != "enemy")
+			{
+				ComponentSystem::Component *possibleTrigger = node->gameObject->GetComponent(ComponentSystem::ComponentType::Trigger);
+				if (possibleTrigger != nullptr)
+				{
+					triggers.push_back((Trigger *)possibleTrigger);
+				}
+				gatherTriggers(node->children);
+			}
+		}
+	}
 }
 
 std::vector<GameObject *> Game::findByTag(const std::vector<SceneNode *> &data, std::string tag)
@@ -679,6 +752,8 @@ void Game::Plot()
     inputBlockade = false;
     return;
   }
+
+
   inputBlockade = true;
 
   static int imageNumber = 1;
@@ -716,7 +791,7 @@ void Game::DisplayImage(const char *path, const char *text)
   glViewport(0, 0, Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT);
   glScissor(0, 0, Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT);
   glEnable(GL_SCISSOR_TEST);
-  glClearColor(0, 1, 0, 1);
+  glClearColor(0, 0, 0, 0);
   glClear(GL_COLOR_BUFFER_BIT);
 
   Texture *imageTex = new Texture(path, GL_NEAREST_MIPMAP_NEAREST);
