@@ -27,6 +27,7 @@ static bool Tab_Pressed = false;
 
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 
+
 class Game
 {
 
@@ -43,9 +44,13 @@ class Game
   Shader *shaderViewCone;
   std::vector<SceneNode *> sNodes;
   std::vector<SceneNode *> rightNodes;
-  
   std::vector<Collider *> collidableObjects;
+<<<<<<< HEAD
   std::vector<Trigger *> triggers;
+=======
+  std::map<int,bool> KeyInEq;
+
+>>>>>>> keyChest factory
 
   //PathFinding
   #pragma region PathFindingAndMapGenerationUtils
@@ -55,8 +60,6 @@ class Game
   unsigned MapSize = 0;
   unsigned MapScale = 0;
   bool debugPathFinding = false;
-
-
 
   GridLocation start{0, 0};
   GridLocation goal{8, 5};
