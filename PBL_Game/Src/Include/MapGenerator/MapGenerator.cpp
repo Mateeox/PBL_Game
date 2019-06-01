@@ -376,6 +376,7 @@ int MapGenerator::FindAnyNeighbour(int boundry, int& move)
 		}
 	}
 	return 0;
+}
 
 void MapGenerator::DefineModels()
 {
