@@ -181,8 +181,9 @@ void Game::Granko()
   }
 
   for (auto &node : generator.nodes)
-  {
-    sNodes.push_back(node);
+  { 
+	  if(node != NULL)
+		sNodes.push_back(node);
   }
 
   shaderProgram->use();
