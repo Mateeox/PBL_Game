@@ -205,7 +205,7 @@ void Game::Granko()
   start.x = startLocation.x;
   start.y = startLocation.y;
 
-  Enemy_Node.Translate(start.x * 100, EnemyYoffset*100, start.y * 100);
+  Enemy_Node.Translate(start.x * EnemyScaleInverse, EnemyYoffset*100, start.y * EnemyScaleInverse);
   leftPlayerNode.Translate(start.x * 100, 0, start.y * 100);
 
   if(debugPathFinding)
@@ -280,7 +280,7 @@ void Game::Update(float interpolation)
       ProcessInput(interpolation, camera2);
     }
 
-    glm::vec2 start_poz = GetPositionOfset(Enemy_Node, MapSize, EnemyXoffset, EnemyZoffset, TileScaleTimes100);
+    glm::vec2 start_poz = GetPositionOfset(Enemy_Node, MapSize, EnemyXoffset, EnemyZoffset, EnemyScaleInverse);
     start.x = start_poz.x;
     start.y = start_poz.y;
 
@@ -817,7 +817,7 @@ void Game::DisplayImage(const char *path, const char *text)
 void Game::MoveNodeToMapTile(SceneNode *sceneNode, GridLocation mapTile, float interpolation, float speed, float NodeXOffset, float NodeZOffset)
 {
   glm::vec2 positionA{sceneNode->local.getPosition().x, sceneNode->local.getPosition().z};
-  glm::vec2 positionB{NodeXOffset + mapTile.x * 100, NodeZOffset + mapTile.y * 100};
+  glm::vec2 positionB{NodeXOffset + mapTile.x * EnemyScaleInverse, NodeZOffset + mapTile.y * EnemyScaleInverse};
 
   glm::vec2 diffVec = positionB - positionA;
   glm::vec3 diffVec3D = {diffVec.x, sceneNode->local.getPosition().y, diffVec.y};
