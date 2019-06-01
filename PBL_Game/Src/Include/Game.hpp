@@ -45,12 +45,9 @@ class Game
   std::vector<SceneNode *> sNodes;
   std::vector<SceneNode *> rightNodes;
   std::vector<Collider *> collidableObjects;
-<<<<<<< HEAD
   std::vector<Trigger *> triggers;
-=======
   std::map<int,bool> KeyInEq;
 
->>>>>>> keyChest factory
 
   //PathFinding
   #pragma region PathFindingAndMapGenerationUtils

@@ -86,13 +86,10 @@ void Game::Granko()
   GameObject *hexObj2 = new GameObject(box2.local);
   GameObject *hexObj3 = new GameObject(box3.local);
 
-<<<<<<< HEAD
   GameObject *doorObj = new GameObject(doorNode.local);
   GameObject *keyObj = new GameObject(keyNode.local);
 
-=======
   std::string ChestModelPath = "Models/Chest/Chest.obj";
->>>>>>> keyChest factory
   std::string BeeModelPath = "Models/House/StaticSimpleDestroyedWall.obj";
   std::string AnimatedEnemyPAth = "Models/" + ConfigUtils::GetValueFromMap<std::string>("Enemy_Animated_Model", ConfigMap);
 

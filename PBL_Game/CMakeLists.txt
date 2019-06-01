@@ -76,7 +76,7 @@ add_executable(PBL_Game
 	  Src/Include/Component/AnimatedModel.cpp
 		Src/Include/Component/BoneUtils.cpp
 		#KeyChestFactory
-		Src/Include/KeyChestFactory.hpp
+		Src/Include/KeyDoorFactory.hpp
 	  #Stb_image
 	  Src/Include/stb_image.cpp
 	  #ImGui
