@@ -2,7 +2,6 @@
 #include "Game.hpp"
 #include "Component/ShapeRenderer3D.hpp"
 #include "Component/Model.hpp"
-#include "Component/AnimatedModel.hpp"
 #include "Shapes.hpp"
 #include "PathFinding/PathFindingUtils.hpp"
 
@@ -14,16 +13,27 @@ static bool swapButtonPressed = false;
 
 void Game::InitializeConfig()
 {
-  MapSize = ConfigUtils::GetValueFromMap<unsigned>("MapSize", ConfigMap);
+  //MapSize = ConfigUtils::GetValueFromMap<unsigned>("MapSize", ConfigMap);
   WINDOW_WIDTH = ConfigUtils::GetValueFromMap<unsigned>("WINDOW_WIDTH", ConfigMap);
   WINDOW_HEIGHT = ConfigUtils::GetValueFromMap<unsigned>("WINDOW_HEIGHT", ConfigMap);
   movementSpeed = ConfigUtils::GetValueFromMap<float>("PlayerSpeed", ConfigMap);
+
+  EnemyBaseSpeed = ConfigUtils::GetValueFromMap<float>("EnemyBaseSpeed", ConfigMap);
+  EnemyXoffset = ConfigUtils::GetValueFromMap<float>("EnemyXoffset", ConfigMap);
+  EnemyZoffset = ConfigUtils::GetValueFromMap<float>("EnemyZoffset", ConfigMap);
+
+  PlayerXOffset = ConfigUtils::GetValueFromMap<float>("PlayerXOffset", ConfigMap);
+  PlayerZOffset = ConfigUtils::GetValueFromMap<float>("PlayerZOffset", ConfigMap);
+
+  floorTransform = ConfigUtils::GetValueFromMap<float>("FloorTranslation", ConfigMap);
+  TileScale = ConfigUtils::GetValueFromMap<float>("TileScale", ConfigMap);
+  TileScaleTimes100 = TileScale * 100;
 }
 
 Game::Game(Window &aOkno) : okienko(aOkno),
                             camera(Camera()),
                             camera2(Camera()),
-                            MapSize(0)                  
+                            MapSize(0)
 {
   LoadConfig();
   InitializeConfig();
@@ -31,17 +41,26 @@ Game::Game(Window &aOkno) : okienko(aOkno),
   glfwSetWindowSize(okienko.window, WINDOW_WIDTH, WINDOW_HEIGHT);
   InitializeConfig();
 
-  grid = make_diagram4(MapSize, MapSize);
+  //grid = make_diagram4(MapSize, MapSize);
 
   shaderProgram = new Shader("Shaders/vertex4.txt", "Shaders/fragment3.txt");
   shaderProgram_For_Model = new Shader("Shaders/vertexModel.txt", "Shaders/fragmentModel.txt");
   shaderAnimatedModel = new Shader("Shaders/skinning.vs", "Shaders/skinning.fs");
+  shaderViewCone = new Shader("Shaders/viewCone.vs", "Shaders/viewCone.fs");
 
   glfwSetCursorPosCallback(okienko.window, mouse_callback);
 }
 
 void Game::Granko()
 {
+  MapGenerator generator(shaderProgram, 100, 0, false);
+  std::vector<MapKey *> mapped = generator.GetConverted();
+
+  MapSize = generator.maxSize;
+  grid = make_diagramFromGeneratedMap(mapped, MapSize);
+
+  Texture *xD = new Texture("Textures/red.png", GL_LINEAR);
+  xD->Load();
   Texture *BlockedTileTexture = new Texture("Textures/BlockedTile.png", GL_LINEAR);
   Texture *FreeTileTexture = new Texture("Textures/FreeTile.png", GL_LINEAR);
   Texture *SlowerTileTexture = new Texture("Textures/SlowerTile.png", GL_LINEAR);
@@ -52,43 +71,29 @@ void Game::Granko()
   SlowerTileTexture->Load();
   PathTileTexture->Load();
 
-  SceneNode scena1_new;
-  SceneNode FloorNode_new;
-  SceneNode box1;
   SceneNode box2;
   SceneNode box3;
   SceneNode doorNode;
   SceneNode keyNode;
 
-  SceneNode Enemy_Node;
-
-  GameObject *enemyGameObject = new GameObject(Enemy_Node.local);
+  GameObject *enemyGameObject = new GameObject(Enemy_Node_For_Model.local);
 
   GameObject *leftPlayerObj = new GameObject(leftPlayerNode.local);
   leftPlayerObj->setTag("player");
   GameObject *rightPlayerObj = new GameObject(rightPlayerNode.local);
   rightPlayerObj->setTag("player");
 
-  GameObject *trojObj = new GameObject(scena1_new.world);
-  GameObject *FloorObj = new GameObject(FloorNode_new.world);
   GameObject *hexObj2 = new GameObject(box2.local);
   GameObject *hexObj3 = new GameObject(box3.local);
 
   GameObject *doorObj = new GameObject(doorNode.local);
   GameObject *keyObj = new GameObject(keyNode.local);
 
-  std::string BeeModelPath = "Models/enemy_model.obj";
+  std::string BeeModelPath = "Models/House/StaticSimpleDestroyedWall.obj";
   std::string AnimatedEnemyPAth = "Models/" + ConfigUtils::GetValueFromMap<std::string>("Enemy_Animated_Model", ConfigMap);
 
   Model *BeeModel = new Model(BeeModelPath, *shaderProgram_For_Model, false);
-  AnimatedModel *animatedModel = new AnimatedModel(AnimatedEnemyPAth, *shaderAnimatedModel, false);
-
-  ShapeRenderer3D *Floor = new ShapeRenderer3D(Shapes::RainBow_Square,
-                                               Shapes::RB_Square_indices,
-                                               sizeof(Shapes::RainBow_Square),
-                                               sizeof(Shapes::RB_Square_indices),
-                                               *shaderProgram,
-                                               BlockedTileTexture, "Basic");
+  animatedModel = new AnimatedModel(AnimatedEnemyPAth, *shaderAnimatedModel, false);
 
   ShapeRenderer3D *TileRenderer = new ShapeRenderer3D(Shapes::RainBow_Square,
                                                       Shapes::RB_Square_indices,
@@ -97,26 +102,19 @@ void Game::Granko()
                                                       *shaderProgram,
                                                       FreeTileTexture, "Basic");
 
-  ShapeRenderer3D *trojkat = new ShapeRenderer3D(Shapes::RainBow_Triangle,
-                                                 Shapes::RB_Triangle_indices,
-                                                 sizeof(Shapes::RainBow_Triangle),
-                                                 sizeof(Shapes::RB_Triangle_indices),
-                                                 *shaderProgram,
-                                                 BlockedTileTexture, "Basic");
-
   ShapeRenderer3D *szescian = new ShapeRenderer3D(Shapes::RainBow_Cube,
                                                   Shapes::RB_Cube_indices,
                                                   sizeof(Shapes::RainBow_Cube),
                                                   sizeof(Shapes::RB_Cube_indices),
                                                   *shaderProgram,
                                                   BlockedTileTexture, "Basic");
+  ConeRenderer *coneRendererLeft = new ConeRenderer(*shaderViewCone, &sNodes);
 
+  leftPlayerObj->AddComponent(coneRendererLeft);
   leftPlayerObj->AddComponent(BeeModel);
   rightPlayerObj->AddComponent(BeeModel);
   enemyGameObject->AddComponent(animatedModel);
 
-  trojObj->AddComponent(trojkat);
-  FloorObj->AddComponent(Floor);
   hexObj2->AddComponent(szescian);
   hexObj3->AddComponent(szescian);
 
@@ -138,10 +136,10 @@ void Game::Granko()
   keyNode.AddGameObject(keyObj);
 
   doorNode.Scale(0.5, 1, 1);
-  doorNode.Translate(30, 0, 0);
+  doorNode.Translate(-30, 0, 0);
 
   keyNode.Scale(0.3, 0.3, 0.3);
-  keyNode.Translate(80, 0, 0);
+  keyNode.Translate(-80, 0, 0);
 
   
 
@@ -162,38 +160,31 @@ void Game::Granko()
   box3Collider->setDimensions(0, 0, 0, 2, 2, 2);
   hexObj3->AddComponent(box3Collider);
 
-  Enemy_Node.AddGameObject(enemyGameObject);
-  scena1_new.AddGameObject(trojObj);
-  FloorNode_new.AddGameObject(FloorObj);
+  Enemy_Node_For_Model.AddGameObject(enemyGameObject);
   box2.AddGameObject(hexObj2);
   box3.AddGameObject(hexObj3);
 
   float floorTransform = ConfigUtils::GetValueFromMap<float>("FloorTranslation", ConfigMap);
   float TileScale = ConfigUtils::GetValueFromMap<float>("TileScale", ConfigMap);
 
-  FloorNode_new.Translate(0, floorTransform, 0);
+  //  FloorNode_new.Translate(0, floorTransform, 0);
 
   leftPlayerNode.Scale(0.01, 0.01, 0.01);
   rightPlayerNode.Scale(0.01, 0.01, 0.01);
   Enemy_Node.Scale(0.01, 0.01, 0.01);
-  box1.Scale(0.1f, 0.6f, 1.0f);
 
   leftPlayerNode.Translate(-150.0, 0, 0);
   rightPlayerNode.Translate(150.0, 0, 0);
 
   Enemy_Node.Translate(5, 5, 0);
   box2.Translate(5, 0, 0);
+  // box2.Scale(1,1,100);
   box3.Translate(-5, 0, 0);
-  FloorNode_new.Scale(TileScale, TileScale, TileScale);
-  FloorNode_new.Rotate(90.0f, glm::vec3(1, 0, 0));
 
+  Enemy_Node.AddChild(&Enemy_Node_For_Model);
   sNodes.push_back(&Enemy_Node);
-  sNodes.push_back(&leftPlayerNode);
-  rightNodes.push_back(&rightPlayerNode);
-  //sNodes.push_back(&scena1_new);
-  sNodes.push_back(&FloorNode_new);
 
-  //sNodes.push_back(&box1);
+  //sNodes.push_back(&FloorNode_new);
   sNodes.push_back(&box2);
   sNodes.push_back(&box3);
 
@@ -208,6 +199,14 @@ void Game::Granko()
   path = reconstruct_path(start, goal, came_from);
   draw_grid(grid, 3, nullptr, nullptr, &path);
 
+  glm::vec2 startLocation = FindFirstEmptyFloor(mapped);
+  std::cout << "First Free Tile:" << startLocation.x << startLocation.y << "\n";
+  start.x = startLocation.x;
+  start.y = startLocation.y;
+
+  Enemy_Node.Translate(start.x * 100, 0, start.y * 100);
+  leftPlayerNode.Translate(start.x * 100, 0, start.y * 100);
+
   AddMapTilesToSceneNodes(mapTiles, sNodes,
                           grid,
                           FreeTileTexture,    //Texture 1
@@ -215,10 +214,14 @@ void Game::Granko()
                           SlowerTileTexture,  //Texture 3
                           BlockedTileTexture, //Texture 4
                           *shaderProgram,
-                          path,
                           TileScale,
                           floorTransform,
                           MapSize);
+
+  for (auto &node : generator.nodes)
+  {
+    sNodes.push_back(node);
+  }
 
   shaderProgram->use();
 
@@ -226,12 +229,13 @@ void Game::Granko()
   int loops;
   float interpolation = 1.0;
 
+  sNodes.push_back(&leftPlayerNode);
+  rightNodes.push_back(&rightPlayerNode);
   gatherCollidableObjects(sNodes);
   gatherTriggers(sNodes);
   while (glfwGetKey(okienko.window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
          glfwWindowShouldClose(okienko.window) == 0)
   {
-  
     loops = 0;
   
     while ((glfwGetTime() * 1000) > next_game_tick && loops < MAX_FRAMESKIP)
@@ -249,68 +253,55 @@ void Game::Granko()
     Render();
   }
 
-  delete trojObj;
-  delete FloorObj;
   delete hexObj2;
   delete hexObj3;
-
-  delete trojkat;
-  delete Floor;
   delete szescian;
 
-  ImGui_ImplOpenGL3_Shutdown();
-  ImGui_ImplGlfw_Shutdown();
-  ImGui::DestroyContext();
+  ImguiClear();
   glDeleteProgram(shaderProgram->shaderProgramID);
   glfwTerminate();
 }
 
 void Game::Update(float interpolation)
 {
-	if (!inputBlockade)
-	{
-		if (leftSideActive)
-		{
-			ProcessInput(interpolation, camera);
-		}
-		else
-		{
-			ProcessInput(interpolation, camera2);
-		}
+  if (!inputBlockade)
+  {
+    if (leftSideActive)
+    {
+      ProcessInput(interpolation, camera);
+    }
+    else
+    {
+      ProcessInput(interpolation, camera2);
+    }
 
-		int x = (100 + (int)leftPlayerNode.local.getPosition().x) / 450;
-		if (x < 0)
-		{
-			x = 0;
-		}
-		if (x >= 40)
-		{
-			x = 39;
-		}
-		int z = (100 + (int)leftPlayerNode.local.getPosition().z) / 450;
+    glm::vec2 start_poz = GetPositionOfset(Enemy_Node, MapSize, EnemyXoffset, EnemyZoffset, TileScaleTimes100);
+    start.x = start_poz.x;
+    start.y = start_poz.y;
 
-		if (z <= 0)
-		{
-			z = 0;
-		}
+    glm::vec2 end_poz = GetPositionOfset(leftPlayerNode, MapSize, PlayerXOffset, PlayerZOffset, TileScaleTimes100);
+    goal.x = end_poz.x;
+    goal.y = end_poz.y;
 
-		if (z > 40)
-		{
-			z = 39;
-		}
+    ResetMapTilePath(mapTiles, grid, MapSize, &path);
 
-		//std::cout << "x: " << x << "  z:" << z << "\n";
-		start.x = x;
-		start.y = z;
-		a_star_search(grid, start, goal, came_from, cost_so_far);
-		path = reconstruct_path(start, goal, came_from);
-		ResetMapTilePath(mapTiles, grid, MapSize, &path);
+    if (path.size() > 1)
+      MoveNodeToMapTile(&Enemy_Node, path[1], interpolation, EnemyBaseSpeed, EnemyXoffset, EnemyZoffset); // TODO Add BaseSpeed
 
-		if (leftSideActive)
-			UpdatePlayer(leftPlayerNode, camera, interpolation);
-		else
-			UpdatePlayer(rightPlayerNode, camera2, interpolation);
-	}
+    if (grid.passable(goal))
+    {
+      a_star_search(grid, start, goal, came_from, cost_so_far);
+      path = reconstruct_path(start, goal, came_from);
+    }
+
+    LastPathNode.x = start_poz.x;
+    LastPathNode.y = start_poz.y;
+
+    if (leftSideActive)
+      UpdatePlayer(leftPlayerNode, camera, interpolation);
+    else
+      UpdatePlayer(rightPlayerNode, camera2, interpolation);
+  }
 }
 
 void Game::Render()
@@ -320,24 +311,7 @@ void Game::Render()
   glEnable(GL_SCISSOR_TEST);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  ImGui_ImplOpenGL3_NewFrame();
-  ImGui_ImplGlfw_NewFrame();
-  ImGui::NewFrame();
-
-  if (show_demo_window)
-  {
-    ImGui::Begin("Klawiszologia",
-                 &show_demo_window); // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-    ImGui::Text("Q - zmiana strony");
-    ImGui::Text("Strzalki - ruch postaci");
-    if (ImGui::Button("Printf Path"))
-    {
-      draw_grid(grid, 3, nullptr, nullptr, &path);
-    }
-
-    ImGui::End();
-  }
-  ImGui::Render();
+  ImguiStartEndDraw();
 
   Transform originTransform = Transform::origin();
 
@@ -373,13 +347,10 @@ void Game::Render()
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT);
 
-
   // Render grafik
   Plot();
 
-
-
-  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+  ImguiDrawData();
 
   // Swap buffers
   glfwSwapBuffers(okienko.window);
@@ -398,8 +369,6 @@ void Game::Serialize()
 
 void Game::SerializeFaza1(std::map<SceneNode *, unsigned long long> &map)
 {
-  this->sNodes[0]->AddChild(this->sNodes[1]);
-  this->sNodes[1]->AddParent(this->sNodes[0]);
   for (SceneNode *scene : this->sNodes)
   {
     unsigned long long n = map.size() + 1;
@@ -622,7 +591,7 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation)
 
   glm::vec3 move = movementDir * movementSpeed * interpolation;
   player.Translate(move.x, move.y, move.z);
-  Collider *playerCollider = ((Collider *)player.gameObject->GetComponent(ComponentSystem::ComponentType::Collider));
+  Collider *playerCollider = (Collider *)player.gameObject->GetComponent(ComponentSystem::ComponentType::Collider);
   //check if there are any collisions, if yes - abort the move
   for (Collider *collider : collidableObjects)
   {
@@ -641,6 +610,15 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation)
 	  }
   }
 
+  //view cone
+  auto coneRenderer = (ConeRenderer *)player.gameObject->GetComponent(ComponentSystem::ComponentType::ConeRenderer);
+  if (coneRenderer != nullptr)
+  {
+    if (glfwGetKey(okienko.window, GLFW_KEY_LEFT) == GLFW_PRESS)
+      coneRenderer->rotateLeft();
+    if (glfwGetKey(okienko.window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+      coneRenderer->rotateRight();
+  }
   camera.Position.x = player.gameObject->transform.getPosition().x * player.gameObject->transform.getScale().x;
   camera.Position.z = player.gameObject->transform.getPosition().z * player.gameObject->transform.getScale().z + cameraZOffset;
 }
@@ -684,39 +662,39 @@ void Game::gatherTriggers(std::vector<SceneNode *> &nodes)
 	}
 }
 
-std::vector<GameObject*> Game::findByTag(const std::vector<SceneNode *> &data, std::string tag)
+std::vector<GameObject *> Game::findByTag(const std::vector<SceneNode *> &data, std::string tag)
 {
-	std::vector<GameObject*> foundObjects;
-	for (auto node : data)
-	{
-		if (node->gameObject != nullptr && node->gameObject->getTag() == tag)
-		{
-			foundObjects.push_back(node->gameObject);
-		}
-		std::vector<GameObject*> foundChildObjects(findByTag(node->children, tag));
-		if (foundChildObjects.size() > 0)
-		{
-			foundObjects.insert(foundObjects.end(), foundChildObjects.begin(), foundChildObjects.end());
-		}
-	}
-	return foundObjects;
+  std::vector<GameObject *> foundObjects;
+  for (auto node : data)
+  {
+    if (node->gameObject != nullptr && node->gameObject->getTag() == tag)
+    {
+      foundObjects.push_back(node->gameObject);
+    }
+    std::vector<GameObject *> foundChildObjects(findByTag(node->children, tag));
+    if (foundChildObjects.size() > 0)
+    {
+      foundObjects.insert(foundObjects.end(), foundChildObjects.begin(), foundChildObjects.end());
+    }
+  }
+  return foundObjects;
 }
 
-GameObject* Game::findByTagSingle(const std::vector<SceneNode*>& data, std::string tag)
+GameObject *Game::findByTagSingle(const std::vector<SceneNode *> &data, std::string tag)
 {
-	for (auto node : data)
-	{
-		if (node->gameObject != nullptr && node->gameObject->getTag() == tag)
-		{
-			return node->gameObject;
-		}
-		GameObject* foundChildObject = findByTagSingle(node->children, tag);
-		if (foundChildObject != nullptr)
-		{
-			return foundChildObject;
-		}
-	}
-	return nullptr;
+  for (auto node : data)
+  {
+    if (node->gameObject != nullptr && node->gameObject->getTag() == tag)
+    {
+      return node->gameObject;
+    }
+    GameObject *foundChildObject = findByTagSingle(node->children, tag);
+    if (foundChildObject != nullptr)
+    {
+      return foundChildObject;
+    }
+  }
+  return nullptr;
 }
 
 void Game::LoadConfig()
@@ -748,6 +726,10 @@ void Game::SetViewAndPerspective(Camera &aCamera)
   shaderProgram_For_Model->setMat4("projection", projection);
   shaderProgram_For_Model->setMat4("view", view);
 
+  shaderViewCone->use();
+  shaderViewCone->setMat4("projection", projection);
+  shaderViewCone->setMat4("view", view);
+
   shaderAnimatedModel->use();
   shaderAnimatedModel->setMat4("projection", projection);
   shaderAnimatedModel->setMat4("view", view);
@@ -756,91 +738,186 @@ void Game::SetViewAndPerspective(Camera &aCamera)
 // Funkcje do wyswietlania grafik
 void Game::Plot()
 {
-	if (plotNumber == 0)
-	{
-		inputBlockade = false;
-		return;
-	}
-	inputBlockade = true;
+  if (plotNumber == 0)
+  {
+    inputBlockade = false;
+    return;
+  }
 
-	static int imageNumber = 1;
-	static bool keyPressed = false;
-	if (glfwGetKey(okienko.window, GLFW_KEY_ENTER) == GLFW_PRESS && !keyPressed)
-	{
-		imageNumber++;
-		keyPressed = true;
-	}
-	else if (!glfwGetKey(okienko.window, GLFW_KEY_ENTER) == GLFW_PRESS && keyPressed)
-		keyPressed = false;
 
-	switch (plotNumber)
-	{
-		case 1:
-			std::string path = "Textures/1_#.png";
-			
-			path[11] = imageNumber + 48;
-			if (FILE *file = fopen(path.c_str(), "r")) {
-				fclose(file);
-				DisplayImage(path.c_str(), "Napis");
-			}
-			else {
-				imageNumber = 0;
-				plotNumber = 0;
-				
-			}
+  inputBlockade = true;
 
-			break;
-	}
+  static int imageNumber = 1;
+  static bool keyPressed = false;
+  if (glfwGetKey(okienko.window, GLFW_KEY_ENTER) == GLFW_PRESS && !keyPressed)
+  {
+    imageNumber++;
+    keyPressed = true;
+  }
+  else if (!glfwGetKey(okienko.window, GLFW_KEY_ENTER) == GLFW_PRESS && keyPressed)
+    keyPressed = false;
+
+  switch (plotNumber)
+  {
+  case 1:
+    std::string path = "Textures/1_#.png";
+
+    path[11] = imageNumber + 48;
+    if (FILE *file = fopen(path.c_str(), "r"))
+    {
+      fclose(file);
+      DisplayImage(path.c_str(), "Napis");
+    }
+    else
+    {
+      imageNumber = 0;
+      plotNumber = 0;
+    }
+
+    break;
+  }
 }
 void Game::DisplayImage(const char *path, const char *text)
 {
-	glViewport(0, 0, Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT);
-	glScissor(0, 0, Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT);
-	glEnable(GL_SCISSOR_TEST);
-	glClearColor(0, 1, 0, 1);
-	glClear(GL_COLOR_BUFFER_BIT);
+  glViewport(0, 0, Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT);
+  glScissor(0, 0, Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT);
+  glEnable(GL_SCISSOR_TEST);
+  glClearColor(0, 0, 0, 0);
+  glClear(GL_COLOR_BUFFER_BIT);
 
-	Texture *imageTex = new Texture(path, GL_NEAREST_MIPMAP_NEAREST);
-	imageTex->Load();
-  
+  Texture *imageTex = new Texture(path, GL_NEAREST_MIPMAP_NEAREST);
+  imageTex->Load();
 
+  SceneNode imageNode;
+  GameObject *imageObj = new GameObject(imageNode.world);
 
+  ShapeRenderer3D *image = new ShapeRenderer3D(
+      Shapes::RainBow_Square,
+      Shapes::RB_Square_indices,
+      sizeof(Shapes::RainBow_Square),
+      sizeof(Shapes::RB_Square_indices),
+      *shaderProgram_For_Model,
+      imageTex, "PlotImage");
 
-	SceneNode imageNode;
-	GameObject *imageObj = new GameObject(imageNode.world);
+  imageObj->AddComponent(image);
+  imageNode.AddGameObject(imageObj);
 
-	ShapeRenderer3D *image = new ShapeRenderer3D(
-    Shapes::RainBow_Square,
-		Shapes::RB_Square_indices,
-		sizeof(Shapes::RainBow_Square),
-		sizeof(Shapes::RB_Square_indices),
-		*shaderProgram_For_Model,
-		imageTex, "PlotImage");
+  imageNode.Translate(0.0f, 2.4f, 4.0f);
+  imageNode.Rotate(camera.Pitch, glm::vec3(1, 0, 0));
+  imageNode.Scale(12.8f / 2.0f, 7.2f / 2.0f, 1);
 
-	//std::string boxPath = "Models/box/box.obj";
-	//Model *image = new Model(boxPath, *shaderProgram_For_Model, false);
+  Transform originTransform = Transform::origin();
+  imageNode.Render(originTransform, true);
+}
 
-	imageObj->AddComponent(image);
-	imageNode.AddGameObject(imageObj);
+void Game::MoveNodeToMapTile(SceneNode *sceneNode, GridLocation mapTile, float interpolation, float speed, float NodeXOffset, float NodeZOffset)
+{
+  glm::vec2 positionA{sceneNode->local.getPosition().x, sceneNode->local.getPosition().z};
+  glm::vec2 positionB{NodeXOffset + mapTile.x * 100, NodeZOffset + mapTile.y * 100};
 
-	imageNode.Translate(0.0f, 2.4f, 4.0f);
-	imageNode.Rotate(camera.Pitch, glm::vec3(1, 0, 0));
-	imageNode.Scale(12.8f / 2.0f, 7.2f / 2.0f, 1);
+  glm::vec2 diffVec = positionB - positionA;
+  glm::vec3 diffVec3D = {diffVec.x, sceneNode->local.getPosition().y, diffVec.y};
 
-	Transform originTransform = Transform::origin();
-	imageNode.Render(originTransform, true);
+  double veclenght = sqrt(diffVec.x * diffVec.x + diffVec.y * diffVec.y);
+  float angle = atan(diffVec3D.y, diffVec3D.x) * 180.0f / 3.14f;
 
-	
-	/*ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplGlfw_NewFrame();
-	
-	ImGui::NewFrame();
-	ImGui::SetNextWindowPos(ImVec2(100, 650));
-	ImGui::SetWindowFontScale(5);
-	ImGui::Begin("foobar", NULL, ImVec2(0, 0), 0.0f, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
-	ImGui::Text("SAMPLE TEXT");
+  if (veclenght != 0)
+  {
+    diffVec.x = diffVec.x / veclenght;
+    diffVec.y = diffVec.y / veclenght;
+  }
+  else
+  {
+    diffVec = glm::vec2(0, 0);
+  }
+  vector2DHelper = glm::vec2(positionB.x, positionB.y);
+  vector2DHelper2 = glm::vec2(positionA.x, positionA.y);
+  float value = interpolation * speed;
+  diffVec *= value;
 
-	ImGui::End();
-	ImGui::Render();
-	*/
+  SceneNode *roationChild = sceneNode->children[0];
+  sceneNode->Translate(diffVec.x, 0, diffVec.y);
+  //roationChild->local.SetRotation(0, angle, 0);
+}
+
+void Game::ImguiDrawData()
+{
+  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+void Game::ImguiStartEndDraw()
+{
+  ImGui_ImplOpenGL3_NewFrame();
+  ImGui_ImplGlfw_NewFrame();
+  ImGui::NewFrame();
+  ImGuiFunctions();
+  ImGui::Render();
+}
+void Game::ImGuiFunctions()
+{
+
+  if (show_demo_window)
+  {
+    ImGui::Begin("Klawiszologia",
+                 &show_demo_window); // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+    ImGui::Text("Q - zmiana strony");
+    ImGui::Text("Strzalki - ruch postaci");
+
+    if (path.size() > 1)
+      ImGui::Text("Next MapTile ID = %i, %i", path[1].x, path[1].y);
+    ImGui::Text("Vector to move = %f, %f", vector2DHelper.x, vector2DHelper.y);
+    ImGui::Text("Enemy position = %f, %f", vector2DHelper2.x, vector2DHelper2.y);
+    ImGui::Text("Player position = %f, %f", leftPlayerNode.local.getPosition().x, leftPlayerNode.local.getPosition().z);
+    if (ImGui::Button("Printf Path"))
+    {
+      draw_grid(grid, 3, nullptr, nullptr, &path);
+    }
+    if (ImGui::Button("List Model AnimationNames"))
+    {
+      if (animatedModel != nullptr)
+        DisplayAnimationInfo(animatedModel);
+    }
+
+    if (ImGui::Button("Swtich Enemy Animation"))
+    {
+      if (animatedModel != nullptr)
+      {
+        if (animatedModel->GetAnimationNR() == 1)
+        {
+          animatedModel->SelectAnimation(0);
+        }
+        else
+        {
+          animatedModel->SelectAnimation(1);
+        }
+      }
+    }
+    if (ImGui::Button("Update Path and use A_Star_Search"))
+    {
+      if (grid.passable(goal))
+      {
+        a_star_search(grid, start, goal, came_from, cost_so_far);
+        path = reconstruct_path(start, goal, came_from);
+      }
+      else
+      {
+        std::cout << "Target not passable"
+                  << "\n";
+        //TODO find closest pasable
+      }
+    }
+
+    ImGui::End();
+  }
+}
+void Game::ImguiClear()
+{
+  ImGui_ImplOpenGL3_Shutdown();
+  ImGui_ImplGlfw_Shutdown();
+  ImGui::DestroyContext();
+}
+
+void Game::DisplayAnimationInfo(AnimatedModel *model)
+{
+  model->ListAnimationNames();
 }

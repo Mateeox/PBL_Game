@@ -7,9 +7,10 @@
 #include "Key.hpp"
 #include "Door.hpp"
 #include "ConfigUtils.hpp"
+#include "Component/ConeRenderer.hpp"
 #include "PathFinding/MapTile.hpp"
 #include "PathFinding/MapTileRenderUtils.cpp"
-
+#include "Component/AnimatedModel.hpp"
 
 const int TICKS_PER_SECOND = 32;
 const int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
@@ -29,10 +30,17 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 class Game
 {
 
+  //DebugHelpers
+
+  glm::vec2 vector2DHelper{0,0};
+  glm::vec2 vector2DHelper2{0,0};
+
+  //
   Window &okienko;
   Shader *shaderProgram;
   Shader *shaderProgram_For_Model;
   Shader *shaderAnimatedModel;
+  Shader *shaderViewCone;
   std::vector<SceneNode *> sNodes;
   std::vector<SceneNode *> rightNodes;
   
@@ -46,6 +54,8 @@ class Game
   GridWithWeights grid;
   unsigned MapSize;
 
+
+
   GridLocation start{0, 0};
   GridLocation goal{8, 5};
   std::unordered_map<GridLocation, GridLocation> came_from;
@@ -56,17 +66,26 @@ class Game
 
   SceneNode leftPlayerNode;
   SceneNode rightPlayerNode;
+  SceneNode Enemy_Node; //Rotation + scale
+  SceneNode Enemy_Node_For_Model;
 
   void LoadConfig();
   void InitializeConfig();
   //How to get value from config
   //ConfigUtils::GetValueFromMap<TYPE>(NAME,ConfigMap) 
-  std::map<std::string,VariantType> ConfigMap;
+  std::unordered_map<std::string,VariantType> ConfigMap;
   
 
-
+  float floorTransform;
+  float TileScale;
+  float TileScaleTimes100;
 
   float movementSpeed; //Move to PlayerData
+  float EnemyBaseSpeed;
+  float EnemyXoffset;
+  float EnemyZoffset;
+  float PlayerXOffset;
+  float PlayerZOffset;
 
   bool mouseCallBack = true;
   bool firstMouse = true;
@@ -83,10 +102,13 @@ class Game
   //Imgui
   bool show_demo_window = true;
   bool printf_path = false;
+  GridLocation LastPathNode{0, 0};
 
   //
   int offset = 125; // Jak bardzo maja sie roznic rozmiary kamery, szerokosc aktywnej to pol okna + offset, szerokosc nieaktywnej to pol okna - offset
 
+//ModelPtrs
+AnimatedModel *animatedModel = nullptr;
 
 
 public:
@@ -118,6 +140,12 @@ public:
   std::vector<GameObject*> findByTag(const std::vector<SceneNode*>& data, std::string tag);
   GameObject * findByTagSingle(const std::vector<SceneNode*>& data, std::string tag);
 
+  //Impgui
+  void ImGuiFunctions();
+  void ImguiStartEndDraw();
+  void ImguiDrawData();
+  void ImguiClear();
+
 private:
   void SerializeFaza1(std::map<SceneNode *,unsigned long long> &map);
   void SerializeFaza2(std::map<SceneNode *,unsigned long long> &map, std::vector<SceneNode> &temp);
@@ -125,7 +153,10 @@ private:
   void SerializeZapisz(std::string serialized);
   void DeserializeOrderPointers(std::map<unsigned long long, SceneNode *> &map);
 
+  void MoveNodeToMapTile(SceneNode * sceneNode,GridLocation mapTile,float interpolation,float speed,float NodeXOffset,float NodeZOffset);
+
   void SetViewAndPerspective(Camera &aCamera);
   void Plot();
   void DisplayImage(const char * path, const char * text);
+  void DisplayAnimationInfo(AnimatedModel * model);
 };

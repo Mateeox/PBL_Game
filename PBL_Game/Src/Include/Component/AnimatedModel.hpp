@@ -56,6 +56,7 @@ enum VB_TYPES
   NUM_VBs
 };
 
+
 struct BoneInfo
 {
   Matrix4f BoneOffset;
@@ -109,8 +110,7 @@ class AnimatedModel : public ComponentSystem::Component
   unsigned m_Buffers[NUM_VBs];
   bool m_Animate;
   unsigned m_AnimationNubmer;
-
-
+  
 public:
   void Clear();
   AnimatedModel(std::string &path, Shader &aShaderProgram, bool gammaCorrection);
@@ -118,6 +118,11 @@ public:
   Shader &ShaderProgram;
   void SelectAnimation(const std::string & aName);
   void SelectAnimation(unsigned aNumer);
+  unsigned GetAnimationNR();
+  std::string GetAnimationName();
+  
+
+  void ListAnimationNames();
 
   
 

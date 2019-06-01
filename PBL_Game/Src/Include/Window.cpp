@@ -1,6 +1,5 @@
 
 #include "Window.hpp"
-#include "Camera.hpp"
 
 namespace PBLGame{
 
@@ -40,6 +39,9 @@ Window::Window(uint16_t Width, uint16_t height, const char *title) : iWidth(Widt
 	// Ensure we can capture the escape key being pressed below
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+	glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	//setup Imgui
 	IMGUI_CHECKVERSION();

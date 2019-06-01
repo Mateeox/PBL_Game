@@ -25,16 +25,47 @@
         <Name>MapSize</Name>
         <Value>40</Value>
     </ConfigParameter>
-        <ConfigParameter>
+    <ConfigParameter>
         <Type>F</Type>
         <Name>TileScale</Name>
-        <Value>4.2</Value>
+        <Value>1</Value>
     </ConfigParameter>
     <ConfigParameter>
         <Type>F</Type>
         <Name>FloorTranslation</Name>
-        <Value>-1.8</Value>
+        <Value>-0.3</Value>
     </ConfigParameter>
+
+    <ConfigParameter>
+        <Type>F</Type>
+        <Name>EnemyXoffset</Name>
+        <Value>3</Value>
+    </ConfigParameter>
+
+    <ConfigParameter>
+        <Type>F</Type>
+        <Name>EnemyZoffset</Name>
+        <Value>5</Value>
+    </ConfigParameter>
+
+    <ConfigParameter>
+        <Type>F</Type>
+        <Name>EnemyBaseSpeed</Name>
+        <Value>5</Value>
+    </ConfigParameter>
+
+    <ConfigParameter>
+        <Type>F</Type>
+        <Name>PlayerXOffset</Name>
+        <Value>0</Value>
+    </ConfigParameter>
+
+    <ConfigParameter>
+        <Type>F</Type>
+        <Name>PlayerZOffset</Name>
+        <Value>0</Value>
+    </ConfigParameter>
+
 </Config>
 
 <!-- types I - int
