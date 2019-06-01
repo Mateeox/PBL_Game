@@ -52,7 +52,9 @@ class Game
   std::vector<MapTile *> mapTiles;
   std::vector<GridLocation> path;
   GridWithWeights grid;
-  unsigned MapSize;
+  unsigned MapSize = 0;
+  unsigned MapScale = 0;
+  bool debugPathFinding = false;
 
 
 

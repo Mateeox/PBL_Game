@@ -30,7 +30,7 @@ void AssignMapTiles(std::vector<MapTile *> &mapTiles, const Graph &graph, int aM
             {
                 mapTile->SwitchTexture(MapTileProfiles::Blocked);
             }
-
+    
             mapTiles.push_back(mapTile);
         }
     }
