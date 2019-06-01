@@ -3,9 +3,7 @@
 MapGenerator::MapGenerator(Shader *shaderProgram)
 {
 	this->shader = shaderProgram;
-	floor = new Model("Models/House/StaticNormal_Floor.obj", *shader, false);
-	wall = new Model("Models/House/StaticSimpleDestroyedWall.obj", *shader, false);
-	door = new Model("Models/House/StaticDoor.obj", *shader, false);
+	DefineModels();
 	srand(time(NULL));
 	GenerateMap(4);
 	CheckForWalls();
@@ -23,9 +21,7 @@ MapGenerator::MapGenerator(Shader *shaderProgram, int squares, int doors, bool g
 	this->Doors = doors;
 	this->GlassDoor = glass_doors;
 	this->shader = shaderProgram;
-	floor = new Model("Models/House/StaticNormal_Floor.obj", *shader, false);
-	wall = new Model("Models/House/StaticSimpleDestroyedWall.obj", *shader, false);
-	door = new Model("Models/House/StaticDoor.obj", *shader, false);
+	DefineModels();
 	srand(time(NULL));
 	GenerateMap(squares);
 	CheckForWalls();
@@ -130,11 +126,18 @@ void MapGenerator::CheckForDoors()
 void MapGenerator::FinishGeneration()
 {
 	SceneNode *mapRoot = new SceneNode();
+	int door_index = 0;
 	for (int i = 0; i < maps.size(); i++)
 	{
-		mapRoot->AddChild(maps[i]->GenerateNode(nodes, mapRoot, floor, wall, door));
+		mapRoot->AddChild(maps[i]->GenerateNode(nodes, mapRoot, floor, wall, door, key, door_index));
 	}
 	nodes.push_back(mapRoot);
+	SceneNode *mapRoot2 = new SceneNode();
+	for (int i = 0; i < maps.size(); i++)
+	{
+		mapRoot2->AddChild(maps[i]->GenerateNode(nodes, mapRoot, floor, wall, door, key, door_index, true));
+	}
+	nodes.push_back(mapRoot2);
 }
 
 glm::vec2 MapGenerator::GetVector2(int step)
@@ -343,4 +346,12 @@ bool MapGenerator::CheckIfNull(int x, int y)
 			return false;
 	}
 	return true;
+}
+
+void MapGenerator::DefineModels()
+{
+	floor = new Model("Models/House/StaticNormal_Floor.obj", *shader, false);
+	wall = new Model("Models/House/StaticSimpleDestroyedWall.obj", *shader, false);
+	door = new Model("Models/House/StaticDoor.obj", *shader, false);
+	key = new Model("Models/House/StaticDoor.obj", *shader, false);
 }
