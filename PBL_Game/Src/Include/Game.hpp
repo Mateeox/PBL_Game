@@ -11,6 +11,7 @@
 #include "PathFinding/MapTile.hpp"
 #include "PathFinding/MapTileRenderUtils.cpp"
 #include "Component/AnimatedModel.hpp"
+#include "Player.hpp"
 
 const int TICKS_PER_SECOND = 32;
 const int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
@@ -127,7 +128,9 @@ class Game
 
 //ModelPtrs
 AnimatedModel *animatedModel = nullptr;
-
+	
+	//Player handling
+	Player* playerObj;
 
 public:
 

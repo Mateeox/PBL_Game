@@ -182,7 +182,7 @@ void Game::Granko()
 
   leftPlayerNode.Translate(0, PlayerYOffset, 0);
   rightPlayerNode.Translate(0, PlayerYOffset, 0);
-
+  playerObj = new Player(&leftPlayerNode, 3, shaderProgram);
   box2.Translate(5, 0, 0);
   box3.Translate(-5, 0, 0);
 
@@ -583,7 +583,7 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos)
 void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation)
 {
   Transform transformBeforeMove(player.gameObject->transform);
-
+  
   glm::vec3 movementDir(0);
 
   if (glfwGetKey(okienko.window, GLFW_KEY_W) == GLFW_PRESS)
@@ -628,6 +628,7 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation)
   camera.Position.x = player.gameObject->transform.getPosition().x * player.gameObject->transform.getScale().x;
   camera.Position.y = cameraYOffset;
   camera.Position.z = player.gameObject->transform.getPosition().z * player.gameObject->transform.getScale().z + cameraZOffset;
+
 }
 
 void Game::gatherCollidableObjects(std::vector<SceneNode *> &nodes)
