@@ -158,6 +158,7 @@ public:
   void ImguiStartEndDraw();
   void ImguiDrawData();
   void ImguiClear();
+  void SetupPlayersColiders();
 
 private:
   void SerializeFaza1(std::map<SceneNode *,unsigned long long> &map);

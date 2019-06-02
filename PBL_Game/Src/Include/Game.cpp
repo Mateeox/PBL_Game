@@ -98,12 +98,11 @@ void Game::Granko()
   GameObject *doorObj = new GameObject(doorNode.local);
   GameObject *keyObj = new GameObject(keyNode.local);
 
-  std::string ChestModelPath = "Models/Chest/Chest.obj";
-  std::string BeeModelPath = "Models/House/StaticSimpleDestroyedWall.obj";
+  std::string PlayerModelPath = "Models/Player_Static.obj";
   std::string AnimatedEnemyPAth = "Models/" + ConfigUtils::GetValueFromMap<std::string>("Enemy_Animated_Model", ConfigMap);
 
-  Model *BeeModel = new Model(BeeModelPath, *shaderProgram_For_Model, false);
-  Model *ChestModel = new Model(ChestModelPath, *shaderProgram_For_Model, false);
+
+  Model * PlayerModel = new Model(PlayerModelPath, *shaderProgram_For_Model, false);
   animatedModel = new AnimatedModel(AnimatedEnemyPAth, *shaderAnimatedModel, false);
 
   ShapeRenderer3D *TileRenderer = new ShapeRenderer3D(Shapes::RainBow_Square,
@@ -122,8 +121,8 @@ void Game::Granko()
   ConeRenderer *coneRendererLeft = new ConeRenderer(*shaderViewCone, &sNodes);
 
   leftPlayerObj->AddComponent(coneRendererLeft);
-  leftPlayerObj->AddComponent(BeeModel);
-  rightPlayerObj->AddComponent(BeeModel);
+  leftPlayerObj->AddComponent(PlayerModel);
+  rightPlayerObj->AddComponent(PlayerModel);
   enemyGameObject->AddComponent(animatedModel);
 
   hexObj2->AddComponent(szescian);
@@ -151,8 +150,6 @@ void Game::Granko()
 
   keyNode.Scale(0.3, 0.3, 0.3);
   keyNode.Translate(-80, 0, 0);
-
-  auto caleTe = KeyDoorFactory::Create(0,BeeModel,BeeModel);
 
   // Koniec triggerow
 
@@ -943,4 +940,9 @@ void Game::ImguiClear()
 void Game::DisplayAnimationInfo(AnimatedModel *model)
 {
   model->ListAnimationNames();
+}
+
+void Game::SetupPlayersColiders()
+{
+
 }

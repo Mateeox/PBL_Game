@@ -254,6 +254,7 @@ void VertexBoneData::AddBoneData(unsigned BoneID, float Weight)
 {
 	for (unsigned i = 0; i < ARRAY_SIZE_IN_ELEMENTS(IDs); i++)
 	{
+
 		if (Weights[i] == 0.0)
 		{
 			IDs[i] = BoneID;
