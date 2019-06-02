@@ -641,7 +641,7 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation)
   }
   camera.Position.x = player.local.getPosition().x * PlayerScale;
   camera.Position.y = cameraYOffset;
-  camera.Position.z = player.gameObject->transform.getPosition().z * player.gameObject->transform.getScale().z + cameraZOffset;
+  camera.Position.z = player.local.getPosition().z * PlayerScale + cameraZOffset;
 
   SceneNode* trap = playerObj->Update(&okienko, PlayerScale);
   if (trap != nullptr)

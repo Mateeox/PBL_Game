@@ -30,9 +30,13 @@ SceneNode* Player::Update(PBLGame::Window* okienko, float scale)
 	if (glfwGetKey(okienko->window, GLFW_KEY_SPACE) == GLFW_PRESS && !placingTrap && Trap())
 	{
 		placingTrap = true;
-		return CreateTrap(scale);
 		PartsAmount -= partsLimit;
+	}
+	if (placingTrap)
+	{
 		placingTrap = false;
+		return CreateTrap(scale);
+
 	}
 	return nullptr;
 }
