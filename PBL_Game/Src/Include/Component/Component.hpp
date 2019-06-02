@@ -23,8 +23,8 @@ class Component
 {
 
   public:
-	Component(GameObject *obj) : gameobject(nullptr) {}
-
+	Component(GameObject *obj) : gameobject(nullptr){}
+	
 	void SetGameObject(GameObject *gamobj)
 	{
 		gameobject = gamobj;

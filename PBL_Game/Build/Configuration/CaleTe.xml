@@ -97,6 +97,27 @@
         <Name>PlayerScale</Name>
         <Value>0.06</Value>
     </ConfigParameter>
+
+<!---  Camera /-->
+
+    <ConfigParameter>
+        <Type>F</Type>
+        <Name>cameraYOffset</Name>
+        <Value>2</Value>
+    </ConfigParameter>
+
+        <ConfigParameter>
+        <Type>F</Type>
+        <Name>cameraZOffset</Name>
+        <Value>5</Value>
+    </ConfigParameter>
+
+        <ConfigParameter>
+        <Type>F</Type>
+        <Name>cameraAngle</Name>
+        <Value>35</Value>
+    </ConfigParameter>
+
 </Config>
 
 <!-- types I - int
