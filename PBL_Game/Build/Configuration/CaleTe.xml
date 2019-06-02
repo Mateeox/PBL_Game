@@ -3,12 +3,12 @@
     <ConfigParameter>
         <Type>U</Type>
         <Name>WINDOW_HEIGHT</Name>
-        <Value>900</Value>
+        <Value>1080</Value>
     </ConfigParameter>
     <ConfigParameter>
         <Type>U</Type>
         <Name>WINDOW_WIDTH</Name>
-        <Value>1600</Value>
+        <Value>1920</Value>
     </ConfigParameter>
     <ConfigParameter>
         <Type>S</Type>
@@ -18,12 +18,12 @@
     <ConfigParameter>
         <Type>F</Type>
         <Name>PlayerSpeed</Name>
-        <Value>25</Value>
+        <Value>15.5</Value>
     </ConfigParameter>
     <ConfigParameter>
         <Type>U</Type>
-        <Name>MapSize</Name>
-        <Value>40</Value>
+        <Name>MapScale</Name>
+        <Value>300</Value>
     </ConfigParameter>
     <ConfigParameter>
         <Type>F</Type>
@@ -33,13 +33,19 @@
     <ConfigParameter>
         <Type>F</Type>
         <Name>FloorTranslation</Name>
-        <Value>-0.3</Value>
+        <Value>0.001</Value>
     </ConfigParameter>
 
     <ConfigParameter>
         <Type>F</Type>
         <Name>EnemyXoffset</Name>
         <Value>3</Value>
+    </ConfigParameter>
+
+    <ConfigParameter>
+        <Type>F</Type>
+        <Name>EnemyYoffset</Name>
+        <Value>1.8</Value>
     </ConfigParameter>
 
     <ConfigParameter>
@@ -51,7 +57,7 @@
     <ConfigParameter>
         <Type>F</Type>
         <Name>EnemyBaseSpeed</Name>
-        <Value>5</Value>
+        <Value>10</Value>
     </ConfigParameter>
 
     <ConfigParameter>
@@ -60,10 +66,56 @@
         <Value>0</Value>
     </ConfigParameter>
 
+      <ConfigParameter>
+        <Type>F</Type>
+        <Name>PlayerYOffset</Name>
+        <Value>10</Value>
+    </ConfigParameter>
+
     <ConfigParameter>
         <Type>F</Type>
         <Name>PlayerZOffset</Name>
         <Value>0</Value>
+    </ConfigParameter>
+
+    <ConfigParameter>
+        <Type>I</Type>
+        <Name>debugPathFinding</Name>
+        <Value>0</Value>
+    </ConfigParameter>
+
+    <!--- Enemy Scale/-->
+
+    <ConfigParameter>
+        <Type>F</Type>
+        <Name>EnemyScale</Name>
+        <Value>0.0025</Value>
+    </ConfigParameter>
+
+    <ConfigParameter>
+        <Type>F</Type>
+        <Name>PlayerScale</Name>
+        <Value>0.06</Value>
+    </ConfigParameter>
+
+<!---  Camera /-->
+
+    <ConfigParameter>
+        <Type>F</Type>
+        <Name>cameraYOffset</Name>
+        <Value>2</Value>
+    </ConfigParameter>
+
+        <ConfigParameter>
+        <Type>F</Type>
+        <Name>cameraZOffset</Name>
+        <Value>5</Value>
+    </ConfigParameter>
+
+        <ConfigParameter>
+        <Type>F</Type>
+        <Name>cameraAngle</Name>
+        <Value>35</Value>
     </ConfigParameter>
 
 </Config>

@@ -28,6 +28,7 @@ class SceneNode
     void Render(Transform& parentWorld, bool aDirty_Flag);
 
     void Scale(float x, float y, float z);
+    void Scale(float value);
     void Translate(float x, float y, float z);
     void DynamicTranslate(float interpolation,float x,float y,float z);
     void Rotate(float x, glm::vec3 axis);

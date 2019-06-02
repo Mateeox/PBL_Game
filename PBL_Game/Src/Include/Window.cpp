@@ -28,6 +28,7 @@ Window::Window(uint16_t Width, uint16_t height, const char *title) : iWidth(Widt
 	}
 	glfwMakeContextCurrent(window);
 
+
 	// Initialize GLEW
 	bool gl3w_err = gl3wInit() != 0;
 	if (gl3w_err)

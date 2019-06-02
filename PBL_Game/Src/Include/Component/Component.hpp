@@ -10,6 +10,7 @@ enum ComponentType
 	Error,
 	Renderer,
 	Collider,
+	Trigger,
 	ShapeRenderer3D,
 	Model,
 	AnimatedModel,
@@ -22,8 +23,8 @@ class Component
 {
 
   public:
-	Component(GameObject *obj) : gameobject(nullptr) {}
-
+	Component(GameObject *obj) : gameobject(nullptr){}
+	
 	void SetGameObject(GameObject *gamobj)
 	{
 		gameobject = gamobj;

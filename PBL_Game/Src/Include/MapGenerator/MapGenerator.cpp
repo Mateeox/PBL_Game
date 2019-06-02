@@ -3,9 +3,7 @@
 MapGenerator::MapGenerator(Shader *shaderProgram)
 {
 	this->shader = shaderProgram;
-	floor = new Model("Models/House/StaticNormal_Floor.obj", *shader, false);
-	wall = new Model("Models/House/StaticSimpleDestroyedWall.obj", *shader, false);
-	door = new Model("Models/House/StaticDoor.obj", *shader, false);
+	DefineModels();
 	srand(time(NULL));
 	GenerateMap(4);
 	CheckForWalls();
@@ -17,20 +15,19 @@ MapGenerator::MapGenerator(Shader *shaderProgram)
 	this->doors.clear();
 }
 
-MapGenerator::MapGenerator(Shader *shaderProgram, int squares, int doors, bool glass_doors)
+MapGenerator::MapGenerator(Shader *shaderProgram, int squares, int doors, int chests, bool glass_doors)
 {
 	this->Squares = squares;
 	this->Doors = doors;
+	this->Chests = chests;
 	this->GlassDoor = glass_doors;
 	this->shader = shaderProgram;
-	floor = new Model("Models/House/StaticNormal_Floor.obj", *shader, false);
-	wall = new Model("Models/House/StaticSimpleDestroyedWall.obj", *shader, false);
-	door = new Model("Models/House/StaticDoor.obj", *shader, false);
+	DefineModels();
 	srand(time(NULL));
 	GenerateMap(squares);
 	CheckForWalls();
 	CheckForDoors();
-
+	GenerateChests(chests);
 	TransformToPositive();
 	FinishGeneration();
 	MapConverter conv = MapConverter(&maps);
@@ -58,15 +55,18 @@ std::vector<MapKey*> MapGenerator::GetConverted()
 	return mapped;
 }
 
+
 void MapGenerator::GenerateMap(int n)
 {
-	MapElement *element = new MapElement(glm::vec2(0, 0), nodes);
+	MapElement *element = new MapElement(glm::vec2(0, 0), leftnodes);
 	maps.push_back(element);
 	positions.push_back(element->Position);
 	int elementIteration = 0;
+	const int boundry = sqrt(n) * 3 / 4;
 	for (int i = 0; i < n - 1; i++)
 	{
-		MapElement *temp = new MapElement(GetVector2(elementIteration), nodes, elementIteration);
+		int parent = 0;
+		MapElement *temp = new MapElement(GetVector2(elementIteration, boundry, parent), leftnodes, parent);
 		maps.push_back(temp);
 		positions.push_back(temp->Position);
 		elementIteration = positions.size() - 1;
@@ -130,48 +130,67 @@ void MapGenerator::CheckForDoors()
 void MapGenerator::FinishGeneration()
 {
 	SceneNode *mapRoot = new SceneNode();
+	int door_index = 0;
 	for (int i = 0; i < maps.size(); i++)
 	{
-		mapRoot->AddChild(maps[i]->GenerateNode(nodes, mapRoot, floor, wall, door));
+		mapRoot->AddChild(maps[i]->GenerateNode(leftnodes, mapRoot, floor, wall, door, key, chest, door_index));
 	}
-	nodes.push_back(mapRoot);
+	leftnodes.push_back(mapRoot);
+	SceneNode *mapRoot2 = new SceneNode();
+	for (int i = 0; i < maps.size(); i++)
+	{
+		mapRoot2->AddChild(maps[i]->GenerateNode(rightnodes, mapRoot, floor, wall, door, key, chest, door_index, true));
+	}
+	rightnodes.push_back(mapRoot2);
 }
 
-glm::vec2 MapGenerator::GetVector2(int step)
+glm::vec2 MapGenerator::GetVector2(int step, int boundry, int &parent)
 {
 	glm::vec2 pos_add;
-	while (!CheckIfAvailiable(positions[step] + pos_add))
+	int iterator = 0;
+	bool stuck = false;
+	while (!CheckIfAvailiable(positions[step] + pos_add) || !(abs(positions[step].x + pos_add.x) <= boundry && abs(positions[step].y + pos_add.y) <= boundry))
 	{
 		int move = GetDirection();
+		if (iterator > 10)
+		{
+			stuck = true;
+			step = FindAnyNeighbour(boundry, move);
+		}
+		
 		switch (move)
 		{
-		default:
-		{
-			step = maps[step]->ParentElement;
-			break;
+			/*default:
+			{
+				if (!stuck) {
+					step = maps[step]->ParentElement;
+				}
+				break;
+			}*/
+			case 1:
+			{
+				pos_add = glm::vec2(0, 1.0f);
+				break;
+			}
+			case 2:
+			{
+				pos_add = glm::vec2(1.0f, 0);
+				break;
+			}
+			case 3:
+			{
+				pos_add = glm::vec2(0, -1.0f);
+				break;
+			}
+			case 4:
+			{
+				pos_add = glm::vec2(-1.0f, 0);
+				break;
+			}
 		}
-		case 1:
-		{
-			pos_add = glm::vec2(0, 1.0f);
-			break;
-		}
-		case 2:
-		{
-			pos_add = glm::vec2(1.0f, 0);
-			break;
-		}
-		case 3:
-		{
-			pos_add = glm::vec2(0, -1.0f);
-			break;
-		}
-		case 4:
-		{
-			pos_add = glm::vec2(-1.0f, 0);
-			break;
-		}
-		}
+		iterator++;
 	}
+	parent = step;
 	return pos_add + this->positions[step];
 }
 
@@ -270,6 +289,8 @@ int MapGenerator::CountDoors()
 void MapGenerator::PickDoors()
 {
 	int doorsCount = CountDoors();
+	if (Doors > doorsCount)
+		Doors = doorsCount;
 	do
 	{
 		int index = GetRandomIndex(doors.size());
@@ -343,4 +364,42 @@ bool MapGenerator::CheckIfNull(int x, int y)
 			return false;
 	}
 	return true;
+}
+
+int MapGenerator::FindAnyNeighbour(int boundry, int& move)
+{
+	for (int i = 0; i < maps.size(); i++)
+	{
+		std::vector<glm::vec2> neighbours = maps[i]->GetNeighbours();
+		for (int j = 0; j < neighbours.size(); j++)
+		{
+			if (CheckIfAvailiable(neighbours[j]) && abs(neighbours[j].x) <= boundry && abs(neighbours[j].y) <= boundry) {
+				move = j + 1;
+				return i;
+			}
+		}
+	}
+	return 0;
+}
+
+void MapGenerator::DefineModels()
+{
+	floor = new Model("Models/House/StaticNormal_Floor.obj", *shader, false);
+	wall = new Model("Models/House/StaticSimpleDestroyedWall.obj", *shader, false);
+	door = new Model("Models/House/StaticDoor.obj", *shader, false);
+	key = new Model("Models/House/StaticDoor.obj", *shader, false);
+	chest = new Model("Models/Chest/Chest.obj", *shader, false);
+}
+
+void MapGenerator::GenerateChests(int amount)
+{
+	int chest = amount;
+	while(chest != 0)
+	{
+		int index = GetRandomIndex(maps.size());
+		if (!maps[index]->Chest) {
+			maps[index]->Chest = true;
+			chest--;
+		}
+	}
 }

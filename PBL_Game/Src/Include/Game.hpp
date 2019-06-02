@@ -3,6 +3,9 @@
 #include "Shader.hpp"
 #include "SceneNode.hpp"
 #include "Collider.hpp"
+#include "Trigger.hpp"
+#include "Key.hpp"
+#include "Door.hpp"
 #include "ConfigUtils.hpp"
 #include "Component/ConeRenderer.hpp"
 #include "PathFinding/MapTile.hpp"
@@ -24,6 +27,7 @@ static bool Tab_Pressed = false;
 
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 
+
 class Game
 {
 
@@ -32,25 +36,33 @@ class Game
   glm::vec2 vector2DHelper{0,0};
   glm::vec2 vector2DHelper2{0,0};
 
+
   //
   Window &okienko;
   Shader *shaderProgram;
   Shader *shaderProgram_For_Model;
   Shader *shaderAnimatedModel;
   Shader *shaderViewCone;
+  SceneNode wholeScene;
+
+  SceneNode leftScene;
+  SceneNode rightScene;
+  
   std::vector<SceneNode *> sNodes;
   std::vector<SceneNode *> rightNodes;
-  
   std::vector<Collider *> collidableObjects;
+  std::vector<Trigger *> triggers;
+  std::map<int,bool> KeyInEq;
+
 
   //PathFinding
   #pragma region PathFindingAndMapGenerationUtils
   std::vector<MapTile *> mapTiles;
   std::vector<GridLocation> path;
   GridWithWeights grid;
-  unsigned MapSize;
-
-
+  unsigned MapSize = 0;
+  unsigned MapScale = 0;
+  bool debugPathFinding = false;
 
   GridLocation start{0, 0};
   GridLocation goal{8, 5};
@@ -61,7 +73,9 @@ class Game
 
 
   SceneNode leftPlayerNode;
+  SceneNode leftPlayerNodeForModel;
   SceneNode rightPlayerNode;
+  SceneNode rightPlayerNodeForModel;
   SceneNode Enemy_Node; //Rotation + scale
   SceneNode Enemy_Node_For_Model;
 
@@ -79,9 +93,20 @@ class Game
   float movementSpeed; //Move to PlayerData
   float EnemyBaseSpeed;
   float EnemyXoffset;
+  float EnemyYoffset;
   float EnemyZoffset;
   float PlayerXOffset;
+  float PlayerYOffset ;
   float PlayerZOffset;
+  float PlayerScale;
+  float EnemyScale;
+  float EnemyScaleInverse;
+  float PlayerScaleInverse;
+
+  float movementSpeedTimesPlayerScale;
+
+  float FogDensity = 0.35;
+ 
 
   bool mouseCallBack = true;
   bool firstMouse = true;
@@ -114,9 +139,9 @@ public:
   unsigned WINDOW_WIDTH = 0;
   unsigned WINDOW_HEIGHT = 0;
 
-  const float cameraZOffset = 7;
-  const float cameraYOffset = 2;
-  const float cameraAngle = 35;
+  float cameraZOffset;
+  float cameraYOffset;
+  float cameraAngle;
 
   int plotNumber = 1;	// Zmienna wskazujaca na obecna wstawke fabularna
   bool inputBlockade = true;	// Zmienna  blokujaca mozliwosci gracza (domyslnie na czas wstawek fabularnych)
@@ -132,6 +157,7 @@ public:
   void Deserialize(std::string path);
   void UpdatePlayer(SceneNode &player, Camera &camera,float interpolation);
   void gatherCollidableObjects(std::vector<SceneNode *> &nodes);
+  void gatherTriggers(std::vector<SceneNode*>& nodes);
   std::vector<GameObject*> findByTag(const std::vector<SceneNode*>& data, std::string tag);
   GameObject * findByTagSingle(const std::vector<SceneNode*>& data, std::string tag);
 
@@ -140,6 +166,7 @@ public:
   void ImguiStartEndDraw();
   void ImguiDrawData();
   void ImguiClear();
+  void SetupPlayersColiders();
 
 private:
   void SerializeFaza1(std::map<SceneNode *,unsigned long long> &map);
@@ -148,7 +175,8 @@ private:
   void SerializeZapisz(std::string serialized);
   void DeserializeOrderPointers(std::map<unsigned long long, SceneNode *> &map);
 
-  void MoveNodeToMapTile(SceneNode * sceneNode,GridLocation mapTile,float interpolation,float speed,float NodeXOffset,float NodeZOffset);
+  void MoveNodeToMapTile(SceneNode * sceneNode,GridLocation mapTile,float interpolation,float speed,float NodeXOffset,
+  float NodeZOffset);
 
   void SetViewAndPerspective(Camera &aCamera);
   void Plot();

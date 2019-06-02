@@ -16,6 +16,8 @@ class MapGenerator //: public Script
 	Model* floor;
 	Model* wall;
 	Model* door;
+	Model* key;
+	Model* chest;
 
 	int GetDirection();
 	void CheckForWalls();
@@ -27,21 +29,26 @@ class MapGenerator //: public Script
 	void GenerateMap(int n);
 	void FinishGeneration();
 	bool CheckIfAvailiable(glm::vec2 pos);
-	glm::vec2 GetVector2(int step);
+	glm::vec2 GetVector2(int step, int boundry, int &parent);
 	glm::vec4 GetVector4(glm::vec2 direction);
 	MapElement* GetElement(glm::vec2 pos);
 	int GetRandomIndex(int max);
-	void FillWithNull(int max );
+	void FillWithNull(int max);
 	bool CheckIfNull(int x, int y);
+	int FindAnyNeighbour(int boundry, int& move);
+	void DefineModels();
+	void GenerateChests(int amount);
 
 	public:
 	int Squares = 1;
 	int Doors = 0;
+	int Chests = 0;
 	int maxSize;
 	bool GlassDoor = false;
-	std::vector<SceneNode*> nodes;
+	std::vector<SceneNode*> leftnodes;
+	std::vector<SceneNode*> rightnodes;
 	MapGenerator(Shader* shaderProgram);
-	MapGenerator(Shader* shaderProgram, int squares, int doors, bool glass_door);
+	MapGenerator(Shader* shaderProgram, int squares, int doors, int chests, bool glass_door);
 	void TransformToPositive();
 	std::vector<MapKey*> GetConverted();
 };
