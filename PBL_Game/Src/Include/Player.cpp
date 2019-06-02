@@ -1,7 +1,8 @@
 #include "Player.hpp"
 
-Player::Player(SceneNode* player, int partsLimit, Shader* shader)
+Player::Player(SceneNode* player, int partsLimit, Shader* shader, std::vector<SceneNode*> nodes)
 {
+	this->nodes = nodes;
 	this->player = player;
 	this->partsLimit = partsLimit;
 	this->partsLimit = 0;
@@ -25,20 +26,15 @@ void Player::AddTrap()
 	PartsAmount++;
 }
 
-SceneNode* Player::Update(PBLGame::Window* okienko, float scale)
+void Player::Update(PBLGame::Window* okienko, float scale)
 {
 	if (glfwGetKey(okienko->window, GLFW_KEY_SPACE) == GLFW_PRESS && !placingTrap && Trap())
 	{
 		placingTrap = true;
 		PartsAmount -= partsLimit;
-	}
-	if (placingTrap)
-	{
+		nodes.push_back(CreateTrap(scale));
 		placingTrap = false;
-		return CreateTrap(scale);
-
 	}
-	return nullptr;
 }
 
 SceneNode* Player::CreateTrap(float scale)

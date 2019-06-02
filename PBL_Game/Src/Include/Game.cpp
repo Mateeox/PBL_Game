@@ -197,7 +197,7 @@ void Game::Granko()
 
   leftPlayerNode.Translate(0, PlayerYOffset, 0);
   rightPlayerNode.Translate(0, PlayerYOffset, 0);
-  playerObj = new Player(&leftPlayerNode, 3, shaderProgram);
+  playerObj = new Player(&leftPlayerNode, 3, shaderProgram, sNodes);
   box2.Translate(5, 0, 0);
   box3.Translate(-5, 0, 0);
 
@@ -655,9 +655,7 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation)
   camera.Position.y = cameraYOffset;
   camera.Position.z = player.local.getPosition().z * PlayerScale + cameraZOffset;
 
-  SceneNode* trap = playerObj->Update(&okienko, PlayerScale);
-  if (trap != nullptr)
-	  sNodes.push_back(trap);
+  playerObj->Update(&okienko, PlayerScale);
 }
 
 void Game::gatherCollidableObjects(std::vector<SceneNode *> &nodes)
