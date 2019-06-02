@@ -92,9 +92,13 @@ void Game::Granko()
   GameObject *enemyGameObject = new GameObject(Enemy_Node_For_Model.local);
 
   GameObject *leftPlayerObj = new GameObject(leftPlayerNodeForModel.local);
-  leftPlayerObj->setTag("player");
   GameObject *rightPlayerObj = new GameObject(rightPlayerNodeForModel.local);
-  rightPlayerObj->setTag("player");
+ 
+
+  GameObject *leftPlayerObjWithCollider = new GameObject(leftPlayerNode.local);
+  GameObject *rightPlayerObjWithCollider = new GameObject(rightPlayerNode.local);
+  leftPlayerObjWithCollider->setTag("player");
+  rightPlayerObjWithCollider->setTag("player");
 
   GameObject *hexObj2 = new GameObject(box2.local);
   GameObject *hexObj3 = new GameObject(box3.local);
@@ -121,7 +125,7 @@ void Game::Granko()
                                                   sizeof(Shapes::RB_Cube_indices),
                                                   *shaderProgram,
                                                   BlockedTileTexture, "Basic");
-  ConeRenderer *coneRendererLeft = new ConeRenderer(*shaderViewCone, &sNodes);
+  ConeRenderer *coneRendererLeft = new ConeRenderer(*shaderViewCone, &leftScene);
 
   leftPlayerObj->AddComponent(coneRendererLeft);
   leftPlayerObj->AddComponent(PlayerModel);
@@ -134,8 +138,8 @@ void Game::Granko()
   doorObj->AddComponent(szescian);
   keyObj->AddComponent(szescian);
 
-  Collider *leftPlayerCollider = new Collider(leftPlayerObj->transform);
-  Collider *rightPlayerCollider = new Collider(rightPlayerObj->transform);
+  Collider *leftPlayerCollider = new Collider(leftPlayerObjWithCollider->transform);
+  Collider *rightPlayerCollider = new Collider(rightPlayerObjWithCollider->transform);
 
   // Triggery
   Door *sampleDoor = new Door(doorObj->transform, &doorNode);
@@ -159,10 +163,16 @@ void Game::Granko()
   leftPlayerCollider->setDimensions(-0.12, 0, 0.25, 2.3, 2, 3.05);
   rightPlayerCollider->setDimensions(-0.12, 0, 0.25, 2.3, 2, 3.05);
 
-  leftPlayerObj->AddComponent(leftPlayerCollider);
-  rightPlayerObj->AddComponent(rightPlayerCollider);
-  leftPlayerNode.AddGameObject(leftPlayerObj);
-  rightPlayerNode.AddGameObject(rightPlayerObj);
+  
+  leftPlayerObjWithCollider->AddComponent(leftPlayerCollider);
+  rightPlayerObjWithCollider->AddComponent(rightPlayerCollider);
+  
+  leftPlayerNode.AddGameObject(leftPlayerObjWithCollider);
+  rightPlayerNode.AddGameObject(rightPlayerObjWithCollider);
+
+  leftPlayerNodeForModel.AddGameObject(leftPlayerObj);
+  rightPlayerNodeForModel.AddGameObject(rightPlayerObj);
+
 
   Collider *box2Collider = new Collider(hexObj2->transform);
   box2Collider->setDimensions(0, 0, 0, 2, 2, 2);
@@ -193,6 +203,7 @@ void Game::Granko()
 
   leftPlayerNode.AddChild(&leftPlayerNodeForModel);
   rightPlayerNode.AddChild(&rightPlayerNodeForModel);
+
   Enemy_Node.AddChild(&Enemy_Node_For_Model);
   sNodes.push_back(&Enemy_Node);
 
@@ -598,16 +609,17 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation)
   if (glfwGetKey(okienko.window, GLFW_KEY_D) == GLFW_PRESS)
     movementDir.x = 1;
 
-  // if (movementDir.z == -1 && movementDir.x == 0)
-  //   player.children[0]->local.SetRotation(0, 180, 0);
-  // else if (movementDir.z == 1 && movementDir.x == 0 )
-  //   player.children[0]->local.SetRotation(0, 0, 0);
-  // else if (movementDir.x == -1 && movementDir.y == 0 )
-  //   player.children[0]->local.SetRotation(0, 90, 0);
-  // else if (movementDir.x == 1 && movementDir.y == 0 )
-  //   player.children[0]->local.SetRotation(0, 270, 0);
+    if (movementDir.z == -1 && movementDir.x == 0)
+      player.children[0]->local.SetRotation(0, 180, 0);
+    else if (movementDir.z == 1 && movementDir.x == 0 )
+       player.children[0]->local.SetRotation(0, 0, 0);
+    else if (movementDir.x == -1 && movementDir.y == 0 )
+       player.children[0]->local.SetRotation(0, 270, 0);
+    else if (movementDir.x == 1 && movementDir.y == 0 )
+      player.children[0]->local.SetRotation(0, 90, 0);
 
-
+   
+   //player.local.Translate(glm::vec3(0, -1.0f * player.local.getPosition().y * PlayerScale, 0));
 
   glm::vec3 move = movementDir * movementSpeedTimesPlayerScale * interpolation;
   player.Translate(move.x, move.y, move.z);
@@ -631,7 +643,7 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation)
   }
 
   //view cone
-  auto coneRenderer = (ConeRenderer *)player.gameObject->GetComponent(ComponentSystem::ComponentType::ConeRenderer);
+  auto coneRenderer = (ConeRenderer *)(player.children[0]->gameObject->GetComponent(ComponentSystem::ComponentType::ConeRenderer));
   if (coneRenderer != nullptr)
   {
     if (glfwGetKey(okienko.window, GLFW_KEY_LEFT) == GLFW_PRESS)
@@ -751,6 +763,9 @@ void Game::SetViewAndPerspective(Camera &aCamera)
   shaderProgram_For_Model->setMat4("projection", projection);
   shaderProgram_For_Model->setMat4("view", view);
   shaderProgram_For_Model->setFloat("FogDensity", FogDensity);
+  shaderProgram_For_Model->setFloat("viewSpaceZOffset", cameraZOffset);
+
+  
 
   shaderViewCone->use();
   shaderViewCone->setMat4("projection", projection);
@@ -759,6 +774,8 @@ void Game::SetViewAndPerspective(Camera &aCamera)
   shaderAnimatedModel->use();
   shaderAnimatedModel->setMat4("projection", projection);
   shaderAnimatedModel->setMat4("view", view);
+  shaderAnimatedModel->setFloat("FogDensity", FogDensity);
+  shaderAnimatedModel->setFloat("viewSpaceZOffset", cameraZOffset);
 }
 
 // Funkcje do wyswietlania grafik

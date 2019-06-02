@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include "Drawable.hpp"
+#include "ConeRenderable.hpp"
 
 namespace ModelMesh
 {
@@ -24,7 +25,7 @@ struct Texture
     string path;
 };
 
-class Mesh : public Drawable
+class Mesh : public ConeRenderable
 {
 
   public:
@@ -40,6 +41,11 @@ class Mesh : public Drawable
 	std::string Serialize() {
 		return Drawable::Serialize();
 	}
+	float* getVertexData() override;
+	int getVertexDataSize() override;
+	int getVerticesPositionStride() override;
+	unsigned int *getIndices() override;
+	int getIndicesSize() override;
 	
     ComponentSystem::ComponentType GetComponentType() override;
     private:

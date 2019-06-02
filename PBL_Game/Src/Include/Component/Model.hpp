@@ -19,6 +19,8 @@ class Model : public ComponentSystem::Component
     Model(std::string path, Shader& aShaderProgram, bool gammaCorrection);
     void Draw(glm::mat4 &  transform);
     Shader & ShaderProgram;
+	std::vector<ModelMesh::Mesh>* getMeshes();
+
 
   private:
 
@@ -32,7 +34,6 @@ class Model : public ComponentSystem::Component
     ModelMesh::Mesh processMesh(aiMesh *mesh, const aiScene *scene);
     std::vector<ModelMesh::Texture> loadMaterialTextures(const aiScene *scene,aiMaterial *mat, aiTextureType type,
                                          std::string typeName);
-
 	ComponentSystem::ComponentType GetComponentType() override;
 	std::string Serialize() {
 		return Component::Serialize();

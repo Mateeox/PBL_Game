@@ -18,7 +18,7 @@ ShapeRenderer3D::ShapeRenderer3D(
 	int aindices_size,
 	Shader &aShaderProgram,
 	Texture *atexture,
-	std::string textureName) : Drawable(aShaderProgram),
+	std::string textureName) : ConeRenderable(aShaderProgram, g_ver, size, getVerticesPositionStride()),
 							   g_vertex_buffer_data(g_ver),
 							   g_vertex_buffer_data_size(size),
 							   indices_size(aindices_size),
@@ -50,16 +50,13 @@ ShapeRenderer3D::ShapeRenderer3D(
 	//texture
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
-
-	//g_vertex_buffer_data_size is in bytes
-	calculateExtrema(g_vertex_buffer_data, g_vertex_buffer_data_size / sizeof(decltype(g_vertex_buffer_data_size)));
 }
 
 ShapeRenderer3D::ShapeRenderer3D(
 	GLfloat *g_ver, int size,
 	Shader &aShaderProgram,
 	Texture *atexture,
-	std::string textureName) : Drawable(aShaderProgram),
+	std::string textureName) : ConeRenderable(aShaderProgram, g_ver, size, getVerticesPositionStride()),
 							   g_vertex_buffer_data(g_ver),
 							   g_vertex_buffer_data_size(size),
 							   textureDisplayed(textureName)
@@ -86,9 +83,6 @@ ShapeRenderer3D::ShapeRenderer3D(
 	//texture
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
-
-	//g_vertex_buffer_data_size is in bytes
-	calculateExtrema(g_vertex_buffer_data, g_vertex_buffer_data_size / sizeof(decltype(g_vertex_buffer_data_size)));
 }
 
 void ShapeRenderer3D::Draw(glm::mat4 &transform)

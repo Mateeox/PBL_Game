@@ -228,6 +228,11 @@ printf("%i \n",(int)(str.C_Str()[1]- '0'));
     return textures;
 }
 
+std::vector<ModelMesh::Mesh>* Model::getMeshes()
+{
+	return &meshes;
+}
+
 unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma)
 {
     std::string filename = std::string(path);

@@ -4,8 +4,9 @@
 #include <vector>
 #include <map>
 #include <array>
+#include "ConeRenderable.hpp"
 
-class ShapeRenderer3D : public Drawable
+class ShapeRenderer3D : public ConeRenderable
 {
 
     float *g_vertex_buffer_data;
