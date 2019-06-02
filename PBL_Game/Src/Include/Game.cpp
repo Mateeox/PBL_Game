@@ -599,15 +599,16 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation)
     movementDir.x = 1;
 
    if (movementDir.z == -1 && movementDir.x == 0)
-     player.children[0]->local.SetRotation(0, 180, 0);
+     player.local.SetRotation(0, 180, 0);
    else if (movementDir.z == 1 && movementDir.x == 0 )
-     player.children[0]->local.SetRotation(0, 0, 0);
+     player.local.SetRotation(0, 0, 0);
    else if (movementDir.x == -1 && movementDir.y == 0 )
-     player.children[0]->local.SetRotation(0, 90, 0);
+     player.local.SetRotation(0, 90, 0);
    else if (movementDir.x == 1 && movementDir.y == 0 )
-     player.children[0]->local.SetRotation(0, 270, 0);
+     player.local.SetRotation(0, 270, 0);
 
-
+   
+   player.local.Translate(glm::vec3(0, -1.0f * player.local.getPosition().y * PlayerScale, 0));
 
   glm::vec3 move = movementDir * movementSpeedTimesPlayerScale * interpolation;
   player.Translate(move.x, move.y, move.z);
