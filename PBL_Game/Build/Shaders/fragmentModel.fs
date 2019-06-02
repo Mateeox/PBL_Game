@@ -17,9 +17,11 @@ uniform float FogDensity = 0.15;
 
 vec3 finalColor = vec3(0, 0, 0);
 
+uniform float viewSpaceZOffset = 5.0f;
+
 void main()
 {    
-    dist = abs(viewSpace.z-5);
+    dist = abs(viewSpace.z-viewSpaceZOffset);
 
     fogFactor = (80 - dist)/(80 - 20);
    fogFactor = clamp( fogFactor, 0.0, 1.0 );

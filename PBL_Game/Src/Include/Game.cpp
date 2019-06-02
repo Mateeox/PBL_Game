@@ -747,6 +747,9 @@ void Game::SetViewAndPerspective(Camera &aCamera)
   shaderProgram_For_Model->setMat4("projection", projection);
   shaderProgram_For_Model->setMat4("view", view);
   shaderProgram_For_Model->setFloat("FogDensity", FogDensity);
+  shaderProgram_For_Model->setFloat("viewSpaceZOffset", cameraZOffset);
+
+  
 
   shaderViewCone->use();
   shaderViewCone->setMat4("projection", projection);
@@ -755,6 +758,8 @@ void Game::SetViewAndPerspective(Camera &aCamera)
   shaderAnimatedModel->use();
   shaderAnimatedModel->setMat4("projection", projection);
   shaderAnimatedModel->setMat4("view", view);
+  shaderAnimatedModel->setFloat("FogDensity", FogDensity);
+  shaderAnimatedModel->setFloat("viewSpaceZOffset", cameraZOffset);
 }
 
 // Funkcje do wyswietlania grafik

@@ -106,6 +106,7 @@ class Game
   float movementSpeedTimesPlayerScale;
 
   float FogDensity = 0.35;
+ 
 
   bool mouseCallBack = true;
   bool firstMouse = true;
