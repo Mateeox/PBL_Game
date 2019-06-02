@@ -55,9 +55,11 @@ class Camera
   void ProcessMouseMovement(float xoffset, float yoffset, bool constrainPitch = true);
   void ProcessMouseScroll(float yoffset);
 
+  void updateCameraVectors();
+
   private:
   //Calculates the front vector from the Camera's (updated) Eular Angles
-  void updateCameraVectors();
+  
 
 
 };

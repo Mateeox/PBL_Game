@@ -103,19 +103,31 @@
     <ConfigParameter>
         <Type>F</Type>
         <Name>cameraYOffset</Name>
-        <Value>2</Value>
+        <Value>3.3</Value>
     </ConfigParameter>
 
         <ConfigParameter>
         <Type>F</Type>
         <Name>cameraZOffset</Name>
-        <Value>5</Value>
+        <Value>2</Value>
     </ConfigParameter>
 
         <ConfigParameter>
         <Type>F</Type>
         <Name>cameraAngle</Name>
         <Value>35</Value>
+    </ConfigParameter>
+
+         <ConfigParameter>
+        <Type>F</Type>
+        <Name>cameraPitch</Name>
+        <Value>-60.0</Value>
+    </ConfigParameter>
+
+         <ConfigParameter>
+        <Type>F</Type>
+        <Name>cameraYaw</Name>
+        <Value>-90.0</Value>
     </ConfigParameter>
 
 </Config>

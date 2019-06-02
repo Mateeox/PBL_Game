@@ -37,6 +37,12 @@ void Game::InitializeConfig()
   cameraYOffset = ConfigUtils::GetValueFromMap<float>("cameraYOffset", ConfigMap);
   cameraAngle = ConfigUtils::GetValueFromMap<float>("cameraAngle", ConfigMap);
 
+  camera.Pitch = ConfigUtils::GetValueFromMap<float>("cameraPitch", ConfigMap);
+  camera.Yaw = ConfigUtils::GetValueFromMap<float>("cameraYaw", ConfigMap);
+
+  camera2.Pitch = ConfigUtils::GetValueFromMap<float>("cameraPitch", ConfigMap);
+  camera2.Yaw = ConfigUtils::GetValueFromMap<float>("cameraYaw", ConfigMap);
+
   TileScaleTimes100 = TileScale * 100;
   EnemyScaleInverse = 1 / EnemyScale;
 
@@ -323,6 +329,7 @@ void Game::Update(float interpolation)
       a_star_search(grid, start, goal, came_from, cost_so_far);
       path = reconstruct_path(start, goal, came_from);
     }
+
 
     if (leftSideActive)
       UpdatePlayer(leftPlayerNode, camera, interpolation);
@@ -933,6 +940,11 @@ void Game::ImGuiFunctions()
     ImGui::SliderFloat("CameraZOffset", &cameraZOffset, 0, 5);
     ImGui::SliderFloat("CameraYOffset", &cameraYOffset, 0, 5);
     ImGui::SliderFloat("FogDensity", &FogDensity, 0, 1);
+	ImGui::SliderFloat("CameraYaw", &camera.Yaw, -180, 180);
+	ImGui::SliderFloat("CameraPitch", &camera.Pitch, -180, 180);
+
+	camera.updateCameraVectors();
+	camera2.updateCameraVectors();
 
     if (ImGui::Button("Printf Path"))
     {
