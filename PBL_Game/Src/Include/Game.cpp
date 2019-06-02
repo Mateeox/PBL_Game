@@ -70,8 +70,6 @@ void Game::Granko()
   MapSize = generator.maxSize;
   grid = make_diagramFromGeneratedMap(mapped, MapSize);
 
-  Texture *xD = new Texture("Textures/red.png", GL_LINEAR);
-  xD->Load();
   Texture *BlockedTileTexture = new Texture("Textures/BlockedTile.png", GL_LINEAR);
   Texture *FreeTileTexture = new Texture("Textures/FreeTile.png", GL_LINEAR);
   Texture *SlowerTileTexture = new Texture("Textures/SlowerTile.png", GL_LINEAR);
@@ -104,7 +102,7 @@ void Game::Granko()
   GameObject *doorObj = new GameObject(doorNode.local);
   GameObject *keyObj = new GameObject(keyNode.local);
 
-  std::string PlayerModelPath = "Models/Player_Static.obj";
+  std::string PlayerModelPath = "Models/Player/Player_Static.obj";
   std::string AnimatedEnemyPAth = "Models/" + ConfigUtils::GetValueFromMap<std::string>("Enemy_Animated_Model", ConfigMap);
 
 
