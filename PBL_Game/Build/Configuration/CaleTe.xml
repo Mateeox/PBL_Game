@@ -3,12 +3,12 @@
     <ConfigParameter>
         <Type>U</Type>
         <Name>WINDOW_HEIGHT</Name>
-        <Value>900</Value>
+        <Value>1080</Value>
     </ConfigParameter>
     <ConfigParameter>
         <Type>U</Type>
         <Name>WINDOW_WIDTH</Name>
-        <Value>1600</Value>
+        <Value>1920</Value>
     </ConfigParameter>
     <ConfigParameter>
         <Type>S</Type>
@@ -18,7 +18,7 @@
     <ConfigParameter>
         <Type>F</Type>
         <Name>PlayerSpeed</Name>
-        <Value>1.5</Value>
+        <Value>15.5</Value>
     </ConfigParameter>
     <ConfigParameter>
         <Type>U</Type>
@@ -66,6 +66,12 @@
         <Value>0</Value>
     </ConfigParameter>
 
+      <ConfigParameter>
+        <Type>F</Type>
+        <Name>PlayerYOffset</Name>
+        <Value>10</Value>
+    </ConfigParameter>
+
     <ConfigParameter>
         <Type>F</Type>
         <Name>PlayerZOffset</Name>
@@ -89,7 +95,7 @@
     <ConfigParameter>
         <Type>F</Type>
         <Name>PlayerScale</Name>
-        <Value>0.20</Value>
+        <Value>0.06</Value>
     </ConfigParameter>
 </Config>
 

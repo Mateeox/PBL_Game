@@ -9,6 +9,6 @@ uniform mat4 projection;
 void main()
 {
   gl_Position = projection * view * vec4(aPos, 1.0);
-  outColor = vec4(0.0, 1.0, 0.0, 0.3);
+  outColor = vec4(0.9, 0.9, 0.8, 0.3);
 };
 

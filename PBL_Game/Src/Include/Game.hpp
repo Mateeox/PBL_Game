@@ -94,6 +94,7 @@ class Game
   float EnemyYoffset;
   float EnemyZoffset;
   float PlayerXOffset;
+  float PlayerYOffset ;
   float PlayerZOffset;
   float PlayerScale;
   float EnemyScale;
