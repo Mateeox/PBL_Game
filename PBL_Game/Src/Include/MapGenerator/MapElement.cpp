@@ -59,6 +59,7 @@ SceneNode* MapElement::AddFloor(Model* model)
 {
 	SceneNode* floor = new SceneNode();
 	GameObject* oFloor = new GameObject(floor->local);
+	oFloor->setTag("floor");
 	oFloor->AddComponent(model);
 	floor->AddGameObject(oFloor);
 	floor->Translate(Position.x, 0, Position.y);
