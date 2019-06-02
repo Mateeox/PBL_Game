@@ -37,6 +37,8 @@ void Game::InitializeConfig()
   cameraYOffset = ConfigUtils::GetValueFromMap<float>("cameraYOffset", ConfigMap);
   cameraAngle = ConfigUtils::GetValueFromMap<float>("cameraAngle", ConfigMap);
 
+  TrapScale = ConfigUtils::GetValueFromMap<float>("TrapScale", ConfigMap);
+
   TileScaleTimes100 = TileScale * 100;
   EnemyScaleInverse = 1 / EnemyScale;
 
@@ -197,7 +199,7 @@ void Game::Granko()
 
   leftPlayerNode.Translate(0, PlayerYOffset, 0);
   rightPlayerNode.Translate(0, PlayerYOffset, 0);
-  playerObj = new Player(&leftPlayerNode, 3, shaderProgram, sNodes);
+  playerObj = new Player(&leftPlayerNode, 3, *shaderProgram, &leftScene);
   box2.Translate(5, 0, 0);
   box3.Translate(-5, 0, 0);
 
@@ -655,7 +657,7 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation)
   camera.Position.y = cameraYOffset;
   camera.Position.z = player.local.getPosition().z * PlayerScale + cameraZOffset;
 
-  playerObj->Update(&okienko, PlayerScale);
+  playerObj->Update(&okienko, TrapScale);
 }
 
 void Game::gatherCollidableObjects(std::vector<SceneNode *> &nodes)

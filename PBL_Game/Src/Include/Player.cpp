@@ -1,14 +1,13 @@
 #include "Player.hpp"
 
-Player::Player(SceneNode* player, int partsLimit, Shader* shader, std::vector<SceneNode*> nodes)
+Player::Player(SceneNode* aPlayer, int aPartsLimit, Shader& aShader, SceneNode* aNode)
 {
-	this->nodes = nodes;
-	this->player = player;
-	this->partsLimit = partsLimit;
-	this->partsLimit = 0;
-	this->PartsAmount = 0;
-	this->placingTrap = false;
-	trapMod = new Model("Models/Trap/TrapPart_JawHinges.obj", *shader, false);
+	parentNode = aNode;
+	player = aPlayer;
+	partsLimit = 0;
+	PartsAmount = 0;
+	placingTrap = false;
+	trapMod = new Model("Models/Trap/TrapPart_JawHinges.obj", aShader, false);
 }
 
 int Player::Parts()
@@ -32,8 +31,7 @@ void Player::Update(PBLGame::Window* okienko, float scale)
 	{
 		placingTrap = true;
 		PartsAmount -= partsLimit;
-		nodes.push_back(CreateTrap(scale));
-		placingTrap = false;
+		parentNode->AddChild(CreateTrap(scale));
 	}
 }
 
@@ -44,8 +42,8 @@ SceneNode* Player::CreateTrap(float scale)
 	trapObj->AddComponent(trapMod);
 	trap->AddGameObject(trapObj);
 	glm::vec3 Position = player->local.getPosition();
-	trap->Translate(Position.x * scale, 0, Position.y * scale);
+	trap->Scale(scale);
+	trap->Translate(Position.x*6, 0, Position.z*6);
 	//floor->Rotate(-90.0f, glm::vec3(1, 0, 0));
-	//trap->Scale(scale);
-	return trap;
+	return std::move(trap);
 }

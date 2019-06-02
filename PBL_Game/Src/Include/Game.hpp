@@ -104,6 +104,8 @@ class Game
   float EnemyScaleInverse;
   float PlayerScaleInverse;
 
+  float TrapScale;
+
   float movementSpeedTimesPlayerScale;
 
   float FogDensity = 0.35;

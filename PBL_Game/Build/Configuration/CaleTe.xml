@@ -118,6 +118,12 @@
         <Value>35</Value>
     </ConfigParameter>
 
+    <ConfigParameter>
+        <Type>F</Type>
+        <Name>TrapScale</Name>
+        <Value>0.010</Value>
+    </ConfigParameter>
+
 </Config>
 
 <!-- types I - int
