@@ -150,11 +150,14 @@ void Game::Granko()
   // Triggery
   Door *sampleDoor = new Door(doorObj->transform, &doorNode);
   Key *sampleKey = new Key(keyObj->transform, sampleDoor);
+  EnemyTrigger *enemyTrigger = new EnemyTrigger(enemyGameObject->transform, &leftPlayerNode);
 
   sampleDoor->setDimensions(0, 0, 0, 0.5, 1, 1);
   sampleKey->setDimensions(0, 0, 0, 0.3, 0.3, 0.3);
+  enemyTrigger->setDimensions(0, 0, 0, 1, 1, 1);
   doorObj->AddComponent(sampleDoor);
   keyObj->AddComponent(sampleKey);
+  enemyGameObject->AddComponent(enemyTrigger);
   doorNode.AddGameObject(doorObj);
   keyNode.AddGameObject(keyObj);
 

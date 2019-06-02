@@ -6,6 +6,7 @@
 #include "Trigger.hpp"
 #include "Key.hpp"
 #include "Door.hpp"
+#include "EnemyTrigger.hpp"
 #include "ConfigUtils.hpp"
 #include "Component/ConeRenderer.hpp"
 #include "PathFinding/MapTile.hpp"
