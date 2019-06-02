@@ -8,7 +8,7 @@
 
 class ConeRenderer : public Drawable
 {
-	std::vector<SceneNode*> *nodes;
+	SceneNode* rootNode;
 	double anglePerSegment;
 	double radius = 6.0;
 	double directionAngle = 3;
@@ -30,7 +30,7 @@ class ConeRenderer : public Drawable
 	bool collectObjectsInConeInternal(ConeRenderable* shapeRenderer, const glm::vec2 &startPoint, const glm::vec2 &endPointLeft, const glm::vec2 &endPointRight, SceneNode* node, Transform& combinedTransform, bool& isTransformsCombined, double radiusSquared);
 
 public:
-	ConeRenderer(Shader &shaderProgram, std::vector<SceneNode*> *nodes);
+	ConeRenderer(Shader &shaderProgram, SceneNode* rootNode);
 	ComponentSystem::ComponentType GetComponentType() override;
 	void Draw(glm::mat4 &transform) override;
 	void rotateRight();

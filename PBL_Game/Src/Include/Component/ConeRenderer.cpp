@@ -2,8 +2,8 @@
 const double ConeRenderer::EPSILON = 1e-6;
 
 
-ConeRenderer::ConeRenderer(Shader &shaderProgram, std::vector<SceneNode*> *nodes) : 
-	Drawable(shaderProgram), nodes(nodes)
+ConeRenderer::ConeRenderer(Shader &shaderProgram, SceneNode* rootNode) : 
+	Drawable(shaderProgram), rootNode(rootNode)
 {
 	anglePerSegment = angle / segmentsNumber;
 	const int pointsInfinalVerticesNum = (segmentsNumber + 2) * 3;
@@ -37,7 +37,9 @@ void ConeRenderer::Draw(glm::mat4 &transform)
 	double radiusSquared = radius * radius;
 
 	objectsInCone.clear();
-	collectObjectsInCone(startPoint, endPointLeft, endPointRight, nodes, Transform::origin(), radiusSquared);
+	//don't judge me, this workaround is 10x faster than rewriting everything
+	std::vector<SceneNode*> rootVector{ rootNode };
+	collectObjectsInCone(startPoint, endPointLeft, endPointRight, &rootVector, Transform::origin(), radiusSquared);
 	glm::vec2 right(endPointLeft);
 	finalVertices.clear();
 	addToFinalVertices(startPoint);

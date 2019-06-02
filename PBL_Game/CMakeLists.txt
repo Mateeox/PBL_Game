@@ -71,6 +71,7 @@ add_executable(PBL_Game
 	  #Component
 	  Src/Include/Component/ShapeRenderer3D.cpp
 	  Src/Include/Component/ConeRenderer.cpp
+	  Src/Include/Component/ConeRenderable.cpp
 	  Src/Include/Component/Mesh.cpp
 	  Src/Include/Component/Model.cpp
 	  Src/Include/Component/AnimatedModel.cpp
