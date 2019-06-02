@@ -43,6 +43,11 @@ class Game
   Shader *shaderProgram_For_Model;
   Shader *shaderAnimatedModel;
   Shader *shaderViewCone;
+  SceneNode wholeScene;
+
+  SceneNode leftScene;
+  SceneNode rightScene;
+  
   std::vector<SceneNode *> sNodes;
   std::vector<SceneNode *> rightNodes;
   std::vector<Collider *> collidableObjects;

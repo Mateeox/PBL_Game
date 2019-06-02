@@ -76,7 +76,7 @@ SceneNode* MapElement::CreateWall(SceneNode* parent, Model* model, float directi
 	wall->AddGameObject(wallObj);
 	wall->Translate(Position.x + direction_x * wall_offset, 0, Position.y + direction_y * wall_offset);
 	wall->Rotate(direction_y == 0 ? 90.0f : 0, glm::vec3(0, 1, 0));
-	wall->Scale(0.0254f, 0.0254f, 0.01f);
+	wall->Scale(0.02545f, 0.0254f, 0.01f);
 	
 	wall->AddParent(parent);
 	return wall;

@@ -58,6 +58,7 @@ Game::Game(Window &aOkno) : okienko(aOkno),
 void Game::Granko()
 {
   MapGenerator generator(shaderProgram_For_Model, MapScale, 3, 4, false);
+
   std::vector<MapKey *> mapped = generator.GetConverted();
 
   MapSize = generator.maxSize;
@@ -81,6 +82,8 @@ void Game::Granko()
   SceneNode box3;
   SceneNode doorNode;
   SceneNode keyNode;
+
+  
 
   GameObject *enemyGameObject = new GameObject(Enemy_Node_For_Model.local);
 
@@ -198,6 +201,8 @@ void Game::Granko()
   sNodes.push_back(&doorNode);
   sNodes.push_back(&keyNode);
 
+  
+
   //a_star_search(grid, start, goal, came_from, cost_so_far);
   //path = reconstruct_path(start, goal, came_from);
 
@@ -223,11 +228,26 @@ void Game::Granko()
                           MapSize);
   }
 
+
   for (auto &node : generator.leftnodes)
   { 
 	  if(node != NULL)
-		sNodes.push_back(node);
+		leftScene.AddChild(node);
   }
+
+  leftScene.AddChild(&leftPlayerNode);
+  leftScene.AddChild(&Enemy_Node);
+
+  for (auto &node : generator.rightnodes)
+  { 
+	  if(node != NULL)
+    {
+      rightScene.AddChild(node);
+    }
+		
+  }
+  rightScene.AddChild(&rightPlayerNode);
+
 
   shaderProgram->use();
 
@@ -324,10 +344,8 @@ void Game::Render()
   glScissor(0, 0, (Game::WINDOW_WIDTH / 2) + offset, Game::WINDOW_HEIGHT);
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT);
-  for (auto node : sNodes)
-  {
-    node->Render(originTransform, true);
-  }
+  leftScene.Render(originTransform,true);
+  Enemy_Node.Render(originTransform,true);
 
   SetViewAndPerspective(camera2);
 
@@ -336,12 +354,8 @@ void Game::Render()
   glScissor((Game::WINDOW_WIDTH / 2) + offset, 0, (Game::WINDOW_WIDTH / 2) - offset, Game::WINDOW_HEIGHT);
   glClearColor(0, 0, 1, 1);
   glClear(GL_COLOR_BUFFER_BIT);
-  sNodes[2]->Render(originTransform, true);
-  sNodes[1]->Render(originTransform, true);
-  for (auto node : rightNodes)
-  {
-    node->Render(originTransform, true);
-  }
+  rightScene.Render(originTransform,true);
+ 
 
   // RENDER PASKA ODDZIELAJACAEGO KAMERY - TODO
   glViewport((Game::WINDOW_WIDTH / 2) + offset - 5, 0, 10, Game::WINDOW_HEIGHT);

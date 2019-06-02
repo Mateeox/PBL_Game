@@ -57,7 +57,7 @@
     <ConfigParameter>
         <Type>F</Type>
         <Name>EnemyBaseSpeed</Name>
-        <Value>5</Value>
+        <Value>10</Value>
     </ConfigParameter>
 
     <ConfigParameter>
@@ -83,7 +83,7 @@
     <ConfigParameter>
         <Type>F</Type>
         <Name>EnemyScale</Name>
-        <Value>0.005</Value>
+        <Value>0.0025</Value>
     </ConfigParameter>
 </Config>
 
