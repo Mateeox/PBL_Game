@@ -32,6 +32,11 @@ void Game::InitializeConfig()
   floorTransform = ConfigUtils::GetValueFromMap<float>("FloorTranslation", ConfigMap);
   TileScale = ConfigUtils::GetValueFromMap<float>("TileScale", ConfigMap);
   EnemyScale = ConfigUtils::GetValueFromMap<float>("EnemyScale", ConfigMap);
+
+  cameraZOffset = ConfigUtils::GetValueFromMap<float>("cameraZOffset", ConfigMap);
+  cameraYOffset = ConfigUtils::GetValueFromMap<float>("cameraYOffset", ConfigMap);
+  cameraAngle = ConfigUtils::GetValueFromMap<float>("cameraAngle", ConfigMap);
+
   TileScaleTimes100 = TileScale * 100;
   EnemyScaleInverse = 1 / EnemyScale;
 
@@ -86,9 +91,9 @@ void Game::Granko()
 
   GameObject *enemyGameObject = new GameObject(Enemy_Node_For_Model.local);
 
-  GameObject *leftPlayerObj = new GameObject(leftPlayerNode.local);
+  GameObject *leftPlayerObj = new GameObject(leftPlayerNodeForModel.local);
   leftPlayerObj->setTag("player");
-  GameObject *rightPlayerObj = new GameObject(rightPlayerNode.local);
+  GameObject *rightPlayerObj = new GameObject(rightPlayerNodeForModel.local);
   rightPlayerObj->setTag("player");
 
   GameObject *hexObj2 = new GameObject(box2.local);
@@ -186,6 +191,8 @@ void Game::Granko()
   box2.Translate(5, 0, 0);
   box3.Translate(-5, 0, 0);
 
+  leftPlayerNode.AddChild(&leftPlayerNodeForModel);
+  rightPlayerNode.AddChild(&rightPlayerNodeForModel);
   Enemy_Node.AddChild(&Enemy_Node_For_Model);
   sNodes.push_back(&Enemy_Node);
 
@@ -196,11 +203,7 @@ void Game::Granko()
   sNodes.push_back(&doorNode);
   sNodes.push_back(&keyNode);
 
-  //a_star_search(grid, start, goal, came_from, cost_so_far);
-  //path = reconstruct_path(start, goal, came_from);
-
   glm::vec2 startLocation = FindFirstEmptyFloor(mapped);
-  std::cout << "First Free Tile:" << startLocation.x << startLocation.y << "\n";
   start.x = startLocation.x;
   start.y = startLocation.y;
 
@@ -595,6 +598,17 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation)
   if (glfwGetKey(okienko.window, GLFW_KEY_D) == GLFW_PRESS)
     movementDir.x = 1;
 
+  // if (movementDir.z == -1 && movementDir.x == 0)
+  //   player.children[0]->local.SetRotation(0, 180, 0);
+  // else if (movementDir.z == 1 && movementDir.x == 0 )
+  //   player.children[0]->local.SetRotation(0, 0, 0);
+  // else if (movementDir.x == -1 && movementDir.y == 0 )
+  //   player.children[0]->local.SetRotation(0, 90, 0);
+  // else if (movementDir.x == 1 && movementDir.y == 0 )
+  //   player.children[0]->local.SetRotation(0, 270, 0);
+
+
+
   glm::vec3 move = movementDir * movementSpeedTimesPlayerScale * interpolation;
   player.Translate(move.x, move.y, move.z);
   Collider *playerCollider = (Collider *)player.gameObject->GetComponent(ComponentSystem::ComponentType::Collider);
@@ -625,10 +639,13 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation)
     if (glfwGetKey(okienko.window, GLFW_KEY_RIGHT) == GLFW_PRESS)
       coneRenderer->rotateRight();
   }
-  camera.Position.x = player.gameObject->transform.getPosition().x * player.gameObject->transform.getScale().x;
+  camera.Position.x = player.local.getPosition().x * PlayerScale;
   camera.Position.y = cameraYOffset;
   camera.Position.z = player.gameObject->transform.getPosition().z * player.gameObject->transform.getScale().z + cameraZOffset;
 
+  SceneNode* trap = playerObj->Update(&okienko, PlayerScale);
+  if (trap != nullptr)
+	  sNodes.push_back(trap);
 }
 
 void Game::gatherCollidableObjects(std::vector<SceneNode *> &nodes)
@@ -840,7 +857,6 @@ void Game::MoveNodeToMapTile(SceneNode *sceneNode, GridLocation mapTile, float i
     diffVec = glm::vec2(0, 0);
   }
 
-  std::cout << diffVec.x << " " << diffVec.y << "\n ";
   vector2DHelper = glm::vec2(positionB.x, positionB.y);
   vector2DHelper2 = glm::vec2(positionA.x, positionA.y);
 
@@ -871,7 +887,6 @@ void Game::MoveNodeToMapTile(SceneNode *sceneNode, GridLocation mapTile, float i
       roationChild->local.SetRotation(0, 90, 0);
     }
   }
-  
 }
 
 void Game::ImguiDrawData()
