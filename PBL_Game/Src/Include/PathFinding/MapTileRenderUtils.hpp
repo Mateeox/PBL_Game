@@ -67,7 +67,7 @@ void ResetMapTilePath(std::vector<MapTile *>& mapTiles,
     }
 }
 
-static void AddMapTilesToSceneNodes(std::vector<MapTile *> &mapTiles, std::vector<SceneNode *> &sNodes,
+static void AddMapTilesToSceneNodes(std::vector<MapTile *> &mapTiles, SceneNode& Nodes,
                                     GridWithWeights &grid,
                                     Texture *FreeTileTexture,
                                     Texture *PathTileTexture,

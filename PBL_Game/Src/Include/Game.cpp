@@ -33,6 +33,12 @@ void Game::InitializeConfig()
   EnemyScale = ConfigUtils::GetValueFromMap<float>("EnemyScale", ConfigMap);
   TileScaleTimes100 = TileScale * 100;
   EnemyScaleInverse = 1 / EnemyScale;
+
+  PlayerScale = ConfigUtils::GetValueFromMap<float>("PlayerScale", ConfigMap);
+  PlayerScaleInverse = 1 / PlayerScale;
+
+  movementSpeedTimesPlayerScale = movementSpeed * PlayerScale;
+
 }
 
 Game::Game(Window &aOkno) : okienko(aOkno),
@@ -177,13 +183,13 @@ void Game::Granko()
 
   //  FloorNode_new.Translate(0, floorTransform, 0);
 
-  leftPlayerNode.Scale(0.01);
-  rightPlayerNode.Scale(0.01);
+  leftPlayerNode.Scale(PlayerScale);
+  rightPlayerNode.Scale(PlayerScale);
 
   Enemy_Node.Scale(EnemyScale);
 
-  leftPlayerNode.Translate(-150.0, 0, 0);
-  rightPlayerNode.Translate(150.0, 0, 0);
+  leftPlayerNode.Translate(0, 2, 0);
+  rightPlayerNode.Translate(0, 2, 0);
 
   box2.Translate(5, 0, 0);
   box3.Translate(-5, 0, 0);
@@ -209,11 +215,11 @@ void Game::Granko()
   start.y = startLocation.y;
 
   Enemy_Node.Translate(start.x * EnemyScaleInverse, EnemyYoffset*100, start.y * EnemyScaleInverse);
-  leftPlayerNode.Translate(start.x * 100, 0, start.y * 100);
+  leftPlayerNode.Translate(start.x * PlayerScaleInverse, 0, start.y * PlayerScaleInverse);
 
   if(debugPathFinding)
   {
-  AddMapTilesToSceneNodes(mapTiles, sNodes,
+  AddMapTilesToSceneNodes(mapTiles, leftScene,
                           grid,
                           FreeTileTexture,    //Texture 1
                           PathTileTexture,    //Texture 2
@@ -302,7 +308,7 @@ void Game::Update(float interpolation)
     start.x = start_poz.x;
     start.y = start_poz.y;
 
-    glm::vec2 end_poz = GetPositionOfset(leftPlayerNode, MapSize, PlayerXOffset, PlayerZOffset, TileScaleTimes100);
+    glm::vec2 end_poz = GetPositionOfset(leftPlayerNode, MapSize, PlayerXOffset, PlayerZOffset, PlayerScaleInverse);
     goal.x = end_poz.x;
     goal.y = end_poz.y;
 
@@ -349,7 +355,7 @@ void Game::Render()
   // RENDER PRAWEJ STRONY
   glViewport((Game::WINDOW_WIDTH / 2) - 125, 0, (Game::WINDOW_WIDTH / 2) + 125, Game::WINDOW_HEIGHT);
   glScissor((Game::WINDOW_WIDTH / 2) + offset, 0, (Game::WINDOW_WIDTH / 2) - offset, Game::WINDOW_HEIGHT);
-  glClearColor(0, 0, 1, 1);
+  glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT);
   rightScene.Render(originTransform,true);
  
@@ -603,7 +609,7 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation)
   if (glfwGetKey(okienko.window, GLFW_KEY_D) == GLFW_PRESS)
     movementDir.x = 1;
 
-  glm::vec3 move = movementDir * movementSpeed * interpolation;
+  glm::vec3 move = movementDir * movementSpeedTimesPlayerScale * interpolation ;
   player.Translate(move.x, move.y, move.z);
   Collider *playerCollider = (Collider *)player.gameObject->GetComponent(ComponentSystem::ComponentType::Collider);
   //check if there are any collisions, if yes - abort the move

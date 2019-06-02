@@ -95,8 +95,12 @@ class Game
   float EnemyZoffset;
   float PlayerXOffset;
   float PlayerZOffset;
+  float PlayerScale;
   float EnemyScale;
   float EnemyScaleInverse;
+  float PlayerScaleInverse;
+
+  float movementSpeedTimesPlayerScale;
 
   float FogDensity = 0.35;
 

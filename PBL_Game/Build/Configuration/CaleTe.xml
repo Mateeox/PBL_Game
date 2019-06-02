@@ -18,7 +18,7 @@
     <ConfigParameter>
         <Type>F</Type>
         <Name>PlayerSpeed</Name>
-        <Value>10</Value>
+        <Value>1.5</Value>
     </ConfigParameter>
     <ConfigParameter>
         <Type>U</Type>
@@ -84,6 +84,12 @@
         <Type>F</Type>
         <Name>EnemyScale</Name>
         <Value>0.0025</Value>
+    </ConfigParameter>
+
+    <ConfigParameter>
+        <Type>F</Type>
+        <Name>PlayerScale</Name>
+        <Value>0.20</Value>
     </ConfigParameter>
 </Config>
 
