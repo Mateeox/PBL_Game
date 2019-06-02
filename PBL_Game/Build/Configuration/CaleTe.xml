@@ -20,11 +20,13 @@
         <Name>PlayerSpeed</Name>
         <Value>15.5</Value>
     </ConfigParameter>
+
     <ConfigParameter>
         <Type>U</Type>
         <Name>MapScale</Name>
         <Value>300</Value>
     </ConfigParameter>
+
     <ConfigParameter>
         <Type>F</Type>
         <Name>TileScale</Name>
@@ -66,7 +68,7 @@
         <Value>0</Value>
     </ConfigParameter>
 
-      <ConfigParameter>
+    <ConfigParameter>
         <Type>F</Type>
         <Name>PlayerYOffset</Name>
         <Value>10</Value>
@@ -98,7 +100,7 @@
         <Value>0.06</Value>
     </ConfigParameter>
 
-<!---  Camera /-->
+    <!---  Camera /-->
 
     <ConfigParameter>
         <Type>F</Type>
@@ -106,28 +108,30 @@
         <Value>3.3</Value>
     </ConfigParameter>
 
-        <ConfigParameter>
+    <ConfigParameter>
         <Type>F</Type>
         <Name>cameraZOffset</Name>
         <Value>2</Value>
     </ConfigParameter>
 
-        <ConfigParameter>
+    <ConfigParameter>
         <Type>F</Type>
         <Name>cameraAngle</Name>
         <Value>35</Value>
     </ConfigParameter>
 
-         <ConfigParameter>
+    <ConfigParameter>
         <Type>F</Type>
         <Name>cameraPitch</Name>
         <Value>-60.0</Value>
     </ConfigParameter>
 
-         <ConfigParameter>
+    <ConfigParameter>
         <Type>F</Type>
         <Name>cameraYaw</Name>
         <Value>-90.0</Value>
+    </ConfigParameter>
+
     <ConfigParameter>
         <Type>F</Type>
         <Name>TrapScale</Name>
