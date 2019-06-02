@@ -125,7 +125,7 @@ void Game::Granko()
                                                   sizeof(Shapes::RB_Cube_indices),
                                                   *shaderProgram,
                                                   BlockedTileTexture, "Basic");
-  ConeRenderer *coneRendererLeft = new ConeRenderer(*shaderViewCone, &sNodes);
+  ConeRenderer *coneRendererLeft = new ConeRenderer(*shaderViewCone, &leftScene);
 
   leftPlayerObj->AddComponent(coneRendererLeft);
   leftPlayerObj->AddComponent(PlayerModel);

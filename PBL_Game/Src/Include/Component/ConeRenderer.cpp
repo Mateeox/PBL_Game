@@ -2,8 +2,8 @@
 const double ConeRenderer::EPSILON = 1e-6;
 
 
-ConeRenderer::ConeRenderer(Shader &shaderProgram, std::vector<SceneNode*> *nodes) : 
-	Drawable(shaderProgram), nodes(nodes)
+ConeRenderer::ConeRenderer(Shader &shaderProgram, SceneNode* rootNode) : 
+	Drawable(shaderProgram), rootNode(rootNode)
 {
 	anglePerSegment = angle / segmentsNumber;
 	const int pointsInfinalVerticesNum = (segmentsNumber + 2) * 3;
@@ -37,7 +37,9 @@ void ConeRenderer::Draw(glm::mat4 &transform)
 	double radiusSquared = radius * radius;
 
 	objectsInCone.clear();
-	collectObjectsInCone(startPoint, endPointLeft, endPointRight, nodes, Transform::origin(), radiusSquared);
+	//don't judge me, this workaround is 10x faster than rewriting everything
+	std::vector<SceneNode*> rootVector{ rootNode };
+	collectObjectsInCone(startPoint, endPointLeft, endPointRight, &rootVector, Transform::origin(), radiusSquared);
 	glm::vec2 right(endPointLeft);
 	finalVertices.clear();
 	addToFinalVertices(startPoint);
@@ -146,8 +148,6 @@ bool ConeRenderer::findLinesIntersectionPoint(glm::vec2 &intersectionPoint, cons
 
 void ConeRenderer::collectObjectsInCone(const glm::vec2 &startPoint, const glm::vec2 &endPointLeft, const glm::vec2 &endPointRight, std::vector<SceneNode*> *nodes, Transform transform, double radiusSquared)
 {
-
-
 	if (radiusSquared < 0)
 	{
 		//if the radius is negative it means it was not given, so we have to calculate it from points
@@ -156,69 +156,82 @@ void ConeRenderer::collectObjectsInCone(const glm::vec2 &startPoint, const glm::
 	for (auto node : *nodes)
 	{
 		Transform combinedTransform;
-		bool transformsCombined = false;
-		if (node->gameObject != nullptr && node->gameObject->getTag() != "floor")
+		bool isTransformsCombined = false;
+		if (node->gameObject != nullptr && node->gameObject->getTag() != "player" && node->gameObject->getTag() != "floor")
 		{
-			ShapeRenderer3D* shapeRenderer = (ShapeRenderer3D*)node->gameObject->GetComponent(ComponentSystem::ComponentType::ShapeRenderer3D);
+			ConeRenderable* shapeRenderer = (ConeRenderable*)node->gameObject->GetComponent(ComponentSystem::ComponentType::ShapeRenderer3D);
 			if (shapeRenderer != nullptr)
 			{
-				auto points = shapeRenderer->getExtrema();
 				combinedTransform = node->gameObject->transform.combine(transform);
-				transformsCombined = true;
-				bool foundAnyPointInsideCone = false;
-				std::vector<glm::vec2> pointsAfterTransfomration;
-				pointsAfterTransfomration.reserve(points.size());
-				for (auto point : points)
+				collectObjectsInConeInternal(shapeRenderer, startPoint, endPointLeft, endPointRight, node, combinedTransform, isTransformsCombined, radiusSquared);
+			}
+			else
+			{
+				Model* model = (Model*)node->gameObject->GetComponent(ComponentSystem::ComponentType::Model);
+				if (model != nullptr)
 				{
-					auto transformedPoint = combinedTransform.GetTransform() * point;
-					auto pointCastedToXZPlane = glm::vec2(transformedPoint.x, transformedPoint.z);
-					pointsAfterTransfomration.push_back(pointCastedToXZPlane);
-
-					if (glm::distance2(pointCastedToXZPlane, startPoint) < radiusSquared)
+					combinedTransform = node->gameObject->transform.combine(transform);
+					for (auto& mesh : *model->getMeshes())
 					{
-						//vertex of object is within cone radius, now lets check if it is between borders
-						if (!isOnLeftSide(startPoint, endPointLeft, pointCastedToXZPlane) && isOnLeftSide(startPoint, endPointRight, pointCastedToXZPlane))
-						{
-							objectsInCone.push_back(std::make_pair(shapeRenderer, combinedTransform.GetTransform()));
-							foundAnyPointInsideCone = true;
+						if (collectObjectsInConeInternal(&mesh, startPoint, endPointLeft, endPointRight, node, combinedTransform, isTransformsCombined, radiusSquared))
 							break;
-						}
 					}
-				}
-				if (!foundAnyPointInsideCone)
-				{
-					//it is still possible that an object intersects the cone, but none of its vertices are inside
-					for (int i = 0; i < pointsAfterTransfomration.size() - 1; ++i)
-					{
-						int nextPointIndex = (i + 1) % pointsAfterTransfomration.size();
-						//check left border
-						if (areLinesIntersecting(startPoint, endPointLeft, pointsAfterTransfomration[i], pointsAfterTransfomration[nextPointIndex]))
-						{
-							objectsInCone.push_back(std::make_pair(shapeRenderer, combinedTransform.GetTransform()));
-							break;
-						}
-						//check right border
-						if (areLinesIntersecting(startPoint, endPointRight, pointsAfterTransfomration[i], pointsAfterTransfomration[nextPointIndex]))
-						{
-							objectsInCone.push_back(std::make_pair(shapeRenderer, combinedTransform.GetTransform()));
-							break;
-						}
-						//check middle line (for an object intersecting with the curved area of the cone) 
-						if (areLinesIntersecting(startPoint, rotatePointAroundPoint(endPointLeft, startPoint, angle / 2.0), pointsAfterTransfomration[i], pointsAfterTransfomration[nextPointIndex]))
-						{
-							objectsInCone.push_back(std::make_pair(shapeRenderer, combinedTransform.GetTransform()));
-							break;
-						}
-					}
-
 				}
 			}
 		}
-		collectObjectsInCone(startPoint, endPointLeft, endPointRight, &node->children, transformsCombined ? combinedTransform : transform, radiusSquared);
+		collectObjectsInCone(startPoint, endPointLeft, endPointRight, &node->children, isTransformsCombined ? combinedTransform : transform, radiusSquared);
 	}
 }
 
-std::vector<std::vector<glm::vec2>> ConeRenderer::calculatePointsAfterTransformation(const std::vector<std::pair<ShapeRenderer3D*, glm::mat4 >> &objects)
+bool ConeRenderer::collectObjectsInConeInternal(ConeRenderable* shapeRenderer, const glm::vec2 &startPoint, const glm::vec2 &endPointLeft, const glm::vec2 &endPointRight, SceneNode* node, Transform& combinedTransform, bool& isTransformsCombined, double radiusSquared)
+{
+	auto points = shapeRenderer->getExtrema();
+	isTransformsCombined = true;
+	std::vector<glm::vec2> pointsAfterTransfomration;
+	pointsAfterTransfomration.reserve(points.size());
+	for (auto point : points)
+	{
+		auto transformedPoint = combinedTransform.GetTransform() * point;
+		auto pointCastedToXZPlane = glm::vec2(transformedPoint.x, transformedPoint.z);
+		pointsAfterTransfomration.push_back(pointCastedToXZPlane);
+
+		if (glm::distance2(pointCastedToXZPlane, startPoint) < radiusSquared)
+		{
+			//vertex of object is within cone radius, now lets check if it is between borders
+			if (!isOnLeftSide(startPoint, endPointLeft, pointCastedToXZPlane) && isOnLeftSide(startPoint, endPointRight, pointCastedToXZPlane))
+			{
+				objectsInCone.push_back(std::make_pair(shapeRenderer, combinedTransform.GetTransform()));
+				return true;
+			}
+		}
+	}
+	//it is still possible that an object intersects the cone, but none of its vertices are inside
+	for (int i = 0; i < pointsAfterTransfomration.size() - 1; ++i)
+	{
+		int nextPointIndex = (i + 1) % pointsAfterTransfomration.size();
+		//check left border
+		if (areLinesIntersecting(startPoint, endPointLeft, pointsAfterTransfomration[i], pointsAfterTransfomration[nextPointIndex]))
+		{
+			objectsInCone.push_back(std::make_pair(shapeRenderer, combinedTransform.GetTransform()));
+			return true;;
+		}
+		//check right border
+		if (areLinesIntersecting(startPoint, endPointRight, pointsAfterTransfomration[i], pointsAfterTransfomration[nextPointIndex]))
+		{
+			objectsInCone.push_back(std::make_pair(shapeRenderer, combinedTransform.GetTransform()));
+			return true;;
+		}
+		//check middle line (for an object intersecting with the curved area of the cone) 
+		if (areLinesIntersecting(startPoint, rotatePointAroundPoint(endPointLeft, startPoint, angle / 2.0), pointsAfterTransfomration[i], pointsAfterTransfomration[nextPointIndex]))
+		{
+			objectsInCone.push_back(std::make_pair(shapeRenderer, combinedTransform.GetTransform()));
+			return true;;
+		}
+	}
+	return false;
+}
+
+std::vector<std::vector<glm::vec2>> ConeRenderer::calculatePointsAfterTransformation(const std::vector<std::pair<ConeRenderable*, glm::mat4 >> &objects)
 {
 	std::vector<std::vector<glm::vec2>> results;
 	for (auto obj : objects)
