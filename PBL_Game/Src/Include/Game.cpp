@@ -37,11 +37,14 @@ void Game::InitializeConfig()
   cameraYOffset = ConfigUtils::GetValueFromMap<float>("cameraYOffset", ConfigMap);
   cameraAngle = ConfigUtils::GetValueFromMap<float>("cameraAngle", ConfigMap);
 
+
   camera.Pitch = ConfigUtils::GetValueFromMap<float>("cameraPitch", ConfigMap);
   camera.Yaw = ConfigUtils::GetValueFromMap<float>("cameraYaw", ConfigMap);
 
   camera2.Pitch = ConfigUtils::GetValueFromMap<float>("cameraPitch", ConfigMap);
   camera2.Yaw = ConfigUtils::GetValueFromMap<float>("cameraYaw", ConfigMap);
+
+  TrapScale = ConfigUtils::GetValueFromMap<float>("TrapScale", ConfigMap);
 
   TileScaleTimes100 = TileScale * 100;
   EnemyScaleInverse = 1 / EnemyScale;
@@ -203,7 +206,7 @@ void Game::Granko()
 
   leftPlayerNode.Translate(0, PlayerYOffset, 0);
   rightPlayerNode.Translate(0, PlayerYOffset, 0);
-
+  playerObj = new Player(&leftPlayerNode, 3, *shaderProgram, &leftScene);
   box2.Translate(5, 0, 0);
   box3.Translate(-5, 0, 0);
 
@@ -604,7 +607,7 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos)
 void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation)
 {
   Transform transformBeforeMove(player.gameObject->transform);
-
+  
   glm::vec3 movementDir(0);
 
   if (glfwGetKey(okienko.window, GLFW_KEY_W) == GLFW_PRESS)
@@ -661,6 +664,8 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation)
   camera.Position.x = player.local.getPosition().x * PlayerScale;
   camera.Position.y = cameraYOffset;
   camera.Position.z = player.local.getPosition().z * PlayerScale + cameraZOffset;
+
+  playerObj->Update(&okienko, TrapScale);
 }
 
 void Game::gatherCollidableObjects(std::vector<SceneNode *> &nodes)
