@@ -643,7 +643,7 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation)
   }
 
   //view cone
-  auto coneRenderer = (ConeRenderer *)player.gameObject->GetComponent(ComponentSystem::ComponentType::ConeRenderer);
+  auto coneRenderer = (ConeRenderer *)(player.children[0]->gameObject->GetComponent(ComponentSystem::ComponentType::ConeRenderer));
   if (coneRenderer != nullptr)
   {
     if (glfwGetKey(okienko.window, GLFW_KEY_LEFT) == GLFW_PRESS)
