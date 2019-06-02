@@ -73,7 +73,9 @@ class Game
 
 
   SceneNode leftPlayerNode;
+  SceneNode leftPlayerNodeForModel;
   SceneNode rightPlayerNode;
+  SceneNode rightPlayerNodeForModel;
   SceneNode Enemy_Node; //Rotation + scale
   SceneNode Enemy_Node_For_Model;
 
@@ -136,9 +138,9 @@ public:
   unsigned WINDOW_WIDTH = 0;
   unsigned WINDOW_HEIGHT = 0;
 
-  float cameraZOffset = 5;
-  float cameraYOffset = 2;
-  float cameraAngle = 35;
+  float cameraZOffset;
+  float cameraYOffset;
+  float cameraAngle;
 
   int plotNumber = 1;	// Zmienna wskazujaca na obecna wstawke fabularna
   bool inputBlockade = true;	// Zmienna  blokujaca mozliwosci gracza (domyslnie na czas wstawek fabularnych)
