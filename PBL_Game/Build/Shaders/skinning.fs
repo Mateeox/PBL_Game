@@ -149,7 +149,6 @@ void main()
     // }          
 
 
-
   dist = abs(WorldPos0.z-viewSpaceZOffset);
 
     fogFactor = (80 - dist)/(80 - 20);
@@ -162,9 +161,6 @@ void main()
 
     //finalColor = finalColor * texture(texture_diffuse1, TexCoords);
     FragColor = texture(gColorMap, In.TexCoord.xy) * vec4(finalColor,1);
-
-
-
-                                                                                            
+                                                                                        
     //FragColor =  texture(gColorMap, In.TexCoord.xy) ;//* TotalLight;     
 }

@@ -598,14 +598,14 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation)
   if (glfwGetKey(okienko.window, GLFW_KEY_D) == GLFW_PRESS)
     movementDir.x = 1;
 
-  // if (movementDir.z == -1 && movementDir.x == 0)
-  //   player.children[0]->local.SetRotation(0, 180, 0);
-  // else if (movementDir.z == 1 && movementDir.x == 0 )
-  //   player.children[0]->local.SetRotation(0, 0, 0);
-  // else if (movementDir.x == -1 && movementDir.y == 0 )
-  //   player.children[0]->local.SetRotation(0, 90, 0);
-  // else if (movementDir.x == 1 && movementDir.y == 0 )
-  //   player.children[0]->local.SetRotation(0, 270, 0);
+   if (movementDir.z == -1 && movementDir.x == 0)
+     player.children[0]->local.SetRotation(0, 180, 0);
+   else if (movementDir.z == 1 && movementDir.x == 0 )
+     player.children[0]->local.SetRotation(0, 0, 0);
+   else if (movementDir.x == -1 && movementDir.y == 0 )
+     player.children[0]->local.SetRotation(0, 90, 0);
+   else if (movementDir.x == 1 && movementDir.y == 0 )
+     player.children[0]->local.SetRotation(0, 270, 0);
 
 
 

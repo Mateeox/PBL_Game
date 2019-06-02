@@ -6,9 +6,6 @@ in vec4 viewSpace;
 
 uniform sampler2D texture_diffuse1;
 
-const vec3 DiffuseLight = vec3(0.15, 0.05, 0.0);
-const vec3 RimColor = vec3(0.2, 0.2, 0.2);
-
 float dist = 0;
 float fogFactor = 0;
  
