@@ -1,5 +1,5 @@
 # 3ds Max Wavefront OBJ Exporter v0.97b - (c)2007 guruware
-# File Created: 02.06.2019 13:55:11
+# File Created: 02.06.2019 14:13:10
 
 newmtl skin
 	Ns 10.0000
@@ -12,10 +12,8 @@ newmtl skin
 	Kd 0.5882 0.5882 0.5882
 	Ks 0.0000 0.0000 0.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka maps\Player_Static_blinn1_Diffuse.png
-	map_Kd maps\Player_Static_blinn1_Diffuse.png
-	map_bump maps\Player_Static_blinn1_Normal.png
-	bump maps\Player_Static_blinn1_Normal.png
+	map_Ka maps\combined_map.png
+	map_Kd maps\combined_map.png
 
 newmtl shirt
 	Ns 10.0000
@@ -28,10 +26,8 @@ newmtl shirt
 	Kd 0.5882 0.5882 0.5882
 	Ks 0.0000 0.0000 0.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka maps\texture.png
-	map_Kd maps\texture.png
-	map_bump maps\texture_bump.png
-	bump maps\texture_bump.png
+	map_Ka maps\combined_map.png
+	map_Kd maps\combined_map.png
 
 newmtl trousers
 	Ns 10.0000
@@ -44,7 +40,5 @@ newmtl trousers
 	Kd 0.5882 0.5882 0.5882
 	Ks 0.0000 0.0000 0.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka maps\Player_Static_lambert4_Diffuse.png
-	map_Kd maps\Player_Static_lambert4_Diffuse.png
-	map_bump maps\Player_Static_lambert4_Normal.png
-	bump maps\Player_Static_lambert4_Normal.png
+	map_Ka maps\combined_map.png
+	map_Kd maps\combined_map.png
