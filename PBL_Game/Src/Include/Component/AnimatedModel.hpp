@@ -115,7 +115,7 @@ class AnimatedModel : public ComponentSystem::Component
 
   float _blendingTime;
   float _blendingTimeMul;
-  uint _prevAnimIndex;
+  unsigned _prevAnimIndex;
 
   long long m_lastTime;
   bool _updateBoth;
@@ -133,7 +133,7 @@ public:
   void SelectAnimation(unsigned aNumer);
   unsigned GetAnimationNR();
   std::string GetAnimationName();
-  bool SetAnimIndex(uint index, bool updateBoth = true, float blendDuration = 0.3f, bool temporary = false, float time = 0.f);
+  bool SetAnimIndex(unsigned index, bool updateBoth = true, float blendDuration = 0.3f, bool temporary = false, float time = 0.f);
   void ListAnimationNames();
 
   unsigned NumBones() const
@@ -202,7 +202,7 @@ private:
   Assimp::Importer m_Importer;
 
   std::vector<const aiScene *> _scenes;
-  uint _curScene;
+  unsigned _curScene;
 
   ComponentSystem::ComponentType GetComponentType() override;
   std::string Serialize()

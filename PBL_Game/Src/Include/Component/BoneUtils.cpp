@@ -4,6 +4,8 @@
 
 #ifdef __linux__
 #include <sys/time.h>
+#elif WIN32
+#include <windows.h.>
 #endif
 
 

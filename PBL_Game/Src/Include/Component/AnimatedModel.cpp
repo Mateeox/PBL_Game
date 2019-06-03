@@ -589,13 +589,13 @@ void AnimatedModel::SelectAnimation(unsigned aNumber)
 		aiMatrix4x4 GlobalTransformation = ParentTransform * NodeTransformation0;
 
 		if (m_BoneMapping.find(NodeName0) != m_BoneMapping.end()) {
-			uint BoneIndex = m_BoneMapping[NodeName0];
+			unsigned BoneIndex = m_BoneMapping[NodeName0];
 			m_BoneInfo[BoneIndex].FinalTransformation = m_GlobalInverseTransform * GlobalTransformation * 
 				m_BoneInfo[BoneIndex].BoneOffset;
 		}
 
-		uint n = std::min(pNode0->mNumChildren, pNode1->mNumChildren);
-		for (uint i = 0 ; i < n ; i++) {
+		unsigned n = std::min(pNode0->mNumChildren, pNode1->mNumChildren);
+		for (unsigned i = 0 ; i < n ; i++) {
 			ReadNodeHeirarchy(scene0, scene1, AnimationTime0, AnimationTime1, pNode0->mChildren[i], pNode1->mChildren[i], GlobalTransformation, stopAnimLevel);
 		}
 	} 
@@ -749,7 +749,7 @@ std::string AnimatedModel::GetAnimationName()
 	return m_pScene->mAnimations[m_AnimationNubmer]->mName.C_Str();
 }
 
-bool AnimatedModel::SetAnimIndex(uint index, bool updateBoth , float blendDuration , bool temporary , float time )
+bool AnimatedModel::SetAnimIndex(unsigned index, bool updateBoth , float blendDuration , bool temporary , float time )
 	{
 		if (index == _curScene || index >= _scenes.size())
 		{
