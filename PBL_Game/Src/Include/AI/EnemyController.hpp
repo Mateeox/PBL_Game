@@ -28,9 +28,11 @@ class EnemyController
 
     GridLocation start;
     GridLocation Currenttarget;
-    
+
    const  GridLocation firstTarget;
 
+
+    void SetStateFromInterestLevel(); 
 
 public:
     EnemyController(SceneNode * enemy,SceneNode * player,GridLocation aStart,GridLocation aFirstTarget);

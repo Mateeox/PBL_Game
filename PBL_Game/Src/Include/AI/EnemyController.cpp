@@ -29,11 +29,40 @@ float EnemyController::GetPlayerDistance()
 void EnemyController::Update()
 {
 
-    if(GetPlayerDistance()>InterestDistance)
+    if (GetPlayerDistance() > InterestDistance && InterestMeter < MaxAlwaysFollow)
     {
-        InterestMeter+=InterestMeterIncrement;
+        InterestMeter += InterestMeterIncrement;
     }
+    else
+    {
+        if (state != AlwaysFollow && InterestMeter <= 0)
+        {
+            InterestMeter -= InterestMeterIncrement;
+        }
+    }
+    SetStateFromInterestLevel();
+    
+}
 
-
-
+void EnemyController::SetStateFromInterestLevel()
+{
+    if (InterestMeter < MaxAlwaysFollow)
+    {
+        if (InterestMeter >= 0 && InterestMeter < MaxNotInterested)
+        {
+            state = NotInteresed;
+        }
+        else if (InterestMeter >= MaxNotInterested && InterestMeter < MaxInterested)
+        {
+            state = Interested;
+        }
+        else if (InterestMeter >= MaxInterested && InterestMeter < MaxFollowing)
+        {
+            state = Following;
+        }
+    }
+    else
+    {
+        state = AlwaysFollow;
+    }
 }
