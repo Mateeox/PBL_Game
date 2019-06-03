@@ -6,6 +6,7 @@ EnemyController::EnemyController(SceneNode *aEnemy,
                                  GridLocation aFirstTarget) : enemy(aEnemy),
                                                               player(aPlayer),
                                                               start(aStart),
+                                                              firstStart(aStart),
                                                               firstTarget(aFirstTarget),
                                                               Currenttarget(aFirstTarget)
 {
@@ -28,10 +29,17 @@ float EnemyController::GetPlayerDistance()
 }
 void EnemyController::Update()
 {
-
-    if (GetPlayerDistance() > InterestDistance && InterestMeter < MaxAlwaysFollow)
+    float playerDistance = GetPlayerDistance();
+    if (playerDistance > InterestDistance && InterestMeter < MaxAlwaysFollow)
     {
-        InterestMeter += InterestMeterIncrement;
+        if (playerDistance > minPlayerDistance && playerDistance != 0)
+        {
+            InterestMeter += InterestMeterIncrement * (1 / (playerDistance * DistanceToInterestRatio));
+        }
+        else
+        {
+            InterestMeter = MaxAlwaysFollow;
+        }
     }
     else
     {
@@ -41,9 +49,52 @@ void EnemyController::Update()
         }
     }
     SetStateFromInterestLevel();
-    
+    SetTarget();
+    CheckIFNotOnEnd();
+
+    //UpdatePosition
 }
 
+void EnemyController::CheckIFNotOnEnd()
+{
+    //check if currnt node position != firstTarget , if it is switch target with startposition // sometings is not yes
+}
+
+void EnemyController::SwtichStartWithEnd()
+{
+    if (LastFirstFlag)
+    {
+        Currenttarget = firstStart;
+        LastFirstFlag != LastFirstFlag;
+    }
+    else
+    {
+        Currenttarget = firstTarget;
+        LastFirstFlag != LastFirstFlag;
+    }
+}
+
+void EnemyController::SetTarget()
+{
+    switch (state)
+    {
+    case NotInteresed:
+        Currenttarget = firstTarget;
+        break;
+
+    case Interested:
+        //Stop enemy
+        break;
+
+    case Following:
+        // find girdlocation and set as currectTarget
+        break;
+
+    case AlwaysFollow:
+        //find girdlocation and set as currentTarget
+        break;
+    }
+}
 void EnemyController::SetStateFromInterestLevel()
 {
     if (InterestMeter < MaxAlwaysFollow)
