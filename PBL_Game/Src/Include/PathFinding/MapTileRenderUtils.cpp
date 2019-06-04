@@ -26,6 +26,7 @@ static void AddMapTilesToSceneNodes(std::vector<MapTile *>& mapTiles,SceneNode& 
     tileSceneNode->Scale(MapScale, 1, MapScale);
     tileSceneNode->Rotate(90, glm::vec3(1, 0, 0));
     gameObject->setTag("MapTile");
+    if(xd->textureDisplayed != "Blocked" )
     sNodes.AddChild(std::move(tileSceneNode));
    // sNodes.push_back(tileSceneNode);
   }

@@ -5,6 +5,8 @@
 #include "Shapes.hpp"
 #include "PathFinding/PathFindingUtils.hpp"
 #include "KeyDoorFactory.hpp"
+#include <random>
+#include <chrono> 
 
 #include <fstream>
 #include <iterator>
@@ -37,7 +39,6 @@ void Game::InitializeConfig()
   cameraYOffset = ConfigUtils::GetValueFromMap<float>("cameraYOffset", ConfigMap);
   cameraAngle = ConfigUtils::GetValueFromMap<float>("cameraAngle", ConfigMap);
 
-
   camera.Pitch = ConfigUtils::GetValueFromMap<float>("cameraPitch", ConfigMap);
   camera.Yaw = ConfigUtils::GetValueFromMap<float>("cameraYaw", ConfigMap);
 
@@ -58,7 +59,8 @@ void Game::InitializeConfig()
 Game::Game(Window &aOkno) : okienko(aOkno),
                             camera(Camera()),
                             camera2(Camera()),
-                            MapSize(0)
+                            MapSize(0),
+							enemyController(nullptr)
 {
   LoadConfig();
   InitializeConfig();
@@ -83,6 +85,26 @@ void Game::Granko()
   MapSize = generator.maxSize;
   grid = make_diagramFromGeneratedMap(mapped, MapSize);
 
+  glm::vec2 leftDown = FindFirstFromLeftDownCorner(mapped, MapSize);
+  glm::vec2 rightDown = FindFirstFromRightDownCorner(mapped, MapSize);
+  glm::vec2 leftUp = FindFirstFromLeftUpCorner(mapped, MapSize);
+  glm::vec2 rightUp = FindFirstFromRightUpCorner(mapped, MapSize);
+
+  std::cout << " leftDown "
+            << "x: " << leftDown.x << " y: " << leftDown.y << "\n";
+  std::cout << " rightDown "
+            << "x: " << rightDown.x << " y: " << rightDown.y << "\n";
+  std::cout << " leftUp "
+            << "x: " << leftUp.x << " y: " << leftUp.y << "\n";
+  std::cout << " rightUp"
+            << "x: " << rightUp.x << " y: " << rightUp.y << "\n";
+
+  std::vector<glm::vec2> Corners = { leftDown,rightDown,leftUp,rightUp };
+  srand(time(0));
+  unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+  shuffle(Corners.begin(), Corners.end(), std::default_random_engine(seed));
+
+
   Texture *BlockedTileTexture = new Texture("Textures/BlockedTile.png", GL_LINEAR);
   Texture *FreeTileTexture = new Texture("Textures/FreeTile.png", GL_LINEAR);
   Texture *SlowerTileTexture = new Texture("Textures/SlowerTile.png", GL_LINEAR);
@@ -93,27 +115,17 @@ void Game::Granko()
   SlowerTileTexture->Load();
   PathTileTexture->Load();
 
-  SceneNode box2;
-  SceneNode box3;
-  SceneNode doorNode;
-  SceneNode keyNode;
 
   GameObject *enemyGameObject = new GameObject(Enemy_Node_For_Model.local);
 
   GameObject *leftPlayerObj = new GameObject(leftPlayerNodeForModel.local);
   GameObject *rightPlayerObj = new GameObject(rightPlayerNodeForModel.local);
- 
 
   GameObject *leftPlayerObjWithCollider = new GameObject(leftPlayerNode.local);
   GameObject *rightPlayerObjWithCollider = new GameObject(rightPlayerNode.local);
   leftPlayerObjWithCollider->setTag("player");
   rightPlayerObjWithCollider->setTag("player");
 
-  GameObject *hexObj2 = new GameObject(box2.local);
-  GameObject *hexObj3 = new GameObject(box3.local);
-
-  GameObject *doorObj = new GameObject(doorNode.local);
-  GameObject *keyObj = new GameObject(keyNode.local);
 
   std::string PlayerModelPath = "Models/Player/Player_Static.obj";
   std::string AnimatedEnemyPAth = "Models/" + ConfigUtils::GetValueFromMap<std::string>("Enemy_Animated_Model", ConfigMap);
@@ -128,12 +140,6 @@ void Game::Granko()
                                                       *shaderProgram,
                                                       FreeTileTexture, "Basic");
 
-  ShapeRenderer3D *szescian = new ShapeRenderer3D(Shapes::RainBow_Cube,
-                                                  Shapes::RB_Cube_indices,
-                                                  sizeof(Shapes::RainBow_Cube),
-                                                  sizeof(Shapes::RB_Cube_indices),
-                                                  *shaderProgram,
-                                                  BlockedTileTexture, "Basic");
   ConeRenderer *coneRendererLeft = new ConeRenderer(*shaderViewCone, &leftScene);
 
   leftPlayerObj->AddComponent(coneRendererLeft);
@@ -141,58 +147,25 @@ void Game::Granko()
   rightPlayerObj->AddComponent(PlayerModel);
   enemyGameObject->AddComponent(animatedModel);
 
-  hexObj2->AddComponent(szescian);
-  hexObj3->AddComponent(szescian);
-
-  doorObj->AddComponent(szescian);
-  keyObj->AddComponent(szescian);
 
   Collider *leftPlayerCollider = new Collider(leftPlayerObjWithCollider->transform);
   Collider *rightPlayerCollider = new Collider(rightPlayerObjWithCollider->transform);
 
-  // Triggery
-  Door *sampleDoor = new Door(doorObj->transform, &doorNode);
-  Key *sampleKey = new Key(keyObj->transform, sampleDoor);
 
-  sampleDoor->setDimensions(0, 0, 0, 0.5, 1, 1);
-  sampleKey->setDimensions(0, 0, 0, 0.3, 0.3, 0.3);
-  doorObj->AddComponent(sampleDoor);
-  keyObj->AddComponent(sampleKey);
-  doorNode.AddGameObject(doorObj);
-  keyNode.AddGameObject(keyObj);
-
-  doorNode.Scale(0.5, 1, 1);
-  doorNode.Translate(-30, 0, 0);
-
-  keyNode.Scale(0.3, 0.3, 0.3);
-  keyNode.Translate(-80, 0, 0);
-
-  // Koniec triggerow
 
   leftPlayerCollider->setDimensions(-0.12, 0, 0.25, 2.3, 2, 3.05);
   rightPlayerCollider->setDimensions(-0.12, 0, 0.25, 2.3, 2, 3.05);
 
-  
   leftPlayerObjWithCollider->AddComponent(leftPlayerCollider);
   rightPlayerObjWithCollider->AddComponent(rightPlayerCollider);
-  
+
   leftPlayerNode.AddGameObject(leftPlayerObjWithCollider);
   rightPlayerNode.AddGameObject(rightPlayerObjWithCollider);
 
   leftPlayerNodeForModel.AddGameObject(leftPlayerObj);
   rightPlayerNodeForModel.AddGameObject(rightPlayerObj);
 
-
-  Collider *box2Collider = new Collider(hexObj2->transform);
-  box2Collider->setDimensions(0, 0, 0, 2, 2, 2);
-  hexObj2->AddComponent(box2Collider);
-  Collider *box3Collider = new Collider(hexObj3->transform);
-  box3Collider->setDimensions(0, 0, 0, 2, 2, 2);
-  hexObj3->AddComponent(box3Collider);
-
   Enemy_Node_For_Model.AddGameObject(enemyGameObject);
-  box2.AddGameObject(hexObj2);
-  box3.AddGameObject(hexObj3);
 
   float floorTransform = ConfigUtils::GetValueFromMap<float>("FloorTranslation", ConfigMap);
   float TileScale = ConfigUtils::GetValueFromMap<float>("TileScale", ConfigMap);
@@ -207,25 +180,20 @@ void Game::Granko()
   leftPlayerNode.Translate(0, PlayerYOffset, 0);
   rightPlayerNode.Translate(0, PlayerYOffset, 0);
   playerObj = new Player(&leftPlayerNode, 3, *shaderProgram, &leftScene);
-  box2.Translate(5, 0, 0);
-  box3.Translate(-5, 0, 0);
+
 
   leftPlayerNode.AddChild(&leftPlayerNodeForModel);
   rightPlayerNode.AddChild(&rightPlayerNodeForModel);
 
   Enemy_Node.AddChild(&Enemy_Node_For_Model);
   sNodes.push_back(&Enemy_Node);
-
-  //sNodes.push_back(&FloorNode_new);
-  sNodes.push_back(&box2);
-  sNodes.push_back(&box3);
-
-  sNodes.push_back(&doorNode);
-  sNodes.push_back(&keyNode);
+;
 
   glm::vec2 startLocation = FindFirstEmptyFloor(mapped);
   start.x = startLocation.x;
   start.y = startLocation.y;
+
+  enemyController = new EnemyController(Enemy_Node,leftPlayerNode , GridLocation{}, GridLocation{},grid);
 
   Enemy_Node.Translate(start.x * EnemyScaleInverse, EnemyYoffset * 100, start.y * EnemyScaleInverse);
   leftPlayerNode.Translate(start.x * PlayerScaleInverse, 0, start.y * PlayerScaleInverse);
@@ -292,9 +260,6 @@ void Game::Granko()
     Render();
   }
 
-  delete hexObj2;
-  delete hexObj3;
-  delete szescian;
 
   ImguiClear();
   glDeleteProgram(shaderProgram->shaderProgramID);
@@ -314,14 +279,15 @@ void Game::Update(float interpolation)
       ProcessInput(interpolation, camera2);
     }
 
-    glm::vec2 start_poz = GetPositionOfset(Enemy_Node, MapSize, EnemyXoffset, EnemyZoffset, EnemyScaleInverse);
+    glm::vec2 start_poz = GetPositionOfset(Enemy_Node, MapSize, EnemyXoffset, EnemyZoffset);
     start.x = start_poz.x;
     start.y = start_poz.y;
 
-    glm::vec2 end_poz = GetPositionOfset(leftPlayerNode, MapSize, PlayerXOffset, PlayerZOffset, PlayerScaleInverse);
+    glm::vec2 end_poz = GetPositionOfset(leftPlayerNode, MapSize, PlayerXOffset, PlayerZOffset);
     goal.x = end_poz.x;
     goal.y = end_poz.y;
 
+	if(debugPathFinding)
     ResetMapTilePath(mapTiles, grid, MapSize, &path);
 
     if (path.size() > 1)
@@ -333,6 +299,7 @@ void Game::Update(float interpolation)
       path = reconstruct_path(start, goal, came_from);
     }
 
+	enemyController->Update(interpolation);
 
     if (leftSideActive)
       UpdatePlayer(leftPlayerNode, camera, interpolation);
@@ -607,7 +574,7 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos)
 void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation)
 {
   Transform transformBeforeMove(player.gameObject->transform);
-  
+
   glm::vec3 movementDir(0);
 
   if (glfwGetKey(okienko.window, GLFW_KEY_W) == GLFW_PRESS)
@@ -619,17 +586,16 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation)
   if (glfwGetKey(okienko.window, GLFW_KEY_D) == GLFW_PRESS)
     movementDir.x = 1;
 
-    if (movementDir.z == -1 && movementDir.x == 0)
-      player.children[0]->local.SetRotation(0, 180, 0);
-    else if (movementDir.z == 1 && movementDir.x == 0 )
-       player.children[0]->local.SetRotation(0, 0, 0);
-    else if (movementDir.x == -1 && movementDir.y == 0 )
-       player.children[0]->local.SetRotation(0, 270, 0);
-    else if (movementDir.x == 1 && movementDir.y == 0 )
-      player.children[0]->local.SetRotation(0, 90, 0);
+  if (movementDir.z == -1 && movementDir.x == 0)
+    player.children[0]->local.SetRotation(0, 180, 0);
+  else if (movementDir.z == 1 && movementDir.x == 0)
+    player.children[0]->local.SetRotation(0, 0, 0);
+  else if (movementDir.x == -1 && movementDir.y == 0)
+    player.children[0]->local.SetRotation(0, 270, 0);
+  else if (movementDir.x == 1 && movementDir.y == 0)
+    player.children[0]->local.SetRotation(0, 90, 0);
 
-   
-   //player.local.Translate(glm::vec3(0, -1.0f * player.local.getPosition().y * PlayerScale, 0));
+  //player.local.Translate(glm::vec3(0, -1.0f * player.local.getPosition().y * PlayerScale, 0));
 
   glm::vec3 move = movementDir * movementSpeedTimesPlayerScale * interpolation;
   player.Translate(move.x, move.y, move.z);
@@ -773,8 +739,6 @@ void Game::SetViewAndPerspective(Camera &aCamera)
   shaderProgram_For_Model->setFloat("FogDensity", FogDensity);
   shaderProgram_For_Model->setFloat("viewSpaceZOffset", cameraZOffset);
 
-  
-
   shaderViewCone->use();
   shaderViewCone->setMat4("projection", projection);
   shaderViewCone->setMat4("view", view);
@@ -862,8 +826,8 @@ void Game::DisplayImage(const char *path, const char *text)
 
 void Game::MoveNodeToMapTile(SceneNode *sceneNode, GridLocation mapTile, float interpolation, float speed, float NodeXOffset, float NodeZOffset)
 {
-  glm::vec2 positionA{sceneNode->local.getPosition().x, sceneNode->local.getPosition().z};
-  glm::vec2 positionB{NodeXOffset + mapTile.x * EnemyScaleInverse, NodeZOffset + mapTile.y * EnemyScaleInverse};
+	glm::vec2 positionA{ sceneNode->local.getPosition().x, sceneNode->local.getPosition().z };
+	glm::vec2 positionB{ NodeXOffset + mapTile.x * EnemyScaleInverse, NodeZOffset + mapTile.y * EnemyScaleInverse };
 
   glm::vec2 diffVec = positionB - positionA;
 
@@ -937,19 +901,22 @@ void Game::ImGuiFunctions()
     ImGui::Text("Q - zmiana strony");
     ImGui::Text("Strzalki - ruch postaci");
 
+
     if (path.size() > 1)
       ImGui::Text("Next MapTile ID = %i, %i", path[1].x, path[1].y);
     ImGui::Text("Vector to move = %f, %f", vector2DHelper.x, vector2DHelper.y);
-    ImGui::Text("Enemy position = %f, %f", Enemy_Node.local.getPosition().x, Enemy_Node.local.getPosition().z);
-    ImGui::Text("Player position = %f, %f", leftPlayerNode.local.getPosition().x, leftPlayerNode.local.getPosition().z);
+    ImGui::Text("Enemy position = %f, %f", Enemy_Node.local.getPosition().x*EnemyScale, Enemy_Node.local.getPosition().z*EnemyScale);
+    ImGui::Text("Player position = %f, %f", leftPlayerNode.local.getPosition().x*PlayerScale, leftPlayerNode.local.getPosition().z*PlayerScale);
     ImGui::SliderFloat("CameraZOffset", &cameraZOffset, 0, 5);
     ImGui::SliderFloat("CameraYOffset", &cameraYOffset, 0, 5);
     ImGui::SliderFloat("FogDensity", &FogDensity, 0, 1);
-	ImGui::SliderFloat("CameraYaw", &camera.Yaw, -180, 180);
-	ImGui::SliderFloat("CameraPitch", &camera.Pitch, -180, 180);
+	ImGui::SliderFloat("EnemyInterestMeter", &enemyController->InterestMeter,0,1000 );
+	ImGui::SliderFloat("EnemyPlayerDistance", &enemyController->EnemyPlayerDistance, 0, 50);
+    ImGui::SliderFloat("CameraYaw", &camera.Yaw, -180, 180);
+    ImGui::SliderFloat("CameraPitch", &camera.Pitch, -180, 180);
 
-	camera.updateCameraVectors();
-	camera2.updateCameraVectors();
+    camera.updateCameraVectors();
+    camera2.updateCameraVectors();
 
     if (ImGui::Button("Printf Path"))
     {

@@ -78,6 +78,8 @@ add_executable(PBL_Game
 		Src/Include/Component/BoneUtils.cpp
 		#Player
 		Src/Include/Player.cpp
+		#Enemy/AI
+		Src/Include/AI/EnemyController.cpp
 		#KeyChestFactory
 		Src/Include/KeyDoorFactory.cpp
 	  #Stb_image
