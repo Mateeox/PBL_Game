@@ -31,8 +31,8 @@ class EnemyController
     SceneNode &enemy;
     SceneNode &player;
 	GridWithWeights& grid;
-	std::unordered_map<GridLocation, GridLocation>& came_from;
-	std::unordered_map<GridLocation, double>& cost_so_far;
+	std::unordered_map<GridLocation, GridLocation> came_from;
+	std::unordered_map<GridLocation, double> cost_so_far;
 	std::vector<GridLocation> path;
 	std::vector<MapTile *>& mapTiles;
 
@@ -54,9 +54,7 @@ public:
 		            GridLocation aFirstTarget,
 		            GridWithWeights& grid,
 		            std::vector<MapTile *>&mapTiles,
-					int mapSize,
-		            std::unordered_map<GridLocation, GridLocation>& aCame_from,
-	                std::unordered_map<GridLocation, double>& aCost_so_far);
+					int mapSize);
 
     void ChangeEnemyState(EnemyState state);
     float GetPlayerDistance();

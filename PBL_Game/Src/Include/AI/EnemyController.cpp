@@ -9,9 +9,7 @@ EnemyController::EnemyController(SceneNode &aEnemy,
 	GridLocation aFirstTarget,
 	GridWithWeights& aGrid,
 	std::vector<MapTile *>&aMapTiles,
-	int aMapSize,
-	std::unordered_map<GridLocation, GridLocation>& aCame_from,
-	std::unordered_map<GridLocation, double>& aCost_so_far) : enemy(aEnemy),
+	int aMapSize) : enemy(aEnemy),
 	player(aPlayer),
 	start(aStart),
 	firstStart(aStart),
@@ -19,8 +17,6 @@ EnemyController::EnemyController(SceneNode &aEnemy,
 	Currenttarget(aFirstTarget),
 	grid(aGrid),
 	mapTiles(aMapTiles),
-	came_from(aCame_from),
-	cost_so_far(aCost_so_far),
 	mapSize(aMapSize)
 {
 
@@ -69,13 +65,15 @@ void EnemyController::Update(float  interpolation)
     }
     SetStateFromInterestLevel();
     SetTarget();
-    CheckIFNotOnEnd();
+    
 
 	if (debugPathFinding)
 		ResetMapTilePath(mapTiles, grid, mapSize, &path);
 
 	if (path.size() > 1)
 		MoveNodeToMapTile(&enemy, path[1], interpolation, 10, 3, 5); // TODO Add BaseSpeed
+
+	CheckIFNotOnEnd();
 
 	start = GetPositionOfset(enemy, mapSize, 3, 5);
 

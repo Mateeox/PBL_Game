@@ -195,8 +195,7 @@ void Game::Granko()
 										GridLocation{ static_cast<int>(Corners[1].x),static_cast<int>(Corners[1].y) }, //enemy firstTarget
 										grid,
 										mapTiles,
-									    MapSize,
-	                                    came_from,cost_so_far); //reference for the map
+									    MapSize); //reference for the map
 
 
   Enemy_Node.Translate(Corners[0].x * EnemyScaleInverse, EnemyYoffset * 100, Corners[0].y * EnemyScaleInverse);
@@ -283,7 +282,6 @@ void Game::Update(float interpolation)
       ProcessInput(interpolation, camera2);
     }
 
-  
 	enemyController->Update(interpolation);
 
     if (leftSideActive)
