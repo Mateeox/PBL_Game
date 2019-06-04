@@ -70,7 +70,7 @@ class Game
   GridLocation goal{8, 5};
   std::unordered_map<GridLocation, GridLocation> came_from;
   std::unordered_map<GridLocation, double> cost_so_far;
-
+  std::vector<glm::vec2> Corners;
   #pragma endregion PathFindingAndMapGenerationUtils
 
 

@@ -99,7 +99,7 @@ void Game::Granko()
   std::cout << " rightUp"
             << "x: " << rightUp.x << " y: " << rightUp.y << "\n";
 
-  std::vector<glm::vec2> Corners = { leftDown,rightDown,leftUp,rightUp };
+  Corners = { leftDown,rightDown,leftUp,rightUp };
   srand(time(0));
   unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
   shuffle(Corners.begin(), Corners.end(), std::default_random_engine(seed));
@@ -127,10 +127,10 @@ void Game::Granko()
   rightPlayerObjWithCollider->setTag("player");
 
 
-  std::string PlayerModelPath = "Models/Player/Player_Static.obj";
+  std::string PlayerModelPath = "Models/Player/Player_Walk.fbx";
   std::string AnimatedEnemyPAth = "Models/" + ConfigUtils::GetValueFromMap<std::string>("Enemy_Animated_Model", ConfigMap);
 
-  Model *PlayerModel = new Model(PlayerModelPath, *shaderProgram_For_Model, false);
+  AnimatedModel *PlayerModel = new AnimatedModel(PlayerModelPath, *shaderProgram_For_Model, false);
   animatedModel = new AnimatedModel(AnimatedEnemyPAth, *shaderAnimatedModel, false);
 
   ShapeRenderer3D *TileRenderer = new ShapeRenderer3D(Shapes::RainBow_Square,
@@ -193,7 +193,10 @@ void Game::Granko()
   start.x = startLocation.x;
   start.y = startLocation.y;
 
-  enemyController = new EnemyController(Enemy_Node,leftPlayerNode , GridLocation{}, GridLocation{},grid);
+  enemyController = new EnemyController(Enemy_Node,leftPlayerNode , 
+	  GridLocation{ static_cast<int>(Corners[0].x),static_cast<int>(Corners[0].y)}, //enemy start location
+	  GridLocation{ static_cast<int>(Corners[1].x),static_cast<int>(Corners[1].y) }, //enemy firstTarget
+	  grid); //reference for the map
 
   Enemy_Node.Translate(start.x * EnemyScaleInverse, EnemyYoffset * 100, start.y * EnemyScaleInverse);
   leftPlayerNode.Translate(start.x * PlayerScaleInverse, 0, start.y * PlayerScaleInverse);

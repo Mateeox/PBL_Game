@@ -56,7 +56,7 @@ glm::vec2 FindFirstFromLeftUpCorner(std::vector<MapKey *> &map, int size)
   glm::vec2 position{ 0, 0 };
   for (auto mapKey : map)
   {
-    
+
     if (mapKey->type == MapType::Floor && firstTile)
     {
       position = {mapKey->x, mapKey->y};
