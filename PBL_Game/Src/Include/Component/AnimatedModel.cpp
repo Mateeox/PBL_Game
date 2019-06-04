@@ -442,6 +442,7 @@ void AnimatedModel::ReadNodeHeirarchy(float AnimationTime, const aiNode *pNode, 
 void AnimatedModel::Draw(glm::mat4 &transform)
 {
 
+	ShaderProgram.use();
 	std::vector<Matrix4f> Transforms;
 
 	float RunningTime = glfwGetTime();
@@ -453,7 +454,7 @@ void AnimatedModel::Draw(glm::mat4 &transform)
 		SetBoneTransform(i, Transforms[i]);
 	}
 
-	ShaderProgram.use();
+	
 	//Set transform
 	unsigned transformLoc = glGetUniformLocation(ShaderProgram.shaderProgramID, "transform");
 	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));

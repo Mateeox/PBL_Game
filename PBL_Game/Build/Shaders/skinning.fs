@@ -149,7 +149,7 @@ void main()
     // }          
 
 
-  dist = abs(WorldPos0.z-viewSpaceZOffset);
+  dist = abs(WorldPos0.z+viewSpaceZOffset);
 
     fogFactor = (80 - dist)/(80 - 20);
    fogFactor = clamp( fogFactor, 0.0, 1.0 );

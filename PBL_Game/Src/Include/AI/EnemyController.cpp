@@ -70,12 +70,11 @@ void EnemyController::Update(float  interpolation)
 	if (debugPathFinding)
 		ResetMapTilePath(mapTiles, grid, mapSize, &path);
 
-	if (path.size() > 1)
-		MoveNodeToMapTile(&enemy, path[1], interpolation, 10, 3, 5); // TODO Add BaseSpeed
-
-	CheckIFNotOnEnd();
+	if (path.size() > 1 && !StopEnemy)
+		MoveNodeToMapTile(&enemy, path[1], interpolation, enemySpeed, 3, 5); // TODO Add BaseSpeed
 
 	start = GetPositionOfset(enemy, mapSize, 3, 5);
+	CheckIFNotOnEnd();
 
 	if (grid.passable(Currenttarget))
 	{
@@ -83,31 +82,31 @@ void EnemyController::Update(float  interpolation)
 		path = reconstruct_path(start, Currenttarget, came_from);
 	}
 
-    //UpdatePosition
 }
 
 void EnemyController::CheckIFNotOnEnd()
 {
-	if(path.size() == 1)
-	SwtichStartWithEnd();
-	
-	if (grid.passable(Currenttarget))
+	if (path.size() == 1)
 	{
-		a_star_search(grid, start, Currenttarget, came_from, cost_so_far);
-		path = reconstruct_path(start, Currenttarget, came_from);
+		SwtichStartWithEnd();
+		if (grid.passable(Currenttarget))
+		{
+			a_star_search(grid, start, Currenttarget, came_from, cost_so_far);
+			path = reconstruct_path(start, Currenttarget, came_from);
+		}
+		LastFirstFlag != LastFirstFlag;
 	}
-	LastFirstFlag != LastFirstFlag;
 }
 
 void EnemyController::SwtichStartWithEnd()
 {
-    if (LastFirstFlag)
+    if(Currenttarget == firstStart)
     {
-        Currenttarget = firstStart;
+        Currenttarget = firstTarget;
     }
     else
     {
-        Currenttarget = firstTarget;
+        Currenttarget = firstStart;
     }
 	
 }
@@ -117,19 +116,24 @@ void EnemyController::SetTarget()
     switch (state)
     {
     case NotInteresed:
-        Currenttarget = firstTarget;
+		StopEnemy = false;
         break;
 
     case Interested:
-        //Stop enemy
+		Currenttarget = GetPositionOfset(player, mapSize, 7, 5);
+		StopEnemy = true;
         break;
 
     case Following:
-        // find girdlocation and set as currectTarget
+        Currenttarget = GetPositionOfset(player, mapSize, 7, 5);
+		StopEnemy = false;
+		enemySpeed = enemyWalkspeed;
         break;
 
     case AlwaysFollow:
-        //find girdlocation and set as currentTarget
+		Currenttarget = GetPositionOfset(player, mapSize, 7, 5);
+		StopEnemy = false;
+		enemySpeed = enemyRunSpeed;
         break;
     }
 }

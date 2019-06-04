@@ -25,6 +25,9 @@ class EnemyController
     const float MaxInterested = 600;
     const float MaxFollowing = 600;
     const float MaxAlwaysFollow = 1000;
+	float enemySpeed = 10;
+	const float enemyRunSpeed = 15;
+	const float enemyWalkspeed = 10;
 
     
     const float InterestMeterIncrement = 100;
@@ -37,7 +40,7 @@ class EnemyController
 	std::vector<MapTile *>& mapTiles;
 
 	bool debugPathFinding = true;
-
+	bool StopEnemy = false;
     bool LastFirstFlag = true;
 
     const GridLocation firstTarget;

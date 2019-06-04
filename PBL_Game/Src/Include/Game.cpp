@@ -127,10 +127,10 @@ void Game::Granko()
   rightPlayerObjWithCollider->setTag("player");
 
 
-  std::string PlayerModelPath = "Models/Player/Player_Static.obj";
+  std::string PlayerModelPath = "Models/Player/player_animations.fbx";
   std::string AnimatedEnemyPAth = "Models/" + ConfigUtils::GetValueFromMap<std::string>("Enemy_Animated_Model", ConfigMap);
 
-  Model *PlayerModel = new Model(PlayerModelPath, *shaderProgram_For_Model, false);
+  AnimatedModel *PlayerModel = new AnimatedModel(PlayerModelPath, *shaderAnimatedModel, false);
   animatedModel = new AnimatedModel(AnimatedEnemyPAth, *shaderAnimatedModel, false);
 
   ShapeRenderer3D *TileRenderer = new ShapeRenderer3D(Shapes::RainBow_Square,
@@ -578,8 +578,7 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation)
   else if (movementDir.x == 1 && movementDir.y == 0)
     player.children[0]->local.SetRotation(0, 90, 0);
 
-  //player.local.Translate(glm::vec3(0, -1.0f * player.local.getPosition().y * PlayerScale, 0));
-
+  
   glm::vec3 move = movementDir * movementSpeedTimesPlayerScale * interpolation;
   player.Translate(move.x, move.y, move.z);
   Collider *playerCollider = (Collider *)player.gameObject->GetComponent(ComponentSystem::ComponentType::Collider);
@@ -729,7 +728,7 @@ void Game::SetViewAndPerspective(Camera &aCamera)
   shaderAnimatedModel->use();
   shaderAnimatedModel->setMat4("projection", projection);
   shaderAnimatedModel->setMat4("view", view);
-  shaderAnimatedModel->setFloat("FogDensity", FogDensity);
+  //shaderAnimatedModel->setFloat("FogDensity", FogDensity);
   shaderAnimatedModel->setFloat("viewSpaceZOffset", cameraZOffset);
 }
 

@@ -18,7 +18,7 @@
     <ConfigParameter>
         <Type>F</Type>
         <Name>PlayerSpeed</Name>
-        <Value>15.5</Value>
+        <Value>10.5</Value>
     </ConfigParameter>
 
     <ConfigParameter>
