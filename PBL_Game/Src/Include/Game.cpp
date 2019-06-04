@@ -189,14 +189,15 @@ void Game::Granko()
   sNodes.push_back(&Enemy_Node);
 ;
 
-  glm::vec2 startLocation = FindFirstEmptyFloor(mapped);
-  start.x = startLocation.x;
-  start.y = startLocation.y;
+  enemyController = new EnemyController(Enemy_Node,
+										leftPlayerNode , 
+										GridLocation{ static_cast<int>(Corners[0].x),static_cast<int>(Corners[0].y)}, //enemy start location
+										GridLocation{ static_cast<int>(Corners[1].x),static_cast<int>(Corners[1].y) }, //enemy firstTarget
+										grid,
+										mapTiles,
+									    MapSize,
+	                                    came_from,cost_so_far); //reference for the map
 
-  enemyController = new EnemyController(Enemy_Node,leftPlayerNode , 
-	  GridLocation{ static_cast<int>(Corners[0].x),static_cast<int>(Corners[0].y)}, //enemy start location
-	  GridLocation{ static_cast<int>(Corners[1].x),static_cast<int>(Corners[1].y) }, //enemy firstTarget
-	  grid); //reference for the map
 
   Enemy_Node.Translate(Corners[0].x * EnemyScaleInverse, EnemyYoffset * 100, Corners[0].y * EnemyScaleInverse);
   leftPlayerNode.Translate(Corners[3].x* PlayerScaleInverse, 0, Corners[3].y * PlayerScaleInverse);
@@ -282,26 +283,7 @@ void Game::Update(float interpolation)
       ProcessInput(interpolation, camera2);
     }
 
-    glm::vec2 start_poz = GetPositionOfset(Enemy_Node, MapSize, EnemyXoffset, EnemyZoffset);
-    start.x = start_poz.x;
-    start.y = start_poz.y;
-
-    glm::vec2 end_poz = GetPositionOfset(leftPlayerNode, MapSize, PlayerXOffset, PlayerZOffset);
-    goal.x = end_poz.x;
-    goal.y = end_poz.y;
-
-	if(debugPathFinding)
-    ResetMapTilePath(mapTiles, grid, MapSize, &path);
-
-    if (path.size() > 1)
-      MoveNodeToMapTile(&Enemy_Node, path[1], interpolation, EnemyBaseSpeed, EnemyXoffset, EnemyZoffset); // TODO Add BaseSpeed
-
-    if (grid.passable(goal))
-    {
-      a_star_search(grid, start, goal, came_from, cost_so_far);
-      path = reconstruct_path(start, goal, came_from);
-    }
-
+  
 	enemyController->Update(interpolation);
 
     if (leftSideActive)
@@ -827,59 +809,7 @@ void Game::DisplayImage(const char *path, const char *text)
   imageNode.Render(originTransform, true);
 }
 
-void Game::MoveNodeToMapTile(SceneNode *sceneNode, GridLocation mapTile, float interpolation, float speed, float NodeXOffset, float NodeZOffset)
-{
-	glm::vec2 positionA{ sceneNode->local.getPosition().x, sceneNode->local.getPosition().z };
-	glm::vec2 positionB{ NodeXOffset + mapTile.x * EnemyScaleInverse, NodeZOffset + mapTile.y * EnemyScaleInverse };
 
-  glm::vec2 diffVec = positionB - positionA;
-
-  glm::vec3 diffVec3D = {diffVec.x, sceneNode->local.getPosition().y, diffVec.y};
-
-  double veclenght = sqrt(diffVec.x * diffVec.x + diffVec.y * diffVec.y);
-  float angle = atan(diffVec3D.y, diffVec3D.x) * 180.0f / 3.14f;
-
-  if (veclenght != 0)
-  {
-    diffVec.x = diffVec.x / veclenght;
-    diffVec.y = diffVec.y / veclenght;
-  }
-  else
-  {
-    diffVec = glm::vec2(0, 0);
-  }
-
-  vector2DHelper = glm::vec2(positionB.x, positionB.y);
-  vector2DHelper2 = glm::vec2(positionA.x, positionA.y);
-
-  float value = interpolation * speed;
-  diffVec *= value;
-
-  SceneNode *roationChild = sceneNode->children[0];
-  sceneNode->Translate(diffVec.x, 0, diffVec.y);
-  if (abs(diffVec.y) > abs(diffVec.x))
-  {
-    if (diffVec.y < 0)
-    {
-      roationChild->local.SetRotation(0, 180, 0);
-    }
-    else
-    {
-      roationChild->local.SetRotation(0, 0, 0);
-    }
-  }
-  else
-  {
-    if (diffVec.x < 0)
-    {
-      roationChild->local.SetRotation(0, 270, 0);
-    }
-    else
-    {
-      roationChild->local.SetRotation(0, 90, 0);
-    }
-  }
-}
 
 void Game::ImguiDrawData()
 {
@@ -905,8 +835,8 @@ void Game::ImGuiFunctions()
     ImGui::Text("Strzalki - ruch postaci");
 
 
-    if (path.size() > 1)
-      ImGui::Text("Next MapTile ID = %i, %i", path[1].x, path[1].y);
+    //if (path.size() > 1)
+    //  ImGui::Text("Next MapTile ID = %i, %i", path[1].x, path[1].y);
     ImGui::Text("Vector to move = %f, %f", vector2DHelper.x, vector2DHelper.y);
     ImGui::Text("Enemy position = %f, %f", Enemy_Node.local.getPosition().x*EnemyScale, Enemy_Node.local.getPosition().z*EnemyScale);
     ImGui::Text("Player position = %f, %f", leftPlayerNode.local.getPosition().x*PlayerScale, leftPlayerNode.local.getPosition().z*PlayerScale);
@@ -921,10 +851,10 @@ void Game::ImGuiFunctions()
     camera.updateCameraVectors();
     camera2.updateCameraVectors();
 
-    if (ImGui::Button("Printf Path"))
-    {
-      draw_grid(grid, 3, nullptr, nullptr, &path);
-    }
+    //if (ImGui::Button("Printf Path"))
+   // {
+   //   draw_grid(grid, 3, nullptr, nullptr, &path);
+   // }
     if (ImGui::Button("List Model AnimationNames"))
     {
       if (animatedModel != nullptr)
@@ -945,7 +875,7 @@ void Game::ImGuiFunctions()
         }
       }
     }
-    if (ImGui::Button("Update Path and use A_Star_Search"))
+    /*if (ImGui::Button("Update Path and use A_Star_Search"))
     {
       if (grid.passable(goal))
       {
@@ -959,6 +889,7 @@ void Game::ImGuiFunctions()
         //TODO find closest pasable
       }
     }
+	*/
 
     ImGui::End();
   }

@@ -11,7 +11,7 @@
 std::array<GridLocation, 4> SquareGrid::DIRS =
     {GridLocation{1, 0}, GridLocation{0, -1}, GridLocation{-1, 0}, GridLocation{0, 1}};
 
-glm::vec2 GetPositionOfset(SceneNode &node, int maxMapSize, float X_offSet, float Z_offset)
+GridLocation GetPositionOfset(SceneNode &node, int maxMapSize, float X_offSet, float Z_offset)
 {
 
   int x = (X_offSet + (int)node.local.getPosition().x) * node.local.getScale().x;
@@ -35,7 +35,7 @@ glm::vec2 GetPositionOfset(SceneNode &node, int maxMapSize, float X_offSet, floa
     z = maxMapSize - 1;
   }
 
-  return glm::vec2(x, z);
+  return GridLocation{ x, z };
 }
 
 glm::vec2 FindFirstEmptyFloor(std::vector<MapKey *> &map)
@@ -54,21 +54,23 @@ glm::vec2 FindFirstFromLeftUpCorner(std::vector<MapKey *> &map, int size)
 {
   bool firstTile = true;
   glm::vec2 position{ 0, 0 };
-  for (auto mapKey : map)
+  for (auto &mapKey : map)
   {
-
-    if (mapKey->type == MapType::Floor && firstTile)
-    {
-      position = {mapKey->x, mapKey->y};
-      firstTile = false;
-    }
-    else
-    {
-      if (mapKey->x <= position.x && mapKey->y <= position.y)
-      {
-        position = {mapKey->x, mapKey->y};
-      }
-    }
+	  if (mapKey->type == MapType::Floor)
+	  {
+		  if (firstTile)
+		  {
+			  position = { mapKey->x, mapKey->y };
+			  firstTile = false;
+		  }
+		  else
+		  {
+			  if (mapKey->x <= position.x && mapKey->y <= position.y)
+			  {
+				  position = { mapKey->x, mapKey->y };
+			  }
+		  }
+	  }
   }
   return position;
 }
@@ -76,21 +78,24 @@ glm::vec2 FindFirstFromLeftDownCorner(std::vector<MapKey *> &map, int size)
 {
   bool firstTile = true;
   glm::vec2 position{ 0, 0 };
-  for (auto mapKey : map)
+  for (auto &mapKey : map)
   {
     
-    if (mapKey->type == MapType::Floor && firstTile)
-    {
-      position = {mapKey->x, mapKey->y};
-      firstTile = false;
-    }
-    else
-    {
-      if (mapKey->x <= position.x && mapKey->y >= position.y)
-      {
-        position = {mapKey->x, mapKey->y};
-      }
-    }
+	  if (mapKey->type == MapType::Floor)
+	  {
+		  if (firstTile)
+		  {
+			  position = { mapKey->x, mapKey->y };
+			  firstTile = false;
+		  }
+		  else
+		  {
+			  if (mapKey->x <= position.x && mapKey->y >= position.y)
+			  {
+				  position = { mapKey->x, mapKey->y };
+			  }
+		  }
+	  }
   }
   return position;
 }
@@ -98,21 +103,24 @@ glm::vec2 FindFirstFromRightUpCorner(std::vector<MapKey *> &map, int size)
 {
   bool firstTile = true;
   glm::vec2 position{ 0, 0 };
-  for (auto mapKey : map)
+  for (auto &mapKey : map)
   {
-    
-    if (mapKey->type == MapType::Floor && firstTile)
-    {
-      position = {mapKey->x, mapKey->y};
-      firstTile = false;
-    }
-    else
-    {
-      if (mapKey->x >= position.x && mapKey->y <= position.y)
-      {
-        position = {mapKey->x, mapKey->y};
-      }
-    }
+
+	  if (mapKey->type == MapType::Floor)
+	  {
+		  if (firstTile)
+		  {
+			  position = { mapKey->x, mapKey->y };
+			  firstTile = false;
+		  }
+		  else
+		  {
+			  if (mapKey->x >= position.x && mapKey->y <= position.y)
+			  {
+				  position = { mapKey->x, mapKey->y };
+			  }
+		  }
+	  }
   }
   return position;
 }
@@ -120,21 +128,23 @@ glm::vec2 FindFirstFromRightDownCorner(std::vector<MapKey *> &map, int size)
 {
   bool firstTile = true;
   glm::vec2 position{ 0, 0 };
-  for (auto mapKey : map)
+  for (auto &mapKey : map)
   {
-    
-    if (mapKey->type == MapType::Floor && firstTile)
-    {
-      position = {mapKey->x, mapKey->y};
-      firstTile = false;
-    }
-    else
-    {
-      if (mapKey->x >= position.x && mapKey->y >= position.y)
-      {
-        position = {mapKey->x, mapKey->y};
-      }
-    }
+	  if (mapKey->type == MapType::Floor)
+	  {
+		  if (firstTile)
+		  {
+			  position = { mapKey->x, mapKey->y };
+			  firstTile = false;
+		  }
+		  else
+		  {
+			  if (mapKey->x >= position.x && mapKey->y >= position.y)
+			  {
+				  position = { mapKey->x, mapKey->y };
+			  }
+		  }
+	  }
   }
   return position;
 }

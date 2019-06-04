@@ -18,6 +18,8 @@ class EnemyController
     const float minPlayerDistance = 0.005f;
     const float DistanceToInterestRatio = 0.5;
 
+	int mapSize;
+
     //Interest levels
     const float MaxNotInterested = 200;
     const float MaxInterested = 600;
@@ -29,7 +31,12 @@ class EnemyController
     SceneNode &enemy;
     SceneNode &player;
 	GridWithWeights& grid;
+	std::unordered_map<GridLocation, GridLocation>& came_from;
+	std::unordered_map<GridLocation, double>& cost_so_far;
+	std::vector<GridLocation> path;
+	std::vector<MapTile *>& mapTiles;
 
+	bool debugPathFinding = true;
 
     bool LastFirstFlag = true;
 
@@ -41,12 +48,21 @@ class EnemyController
     void CheckIFNotOnEnd();
 
 public:
-    EnemyController(SceneNode &enemy, SceneNode &player, GridLocation aStart, GridLocation aFirstTarget, GridWithWeights& grid);
+    EnemyController(SceneNode &enemy,
+		            SceneNode &player,
+		            GridLocation aStart,
+		            GridLocation aFirstTarget,
+		            GridWithWeights& grid,
+		            std::vector<MapTile *>&mapTiles,
+					int mapSize,
+		            std::unordered_map<GridLocation, GridLocation>& aCame_from,
+	                std::unordered_map<GridLocation, double>& aCost_so_far);
+
     void ChangeEnemyState(EnemyState state);
     float GetPlayerDistance();
     void Update(float interpolation);
     void SwtichStartWithEnd();
-
+	void EnemyController::MoveNodeToMapTile(SceneNode *sceneNode, GridLocation mapTile, float interpolation, float speed, float NodeXOffset, float NodeZOffset);
 
 	float EnemyPlayerDistance;
 	float InterestMeter = 0;

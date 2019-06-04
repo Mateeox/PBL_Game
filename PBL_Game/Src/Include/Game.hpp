@@ -60,7 +60,6 @@ class Game
   //PathFinding
   #pragma region PathFindingAndMapGenerationUtils
   std::vector<MapTile *> mapTiles;
-  std::vector<GridLocation> path;
   GridWithWeights grid;
   unsigned MapSize = 0;
   unsigned MapScale = 0;
