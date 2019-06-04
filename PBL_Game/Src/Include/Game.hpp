@@ -134,7 +134,8 @@ class Game
   int offset = 125; // Jak bardzo maja sie roznic rozmiary kamery, szerokosc aktywnej to pol okna + offset, szerokosc nieaktywnej to pol okna - offset
 
 //ModelPtrs
-AnimatedModel *animatedModel = nullptr;
+AnimatedModel *enemyModel = nullptr;
+AnimatedModel *playerModel = nullptr;
 	
 	//Player handling
 	Player* playerObj;

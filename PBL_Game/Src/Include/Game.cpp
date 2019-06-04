@@ -130,8 +130,8 @@ void Game::Granko()
   std::string PlayerModelPath = "Models/Player/player_animations.fbx";
   std::string AnimatedEnemyPAth = "Models/" + ConfigUtils::GetValueFromMap<std::string>("Enemy_Animated_Model", ConfigMap);
 
-  AnimatedModel *PlayerModel = new AnimatedModel(PlayerModelPath, *shaderAnimatedModel, false);
-  animatedModel = new AnimatedModel(AnimatedEnemyPAth, *shaderAnimatedModel, false);
+  playerModel = new AnimatedModel(PlayerModelPath, *shaderAnimatedModel, false);
+  enemyModel = new AnimatedModel(AnimatedEnemyPAth, *shaderAnimatedModel, false);
 
   ShapeRenderer3D *TileRenderer = new ShapeRenderer3D(Shapes::RainBow_Square,
                                                       Shapes::RB_Square_indices,
@@ -143,9 +143,9 @@ void Game::Granko()
   ConeRenderer *coneRendererLeft = new ConeRenderer(*shaderViewCone, &leftScene);
 
   leftPlayerObj->AddComponent(coneRendererLeft);
-  leftPlayerObj->AddComponent(PlayerModel);
-  rightPlayerObj->AddComponent(PlayerModel);
-  enemyGameObject->AddComponent(animatedModel);
+  leftPlayerObj->AddComponent(playerModel);
+  rightPlayerObj->AddComponent(playerModel);
+  enemyGameObject->AddComponent(enemyModel);
 
 
   Collider *leftPlayerCollider = new Collider(leftPlayerObjWithCollider->transform);
@@ -169,8 +169,6 @@ void Game::Granko()
 
   float floorTransform = ConfigUtils::GetValueFromMap<float>("FloorTranslation", ConfigMap);
   float TileScale = ConfigUtils::GetValueFromMap<float>("TileScale", ConfigMap);
-
-  //  FloorNode_new.Translate(0, floorTransform, 0);
 
   leftPlayerNode.Scale(PlayerScale);
   rightPlayerNode.Scale(PlayerScale);
@@ -200,6 +198,7 @@ void Game::Granko()
 
   Enemy_Node.Translate(Corners[0].x * EnemyScaleInverse, EnemyYoffset * 100, Corners[0].y * EnemyScaleInverse);
   leftPlayerNode.Translate(Corners[3].x* PlayerScaleInverse, 0, Corners[3].y * PlayerScaleInverse);
+  rightPlayerNode.Translate(Corners[3].x* PlayerScaleInverse, 0, Corners[3].y * PlayerScaleInverse);
 
   if (debugPathFinding)
   {
@@ -569,14 +568,32 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation)
   if (glfwGetKey(okienko.window, GLFW_KEY_D) == GLFW_PRESS)
     movementDir.x = 1;
 
+  if (movementDir.x == 1 || movementDir.z == 1 || movementDir.x == -1 || movementDir.z == -1)
+  {
+	  playerModel->SelectAnimation("Player_Walk");
+  }
+  else
+  {
+	  playerModel->SelectAnimation("player_idle");
+  }
+
   if (movementDir.z == -1 && movementDir.x == 0)
     player.children[0]->local.SetRotation(0, 180, 0);
   else if (movementDir.z == 1 && movementDir.x == 0)
     player.children[0]->local.SetRotation(0, 0, 0);
-  else if (movementDir.x == -1 && movementDir.y == 0)
+  else if (movementDir.x == -1 && movementDir.z == 0)
     player.children[0]->local.SetRotation(0, 270, 0);
-  else if (movementDir.x == 1 && movementDir.y == 0)
+  else if (movementDir.x == 1 && movementDir.z == 0)
     player.children[0]->local.SetRotation(0, 90, 0);
+  else if (movementDir.x == 1 && movementDir.z == -1)
+	  player.children[0]->local.SetRotation(0, 135, 0);
+  else if (movementDir.x == -1 && movementDir.z == -1)
+	  player.children[0]->local.SetRotation(0, 225, 0);
+  else if (movementDir.x == -1 && movementDir.z == 1)
+	  player.children[0]->local.SetRotation(0, 315, 0);
+  else if (movementDir.x == 1 && movementDir.z == 1)
+	  player.children[0]->local.SetRotation(0, 45, 0);
+
 
   
   glm::vec3 move = movementDir * movementSpeedTimesPlayerScale * interpolation;
@@ -854,21 +871,24 @@ void Game::ImGuiFunctions()
    // }
     if (ImGui::Button("List Model AnimationNames"))
     {
-      if (animatedModel != nullptr)
-        DisplayAnimationInfo(animatedModel);
+		if (enemyModel != nullptr && playerModel != nullptr )
+		{
+			DisplayAnimationInfo(enemyModel);
+			DisplayAnimationInfo(playerModel);
+		}
     }
 
     if (ImGui::Button("Swtich Enemy Animation"))
     {
-      if (animatedModel != nullptr)
+      if (enemyModel != nullptr)
       {
-        if (animatedModel->GetAnimationNR() == 1)
+        if (enemyModel->GetAnimationNR() == 1)
         {
-          animatedModel->SelectAnimation(0);
+          enemyModel->SelectAnimation(0);
         }
         else
         {
-          animatedModel->SelectAnimation(1);
+          enemyModel->SelectAnimation(1);
         }
       }
     }
