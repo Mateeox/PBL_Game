@@ -8,9 +8,22 @@
 
 #include <fstream>
 #include <iterator>
+#include <thread>
 
 static bool leftSideActive = true;
 static bool swapButtonPressed = false;
+
+void Game::t1()
+{
+   Transform originTransform = Transform::origin();
+  leftScene.Render(originTransform, true);
+  Enemy_Node.Render(originTransform, true);
+}
+void Game::t2()
+{
+   Transform originTransform = Transform::origin();
+  leftScene.Render(originTransform, true);
+}
 
 void Game::InitializeConfig()
 {
@@ -36,7 +49,6 @@ void Game::InitializeConfig()
   cameraZOffset = ConfigUtils::GetValueFromMap<float>("cameraZOffset", ConfigMap);
   cameraYOffset = ConfigUtils::GetValueFromMap<float>("cameraYOffset", ConfigMap);
   cameraAngle = ConfigUtils::GetValueFromMap<float>("cameraAngle", ConfigMap);
-
 
   camera.Pitch = ConfigUtils::GetValueFromMap<float>("cameraPitch", ConfigMap);
   camera.Yaw = ConfigUtils::GetValueFromMap<float>("cameraYaw", ConfigMap);
@@ -102,7 +114,6 @@ void Game::Granko()
 
   GameObject *leftPlayerObj = new GameObject(leftPlayerNodeForModel.local);
   GameObject *rightPlayerObj = new GameObject(rightPlayerNodeForModel.local);
- 
 
   GameObject *leftPlayerObjWithCollider = new GameObject(leftPlayerNode.local);
   GameObject *rightPlayerObjWithCollider = new GameObject(rightPlayerNode.local);
@@ -172,16 +183,14 @@ void Game::Granko()
   leftPlayerCollider->setDimensions(-0.12, 0, 0.25, 2.3, 2, 3.05);
   rightPlayerCollider->setDimensions(-0.12, 0, 0.25, 2.3, 2, 3.05);
 
-  
   leftPlayerObjWithCollider->AddComponent(leftPlayerCollider);
   rightPlayerObjWithCollider->AddComponent(rightPlayerCollider);
-  
+
   leftPlayerNode.AddGameObject(leftPlayerObjWithCollider);
   rightPlayerNode.AddGameObject(rightPlayerObjWithCollider);
 
   leftPlayerNodeForModel.AddGameObject(leftPlayerObj);
   rightPlayerNodeForModel.AddGameObject(rightPlayerObj);
-
 
   Collider *box2Collider = new Collider(hexObj2->transform);
   box2Collider->setDimensions(0, 0, 0, 2, 2, 2);
@@ -333,7 +342,6 @@ void Game::Update(float interpolation)
       path = reconstruct_path(start, goal, came_from);
     }
 
-
     if (leftSideActive)
       UpdatePlayer(leftPlayerNode, camera, interpolation);
     else
@@ -358,8 +366,10 @@ void Game::Render()
   glScissor(0, 0, (Game::WINDOW_WIDTH / 2) + offset, Game::WINDOW_HEIGHT);
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT);
-  leftScene.Render(originTransform, true);
-  Enemy_Node.Render(originTransform, true);
+  //leftScene.Render(originTransform, true);
+  //Enemy_Node.Render(originTransform, true);
+
+  std::thread th1(&Game::t1,this);
 
   SetViewAndPerspective(camera2);
 
@@ -368,7 +378,10 @@ void Game::Render()
   glScissor((Game::WINDOW_WIDTH / 2) + offset, 0, (Game::WINDOW_WIDTH / 2) - offset, Game::WINDOW_HEIGHT);
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT);
-  rightScene.Render(originTransform, true);
+
+  std::thread th2(&Game::t2,this);
+
+  //rightScene.Render(originTransform, true);
 
   // RENDER PASKA ODDZIELAJACAEGO KAMERY - TODO
   glViewport((Game::WINDOW_WIDTH / 2) + offset - 5, 0, 10, Game::WINDOW_HEIGHT);
@@ -381,6 +394,9 @@ void Game::Render()
   Plot();
 
   ImguiDrawData();
+
+  th1.join();
+  th2.join();
 
   // Swap buffers
   glfwSwapBuffers(okienko.window);
@@ -607,7 +623,7 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos)
 void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation)
 {
   Transform transformBeforeMove(player.gameObject->transform);
-  
+
   glm::vec3 movementDir(0);
 
   if (glfwGetKey(okienko.window, GLFW_KEY_W) == GLFW_PRESS)
@@ -619,17 +635,16 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation)
   if (glfwGetKey(okienko.window, GLFW_KEY_D) == GLFW_PRESS)
     movementDir.x = 1;
 
-    if (movementDir.z == -1 && movementDir.x == 0)
-      player.children[0]->local.SetRotation(0, 180, 0);
-    else if (movementDir.z == 1 && movementDir.x == 0 )
-       player.children[0]->local.SetRotation(0, 0, 0);
-    else if (movementDir.x == -1 && movementDir.y == 0 )
-       player.children[0]->local.SetRotation(0, 270, 0);
-    else if (movementDir.x == 1 && movementDir.y == 0 )
-      player.children[0]->local.SetRotation(0, 90, 0);
+  if (movementDir.z == -1 && movementDir.x == 0)
+    player.children[0]->local.SetRotation(0, 180, 0);
+  else if (movementDir.z == 1 && movementDir.x == 0)
+    player.children[0]->local.SetRotation(0, 0, 0);
+  else if (movementDir.x == -1 && movementDir.y == 0)
+    player.children[0]->local.SetRotation(0, 270, 0);
+  else if (movementDir.x == 1 && movementDir.y == 0)
+    player.children[0]->local.SetRotation(0, 90, 0);
 
-   
-   //player.local.Translate(glm::vec3(0, -1.0f * player.local.getPosition().y * PlayerScale, 0));
+  //player.local.Translate(glm::vec3(0, -1.0f * player.local.getPosition().y * PlayerScale, 0));
 
   glm::vec3 move = movementDir * movementSpeedTimesPlayerScale * interpolation;
   player.Translate(move.x, move.y, move.z);
@@ -772,8 +787,6 @@ void Game::SetViewAndPerspective(Camera &aCamera)
   shaderProgram_For_Model->setMat4("view", view);
   shaderProgram_For_Model->setFloat("FogDensity", FogDensity);
   shaderProgram_For_Model->setFloat("viewSpaceZOffset", cameraZOffset);
-
-  
 
   shaderViewCone->use();
   shaderViewCone->setMat4("projection", projection);
@@ -945,11 +958,11 @@ void Game::ImGuiFunctions()
     ImGui::SliderFloat("CameraZOffset", &cameraZOffset, 0, 5);
     ImGui::SliderFloat("CameraYOffset", &cameraYOffset, 0, 5);
     ImGui::SliderFloat("FogDensity", &FogDensity, 0, 1);
-	ImGui::SliderFloat("CameraYaw", &camera.Yaw, -180, 180);
-	ImGui::SliderFloat("CameraPitch", &camera.Pitch, -180, 180);
+    ImGui::SliderFloat("CameraYaw", &camera.Yaw, -180, 180);
+    ImGui::SliderFloat("CameraPitch", &camera.Pitch, -180, 180);
 
-	camera.updateCameraVectors();
-	camera2.updateCameraVectors();
+    camera.updateCameraVectors();
+    camera2.updateCameraVectors();
 
     if (ImGui::Button("Printf Path"))
     {

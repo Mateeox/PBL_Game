@@ -187,4 +187,7 @@ private:
   void Plot();
   void DisplayImage(const char * path, const char * text);
   void DisplayAnimationInfo(AnimatedModel * model);
+
+  void t1();
+  void t2();
 };
