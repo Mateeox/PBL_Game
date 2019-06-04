@@ -127,10 +127,10 @@ void Game::Granko()
   rightPlayerObjWithCollider->setTag("player");
 
 
-  std::string PlayerModelPath = "Models/Player/Player_Walk.fbx";
+  std::string PlayerModelPath = "Models/Player/Player_Static.obj";
   std::string AnimatedEnemyPAth = "Models/" + ConfigUtils::GetValueFromMap<std::string>("Enemy_Animated_Model", ConfigMap);
 
-  AnimatedModel *PlayerModel = new AnimatedModel(PlayerModelPath, *shaderProgram_For_Model, false);
+  Model *PlayerModel = new Model(PlayerModelPath, *shaderProgram_For_Model, false);
   animatedModel = new AnimatedModel(AnimatedEnemyPAth, *shaderAnimatedModel, false);
 
   ShapeRenderer3D *TileRenderer = new ShapeRenderer3D(Shapes::RainBow_Square,
@@ -198,8 +198,8 @@ void Game::Granko()
 	  GridLocation{ static_cast<int>(Corners[1].x),static_cast<int>(Corners[1].y) }, //enemy firstTarget
 	  grid); //reference for the map
 
-  Enemy_Node.Translate(start.x * EnemyScaleInverse, EnemyYoffset * 100, start.y * EnemyScaleInverse);
-  leftPlayerNode.Translate(start.x * PlayerScaleInverse, 0, start.y * PlayerScaleInverse);
+  Enemy_Node.Translate(Corners[0].x * EnemyScaleInverse, EnemyYoffset * 100, Corners[0].y * EnemyScaleInverse);
+  leftPlayerNode.Translate(Corners[3].x* PlayerScaleInverse, 0, Corners[3].y * PlayerScaleInverse);
 
   if (debugPathFinding)
   {
