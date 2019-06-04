@@ -60,7 +60,7 @@ void EnemyController::Update(float  interpolation)
     {
         if (state != AlwaysFollow && InterestMeter > 0)
         {
-            InterestMeter -= InterestMeterIncrement;
+            InterestMeter -= InterestMeterIncrement * (1 / (EnemyPlayerDistance * DistanceToInterestRatio));
 			if (InterestMeter < 0)
 			{
 				InterestMeter = 0;
@@ -90,7 +90,15 @@ void EnemyController::Update(float  interpolation)
 
 void EnemyController::CheckIFNotOnEnd()
 {
-    //check if currnt node position != firstTarget , if it is switch target with startposition // sometings is not yes
+	if(path.size() == 1)
+	SwtichStartWithEnd();
+	
+	if (grid.passable(Currenttarget))
+	{
+		a_star_search(grid, start, Currenttarget, came_from, cost_so_far);
+		path = reconstruct_path(start, Currenttarget, came_from);
+	}
+	LastFirstFlag != LastFirstFlag;
 }
 
 void EnemyController::SwtichStartWithEnd()
@@ -98,13 +106,12 @@ void EnemyController::SwtichStartWithEnd()
     if (LastFirstFlag)
     {
         Currenttarget = firstStart;
-        LastFirstFlag != LastFirstFlag;
     }
     else
     {
         Currenttarget = firstTarget;
-        LastFirstFlag != LastFirstFlag;
     }
+	
 }
 
 void EnemyController::SetTarget()
