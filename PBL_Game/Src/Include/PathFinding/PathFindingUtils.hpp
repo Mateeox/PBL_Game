@@ -373,6 +373,11 @@ cost_so_far.clear();
   }
 }
 
-glm::vec2 GetPositionOfset(SceneNode& node,int maxMapSize,float X_offSet,float Z_offset,float mapScale);
+glm::vec2 GetPositionOfset(SceneNode& node,int maxMapSize,float X_offSet,float Z_offset);
 
 glm::vec2 FindFirstEmptyFloor(std::vector<MapKey*>& map);
+
+glm::vec2 FindFirstFromLeftUpCorner(std::vector<MapKey*>& map,int size);
+glm::vec2 FindFirstFromLeftDownCorner(std::vector<MapKey*>& map,int size);
+glm::vec2 FindFirstFromRightUpCorner(std::vector<MapKey*>& map,int size);
+glm::vec2 FindFirstFromRightDownCorner(std::vector<MapKey*>& map,int size);

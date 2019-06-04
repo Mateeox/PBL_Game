@@ -13,7 +13,7 @@ enum EnemyState
 class EnemyController
 {
     EnemyState state = NotInteresed;
-    const float InterestDistance = 50;
+    const float InterestDistance = 35;
 
     const float minPlayerDistance = 0.005f;
     const float DistanceToInterestRatio = 0.5;
@@ -24,10 +24,11 @@ class EnemyController
     const float MaxFollowing = 600;
     const float MaxAlwaysFollow = 1000;
 
-    float InterestMeter = 0;
-    const float InterestMeterIncrement = 2;
-    SceneNode *enemy;
-    SceneNode *player;
+    
+    const float InterestMeterIncrement = 100;
+    SceneNode &enemy;
+    SceneNode &player;
+	GridWithWeights& grid;
 
 
     bool LastFirstFlag = true;
@@ -40,12 +41,15 @@ class EnemyController
     void CheckIFNotOnEnd();
 
 public:
-    EnemyController(SceneNode *enemy, SceneNode *player, GridLocation aStart, GridLocation aFirstTarget);
+    EnemyController(SceneNode &enemy, SceneNode &player, GridLocation aStart, GridLocation aFirstTarget, GridWithWeights& grid);
     void ChangeEnemyState(EnemyState state);
     float GetPlayerDistance();
-    void Update();
+    void Update(float interpolation);
     void SwtichStartWithEnd();
 
+
+	float EnemyPlayerDistance;
+	float InterestMeter = 0;
     GridLocation start;
     GridLocation Currenttarget;
 };

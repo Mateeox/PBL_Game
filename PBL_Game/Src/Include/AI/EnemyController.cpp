@@ -1,15 +1,19 @@
 #include "EnemyController.hpp"
 
-EnemyController::EnemyController(SceneNode *aEnemy,
-                                 SceneNode *aPlayer,
-                                 GridLocation aStart,
-                                 GridLocation aFirstTarget) : enemy(aEnemy),
-                                                              player(aPlayer),
-                                                              start(aStart),
-                                                              firstStart(aStart),
-                                                              firstTarget(aFirstTarget),
-                                                              Currenttarget(aFirstTarget)
+EnemyController::EnemyController(SceneNode &aEnemy,
+	SceneNode &aPlayer,
+	GridLocation aStart,
+	GridLocation aFirstTarget,
+	GridWithWeights& aGrid) : enemy(aEnemy),
+	player(aPlayer),
+	start(aStart),
+	firstStart(aStart),
+	firstTarget(aFirstTarget),
+	Currenttarget(aFirstTarget),
+	grid(aGrid)
 {
+
+
 }
 
 void EnemyController::ChangeEnemyState(EnemyState aState)
@@ -19,22 +23,22 @@ void EnemyController::ChangeEnemyState(EnemyState aState)
 float EnemyController::GetPlayerDistance()
 {
 
-    int x1 = enemy->local.getPosition().x;
-    int x2 = player->local.getPosition().x;
+    int x1 = enemy.local.getPosition().x*enemy.local.getScale().x;
+    int x2 = player.local.getPosition().x*player.local.getScale().x;
 
-    int y1 = enemy->local.getPosition().y;
-    int y2 = player->local.getPosition().y;
+    int z1 = enemy.local.getPosition().z*enemy.local.getScale().z;
+    int z2 = player.local.getPosition().z*player.local.getScale().z;
 
-    return sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+    return sqrt((x1 - x2) * (x1 - x2) + (z1 - z2) * (z1 - z2)) * 10;
 }
-void EnemyController::Update()
+void EnemyController::Update(float  interpolation)
 {
-    float playerDistance = GetPlayerDistance();
-    if (playerDistance > InterestDistance && InterestMeter < MaxAlwaysFollow)
+	EnemyPlayerDistance = GetPlayerDistance();
+    if (EnemyPlayerDistance < InterestDistance && InterestMeter < MaxAlwaysFollow)
     {
-        if (playerDistance > minPlayerDistance && playerDistance != 0)
+        if (EnemyPlayerDistance > minPlayerDistance && EnemyPlayerDistance != 0)
         {
-            InterestMeter += InterestMeterIncrement * (1 / (playerDistance * DistanceToInterestRatio));
+            InterestMeter += InterestMeterIncrement * (1 / (EnemyPlayerDistance * DistanceToInterestRatio));
         }
         else
         {
@@ -43,9 +47,13 @@ void EnemyController::Update()
     }
     else
     {
-        if (state != AlwaysFollow && InterestMeter <= 0)
+        if (state != AlwaysFollow && InterestMeter > 0)
         {
             InterestMeter -= InterestMeterIncrement;
+			if (InterestMeter < 0)
+			{
+				InterestMeter = 0;
+			}
         }
     }
     SetStateFromInterestLevel();

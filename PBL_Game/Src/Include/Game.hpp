@@ -12,6 +12,7 @@
 #include "PathFinding/MapTileRenderUtils.cpp"
 #include "Component/AnimatedModel.hpp"
 #include "Player.hpp"
+#include "AI/EnemyController.hpp"
 
 const int TICKS_PER_SECOND = 32;
 const int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
@@ -79,6 +80,8 @@ class Game
   SceneNode rightPlayerNodeForModel;
   SceneNode Enemy_Node; //Rotation + scale
   SceneNode Enemy_Node_For_Model;
+
+  EnemyController *enemyController;
 
   void LoadConfig();
   void InitializeConfig();
