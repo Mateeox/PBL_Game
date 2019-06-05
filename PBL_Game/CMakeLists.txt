@@ -56,9 +56,10 @@ add_executable(PBL_Game
 	  Src/Include/SceneNode.cpp
 		Src/Include/Collider.cpp
 		Src/Include/Trigger.cpp
-		  Src/Include/Key.cpp
-		  Src/Include/Door.cpp
-		Src/Include/ConfigUtils.cpp
+		Src/Include/Key.cpp
+		Src/Include/Door.cpp
+		#ConfigUtils
+		Src/Include/Configuration/ConfigUtils.cpp
 		#PathFinding
 		Src/Include/PathFinding/PathFindingUtils.cpp
 		Src/Include/PathFinding/MapTile.cpp

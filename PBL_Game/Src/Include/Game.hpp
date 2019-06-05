@@ -6,7 +6,7 @@
 #include "Trigger.hpp"
 #include "Key.hpp"
 #include "Door.hpp"
-#include "ConfigUtils.hpp"
+#include "Configuration/ConfigUtils.hpp"
 #include "Component/ConeRenderer.hpp"
 #include "PathFinding/MapTile.hpp"
 #include "PathFinding/MapTileRenderUtils.cpp"

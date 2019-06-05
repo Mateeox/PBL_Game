@@ -3,7 +3,7 @@
 #include <iostream>
 #include "Game.hpp"
 #include "Window.hpp"
-#include "ConfigUtils.hpp"
+#include "Configuration/ConfigUtils.hpp"
 
 using namespace PBLGame;
 

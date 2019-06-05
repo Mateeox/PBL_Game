@@ -6,6 +6,7 @@
 #include <string>
 #include <cstring>
 
+
 #include <glm/gtc/type_ptr.hpp>
 
 #define SAFE_DELETE(p) \
@@ -47,7 +48,7 @@ bool AnimatedModel::loadAnimatedModel(std::string &path)
 	glGenBuffers(ARRAY_SIZE_IN_ELEMENTS(m_Buffers), m_Buffers);
 
 	bool Ret = false;
-
+	
 	m_pScene = m_Importer.ReadFile(path.c_str(), ASSIMP_LOAD_FLAGS);
 
 	if (m_pScene)

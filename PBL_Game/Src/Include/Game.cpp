@@ -16,41 +16,42 @@ static bool swapButtonPressed = false;
 
 void Game::InitializeConfig()
 {
-  MapScale = ConfigUtils::GetValueFromMap<unsigned>("MapScale", ConfigUtils::GlobalConfigMap);
-  WINDOW_WIDTH = ConfigUtils::GetValueFromMap<unsigned>("WINDOW_WIDTH", ConfigUtils::GlobalConfigMap);
-  WINDOW_HEIGHT = ConfigUtils::GetValueFromMap<unsigned>("WINDOW_HEIGHT", ConfigUtils::GlobalConfigMap);
-  movementSpeed = ConfigUtils::GetValueFromMap<float>("PlayerSpeed", ConfigUtils::GlobalConfigMap);
-  debugPathFinding = ConfigUtils::GetValueFromMap<int>("debugPathFinding", ConfigUtils::GlobalConfigMap);
+   using namespace ConfigUtils;
+  MapScale = GetValueFromMap<unsigned>("MapScale", GlobalConfigMap);
+  WINDOW_WIDTH = GetValueFromMap<unsigned>("WINDOW_WIDTH", GlobalConfigMap);
+  WINDOW_HEIGHT = GetValueFromMap<unsigned>("WINDOW_HEIGHT", GlobalConfigMap);
+  movementSpeed = GetValueFromMap<float>("PlayerSpeed", GlobalConfigMap);
+  debugPathFinding = GetValueFromMap<int>("debugPathFinding", GlobalConfigMap);
 
-  EnemyBaseSpeed = ConfigUtils::GetValueFromMap<float>("EnemyBaseSpeed", ConfigUtils::GlobalConfigMap);
-  EnemyXoffset = ConfigUtils::GetValueFromMap<float>("EnemyXoffset", ConfigUtils::GlobalConfigMap);
-  EnemyYoffset = ConfigUtils::GetValueFromMap<float>("EnemyYoffset", ConfigUtils::GlobalConfigMap);
-  EnemyZoffset = ConfigUtils::GetValueFromMap<float>("EnemyZoffset", ConfigUtils::GlobalConfigMap);
+  EnemyBaseSpeed = GetValueFromMap<float>("EnemyBaseSpeed", GlobalConfigMap);
+  EnemyXoffset = GetValueFromMap<float>("EnemyXoffset", GlobalConfigMap);
+  EnemyYoffset = GetValueFromMap<float>("EnemyYoffset", GlobalConfigMap);
+  EnemyZoffset = GetValueFromMap<float>("EnemyZoffset", GlobalConfigMap);
 
-  PlayerXOffset = ConfigUtils::GetValueFromMap<float>("PlayerXOffset", ConfigUtils::GlobalConfigMap);
-  PlayerYOffset = ConfigUtils::GetValueFromMap<float>("PlayerYOffset", ConfigUtils::GlobalConfigMap);
-  PlayerZOffset = ConfigUtils::GetValueFromMap<float>("PlayerZOffset", ConfigUtils::GlobalConfigMap);
+  PlayerXOffset = GetValueFromMap<float>("PlayerXOffset", GlobalConfigMap);
+  PlayerYOffset = GetValueFromMap<float>("PlayerYOffset", GlobalConfigMap);
+  PlayerZOffset = GetValueFromMap<float>("PlayerZOffset", GlobalConfigMap);
 
-  floorTransform = ConfigUtils::GetValueFromMap<float>("FloorTranslation", ConfigUtils::GlobalConfigMap);
-  TileScale = ConfigUtils::GetValueFromMap<float>("TileScale", ConfigUtils::GlobalConfigMap);
-  EnemyScale = ConfigUtils::GetValueFromMap<float>("EnemyScale", ConfigUtils::GlobalConfigMap);
+  floorTransform = GetValueFromMap<float>("FloorTranslation", GlobalConfigMap);
+  TileScale = GetValueFromMap<float>("TileScale", GlobalConfigMap);
+  EnemyScale = GetValueFromMap<float>("EnemyScale", GlobalConfigMap);
 
-  cameraZOffset = ConfigUtils::GetValueFromMap<float>("cameraZOffset", ConfigUtils::GlobalConfigMap);
-  cameraYOffset = ConfigUtils::GetValueFromMap<float>("cameraYOffset", ConfigUtils::GlobalConfigMap);
-  cameraAngle = ConfigUtils::GetValueFromMap<float>("cameraAngle", ConfigUtils::GlobalConfigMap);
+  cameraZOffset = GetValueFromMap<float>("cameraZOffset", GlobalConfigMap);
+  cameraYOffset = GetValueFromMap<float>("cameraYOffset", GlobalConfigMap);
+  cameraAngle = GetValueFromMap<float>("cameraAngle", GlobalConfigMap);
 
-  camera.Pitch = ConfigUtils::GetValueFromMap<float>("cameraPitch", ConfigUtils::GlobalConfigMap);
-  camera.Yaw = ConfigUtils::GetValueFromMap<float>("cameraYaw", ConfigUtils::GlobalConfigMap);
+  camera.Pitch = GetValueFromMap<float>("cameraPitch", GlobalConfigMap);
+  camera.Yaw = GetValueFromMap<float>("cameraYaw", GlobalConfigMap);
 
-  camera2.Pitch = ConfigUtils::GetValueFromMap<float>("cameraPitch", ConfigUtils::GlobalConfigMap);
-  camera2.Yaw = ConfigUtils::GetValueFromMap<float>("cameraYaw", ConfigUtils::GlobalConfigMap);
+  camera2.Pitch = GetValueFromMap<float>("cameraPitch", GlobalConfigMap);
+  camera2.Yaw = GetValueFromMap<float>("cameraYaw", GlobalConfigMap);
 
-  TrapScale = ConfigUtils::GetValueFromMap<float>("TrapScale", ConfigUtils::GlobalConfigMap);
+  TrapScale = GetValueFromMap<float>("TrapScale", GlobalConfigMap);
 
   TileScaleTimes100 = TileScale * 100;
   EnemyScaleInverse = 1 / EnemyScale;
 
-  PlayerScale = ConfigUtils::GetValueFromMap<float>("PlayerScale", ConfigUtils::GlobalConfigMap);
+  PlayerScale = GetValueFromMap<float>("PlayerScale", GlobalConfigMap);
   PlayerScaleInverse = 1 / PlayerScale;
 
   movementSpeedTimesPlayerScale = movementSpeed * PlayerScale;
