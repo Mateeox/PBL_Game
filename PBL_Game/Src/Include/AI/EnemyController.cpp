@@ -61,7 +61,7 @@ void EnemyController::Update(float  interpolation)
     {
         if (EnemyPlayerDistance > minPlayerDistance && EnemyPlayerDistance != 0)
         {
-            InterestMeter += InterestMeterIncrement *1/4* (1 / (EnemyPlayerDistance * DistanceToInterestRatio));
+            InterestMeter += InterestMeterIncrement * (1 / (EnemyPlayerDistance * DistanceToInterestRatio));
         }
         else
         {
@@ -72,7 +72,7 @@ void EnemyController::Update(float  interpolation)
     {
         if (state != AlwaysFollow && InterestMeter > 0)
         {
-            InterestMeter -= InterestMeterIncrement * 1/4*(1 / (EnemyPlayerDistance * DistanceToInterestRatio));
+            InterestMeter -= InterestMeterIncrement *(1 / (EnemyPlayerDistance * DistanceToInterestRatio));
 			if (InterestMeter < 0)
 			{
 				InterestMeter = 0;

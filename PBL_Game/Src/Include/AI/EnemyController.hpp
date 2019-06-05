@@ -13,10 +13,10 @@ enum EnemyState
 class EnemyController
 {
     EnemyState state = NotInteresed;
-    const float InterestDistance = 100;
+    const float InterestDistance = 50;
 
     const float minPlayerDistance = 0.005f;
-    const float DistanceToInterestRatio = 0.5;
+    const float DistanceToInterestRatio = 0.65;
 
 	int mapSize;
 
