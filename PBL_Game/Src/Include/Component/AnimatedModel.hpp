@@ -162,7 +162,8 @@ private:
   bool gammaCorrection;
 
   void BoneTransform(float TimeInSeconds, std::vector<Matrix4f>& Transforms);
-  void ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const Matrix4f& ParentTransform);
+  void ReadNodeHeirarchy(float AnimationTime0, const aiNode *pNode, const Matrix4f &ParentTransform, int animLevel);
+  void ReadNodeHeirarchy(float AnimationTime0, float AnimationTime1, const aiNode *pNode, const Matrix4f &ParentTransform, int animLevel);
   const aiNodeAnim* FindNodeAnim(const aiAnimation* pAnimation, const std::string NodeName);
   void CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
   void CalcInterpolatedScaling(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);

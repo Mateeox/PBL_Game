@@ -282,6 +282,10 @@ void Game::Update(float interpolation)
       UpdatePlayer(rightPlayerNode, camera2, interpolation);
   }
 
+  enemyModel->Update();
+  playerModel->Update();
+  player2Model->Update();
+
   if (leftSideActive)
   {
 	  ProcessInput(interpolation, camera);
