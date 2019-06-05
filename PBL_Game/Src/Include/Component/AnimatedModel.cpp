@@ -304,7 +304,7 @@ unsigned AnimatedModel::FindRotation(float AnimationTime, const aiNodeAnim *pNod
 		}
 	}
 
-	assert(0);
+	//assert(0);
 
 	return 0;
 }
@@ -321,7 +321,7 @@ unsigned AnimatedModel::FindScaling(float AnimationTime, const aiNodeAnim *pNode
 		}
 	}
 
-	assert(0);
+	//assert(0);
 
 	return 0;
 }
@@ -377,7 +377,7 @@ unsigned AnimatedModel::FindPosition(float AnimationTime, const aiNodeAnim *pNod
 		}
 	}
 
-	assert(0);
+	//assert(0);
 
 	return 0;
 }
@@ -452,7 +452,7 @@ void AnimatedModel::ReadNodeHeirarchy(float AnimationTime0, float AnimationTime1
 		aiVector3D Translation1;
 		{
 			float time(stopAnimLevel <= 0 ? AnimationTime1 : 0.f);
-			CalcInterpolatedPosition(Translation1, time, pNodeAnim);
+			CalcInterpolatedPosition(Translation1, time, pNodeAnim1);
 		}
 		Matrix4f TranslationM;
 		TranslationM.InitTranslationTransform(
