@@ -22,7 +22,41 @@
         <Name>Enemy_Animated_Model</Name>
         <Value>enemy_walk_run.FBX</Value>
     </ConfigParameter>
-    
+
+
+    <!--      Enemy Interest Levels             -->
+
+
+    <ConfigParameter>
+        <Type>F</Type>
+        <Name>MinNotInterested</Name>
+        <Value>100</Value>
+    </ConfigParameter>
+
+    <ConfigParameter>
+        <Type>F</Type>
+        <Name>MinInterested</Name>
+        <Value>200</Value>
+    </ConfigParameter>
+
+    <ConfigParameter>
+        <Type>F</Type>
+        <Name>MinFollowing</Name>
+        <Value>500</Value>
+    </ConfigParameter>
+
+    <ConfigParameter>
+        <Type>F</Type>
+        <Name>MinAlwaysFollow</Name>
+        <Value>2000</Value>
+    </ConfigParameter>
+
+
+
+
+
+    <!--      #####################             -->
+
     <ConfigParameter>
         <Type>F</Type>
         <Name>PlayerSpeed</Name>
@@ -112,7 +146,7 @@
     <ConfigParameter>
         <Type>F</Type>
         <Name>PlayerYOffset</Name>
-        <Value>10</Value>
+        <Value>0</Value>
     </ConfigParameter>
 
     <ConfigParameter>

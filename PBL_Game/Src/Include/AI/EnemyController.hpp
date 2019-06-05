@@ -21,10 +21,10 @@ class EnemyController
 	int mapSize;
 
     //Interest levels
-    float MaxNotInterested;
-    float MaxInterested;
-    float MaxFollowing;
-    float MaxAlwaysFollow;
+	float MinNotInterested;
+	float MinInterested;
+	float MinFollowing;
+	float MinAlwaysFollow;
 	float enemySpeed;
 	float enemyRunSpeed;
 	float enemyWalkSpeed;

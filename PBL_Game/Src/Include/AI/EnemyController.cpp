@@ -19,20 +19,23 @@ EnemyController::EnemyController(SceneNode &aEnemy,
 	mapTiles(aMapTiles),
 	mapSize(aMapSize)
 {
+
 	LoadFromConfig();
+
 
 }
 
+
 void EnemyController::LoadFromConfig()
 {
-	using namespace ConfigUtils;
- MaxNotInterested =  GetValueFromMap<float>("MaxNotInterested",GlobalConfigMap); //500
- MaxInterested = GetValueFromMap<float>("MaxInterested",GlobalConfigMap); //500
- MaxFollowing =  GetValueFromMap<float>("MaxFollowing",GlobalConfigMap); //1500
- MaxAlwaysFollow =  GetValueFromMap<float>("MaxAlwaysFollow",GlobalConfigMap); //2000
- enemySpeed = GetValueFromMap<float>("EnemyBaseSpeed",GlobalConfigMap); //10
- enemyRunSpeed =  GetValueFromMap<float>("EnemyRunSpeed",GlobalConfigMap); //15
- enemyWalkSpeed =  GetValueFromMap<float>("EnemyBaseSpeed",GlobalConfigMap); //10
+		using namespace ConfigUtils;
+	MinNotInterested = GetValueFromMap<float>("MinNotInterested", GlobalConfigMap);
+	MinInterested = GetValueFromMap<float>("MinInterested", GlobalConfigMap);
+	MinFollowing = GetValueFromMap<float>("MinFollowing", GlobalConfigMap);
+	MinAlwaysFollow = GetValueFromMap<float>("MinAlwaysFollow", GlobalConfigMap);
+	enemySpeed = GetValueFromMap<float>("EnemyBaseSpeed", GlobalConfigMap);
+	enemyRunSpeed = GetValueFromMap<float>("EnemyRunSpeed", GlobalConfigMap);
+	enemyWalkSpeed = GetValueFromMap<float>("EnemyBaseSpeed", GlobalConfigMap);
 
 }
 
@@ -54,7 +57,7 @@ float EnemyController::GetPlayerDistance()
 void EnemyController::Update(float  interpolation)
 {
 	EnemyPlayerDistance = GetPlayerDistance();
-    if (EnemyPlayerDistance < InterestDistance && InterestMeter < MaxAlwaysFollow)
+    if (EnemyPlayerDistance < InterestDistance && InterestMeter < MinAlwaysFollow)
     {
         if (EnemyPlayerDistance > minPlayerDistance && EnemyPlayerDistance != 0)
         {
@@ -62,7 +65,7 @@ void EnemyController::Update(float  interpolation)
         }
         else
         {
-            InterestMeter = MaxAlwaysFollow;
+            InterestMeter = MinAlwaysFollow;
         }
     }
     else
@@ -152,17 +155,17 @@ void EnemyController::SetTarget()
 }
 void EnemyController::SetStateFromInterestLevel()
 {
-    if (InterestMeter < MaxAlwaysFollow)
+    if (InterestMeter < MinAlwaysFollow)
     {
-        if (InterestMeter >= 0 && InterestMeter < MaxNotInterested)
+        if (InterestMeter >= 0 && InterestMeter < MinNotInterested)
         {
             state = NotInteresed;
         }
-        else if (InterestMeter >= MaxNotInterested && InterestMeter < MaxInterested)
+        else if (InterestMeter >= MinInterested && InterestMeter < MinFollowing)
         {
             state = Interested;
         }
-        else if (InterestMeter >= MaxInterested && InterestMeter < MaxFollowing)
+        else if (InterestMeter >= MinFollowing && InterestMeter < MinAlwaysFollow)
         {
             state = Following;
         }
