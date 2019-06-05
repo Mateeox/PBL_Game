@@ -291,6 +291,8 @@ void MapGenerator::PickDoors()
 	int doorsCount = CountDoors();
 	if (Doors > doorsCount)
 		Doors = doorsCount;
+	else if (doorsCount < 0)
+		return;
 	do
 	{
 		int index = GetRandomIndex(doors.size());
@@ -387,7 +389,7 @@ void MapGenerator::DefineModels()
 	floor = new Model("Models/House/StaticNormal_Floor.obj", *shader, false);
 	wall = new Model("Models/House/StaticSimpleDestroyedWall.obj", *shader, false);
 	door = new Model("Models/House/StaticDoor.obj", *shader, false);
-	key = new Model("Models/House/StaticDoor.obj", *shader, false);
+	key = new Model("Models/Key/key.obj", *shader, false);
 	chest = new Model("Models/Chest/Chest.obj", *shader, false);
 }
 
