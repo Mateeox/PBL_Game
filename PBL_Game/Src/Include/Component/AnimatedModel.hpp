@@ -114,6 +114,7 @@ class AnimatedModel : public ComponentSystem::Component
 public:
   void Clear();
   AnimatedModel(std::string &path, Shader &aShaderProgram, bool gammaCorrection);
+  AnimatedModel(AnimatedModel &) = default;
   void Draw(glm::mat4 &transform);
   Shader &ShaderProgram;
   void SelectAnimation(const std::string & aName);

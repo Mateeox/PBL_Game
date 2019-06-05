@@ -131,6 +131,7 @@ void Game::Granko()
   std::string AnimatedEnemyPAth = "Models/" + ConfigUtils::GetValueFromMap<std::string>("Enemy_Animated_Model",  ConfigUtils::GlobalConfigMap);
 
   playerModel = new AnimatedModel(PlayerModelPath, *shaderAnimatedModel, false);
+  player2Model = new AnimatedModel(*playerModel);
   enemyModel = new AnimatedModel(AnimatedEnemyPAth, *shaderAnimatedModel, false);
 
   ShapeRenderer3D *TileRenderer = new ShapeRenderer3D(Shapes::RainBow_Square,
@@ -144,7 +145,7 @@ void Game::Granko()
 
   leftPlayerObj->AddComponent(coneRendererLeft);
   leftPlayerObj->AddComponent(playerModel);
-  rightPlayerObj->AddComponent(playerModel);
+  rightPlayerObj->AddComponent(player2Model);
   enemyGameObject->AddComponent(enemyModel);
 
 
@@ -272,15 +273,7 @@ void Game::Update(float interpolation)
 {
   if (!inputBlockade)
   {
-    if (leftSideActive)
-    {
-      ProcessInput(interpolation, camera);
-    }
-    else
-    {
-      ProcessInput(interpolation, camera2);
-    }
-
+ 
 	enemyController->Update(interpolation);
 
     if (leftSideActive)
@@ -288,6 +281,16 @@ void Game::Update(float interpolation)
     else
       UpdatePlayer(rightPlayerNode, camera2, interpolation);
   }
+
+  if (leftSideActive)
+  {
+	  ProcessInput(interpolation, camera);
+  }
+  else
+  {
+	  ProcessInput(interpolation, camera2);
+  }
+
 }
 
 void Game::Render()
@@ -484,6 +487,7 @@ void Game::ProcessInput(float interpolation, Camera &camera_update)
   ProcessMouse();
   if (glfwGetKey(okienko.window, GLFW_KEY_Q) == GLFW_PRESS && swapButtonPressed == false)
   {
+	  
     offset *= -1;
     leftSideActive = !leftSideActive;
     swapButtonPressed = true;
@@ -516,6 +520,8 @@ void Game::ProcessInput(float interpolation, Camera &camera_update)
   {
     Tab_Pressed = false;
   }
+
+  FixAnimation();
 }
 void Game::ProcessMouse()
 {
@@ -559,6 +565,7 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation)
 
   glm::vec3 movementDir(0);
 
+
   if (glfwGetKey(okienko.window, GLFW_KEY_W) == GLFW_PRESS)
     movementDir.z = -1;
   if (glfwGetKey(okienko.window, GLFW_KEY_S) == GLFW_PRESS)
@@ -568,34 +575,15 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation)
   if (glfwGetKey(okienko.window, GLFW_KEY_D) == GLFW_PRESS)
     movementDir.x = 1;
 
-  if (movementDir.x == 1 || movementDir.z == 1 || movementDir.x == -1 || movementDir.z == -1)
+
+  if (leftSideActive)
   {
-	  playerModel->SelectAnimation("Player_Walk");
+	  SetPlayerRotation(player, movementDir,playerModel);
   }
   else
   {
-	  playerModel->SelectAnimation("player_idle");
+	  SetPlayerRotation(player, movementDir, player2Model);
   }
-
-  if (movementDir.z == -1 && movementDir.x == 0)
-    player.children[0]->local.SetRotation(0, 180, 0);
-  else if (movementDir.z == 1 && movementDir.x == 0)
-    player.children[0]->local.SetRotation(0, 0, 0);
-  else if (movementDir.x == -1 && movementDir.z == 0)
-    player.children[0]->local.SetRotation(0, 270, 0);
-  else if (movementDir.x == 1 && movementDir.z == 0)
-    player.children[0]->local.SetRotation(0, 90, 0);
-  else if (movementDir.x == 1 && movementDir.z == -1)
-	  player.children[0]->local.SetRotation(0, 135, 0);
-  else if (movementDir.x == -1 && movementDir.z == -1)
-	  player.children[0]->local.SetRotation(0, 225, 0);
-  else if (movementDir.x == -1 && movementDir.z == 1)
-	  player.children[0]->local.SetRotation(0, 315, 0);
-  else if (movementDir.x == 1 && movementDir.z == 1)
-	  player.children[0]->local.SetRotation(0, 45, 0);
-
-
-  
   glm::vec3 move = movementDir * movementSpeedTimesPlayerScale * interpolation;
   player.Translate(move.x, move.y, move.z);
   Collider *playerCollider = (Collider *)player.gameObject->GetComponent(ComponentSystem::ComponentType::Collider);
@@ -833,8 +821,6 @@ void Game::ImGuiFunctions()
     ImGui::Text("Strzalki - ruch postaci");
 
 
-    //if (path.size() > 1)
-    //  ImGui::Text("Next MapTile ID = %i, %i", path[1].x, path[1].y);
     ImGui::Text("Vector to move = %f, %f", vector2DHelper.x, vector2DHelper.y);
     ImGui::Text("Enemy position = %f, %f", Enemy_Node.local.getPosition().x*EnemyScale, Enemy_Node.local.getPosition().z*EnemyScale);
     ImGui::Text("Player position = %f, %f", leftPlayerNode.local.getPosition().x*PlayerScale, leftPlayerNode.local.getPosition().z*PlayerScale);
@@ -849,10 +835,7 @@ void Game::ImGuiFunctions()
     camera.updateCameraVectors();
     camera2.updateCameraVectors();
 
-    //if (ImGui::Button("Printf Path"))
-   // {
-   //   draw_grid(grid, 3, nullptr, nullptr, &path);
-   // }
+ 
     if (ImGui::Button("List Model AnimationNames"))
     {
 		if (enemyModel != nullptr && playerModel != nullptr )
@@ -876,21 +859,6 @@ void Game::ImGuiFunctions()
         }
       }
     }
-    /*if (ImGui::Button("Update Path and use A_Star_Search"))
-    {
-      if (grid.passable(goal))
-      {
-        a_star_search(grid, start, goal, came_from, cost_so_far);
-        path = reconstruct_path(start, goal, came_from);
-      }
-      else
-      {
-        std::cout << "Target not passable"
-                  << "\n";
-        //TODO find closest pasable
-      }
-    }
-	*/
 
     ImGui::End();
   }
@@ -905,6 +873,48 @@ void Game::ImguiClear()
 void Game::DisplayAnimationInfo(AnimatedModel *model)
 {
   model->ListAnimationNames();
+}
+
+void Game::SetPlayerRotation(SceneNode & aPlayer, glm::vec3 movementDir,AnimatedModel * aPlayerModel)
+{
+
+	if (movementDir.x == 1 || movementDir.z == 1 || movementDir.x == -1 || movementDir.z == -1)
+	{
+		aPlayerModel->SelectAnimation("Player_Walk");
+	}
+	else
+	{
+		aPlayerModel->SelectAnimation("player_idle");
+	}
+
+	if (movementDir.z == -1 && movementDir.x == 0)
+		aPlayer.children[0]->local.SetRotation(0, 180, 0);
+	else if (movementDir.z == 1 && movementDir.x == 0)
+		aPlayer.children[0]->local.SetRotation(0, 0, 0);
+	else if (movementDir.x == -1 && movementDir.z == 0)
+		aPlayer.children[0]->local.SetRotation(0, 270, 0);
+	else if (movementDir.x == 1 && movementDir.z == 0)
+		aPlayer.children[0]->local.SetRotation(0, 90, 0);
+	else if (movementDir.x == 1 && movementDir.z == -1)
+		aPlayer.children[0]->local.SetRotation(0, 135, 0);
+	else if (movementDir.x == -1 && movementDir.z == -1)
+		aPlayer.children[0]->local.SetRotation(0, 225, 0);
+	else if (movementDir.x == -1 && movementDir.z == 1)
+		aPlayer.children[0]->local.SetRotation(0, 315, 0);
+	else if (movementDir.x == 1 && movementDir.z == 1)
+		aPlayer.children[0]->local.SetRotation(0, 45, 0);
+
+}
+void Game::FixAnimation()
+{
+	if (leftSideActive)
+	{
+		player2Model->SelectAnimation("player_idle");
+	}
+	else
+	{
+		playerModel->SelectAnimation("player_idle");
+	}
 }
 
 void Game::SetupPlayersColiders()

@@ -51,16 +51,11 @@
         <Value>2000</Value>
     </ConfigParameter>
 
-
-
-
-
     <!--      #####################             -->
-
     <ConfigParameter>
         <Type>F</Type>
         <Name>PlayerSpeed</Name>
-        <Value>10.5</Value>
+        <Value>5</Value>
     </ConfigParameter>
 
     <ConfigParameter>
