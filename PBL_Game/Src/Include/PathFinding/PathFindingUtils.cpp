@@ -48,6 +48,7 @@ glm::vec2 FindFirstEmptyFloor(std::vector<MapKey *> &map)
       return glm::vec2(pair->x, pair->y);
     }
   }
+	return glm::vec2(0,0); //should not happen
 }
 
 glm::vec2 FindFirstFromLeftUpCorner(std::vector<MapKey *> &map, int size)
