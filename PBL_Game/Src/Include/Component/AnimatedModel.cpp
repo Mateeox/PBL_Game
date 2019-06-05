@@ -28,6 +28,15 @@ AnimatedModel::AnimatedModel(std::string &path, Shader &aShaderProgram, bool gam
 {
 	m_NumBones = 0;
 	loadAnimatedModel(path);
+
+	//blending
+	prevAnimIndex = -1;
+	blendingTime = 0.0f;
+	blendingTimeMul = 1.0f;
+	updateBoth = true;
+	temporary = false;
+	playTime = 0.0f;
+	currentAnimation = 0;
 }
 
 ComponentSystem::ComponentType AnimatedModel::GetComponentType()
@@ -587,6 +596,80 @@ void AnimatedModel::Clear()
 		m_VAO = 0;
 	}
 }
+
+long long AnimatedModel::GetCurrentTimeMillis()
+{
+#ifdef WIN32    
+	return GetTickCount();
+#else
+	timeval t;
+	gettimeofday(&t, NULL);
+
+	long long ret = t.tv_sec * 1000 + t.tv_usec / 1000;
+	return ret;
+#endif    
+}
+
+bool AnimatedModel::SetAnimIndex(unsigned index, bool updateBoth , float blendDuration , bool temporary , float time )
+{
+	if (index == currentAnimation )
+	{
+		return false;
+	}
+	prevAnimIndex = currentAnimation;
+	currentAnimation = index;
+	blendingTime = 1.f;
+	blendingTimeMul = 1.f / blendDuration;
+	animationTime1 = 0.f;
+	updateBoth = updateBoth;
+	temporary = temporary;
+	playTime = time;
+	return true;
+}
+
+
+void AnimatedModel::Update()
+{
+	if (m_lastTime == -1)
+	{
+		m_lastTime = GetCurrentTimeMillis();
+	}
+
+	long long newTime = GetCurrentTimeMillis();
+	float dt = (float)((double)newTime - (double)m_lastTime) / 1000.0f;
+	m_lastTime = newTime;
+
+	animationTime0 += dt;
+	if (blendingTime > 0.f)
+	{
+		blendingTime -= dt * blendingTimeMul;
+		if (blendingTime <= 0.f)
+		{
+			animationTime0 = animationTime1;
+		}
+		if (updateBoth)
+		{
+			animationTime1 += dt;
+		}
+	}
+	else
+	{
+		animationTime1 += dt;
+	}
+
+	if (temporary)
+	{
+		playTime -= dt;
+		if (playTime <= 0.f)
+		{
+			temporary = false;
+			SetAnimIndex(prevAnimIndex);
+		}
+	}
+
+
+}
+
 
 unsigned AnimatedModel::GetAnimationNR()
 {

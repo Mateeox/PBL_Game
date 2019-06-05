@@ -110,12 +110,30 @@ class AnimatedModel : public ComponentSystem::Component
   unsigned m_Buffers[NUM_VBs];
   bool m_Animate;
   unsigned m_AnimationNubmer;
+
+
+  //blending
+  long long m_lastTime;
+  float animationTime0;
+  float animationTime1;
+  float blendingTime;
+  float blendingTimeMul;
+  unsigned prevAnimIndex;
+  bool updateBoth;
+  bool temporary;
+  float playTime;
+  unsigned currentAnimation;
   
+
+  long long GetCurrentTimeMillis();
+  bool SetAnimIndex(unsigned index, bool updateBoth = true, float blendDuration = 0.3f, bool temporary = false, float time = 0.f);
+
 public:
   void Clear();
   AnimatedModel(std::string &path, Shader &aShaderProgram, bool gammaCorrection);
   AnimatedModel(AnimatedModel &) = default;
   void Draw(glm::mat4 &transform);
+  void Update();
   Shader &ShaderProgram;
   void SelectAnimation(const std::string & aName);
   void SelectAnimation(unsigned aNumer);
