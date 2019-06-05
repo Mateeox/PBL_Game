@@ -842,7 +842,7 @@ void Game::ImGuiFunctions()
     ImGui::SliderFloat("CameraYOffset", &cameraYOffset, 0, 5);
     ImGui::SliderFloat("FogDensity", &FogDensity, 0, 1);
 	ImGui::SliderFloat("EnemyInterestMeter", &enemyController->InterestMeter,0,1000 );
-	ImGui::SliderFloat("EnemyPlayerDistance", &enemyController->EnemyPlayerDistance, 0, 50);
+	ImGui::SliderFloat("EnemyPlayerDistance", &enemyController->EnemyPlayerDistance, 0, 3000);
     ImGui::SliderFloat("CameraYaw", &camera.Yaw, -180, 180);
     ImGui::SliderFloat("CameraPitch", &camera.Pitch, -180, 180);
 

@@ -13,7 +13,7 @@ enum EnemyState
 class EnemyController
 {
     EnemyState state = NotInteresed;
-    const float InterestDistance = 35;
+    const float InterestDistance = 100;
 
     const float minPlayerDistance = 0.005f;
     const float DistanceToInterestRatio = 0.5;
@@ -21,13 +21,13 @@ class EnemyController
 	int mapSize;
 
     //Interest levels
-    const float MaxNotInterested = 200;
-    const float MaxInterested = 600;
-    const float MaxFollowing = 600;
-    const float MaxAlwaysFollow = 1000;
-	float enemySpeed = 10;
-	const float enemyRunSpeed = 15;
-	const float enemyWalkspeed = 10;
+    float MaxNotInterested;
+    float MaxInterested;
+    float MaxFollowing;
+    float MaxAlwaysFollow;
+	float enemySpeed;
+	float enemyRunSpeed;
+	float enemyWalkSpeed;
 
     
     const float InterestMeterIncrement = 100;
@@ -64,6 +64,7 @@ public:
     void Update(float interpolation);
     void SwtichStartWithEnd();
 	void MoveNodeToMapTile(SceneNode *sceneNode, GridLocation mapTile, float interpolation, float speed, float NodeXOffset, float NodeZOffset);
+    void LoadFromConfig();
 
 	float EnemyPlayerDistance;
 	float InterestMeter = 0;

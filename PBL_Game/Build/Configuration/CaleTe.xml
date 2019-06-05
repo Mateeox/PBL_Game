@@ -35,6 +35,33 @@
         <Value>300</Value>
     </ConfigParameter>
 
+<!-- Enemy Interest Levels   /-->
+
+   <ConfigParameter>
+        <Type>F</Type>
+        <Name>MaxNotInterested</Name>
+        <Value>500</Value>
+    </ConfigParameter>
+
+       <ConfigParameter>
+        <Type>F</Type>
+        <Name>MaxInterested</Name>
+        <Value>1000</Value>
+    </ConfigParameter>
+
+       <ConfigParameter>
+        <Type>F</Type>
+        <Name>MaxFollowing</Name>
+        <Value>1500</Value>
+    </ConfigParameter>
+
+       <ConfigParameter>
+        <Type>F</Type>
+        <Name>MaxAlwaysFollow</Name>
+        <Value>2000</Value>
+    </ConfigParameter>
+<!-- ####################### /-->
+
     <ConfigParameter>
         <Type>F</Type>
         <Name>TileScale</Name>
@@ -67,6 +94,12 @@
     <ConfigParameter>
         <Type>F</Type>
         <Name>EnemyBaseSpeed</Name>
+        <Value>10</Value>
+    </ConfigParameter>
+
+        <ConfigParameter>
+        <Type>F</Type>
+        <Name>EnemyRunSpeed</Name>
         <Value>10</Value>
     </ConfigParameter>
 

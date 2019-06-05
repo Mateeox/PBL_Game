@@ -1,7 +1,7 @@
 #include "EnemyController.hpp"
 #include "PathFinding/PathFindingUtils.hpp"
 #include "../PathFinding/MapTileRenderUtils.hpp"
-
+#include "Configuration/ConfigUtils.hpp"
 
 EnemyController::EnemyController(SceneNode &aEnemy,
 	SceneNode &aPlayer,
@@ -19,7 +19,20 @@ EnemyController::EnemyController(SceneNode &aEnemy,
 	mapTiles(aMapTiles),
 	mapSize(aMapSize)
 {
+	LoadFromConfig();
 
+}
+
+void EnemyController::LoadFromConfig()
+{
+	using namespace ConfigUtils;
+ MaxNotInterested =  GetValueFromMap<float>("MaxNotInterested",GlobalConfigMap); //500
+ MaxInterested = GetValueFromMap<float>("MaxInterested",GlobalConfigMap); //500
+ MaxFollowing =  GetValueFromMap<float>("MaxFollowing",GlobalConfigMap); //1500
+ MaxAlwaysFollow =  GetValueFromMap<float>("MaxAlwaysFollow",GlobalConfigMap); //2000
+ enemySpeed = GetValueFromMap<float>("EnemyBaseSpeed",GlobalConfigMap); //10
+ enemyRunSpeed =  GetValueFromMap<float>("EnemyRunSpeed",GlobalConfigMap); //15
+ enemyWalkSpeed =  GetValueFromMap<float>("EnemyBaseSpeed",GlobalConfigMap); //10
 
 }
 
@@ -45,7 +58,7 @@ void EnemyController::Update(float  interpolation)
     {
         if (EnemyPlayerDistance > minPlayerDistance && EnemyPlayerDistance != 0)
         {
-            InterestMeter += InterestMeterIncrement * (1 / (EnemyPlayerDistance * DistanceToInterestRatio));
+            InterestMeter += InterestMeterIncrement *1/4* (1 / (EnemyPlayerDistance * DistanceToInterestRatio));
         }
         else
         {
@@ -56,7 +69,7 @@ void EnemyController::Update(float  interpolation)
     {
         if (state != AlwaysFollow && InterestMeter > 0)
         {
-            InterestMeter -= InterestMeterIncrement * (1 / (EnemyPlayerDistance * DistanceToInterestRatio));
+            InterestMeter -= InterestMeterIncrement * 1/4*(1 / (EnemyPlayerDistance * DistanceToInterestRatio));
 			if (InterestMeter < 0)
 			{
 				InterestMeter = 0;
@@ -127,7 +140,7 @@ void EnemyController::SetTarget()
     case Following:
         Currenttarget = GetPositionOfset(player, mapSize, 7, 5);
 		StopEnemy = false;
-		enemySpeed = enemyWalkspeed;
+		enemySpeed = enemyWalkSpeed;
         break;
 
     case AlwaysFollow:
