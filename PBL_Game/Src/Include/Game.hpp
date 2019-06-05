@@ -82,13 +82,10 @@ class Game
 
   EnemyController *enemyController;
 
-  void LoadConfig();
   void InitializeConfig();
   //How to get value from config
-  //ConfigUtils::GetValueFromMap<TYPE>(NAME,ConfigMap) 
-  std::unordered_map<std::string,VariantType> ConfigMap;
+  //ConfigUtils::GetValueFromMap<TYPE>(NAME,ConfigUtils::GlobalConfigMap) 
   
-
   float floorTransform;
   float TileScale;
   float TileScaleTimes100;

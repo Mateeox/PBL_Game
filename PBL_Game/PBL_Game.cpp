@@ -3,16 +3,19 @@
 #include <iostream>
 #include "Game.hpp"
 #include "Window.hpp"
-
-#include "PathFinding/PathFindingUtils.hpp"
+#include "ConfigUtils.hpp"
 
 using namespace PBLGame;
 
 
 int main()
 {
-    Window okienko(1280, 720, "37");
-        Game gierka(okienko);
+    ConfigUtils::LoadConfig();
+  unsigned  WINDOW_WIDTH = ConfigUtils::GetValueFromMap<unsigned>("WINDOW_WIDTH", ConfigUtils::GlobalConfigMap);
+  unsigned WINDOW_HEIGHT = ConfigUtils::GetValueFromMap<unsigned>("WINDOW_HEIGHT", ConfigUtils::GlobalConfigMap);
+  std::string GameName = ConfigUtils::GetValueFromMap<std::string>("Game_Name", ConfigUtils::GlobalConfigMap);
+    Window okienko(WINDOW_WIDTH, WINDOW_HEIGHT, GameName.c_str());
+    Game gierka(okienko);
     gierka.Granko();
 
 }

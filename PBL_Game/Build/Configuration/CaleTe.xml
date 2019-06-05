@@ -10,11 +10,19 @@
         <Name>WINDOW_WIDTH</Name>
         <Value>1920</Value>
     </ConfigParameter>
+
+    <ConfigParameter>
+        <Type>S</Type>
+        <Name>Game_Name</Name>
+        <Value>Between_Dimensions</Value>
+    </ConfigParameter>
+
     <ConfigParameter>
         <Type>S</Type>
         <Name>Enemy_Animated_Model</Name>
         <Value>enemy_walk_run.FBX</Value>
     </ConfigParameter>
+    
     <ConfigParameter>
         <Type>F</Type>
         <Name>PlayerSpeed</Name>

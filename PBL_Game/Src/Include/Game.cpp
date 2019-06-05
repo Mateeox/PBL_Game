@@ -16,41 +16,41 @@ static bool swapButtonPressed = false;
 
 void Game::InitializeConfig()
 {
-  MapScale = ConfigUtils::GetValueFromMap<unsigned>("MapScale", ConfigMap);
-  WINDOW_WIDTH = ConfigUtils::GetValueFromMap<unsigned>("WINDOW_WIDTH", ConfigMap);
-  WINDOW_HEIGHT = ConfigUtils::GetValueFromMap<unsigned>("WINDOW_HEIGHT", ConfigMap);
-  movementSpeed = ConfigUtils::GetValueFromMap<float>("PlayerSpeed", ConfigMap);
-  debugPathFinding = ConfigUtils::GetValueFromMap<int>("debugPathFinding", ConfigMap);
+  MapScale = ConfigUtils::GetValueFromMap<unsigned>("MapScale", ConfigUtils::GlobalConfigMap);
+  WINDOW_WIDTH = ConfigUtils::GetValueFromMap<unsigned>("WINDOW_WIDTH", ConfigUtils::GlobalConfigMap);
+  WINDOW_HEIGHT = ConfigUtils::GetValueFromMap<unsigned>("WINDOW_HEIGHT", ConfigUtils::GlobalConfigMap);
+  movementSpeed = ConfigUtils::GetValueFromMap<float>("PlayerSpeed", ConfigUtils::GlobalConfigMap);
+  debugPathFinding = ConfigUtils::GetValueFromMap<int>("debugPathFinding", ConfigUtils::GlobalConfigMap);
 
-  EnemyBaseSpeed = ConfigUtils::GetValueFromMap<float>("EnemyBaseSpeed", ConfigMap);
-  EnemyXoffset = ConfigUtils::GetValueFromMap<float>("EnemyXoffset", ConfigMap);
-  EnemyYoffset = ConfigUtils::GetValueFromMap<float>("EnemyYoffset", ConfigMap);
-  EnemyZoffset = ConfigUtils::GetValueFromMap<float>("EnemyZoffset", ConfigMap);
+  EnemyBaseSpeed = ConfigUtils::GetValueFromMap<float>("EnemyBaseSpeed", ConfigUtils::GlobalConfigMap);
+  EnemyXoffset = ConfigUtils::GetValueFromMap<float>("EnemyXoffset", ConfigUtils::GlobalConfigMap);
+  EnemyYoffset = ConfigUtils::GetValueFromMap<float>("EnemyYoffset", ConfigUtils::GlobalConfigMap);
+  EnemyZoffset = ConfigUtils::GetValueFromMap<float>("EnemyZoffset", ConfigUtils::GlobalConfigMap);
 
-  PlayerXOffset = ConfigUtils::GetValueFromMap<float>("PlayerXOffset", ConfigMap);
-  PlayerYOffset = ConfigUtils::GetValueFromMap<float>("PlayerYOffset", ConfigMap);
-  PlayerZOffset = ConfigUtils::GetValueFromMap<float>("PlayerZOffset", ConfigMap);
+  PlayerXOffset = ConfigUtils::GetValueFromMap<float>("PlayerXOffset", ConfigUtils::GlobalConfigMap);
+  PlayerYOffset = ConfigUtils::GetValueFromMap<float>("PlayerYOffset", ConfigUtils::GlobalConfigMap);
+  PlayerZOffset = ConfigUtils::GetValueFromMap<float>("PlayerZOffset", ConfigUtils::GlobalConfigMap);
 
-  floorTransform = ConfigUtils::GetValueFromMap<float>("FloorTranslation", ConfigMap);
-  TileScale = ConfigUtils::GetValueFromMap<float>("TileScale", ConfigMap);
-  EnemyScale = ConfigUtils::GetValueFromMap<float>("EnemyScale", ConfigMap);
+  floorTransform = ConfigUtils::GetValueFromMap<float>("FloorTranslation", ConfigUtils::GlobalConfigMap);
+  TileScale = ConfigUtils::GetValueFromMap<float>("TileScale", ConfigUtils::GlobalConfigMap);
+  EnemyScale = ConfigUtils::GetValueFromMap<float>("EnemyScale", ConfigUtils::GlobalConfigMap);
 
-  cameraZOffset = ConfigUtils::GetValueFromMap<float>("cameraZOffset", ConfigMap);
-  cameraYOffset = ConfigUtils::GetValueFromMap<float>("cameraYOffset", ConfigMap);
-  cameraAngle = ConfigUtils::GetValueFromMap<float>("cameraAngle", ConfigMap);
+  cameraZOffset = ConfigUtils::GetValueFromMap<float>("cameraZOffset", ConfigUtils::GlobalConfigMap);
+  cameraYOffset = ConfigUtils::GetValueFromMap<float>("cameraYOffset", ConfigUtils::GlobalConfigMap);
+  cameraAngle = ConfigUtils::GetValueFromMap<float>("cameraAngle", ConfigUtils::GlobalConfigMap);
 
-  camera.Pitch = ConfigUtils::GetValueFromMap<float>("cameraPitch", ConfigMap);
-  camera.Yaw = ConfigUtils::GetValueFromMap<float>("cameraYaw", ConfigMap);
+  camera.Pitch = ConfigUtils::GetValueFromMap<float>("cameraPitch", ConfigUtils::GlobalConfigMap);
+  camera.Yaw = ConfigUtils::GetValueFromMap<float>("cameraYaw", ConfigUtils::GlobalConfigMap);
 
-  camera2.Pitch = ConfigUtils::GetValueFromMap<float>("cameraPitch", ConfigMap);
-  camera2.Yaw = ConfigUtils::GetValueFromMap<float>("cameraYaw", ConfigMap);
+  camera2.Pitch = ConfigUtils::GetValueFromMap<float>("cameraPitch", ConfigUtils::GlobalConfigMap);
+  camera2.Yaw = ConfigUtils::GetValueFromMap<float>("cameraYaw", ConfigUtils::GlobalConfigMap);
 
-  TrapScale = ConfigUtils::GetValueFromMap<float>("TrapScale", ConfigMap);
+  TrapScale = ConfigUtils::GetValueFromMap<float>("TrapScale", ConfigUtils::GlobalConfigMap);
 
   TileScaleTimes100 = TileScale * 100;
   EnemyScaleInverse = 1 / EnemyScale;
 
-  PlayerScale = ConfigUtils::GetValueFromMap<float>("PlayerScale", ConfigMap);
+  PlayerScale = ConfigUtils::GetValueFromMap<float>("PlayerScale", ConfigUtils::GlobalConfigMap);
   PlayerScaleInverse = 1 / PlayerScale;
 
   movementSpeedTimesPlayerScale = movementSpeed * PlayerScale;
@@ -62,7 +62,6 @@ Game::Game(Window &aOkno) : okienko(aOkno),
                             MapSize(0),
 							enemyController(nullptr)
 {
-  LoadConfig();
   InitializeConfig();
 
   glfwSetWindowSize(okienko.window, WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -128,7 +127,7 @@ void Game::Granko()
 
 
   std::string PlayerModelPath = "Models/Player/player_animations.fbx";
-  std::string AnimatedEnemyPAth = "Models/" + ConfigUtils::GetValueFromMap<std::string>("Enemy_Animated_Model", ConfigMap);
+  std::string AnimatedEnemyPAth = "Models/" + ConfigUtils::GetValueFromMap<std::string>("Enemy_Animated_Model",  ConfigUtils::GlobalConfigMap);
 
   playerModel = new AnimatedModel(PlayerModelPath, *shaderAnimatedModel, false);
   enemyModel = new AnimatedModel(AnimatedEnemyPAth, *shaderAnimatedModel, false);
@@ -167,8 +166,8 @@ void Game::Granko()
 
   Enemy_Node_For_Model.AddGameObject(enemyGameObject);
 
-  float floorTransform = ConfigUtils::GetValueFromMap<float>("FloorTranslation", ConfigMap);
-  float TileScale = ConfigUtils::GetValueFromMap<float>("TileScale", ConfigMap);
+  float floorTransform = ConfigUtils::GetValueFromMap<float>("FloorTranslation", ConfigUtils::GlobalConfigMap);
+  float TileScale = ConfigUtils::GetValueFromMap<float>("TileScale", ConfigUtils::GlobalConfigMap);
 
   leftPlayerNode.Scale(PlayerScale);
   rightPlayerNode.Scale(PlayerScale);
@@ -705,22 +704,6 @@ GameObject *Game::findByTagSingle(const std::vector<SceneNode *> &data, std::str
     }
   }
   return nullptr;
-}
-
-void Game::LoadConfig()
-{
-  tinyxml2::XMLDocument doc;
-  doc.LoadFile("Configuration/CaleTe.xml");
-
-  tinyxml2::XMLElement *pRoot = doc.FirstChildElement();
-
-  if (pRoot != nullptr)
-  {
-    for (tinyxml2::XMLElement *e = pRoot->FirstChildElement(); e != nullptr; e = e->NextSiblingElement())
-    {
-      ConfigUtils::GetVariantValueAndInsertToMap(e, ConfigMap);
-    }
-  }
 }
 
 void Game::SetViewAndPerspective(Camera &aCamera)

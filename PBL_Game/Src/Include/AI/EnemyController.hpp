@@ -63,7 +63,7 @@ public:
     float GetPlayerDistance();
     void Update(float interpolation);
     void SwtichStartWithEnd();
-	void EnemyController::MoveNodeToMapTile(SceneNode *sceneNode, GridLocation mapTile, float interpolation, float speed, float NodeXOffset, float NodeZOffset);
+	void MoveNodeToMapTile(SceneNode *sceneNode, GridLocation mapTile, float interpolation, float speed, float NodeXOffset, float NodeZOffset);
 
 	float EnemyPlayerDistance;
 	float InterestMeter = 0;

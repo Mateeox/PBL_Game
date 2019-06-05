@@ -2,6 +2,22 @@
 
 namespace ConfigUtils
 {
+std::unordered_map<std::string, VariantType> GlobalConfigMap;
+  void LoadConfig()
+{
+  tinyxml2::XMLDocument doc;
+  doc.LoadFile("Configuration/CaleTe.xml");
+
+  tinyxml2::XMLElement *pRoot = doc.FirstChildElement();
+
+  if (pRoot != nullptr)
+  {
+    for (tinyxml2::XMLElement *e = pRoot->FirstChildElement(); e != nullptr; e = e->NextSiblingElement())
+    {
+      GetVariantValueAndInsertToMap(e, GlobalConfigMap);
+    }
+  }
+}
 
 void GetVariantValueAndInsertToMap(tinyxml2::XMLElement *xmlelemnt,std::unordered_map<std::string,VariantType> & aConfigMap)
 {
