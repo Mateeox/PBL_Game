@@ -14,7 +14,7 @@
 #include "Player.hpp"
 #include "AI/EnemyController.hpp"
 
-const int TICKS_PER_SECOND = 32;
+const int TICKS_PER_SECOND = 64;
 const int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
 const int MAX_FRAMESKIP = 5;
 
@@ -133,6 +133,7 @@ class Game
 //ModelPtrs
 AnimatedModel *enemyModel = nullptr;
 AnimatedModel *playerModel = nullptr;
+AnimatedModel *player2Model = nullptr;
 	
 	//Player handling
 	Player* playerObj;
@@ -171,8 +172,11 @@ public:
   void ImguiStartEndDraw();
   void ImguiDrawData();
   void ImguiClear();
-  void SetupPlayersColiders();
 
+  //Player
+  void SetupPlayersColiders();
+  void SetPlayerRotation(SceneNode & sceneNode,glm::vec3 Direction_vec, AnimatedModel * playerModel);
+  void FixAnimation();
 private:
   void SerializeFaza1(std::map<SceneNode *,unsigned long long> &map);
   void SerializeFaza2(std::map<SceneNode *,unsigned long long> &map, std::vector<SceneNode> &temp);
@@ -180,8 +184,7 @@ private:
   void SerializeZapisz(std::string serialized);
   void DeserializeOrderPointers(std::map<unsigned long long, SceneNode *> &map);
 
-  void MoveNodeToMapTile(SceneNode * sceneNode,GridLocation mapTile,float interpolation,float speed,float NodeXOffset,
-  float NodeZOffset);
+
 
   void SetViewAndPerspective(Camera &aCamera);
   void Plot();
