@@ -1,4 +1,5 @@
 #include "MapGenerator/MapElement.hpp"
+#include "Collider.hpp"
 
 MapElement::MapElement(std::vector<SceneNode*>&aNodes):nodes(aNodes) {
 	this->Position = glm::vec2();
@@ -74,7 +75,10 @@ SceneNode* MapElement::CreateWall(SceneNode* parent, Model* model, float directi
 {
 	SceneNode* wall = new SceneNode();
 	GameObject* wallObj = new GameObject(wall->local);
+	Collider * collider = new Collider(wall->local);
+	collider->setDimensions(Position.x + direction_x * wall_offset,0,Position.y + direction_y * wall_offset,1,1,1);
 	wallObj->AddComponent(model);
+	wallObj->AddComponent(collider);
 	wall->AddGameObject(wallObj);
 	wall->Translate(Position.x + direction_x * wall_offset, 0, Position.y + direction_y * wall_offset);
 	wall->Rotate(direction_y == 0 ? 90.0f : 0, glm::vec3(0, 1, 0));
@@ -93,6 +97,7 @@ SceneNode* MapElement::CreateDoor(SceneNode* parent, Model* model, Model* key, i
 		door->Rotate(direction_y == 0 ? -90.0f : 0, glm::vec3(0, 1, 0));
 		door->Scale(0.0254f, 0.0254f, 0.01f);
 		door->AddParent(parent);
+		
 		door_index++;
 		return door;
 	}

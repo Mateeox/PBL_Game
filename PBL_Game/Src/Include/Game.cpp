@@ -186,7 +186,6 @@ void Game::Granko()
 
   Enemy_Node.AddChild(&Enemy_Node_For_Model);
   sNodes.push_back(&Enemy_Node);
-;
 
   enemyController = new EnemyController(Enemy_Node,
 										leftPlayerNode , 
@@ -241,7 +240,7 @@ void Game::Granko()
 
   sNodes.push_back(&leftPlayerNode);
   rightNodes.push_back(&rightPlayerNode);
-  gatherCollidableObjects(sNodes);
+  gatherCollidableObjects(leftScene.children);
   gatherTriggers(sNodes);
   while (glfwGetKey(okienko.window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
          glfwWindowShouldClose(okienko.window) == 0)
