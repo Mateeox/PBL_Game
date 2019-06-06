@@ -7,6 +7,12 @@
 #include <cstring>
 
 
+#ifdef WIN32    
+#else
+#include <sys/time.h>
+#endif 
+
+
 #include <glm/gtc/type_ptr.hpp>
 
 #define SAFE_DELETE(p) \
