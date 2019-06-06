@@ -291,7 +291,7 @@ void MapGenerator::PickDoors()
 	int doorsCount = CountDoors();
 	if (Doors > doorsCount)
 		Doors = doorsCount;
-	else if (doorsCount < 0)
+	else if (doorsCount < 0 || doorsCount == NULL)
 		return;
 	do
 	{
