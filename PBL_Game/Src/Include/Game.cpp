@@ -73,6 +73,19 @@ Game::Game(Window &aOkno) : okienko(aOkno),
   shaderAnimatedModel = new Shader("Shaders/skinning.vs", "Shaders/skinning.fs");
   shaderViewCone = new Shader("Shaders/viewCone.vs", "Shaders/viewCone.fs");
 
+  shaderProgram_For_Model->use();
+  shaderProgram_For_Model->setVec3("material.ambient", 0.1,0.1,0.1);
+  shaderProgram_For_Model->setVec3("material.diffuse", 0.9,0.9,0.9);
+  shaderProgram_For_Model->setVec3("material.specular", 0.1,0.1,0.1);
+  shaderProgram_For_Model->setFloat("material.shininess", 32.0f);
+
+  shaderProgram_For_Model->setVec3("pointLight.ambient", 1, 1, 1);
+  shaderProgram_For_Model->setVec3("pointLight.diffuse", 1, 1, 1);
+  shaderProgram_For_Model->setVec3("pointLight.specular", 1, 1, 1);
+  shaderProgram_For_Model->setFloat("pointLight.constant", 1.0f);
+  shaderProgram_For_Model->setFloat("pointLight.linear", 0.09);
+  shaderProgram_For_Model->setFloat("pointLight.quadratic", 0.032);
+
   glfwSetCursorPosCallback(okienko.window, mouse_callback);
 }
 
@@ -565,6 +578,11 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos)
 
 void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation)
 {
+	shaderProgram_For_Model->use();
+	auto lightPos = player.local.getPosition()*player.local.getScale();
+	lightPos.y = 0.5;
+	shaderProgram_For_Model->setVec3("pointLight.position", lightPos);
+
   Transform transformBeforeMove(player.gameObject->transform);
 
   glm::vec3 movementDir(0);
@@ -713,6 +731,7 @@ void Game::SetViewAndPerspective(Camera &aCamera)
   shaderProgram_For_Model->setMat4("view", view);
   shaderProgram_For_Model->setFloat("FogDensity", FogDensity);
   shaderProgram_For_Model->setFloat("viewSpaceZOffset", cameraZOffset);
+  shaderProgram_For_Model->setVec3("viewPos", aCamera.Position);
 
   shaderViewCone->use();
   shaderViewCone->setMat4("projection", projection);
