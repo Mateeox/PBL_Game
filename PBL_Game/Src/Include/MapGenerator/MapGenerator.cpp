@@ -136,6 +136,8 @@ void MapGenerator::FinishGeneration()
 		mapRoot->AddChild(maps[i]->GenerateNode(leftnodes, mapRoot, floor, wall, door, key, chest, door_index));
 	}
 	leftnodes.push_back(mapRoot);
+
+
 	SceneNode *mapRoot2 = new SceneNode();
 	for (int i = 0; i < maps.size(); i++)
 	{

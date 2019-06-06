@@ -214,7 +214,7 @@ void Game::Granko()
                             MapSize);
   }
 
-  for (auto &node : generator.leftnodes)
+  for (auto node : generator.leftnodes)
   {
     if (node != NULL)
       leftScene.AddChild(node);
@@ -241,6 +241,7 @@ void Game::Granko()
   sNodes.push_back(&leftPlayerNode);
   rightNodes.push_back(&rightPlayerNode);
   gatherCollidableObjects(leftScene.children);
+  std::cout<<collidableObjects.size()<<"\n";
   gatherTriggers(sNodes);
   while (glfwGetKey(okienko.window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
          glfwWindowShouldClose(okienko.window) == 0)
@@ -630,6 +631,7 @@ void Game::gatherCollidableObjects(std::vector<SceneNode *> &nodes)
   {
     if (node->gameObject != nullptr)
     {
+     // std::cout<<node->gameObject->getTag()<<"\n";
 
       if (node->gameObject->getTag() != "player" && node->gameObject->getTag() != "enemy")
       {
@@ -638,10 +640,13 @@ void Game::gatherCollidableObjects(std::vector<SceneNode *> &nodes)
         {
           collidableObjects.push_back((Collider *)possibleCollider);
         }
-        gatherCollidableObjects(node->children);
+        
       }
+    
     }
+      gatherCollidableObjects(node->children);
   }
+
 }
 void Game::gatherTriggers(std::vector<SceneNode *> &nodes)
 {
