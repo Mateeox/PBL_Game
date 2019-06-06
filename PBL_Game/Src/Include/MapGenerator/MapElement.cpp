@@ -1,4 +1,5 @@
 #include "MapGenerator/MapElement.hpp"
+#include "Collider.hpp"
 
 MapElement::MapElement(std::vector<SceneNode*>&aNodes):nodes(aNodes) {
 	this->Position = glm::vec2();
@@ -53,6 +54,7 @@ SceneNode* MapElement::GenerateNode(std::vector<SceneNode*>& aNodes, SceneNode* 
 		element->AddChild(chestNode);
 		nodes.push_back(element);
 	}
+
 	return element;
 }
 
@@ -74,14 +76,24 @@ SceneNode* MapElement::CreateWall(SceneNode* parent, Model* model, float directi
 {
 	SceneNode* wall = new SceneNode();
 	GameObject* wallObj = new GameObject(wall->local);
-	wallObj->AddComponent(model);
+	wallObj->setTag("Wall");
+
 	wall->AddGameObject(wallObj);
-	wall->Translate(Position.x + direction_x * wall_offset, 0, Position.y + direction_y * wall_offset);
+	if(direction_y == 0)
+	wall->Translate(Position.x + direction_x * wall_offset , 0, Position.y + direction_y * wall_offset + 0.05f);
+	else
+	wall->Translate(Position.x + direction_x * wall_offset -0.05f, 0, Position.y + direction_y * wall_offset);
+	
 	wall->Rotate(direction_y == 0 ? 90.0f : 0, glm::vec3(0, 1, 0));
-	wall->Scale(0.02545f, 0.0254f, 0.01f);
+	wall->Scale(0.0255f, 0.0255f, 0.01f);
+
+	Collider * collider = new Collider(wall->local);
+	collider->setDimensions(0,0,0,parent->local.getScale().x *1/0.02545f, parent->local.getScale().y * 1/0.0254f, parent->local.getScale().z * 0.01f);
+	wallObj->AddComponent(model);
+	//wallObj->AddComponent(collider);
 	
 	wall->AddParent(parent);
-	return wall;
+	return std::move(wall);
 }
 
 SceneNode* MapElement::CreateDoor(SceneNode* parent, Model* model, Model* key, int& door_index, float direction_x, float direction_y)
@@ -93,6 +105,7 @@ SceneNode* MapElement::CreateDoor(SceneNode* parent, Model* model, Model* key, i
 		door->Rotate(direction_y == 0 ? -90.0f : 0, glm::vec3(0, 1, 0));
 		door->Scale(0.0254f, 0.0254f, 0.01f);
 		door->AddParent(parent);
+		
 		door_index++;
 		return door;
 	}
