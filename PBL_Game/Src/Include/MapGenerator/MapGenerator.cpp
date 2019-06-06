@@ -136,6 +136,8 @@ void MapGenerator::FinishGeneration()
 		mapRoot->AddChild(maps[i]->GenerateNode(leftnodes, mapRoot, floor, wall, door, key, chest, door_index));
 	}
 	leftnodes.push_back(mapRoot);
+
+
 	SceneNode *mapRoot2 = new SceneNode();
 	for (int i = 0; i < maps.size(); i++)
 	{
@@ -291,7 +293,7 @@ void MapGenerator::PickDoors()
 	int doorsCount = CountDoors();
 	if (Doors > doorsCount)
 		Doors = doorsCount;
-	else if (doorsCount < 0)
+	else if (doorsCount < 0 || doorsCount == NULL)
 		return;
 	do
 	{
