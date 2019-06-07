@@ -77,14 +77,23 @@ Game::Game(Window &aOkno) : okienko(aOkno),
   shaderProgram_For_Model->setVec3("material.ambient", 0.1,0.1,0.1);
   shaderProgram_For_Model->setVec3("material.diffuse", 0.9,0.9,0.9);
   shaderProgram_For_Model->setVec3("material.specular", 0.1,0.1,0.1);
-  shaderProgram_For_Model->setFloat("material.shininess", 32.0f);
+  shaderProgram_For_Model->setFloat("material.shininess", 2.0f);
 
-  shaderProgram_For_Model->setVec3("pointLight.ambient", 1, 1, 1);
-  shaderProgram_For_Model->setVec3("pointLight.diffuse", 1, 1, 1);
-  shaderProgram_For_Model->setVec3("pointLight.specular", 1, 1, 1);
-  shaderProgram_For_Model->setFloat("pointLight.constant", 1.0f);
-  shaderProgram_For_Model->setFloat("pointLight.linear", 0.09);
-  shaderProgram_For_Model->setFloat("pointLight.quadratic", 0.032);
+  //player
+  shaderProgram_For_Model->setVec3("pointLights[0].ambient", 1, 1, 1);
+  shaderProgram_For_Model->setVec3("pointLights[0].diffuse", 1, 1, 1);
+  shaderProgram_For_Model->setVec3("pointLights[0].specular", 1, 1, 1);
+  shaderProgram_For_Model->setFloat("pointLights[0].constant", 1.0f);
+  shaderProgram_For_Model->setFloat("pointLights[0].linear", 0.35);
+  shaderProgram_For_Model->setFloat("pointLights[0].quadratic", 0.44);
+
+  //enemy
+  shaderProgram_For_Model->setVec3("pointLights[1].ambient", 1, 1, 1);
+  shaderProgram_For_Model->setVec3("pointLights[1].diffuse", 1, 1, 1);
+  shaderProgram_For_Model->setVec3("pointLights[1].specular", 1, 1, 1);
+  shaderProgram_For_Model->setFloat("pointLights[1].constant", 1.0f);
+  shaderProgram_For_Model->setFloat("pointLights[1].linear", 0.14);
+  shaderProgram_For_Model->setFloat("pointLights[1].quadratic", 0.1);
 
   glfwSetCursorPosCallback(okienko.window, mouse_callback);
 }
@@ -321,7 +330,7 @@ void Game::Render()
 
   Transform originTransform = Transform::origin();
 
-  SetViewAndPerspective(camera);
+  SetViewAndPerspective(camera, leftPlayerNode.local, &Enemy_Node.local);
   // RENDER LEWEJ STRONY
   glViewport(0, 0, (Game::WINDOW_WIDTH / 2) + 125, Game::WINDOW_HEIGHT);
   glScissor(0, 0, (Game::WINDOW_WIDTH / 2) + offset, Game::WINDOW_HEIGHT);
@@ -330,7 +339,7 @@ void Game::Render()
   leftScene.Render(originTransform, true);
   Enemy_Node.Render(originTransform, true);
 
-  SetViewAndPerspective(camera2);
+  SetViewAndPerspective(camera2, rightPlayerNode.local, nullptr);
 
   // RENDER PRAWEJ STRONY
   glViewport((Game::WINDOW_WIDTH / 2) - 125, 0, (Game::WINDOW_WIDTH / 2) + 125, Game::WINDOW_HEIGHT);
@@ -578,11 +587,6 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos)
 
 void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation)
 {
-	shaderProgram_For_Model->use();
-	auto lightPos = player.local.getPosition()*player.local.getScale();
-	lightPos.y = 0.5;
-	shaderProgram_For_Model->setVec3("pointLight.position", lightPos);
-
   Transform transformBeforeMove(player.gameObject->transform);
 
   glm::vec3 movementDir(0);
@@ -721,7 +725,7 @@ GameObject *Game::findByTagSingle(const std::vector<SceneNode *> &data, std::str
   return nullptr;
 }
 
-void Game::SetViewAndPerspective(Camera &aCamera)
+void Game::SetViewAndPerspective(Camera &aCamera, Transform &player, Transform *enemy)
 {
   projection = glm::perspective(aCamera.Zoom, (float)Game::WINDOW_WIDTH / (float)Game::WINDOW_HEIGHT, 0.1f, 100.0f);
   view = aCamera.GetViewMatrix();
@@ -736,6 +740,21 @@ void Game::SetViewAndPerspective(Camera &aCamera)
   shaderProgram_For_Model->setFloat("FogDensity", FogDensity);
   shaderProgram_For_Model->setFloat("viewSpaceZOffset", cameraZOffset);
   shaderProgram_For_Model->setVec3("viewPos", aCamera.Position);
+  auto lightPos = player.getPosition()*player.getScale();
+  lightPos.y = 0.5;
+  shaderProgram_For_Model->setVec3("pointLights[0].position", lightPos);
+  glm::vec3 enemyLightPos;
+  if (enemy != nullptr)
+  {
+	  enemyLightPos = enemy->getPosition()*enemy->getScale();
+	  enemyLightPos.y = 0.5;
+  }
+  else
+  {
+	  //we don't want this light to be visible
+	  enemyLightPos.y = -1;
+  }
+  shaderProgram_For_Model->setVec3("pointLights[1].position", enemyLightPos);
 
   shaderViewCone->use();
   shaderViewCone->setMat4("projection", projection);
