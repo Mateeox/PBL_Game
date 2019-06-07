@@ -186,7 +186,7 @@ private:
 
 
 
-  void SetViewAndPerspective(Camera &aCamera);
+  void SetViewAndPerspective(Camera &aCamera, Transform &player, Transform *enemy);
   void Plot();
   void DisplayImage(const char * path, const char * text);
   void DisplayAnimationInfo(AnimatedModel * model);
