@@ -6,7 +6,6 @@ namespace ComponentSystem
 {
 enum ComponentType
 {
-
 	Error,
 	Renderer,
 	Collider,
