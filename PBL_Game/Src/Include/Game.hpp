@@ -5,7 +5,6 @@
 #include "Collider.hpp"
 #include "Trigger.hpp"
 #include "Key.hpp"
-#include "Door.hpp"
 #include "EnemyTrigger.hpp"
 #include "Configuration/ConfigUtils.hpp"
 #include "Component/ConeRenderer.hpp"

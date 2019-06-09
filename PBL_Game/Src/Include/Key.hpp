@@ -2,16 +2,15 @@
 #include "Component/Component.hpp"
 #include "Transform.hpp"
 #include "Trigger.hpp"
-#include "Door.hpp"
+#include "SceneNode.hpp"
 
 //using namespace ComponentSystem;
 class GameObject;
 
 class Key : public Trigger {
-
-	Door* door;
-
+private:
+	SceneNode* door;
 public:
-	Key(Transform& transform, Door* door);
+	Key(Transform& transform, SceneNode* door);
 	virtual void ActivateTrigger();
 };

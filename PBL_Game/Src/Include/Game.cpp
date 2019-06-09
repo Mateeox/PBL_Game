@@ -5,6 +5,7 @@
 #include "Shapes.hpp"
 #include "PathFinding/PathFindingUtils.hpp"
 #include "KeyDoorFactory.hpp"
+#include "EnemyKills.hpp"
 #include <random>
 #include <chrono> 
 
@@ -100,7 +101,7 @@ Game::Game(Window &aOkno) : okienko(aOkno),
 
 void Game::Granko()
 {
-  MapGenerator generator(shaderProgram_For_Model, MapScale, 10, 4, false);
+  MapGenerator generator(shaderProgram_For_Model, MapScale, 10, 4, false, &sNodes);
 
   std::vector<MapKey *> mapped = generator.GetConverted();
 
@@ -169,19 +170,16 @@ void Game::Granko()
   leftPlayerObj->AddComponent(playerModel);
   rightPlayerObj->AddComponent(player2Model);
   enemyGameObject->AddComponent(enemyModel);
-
+  
 
   Collider *leftPlayerCollider = new Collider(leftPlayerObjWithCollider->transform);
   Collider *rightPlayerCollider = new Collider(rightPlayerObjWithCollider->transform);
 
-  EnemyTrigger *enemyTrigger = new EnemyTrigger(enemyGameObject->transform, &leftPlayerNode);
+  EnemyKills* killer = new EnemyKills(Enemy_Node.local, &leftPlayerNode);
+  enemyGameObject->AddComponent(killer);
 
-  enemyTrigger->setDimensions(0, 0, 0, 1, 1, 1);
-  enemyGameObject->AddComponent(enemyTrigger);
-
-
-  leftPlayerCollider->setDimensions(-0.12, 0, 0.25, 2.3, 2, 3.05);
-  rightPlayerCollider->setDimensions(-0.12, 0, 0.25, 2.3, 2, 3.05);
+  leftPlayerCollider->setDimensions(-0.12, 0, 0.25, 2.3/15, 2, 3.05/15);
+  rightPlayerCollider->setDimensions(-0.12, 0, 0.25, 2.3/15, 2, 3.05/15);
 
   leftPlayerObjWithCollider->AddComponent(leftPlayerCollider);
   rightPlayerObjWithCollider->AddComponent(rightPlayerCollider);
@@ -267,12 +265,9 @@ void Game::Granko()
   sNodes.push_back(&leftPlayerNode);
   rightNodes.push_back(&rightPlayerNode);
   gatherCollidableObjects(leftScene.children);
-  std::cout<<collidableObjects.size()<<"\n";
+  std::cout<<"Colliders gathered: " << collidableObjects.size() << std::endl;
   gatherTriggers(sNodes);
-  std::vector<SceneNode *> enemyNode;
-  SceneNode *enemyNodePtr = &Enemy_Node_For_Model;
-  enemyNode.push_back(enemyNodePtr);
-  gatherTriggers(enemyNode);
+  std::cout << "Triggers gathered: " << triggers.size() << std::endl;
   while (glfwGetKey(okienko.window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
          glfwWindowShouldClose(okienko.window) == 0)
   {
@@ -668,7 +663,7 @@ void Game::gatherCollidableObjects(std::vector<SceneNode *> &nodes)
     {
      // std::cout<<node->gameObject->getTag()<<"\n";
 
-      if (node->gameObject->getTag() != "player" && node->gameObject->getTag() != "enemy")
+      if (node->gameObject->getTag() != "player" && node->gameObject->getTag() != "enemy" && node->gameObject->getTag() != "floor")
       {
         ComponentSystem::Component *possibleCollider = node->gameObject->GetComponent(ComponentSystem::ComponentType::Collider);
         if (possibleCollider != nullptr)
@@ -687,22 +682,18 @@ void Game::gatherTriggers(std::vector<SceneNode *> &nodes)
 {
   for (auto node : nodes)
   {
-	  int i = 0;
-
     if (node->gameObject != nullptr)
     {
-		if (node->gameObject->getTag() == "enemy")
+		if (node->gameObject->getTag() != "player")// && node->gameObject->getTag() != "enemy")
 		{
-			std::cout << "Sprawdzanie Enemy" << std::endl;
+			ComponentSystem::Component *possibleTrigger = node->gameObject->GetComponent(ComponentSystem::ComponentType::Trigger);
+			if (possibleTrigger != nullptr)
+			{
+				triggers.push_back((Trigger *)possibleTrigger);
+			}
 		}
-        ComponentSystem::Component *possibleTrigger = node->gameObject->GetComponent(ComponentSystem::ComponentType::Trigger);
-        if (possibleTrigger != nullptr)
-        {
-			std::cout << "Gather Trigger: " << ++i << std::endl;
-          triggers.push_back((Trigger *)possibleTrigger);
-        }
-        gatherTriggers(node->children);
     }
+	gatherTriggers(node->children);
   }
 }
 
