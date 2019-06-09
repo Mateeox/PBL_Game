@@ -104,8 +104,8 @@ SceneNode* MapElement::CreateWall(SceneNode* parent, Model* model, float directi
 SceneNode* MapElement::CreateDoor(SceneNode* parent, Model* model, Model* key, int& door_index, float direction_x, float direction_y)
 {
 	if (!mirror) {
-		keydoor = KeyDoorFactory::Create(door_index, model, key, this->sNodes);
-		SceneNode* door = keydoor.first;
+		keydoor = KeyDoorFactory::Create(door_index, key, model, this->sNodes);
+		SceneNode* door = keydoor.second;
 		door->Translate(Position.x + direction_x * wall_offset, 0, Position.y + direction_y * wall_offset);
 		door->Rotate(direction_y == 0 ? -90.0f : 0, glm::vec3(0, 1, 0));
 		door->Scale(0.0254f, 0.0254f, 0.01f);
@@ -116,10 +116,10 @@ SceneNode* MapElement::CreateDoor(SceneNode* parent, Model* model, Model* key, i
 	}
 	else
 	{
-		SceneNode* key = keydoor.second;
-		key->Scale(0.15f, 0.15f, 0.15f);
+		keydoor = KeyDoorFactory::Create(door_index, key, model, this->sNodes);
+		SceneNode* key = keydoor.first;
 		key->Translate(Position.x + direction_x, 0, Position.y + direction_y);
-		
+		key->Scale(0.15f, 0.15f, 0.15f);
 		key->AddParent(parent);
 		return key;
 	}
