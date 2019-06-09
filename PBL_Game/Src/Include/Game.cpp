@@ -882,7 +882,8 @@ void Game::DisplayImage(const char *path, const char *text, Texture *imageTex)
   imageNode->Rotate(camera.Pitch, glm::vec3(1, 0, 0));
   imageNode->Scale(12.8f / 30.0f, 7.2f / 30.0f, 1);
 
-  imageNode->Render(Transform::origin(), true);
+  Transform origin = Transform::origin();
+  imageNode->Render(origin, true);
   
   //delete imageTex;
   delete imageNode;
