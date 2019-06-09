@@ -88,9 +88,13 @@ SceneNode* MapElement::CreateWall(SceneNode* parent, Model* model, float directi
 	wall->Scale(0.0255f, 0.0255f, 0.01f);
 
 	Collider * collider = new Collider(wall->local);
-	collider->setDimensions(0,0,0,parent->local.getScale().x *1/0.02545f, parent->local.getScale().y * 1/0.0254f, parent->local.getScale().z * 0.01f);
+	if (direction_y != 0)
+	collider->setDimensions(0,0,10 * parent->local.getScale().x,parent->local.getScale().x *1/0.02545f, 0 * 1/0.0254f, parent->local.getScale().z * 0.01f);
+	else
+	collider->setDimensions(-5 * parent->local.getScale().z, 0, 0, parent->local.getScale().z * 0.01f, 0, parent->local.getScale().x * 1 / 0.02545f);
+
 	wallObj->AddComponent(model);
-	//wallObj->AddComponent(collider);
+	wallObj->AddComponent(collider);
 	
 	wall->AddParent(parent);
 	return std::move(wall);

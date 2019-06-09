@@ -180,8 +180,8 @@ void Game::Granko()
   enemyGameObject->AddComponent(enemyTrigger);
 
 
-  leftPlayerCollider->setDimensions(-0.12, 0, 0.25, 2.3, 2, 3.05);
-  rightPlayerCollider->setDimensions(-0.12, 0, 0.25, 2.3, 2, 3.05);
+  leftPlayerCollider->setDimensions(-0.12, 0, 0.25, 2.3/15, 2, 3.05/15);
+  rightPlayerCollider->setDimensions(-0.12, 0, 0.25, 2.3/15, 2, 3.05/15);
 
   leftPlayerObjWithCollider->AddComponent(leftPlayerCollider);
   rightPlayerObjWithCollider->AddComponent(rightPlayerCollider);
