@@ -267,6 +267,10 @@ void Game::Granko()
   gatherCollidableObjects(leftScene.children);
   std::cout<<collidableObjects.size()<<"\n";
   gatherTriggers(sNodes);
+  std::vector<SceneNode *> enemyNode;
+  SceneNode *enemyNodePtr = &Enemy_Node_For_Model;
+  enemyNode.push_back(enemyNodePtr);
+  gatherTriggers(enemyNode);
   while (glfwGetKey(okienko.window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
          glfwWindowShouldClose(okienko.window) == 0)
   {
@@ -292,9 +296,14 @@ void Game::Granko()
   glDeleteProgram(shaderProgram->shaderProgramID);
   glfwTerminate();
 }
-
+void Game::CheckPlayerDeath()
+{
+	std::cout << "Monster position * scale: " << Enemy_Node.local.getPosition().x * Enemy_Node.local.getScale().x << ", " << Enemy_Node.local.getPosition().z * Enemy_Node.local.getScale().z << std::endl;
+}
 void Game::Update(float interpolation)
 {
+	CheckPlayerDeath();
+
   if (!inputBlockade)
   {
  
@@ -676,17 +685,19 @@ void Game::gatherTriggers(std::vector<SceneNode *> &nodes)
 {
   for (auto node : nodes)
   {
+	  int i = 0;
+
     if (node->gameObject != nullptr)
     {
-
-      if (node->gameObject->getTag() != "player")// && node->gameObject->getTag() != "enemy")
-      {
-        ComponentSystem::Component *possibleTrigger = node->gameObject->GetComponent(ComponentSystem::ComponentType::Trigger);
-        if (possibleTrigger != nullptr)
-        {
-          triggers.push_back((Trigger *)possibleTrigger);
-        }
-      }
+		if (node->gameObject->getTag() != "player")// && node->gameObject->getTag() != "enemy")
+		{
+			ComponentSystem::Component *possibleTrigger = node->gameObject->GetComponent(ComponentSystem::ComponentType::Trigger);
+			if (possibleTrigger != nullptr)
+			{
+				std::cout << "Gather Trigger: " << ++i << std::endl;
+				triggers.push_back((Trigger *)possibleTrigger);
+			}
+		}
     }
 	gatherTriggers(node->children);
   }
@@ -835,9 +846,9 @@ void Game::DisplayImage(const char *path, const char *text)
   imageObj->AddComponent(image);
   imageNode.AddGameObject(imageObj);
 
-  imageNode.Translate(0.0f, 2.4f, 4.0f);
+  imageNode.Translate(camera.Position.x, camera.Position.y - 0.184f, camera.Position.z - 0.1f);
   imageNode.Rotate(camera.Pitch, glm::vec3(1, 0, 0));
-  imageNode.Scale(12.8f / 2.0f, 7.2f / 2.0f, 1);
+  imageNode.Scale(12.8f / 30.0f, 7.2f / 30.0f, 1);
 
   Transform originTransform = Transform::origin();
   imageNode.Render(originTransform, true);

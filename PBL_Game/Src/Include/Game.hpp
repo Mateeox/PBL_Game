@@ -6,6 +6,7 @@
 #include "Trigger.hpp"
 #include "Key.hpp"
 #include "Door.hpp"
+#include "EnemyTrigger.hpp"
 #include "Configuration/ConfigUtils.hpp"
 #include "Component/ConeRenderer.hpp"
 #include "PathFinding/MapTile.hpp"
@@ -157,6 +158,7 @@ public:
   void ProcessInput(float interpolation, Camera &camera_update);
 
   void Granko();
+  void CheckPlayerDeath();
   void Update(float interpolation);
   void Render();
   void Serialize();
