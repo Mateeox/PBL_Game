@@ -829,12 +829,7 @@ void Game::Plot()
 		}
 		if (tex != nullptr)
 		{
-			std::cout << "Nie jest nullptr" << std::endl;
 			DisplayImage(path.c_str(), "Napis", tex);
-		}
-		else
-		{
-			std::cout << "JEST NULLPTR" << std::endl;
 		}
 	}
 
