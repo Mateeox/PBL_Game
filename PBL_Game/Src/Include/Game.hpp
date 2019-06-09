@@ -157,6 +157,7 @@ public:
   void ProcessInput(float interpolation, Camera &camera_update);
 
   void Granko();
+  void CheckPlayerDeath();
   void Update(float interpolation);
   void Render();
   void Serialize();
