@@ -118,8 +118,8 @@ SceneNode* MapElement::CreateDoor(SceneNode* parent, Model* model, Model* key, i
 	{
 		keydoor = KeyDoorFactory::Create(door_index, key, model, this->sNodes);
 		SceneNode* key = keydoor.first;
-		key->Translate(Position.x + direction_x, 0, Position.y + direction_y);
-		key->Scale(0.15f, 0.15f, 0.15f);
+		key->Translate(Position.x + direction_x * wall_offset, 0.1, Position.y + direction_y * wall_offset);
+		key->Scale(0.025f, 0.025f, 0.025f);
 		key->AddParent(parent);
 		return key;
 	}
