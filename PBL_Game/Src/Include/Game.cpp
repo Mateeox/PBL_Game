@@ -5,6 +5,7 @@
 #include "Shapes.hpp"
 #include "PathFinding/PathFindingUtils.hpp"
 #include "KeyDoorFactory.hpp"
+#include "EnemyKills.hpp"
 #include <random>
 #include <chrono> 
 
@@ -169,12 +170,13 @@ void Game::Granko()
   leftPlayerObj->AddComponent(playerModel);
   rightPlayerObj->AddComponent(player2Model);
   enemyGameObject->AddComponent(enemyModel);
-
+  
 
   Collider *leftPlayerCollider = new Collider(leftPlayerObjWithCollider->transform);
   Collider *rightPlayerCollider = new Collider(rightPlayerObjWithCollider->transform);
 
-
+  EnemyKills* killer = new EnemyKills(Enemy_Node.local, &leftPlayerNode);
+  enemyGameObject->AddComponent(killer);
 
   leftPlayerCollider->setDimensions(-0.12, 0, 0.25, 2.3, 2, 3.05);
   rightPlayerCollider->setDimensions(-0.12, 0, 0.25, 2.3, 2, 3.05);
@@ -677,16 +679,16 @@ void Game::gatherTriggers(std::vector<SceneNode *> &nodes)
     if (node->gameObject != nullptr)
     {
 
-      if (node->gameObject->getTag() != "player" && node->gameObject->getTag() != "enemy")
+      if (node->gameObject->getTag() != "player")// && node->gameObject->getTag() != "enemy")
       {
         ComponentSystem::Component *possibleTrigger = node->gameObject->GetComponent(ComponentSystem::ComponentType::Trigger);
         if (possibleTrigger != nullptr)
         {
           triggers.push_back((Trigger *)possibleTrigger);
         }
-        gatherTriggers(node->children);
       }
     }
+	gatherTriggers(node->children);
   }
 }
 

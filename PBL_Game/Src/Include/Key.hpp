@@ -9,9 +9,9 @@ class GameObject;
 
 class Key : public Trigger {
 
-	Door* door;
+	SceneNode* door;
 
 public:
-	Key(Transform& transform, Door* door);
+	Key(Transform& transform, SceneNode* door);
 	virtual void ActivateTrigger();
 };

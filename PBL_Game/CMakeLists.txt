@@ -57,7 +57,7 @@ add_executable(PBL_Game
 		Src/Include/Collider.cpp
 		Src/Include/Trigger.cpp
 		Src/Include/Key.cpp
-		Src/Include/Door.cpp
+		Src/Include/EnemyKills.cpp
 		#ConfigUtils
 		Src/Include/Configuration/ConfigUtils.cpp
 		#PathFinding
