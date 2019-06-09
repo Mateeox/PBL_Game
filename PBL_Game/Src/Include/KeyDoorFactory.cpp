@@ -26,3 +26,16 @@ std::pair<SceneNode *, SceneNode *> KeyDoorFactory::Create(int aNumber, Componen
 	sNodes->push_back(KeyNode);
     return std::pair<SceneNode *, SceneNode *>(KeyNode, DoorNode);
 }
+SceneNode * KeyDoorFactory::CreateNode(int aNumber,std::string tag, ComponentSystem::Component * model)
+{
+
+    SceneNode *node = new SceneNode();
+    GameObject *gameObj = new GameObject(node->local);
+	node->gameObject = std::move(gameObj);
+
+    gameObj->setTag(tag + std::to_string(aNumber));
+    gameObj->AddComponent(model);
+
+    std::move(node);
+
+}
