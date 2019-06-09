@@ -13,10 +13,10 @@ std::pair<SceneNode *, SceneNode *> KeyDoorFactory::Create(int aNumber, Componen
     GameObject *DoorGamObj = new GameObject(DoorNode->local);
 	DoorNode->gameObject = std::move(DoorGamObj);
 
-    KeyGamObj->setTag("Key" + aNumber);
+    KeyGamObj->setTag("Key" + std::to_string(aNumber));
     KeyGamObj->AddComponent(aKeyModel);
 
-    DoorGamObj->setTag("Door" + aNumber);
+    DoorGamObj->setTag("Door" + std::to_string(aNumber));
     DoorGamObj->AddComponent(aDoorModel);
 
     //Create triggers (they are connected)

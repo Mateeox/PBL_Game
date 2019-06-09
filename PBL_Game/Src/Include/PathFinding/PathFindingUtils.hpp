@@ -338,8 +338,8 @@ void a_star_search(Graph graph,
                    std::unordered_map<Location, Location> &came_from,
                    std::unordered_map<Location, double> &cost_so_far)
 {
-came_from.clear();
-cost_so_far.clear();
+  came_from.clear();
+  cost_so_far.clear();
 
   PriorityQueue<Location, double> frontier;
   frontier.put(start, 0);
@@ -373,6 +373,11 @@ cost_so_far.clear();
   }
 }
 
-glm::vec2 GetPositionOfset(SceneNode& node,int maxMapSize,float X_offSet,float Z_offset,float mapScale);
+GridLocation GetPositionOfset(SceneNode& node,int maxMapSize,float X_offSet,float Z_offset);
 
 glm::vec2 FindFirstEmptyFloor(std::vector<MapKey*>& map);
+
+glm::vec2 FindFirstFromLeftUpCorner(std::vector<MapKey*>& map,int size);
+glm::vec2 FindFirstFromLeftDownCorner(std::vector<MapKey*>& map,int size);
+glm::vec2 FindFirstFromRightUpCorner(std::vector<MapKey*>& map,int size);
+glm::vec2 FindFirstFromRightDownCorner(std::vector<MapKey*>& map,int size);

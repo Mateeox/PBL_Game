@@ -5,6 +5,8 @@
 #include "Shapes.hpp"
 #include "PathFinding/PathFindingUtils.hpp"
 #include "KeyDoorFactory.hpp"
+#include <random>
+#include <chrono> 
 
 #include <fstream>
 #include <iterator>
@@ -14,42 +16,42 @@ static bool swapButtonPressed = false;
 
 void Game::InitializeConfig()
 {
-  MapScale = ConfigUtils::GetValueFromMap<unsigned>("MapScale", ConfigMap);
-  WINDOW_WIDTH = ConfigUtils::GetValueFromMap<unsigned>("WINDOW_WIDTH", ConfigMap);
-  WINDOW_HEIGHT = ConfigUtils::GetValueFromMap<unsigned>("WINDOW_HEIGHT", ConfigMap);
-  movementSpeed = ConfigUtils::GetValueFromMap<float>("PlayerSpeed", ConfigMap);
-  debugPathFinding = ConfigUtils::GetValueFromMap<int>("debugPathFinding", ConfigMap);
+   using namespace ConfigUtils;
+  MapScale = GetValueFromMap<unsigned>("MapScale", GlobalConfigMap);
+  WINDOW_WIDTH = GetValueFromMap<unsigned>("WINDOW_WIDTH", GlobalConfigMap);
+  WINDOW_HEIGHT = GetValueFromMap<unsigned>("WINDOW_HEIGHT", GlobalConfigMap);
+  movementSpeed = GetValueFromMap<float>("PlayerSpeed", GlobalConfigMap);
+  debugPathFinding = GetValueFromMap<int>("debugPathFinding", GlobalConfigMap);
 
-  EnemyBaseSpeed = ConfigUtils::GetValueFromMap<float>("EnemyBaseSpeed", ConfigMap);
-  EnemyXoffset = ConfigUtils::GetValueFromMap<float>("EnemyXoffset", ConfigMap);
-  EnemyYoffset = ConfigUtils::GetValueFromMap<float>("EnemyYoffset", ConfigMap);
-  EnemyZoffset = ConfigUtils::GetValueFromMap<float>("EnemyZoffset", ConfigMap);
+  EnemyBaseSpeed = GetValueFromMap<float>("EnemyBaseSpeed", GlobalConfigMap);
+  EnemyXoffset = GetValueFromMap<float>("EnemyXoffset", GlobalConfigMap);
+  EnemyYoffset = GetValueFromMap<float>("EnemyYoffset", GlobalConfigMap);
+  EnemyZoffset = GetValueFromMap<float>("EnemyZoffset", GlobalConfigMap);
 
-  PlayerXOffset = ConfigUtils::GetValueFromMap<float>("PlayerXOffset", ConfigMap);
-  PlayerYOffset = ConfigUtils::GetValueFromMap<float>("PlayerYOffset", ConfigMap);
-  PlayerZOffset = ConfigUtils::GetValueFromMap<float>("PlayerZOffset", ConfigMap);
+  PlayerXOffset = GetValueFromMap<float>("PlayerXOffset", GlobalConfigMap);
+  PlayerYOffset = GetValueFromMap<float>("PlayerYOffset", GlobalConfigMap);
+  PlayerZOffset = GetValueFromMap<float>("PlayerZOffset", GlobalConfigMap);
 
-  floorTransform = ConfigUtils::GetValueFromMap<float>("FloorTranslation", ConfigMap);
-  TileScale = ConfigUtils::GetValueFromMap<float>("TileScale", ConfigMap);
-  EnemyScale = ConfigUtils::GetValueFromMap<float>("EnemyScale", ConfigMap);
+  floorTransform = GetValueFromMap<float>("FloorTranslation", GlobalConfigMap);
+  TileScale = GetValueFromMap<float>("TileScale", GlobalConfigMap);
+  EnemyScale = GetValueFromMap<float>("EnemyScale", GlobalConfigMap);
 
-  cameraZOffset = ConfigUtils::GetValueFromMap<float>("cameraZOffset", ConfigMap);
-  cameraYOffset = ConfigUtils::GetValueFromMap<float>("cameraYOffset", ConfigMap);
-  cameraAngle = ConfigUtils::GetValueFromMap<float>("cameraAngle", ConfigMap);
+  cameraZOffset = GetValueFromMap<float>("cameraZOffset", GlobalConfigMap);
+  cameraYOffset = GetValueFromMap<float>("cameraYOffset", GlobalConfigMap);
+  cameraAngle = GetValueFromMap<float>("cameraAngle", GlobalConfigMap);
 
+  camera.Pitch = GetValueFromMap<float>("cameraPitch", GlobalConfigMap);
+  camera.Yaw = GetValueFromMap<float>("cameraYaw", GlobalConfigMap);
 
-  camera.Pitch = ConfigUtils::GetValueFromMap<float>("cameraPitch", ConfigMap);
-  camera.Yaw = ConfigUtils::GetValueFromMap<float>("cameraYaw", ConfigMap);
+  camera2.Pitch = GetValueFromMap<float>("cameraPitch", GlobalConfigMap);
+  camera2.Yaw = GetValueFromMap<float>("cameraYaw", GlobalConfigMap);
 
-  camera2.Pitch = ConfigUtils::GetValueFromMap<float>("cameraPitch", ConfigMap);
-  camera2.Yaw = ConfigUtils::GetValueFromMap<float>("cameraYaw", ConfigMap);
-
-  TrapScale = ConfigUtils::GetValueFromMap<float>("TrapScale", ConfigMap);
+  TrapScale = GetValueFromMap<float>("TrapScale", GlobalConfigMap);
 
   TileScaleTimes100 = TileScale * 100;
   EnemyScaleInverse = 1 / EnemyScale;
 
-  PlayerScale = ConfigUtils::GetValueFromMap<float>("PlayerScale", ConfigMap);
+  PlayerScale = GetValueFromMap<float>("PlayerScale", GlobalConfigMap);
   PlayerScaleInverse = 1 / PlayerScale;
 
   movementSpeedTimesPlayerScale = movementSpeed * PlayerScale;
@@ -58,9 +60,9 @@ void Game::InitializeConfig()
 Game::Game(Window &aOkno) : okienko(aOkno),
                             camera(Camera()),
                             camera2(Camera()),
-                            MapSize(0)
+                            MapSize(0),
+							enemyController(nullptr)
 {
-  LoadConfig();
   InitializeConfig();
 
   glfwSetWindowSize(okienko.window, WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -71,17 +73,59 @@ Game::Game(Window &aOkno) : okienko(aOkno),
   shaderAnimatedModel = new Shader("Shaders/skinning.vs", "Shaders/skinning.fs");
   shaderViewCone = new Shader("Shaders/viewCone.vs", "Shaders/viewCone.fs");
 
+  shaderProgram_For_Model->use();
+  shaderProgram_For_Model->setVec3("material.ambient", 0.1,0.1,0.1);
+  shaderProgram_For_Model->setVec3("material.diffuse", 0.9,0.9,0.9);
+  shaderProgram_For_Model->setVec3("material.specular", 0.1,0.1,0.1);
+  shaderProgram_For_Model->setFloat("material.shininess", 2.0f);
+
+  //player
+  shaderProgram_For_Model->setVec3("pointLights[0].ambient", 1, 1, 1);
+  shaderProgram_For_Model->setVec3("pointLights[0].diffuse", 1, 1, 1);
+  shaderProgram_For_Model->setVec3("pointLights[0].specular", 1, 1, 1);
+  shaderProgram_For_Model->setFloat("pointLights[0].constant", 1.0f);
+  shaderProgram_For_Model->setFloat("pointLights[0].linear", 0.35);
+  shaderProgram_For_Model->setFloat("pointLights[0].quadratic", 0.44);
+
+  //enemy
+  shaderProgram_For_Model->setVec3("pointLights[1].ambient", 1, 1, 1);
+  shaderProgram_For_Model->setVec3("pointLights[1].diffuse", 1, 1, 1);
+  shaderProgram_For_Model->setVec3("pointLights[1].specular", 1, 1, 1);
+  shaderProgram_For_Model->setFloat("pointLights[1].constant", 1.0f);
+  shaderProgram_For_Model->setFloat("pointLights[1].linear", 0.14);
+  shaderProgram_For_Model->setFloat("pointLights[1].quadratic", 0.1);
+
   glfwSetCursorPosCallback(okienko.window, mouse_callback);
 }
 
 void Game::Granko()
 {
-  MapGenerator generator(shaderProgram_For_Model, MapScale, 3, 4, false);
+  MapGenerator generator(shaderProgram_For_Model, MapScale, 10, 4, false);
 
   std::vector<MapKey *> mapped = generator.GetConverted();
 
   MapSize = generator.maxSize;
   grid = make_diagramFromGeneratedMap(mapped, MapSize);
+
+  glm::vec2 leftDown = FindFirstFromLeftDownCorner(mapped, MapSize);
+  glm::vec2 rightDown = FindFirstFromRightDownCorner(mapped, MapSize);
+  glm::vec2 leftUp = FindFirstFromLeftUpCorner(mapped, MapSize);
+  glm::vec2 rightUp = FindFirstFromRightUpCorner(mapped, MapSize);
+
+  std::cout << " leftDown "
+            << "x: " << leftDown.x << " y: " << leftDown.y << "\n";
+  std::cout << " rightDown "
+            << "x: " << rightDown.x << " y: " << rightDown.y << "\n";
+  std::cout << " leftUp "
+            << "x: " << leftUp.x << " y: " << leftUp.y << "\n";
+  std::cout << " rightUp"
+            << "x: " << rightUp.x << " y: " << rightUp.y << "\n";
+
+  Corners = { leftDown,rightDown,leftUp,rightUp };
+  srand(time(0));
+  unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+  shuffle(Corners.begin(), Corners.end(), std::default_random_engine(seed));
+
 
   Texture *BlockedTileTexture = new Texture("Textures/BlockedTile.png", GL_LINEAR);
   Texture *FreeTileTexture = new Texture("Textures/FreeTile.png", GL_LINEAR);
@@ -93,33 +137,24 @@ void Game::Granko()
   SlowerTileTexture->Load();
   PathTileTexture->Load();
 
-  SceneNode box2;
-  SceneNode box3;
-  SceneNode doorNode;
-  SceneNode keyNode;
 
   GameObject *enemyGameObject = new GameObject(Enemy_Node_For_Model.local);
 
   GameObject *leftPlayerObj = new GameObject(leftPlayerNodeForModel.local);
   GameObject *rightPlayerObj = new GameObject(rightPlayerNodeForModel.local);
- 
 
   GameObject *leftPlayerObjWithCollider = new GameObject(leftPlayerNode.local);
   GameObject *rightPlayerObjWithCollider = new GameObject(rightPlayerNode.local);
   leftPlayerObjWithCollider->setTag("player");
   rightPlayerObjWithCollider->setTag("player");
 
-  GameObject *hexObj2 = new GameObject(box2.local);
-  GameObject *hexObj3 = new GameObject(box3.local);
 
-  GameObject *doorObj = new GameObject(doorNode.local);
-  GameObject *keyObj = new GameObject(keyNode.local);
+  std::string PlayerModelPath = "Models/Player/player_animations.fbx";
+  std::string AnimatedEnemyPAth = "Models/" + ConfigUtils::GetValueFromMap<std::string>("Enemy_Animated_Model",  ConfigUtils::GlobalConfigMap);
 
-  std::string PlayerModelPath = "Models/Player/Player_Static.obj";
-  std::string AnimatedEnemyPAth = "Models/" + ConfigUtils::GetValueFromMap<std::string>("Enemy_Animated_Model", ConfigMap);
-
-  Model *PlayerModel = new Model(PlayerModelPath, *shaderProgram_For_Model, false);
-  animatedModel = new AnimatedModel(AnimatedEnemyPAth, *shaderAnimatedModel, false);
+  playerModel = new AnimatedModel(PlayerModelPath, *shaderAnimatedModel, false);
+  player2Model = new AnimatedModel(*playerModel);
+  enemyModel = new AnimatedModel(AnimatedEnemyPAth, *shaderAnimatedModel, false);
 
   ShapeRenderer3D *TileRenderer = new ShapeRenderer3D(Shapes::RainBow_Square,
                                                       Shapes::RB_Square_indices,
@@ -128,79 +163,39 @@ void Game::Granko()
                                                       *shaderProgram,
                                                       FreeTileTexture, "Basic");
 
-  ShapeRenderer3D *szescian = new ShapeRenderer3D(Shapes::RainBow_Cube,
-                                                  Shapes::RB_Cube_indices,
-                                                  sizeof(Shapes::RainBow_Cube),
-                                                  sizeof(Shapes::RB_Cube_indices),
-                                                  *shaderProgram,
-                                                  BlockedTileTexture, "Basic");
   ConeRenderer *coneRendererLeft = new ConeRenderer(*shaderViewCone, &leftScene);
 
   leftPlayerObj->AddComponent(coneRendererLeft);
-  leftPlayerObj->AddComponent(PlayerModel);
-  rightPlayerObj->AddComponent(PlayerModel);
-  enemyGameObject->AddComponent(animatedModel);
+  leftPlayerObj->AddComponent(playerModel);
+  rightPlayerObj->AddComponent(player2Model);
+  enemyGameObject->AddComponent(enemyModel);
 
-  hexObj2->AddComponent(szescian);
-  hexObj3->AddComponent(szescian);
-
-  doorObj->AddComponent(szescian);
-  keyObj->AddComponent(szescian);
 
   Collider *leftPlayerCollider = new Collider(leftPlayerObjWithCollider->transform);
   Collider *rightPlayerCollider = new Collider(rightPlayerObjWithCollider->transform);
 
-  // Triggery
-  Door *sampleDoor = new Door(doorObj->transform, &doorNode);
-  Key *sampleKey = new Key(keyObj->transform, sampleDoor);
   EnemyTrigger *enemyTrigger = new EnemyTrigger(enemyGameObject->transform, &leftPlayerNode);
 
-  sampleDoor->setDimensions(0, 0, 0, 0.5, 1, 1);
-  sampleKey->setDimensions(0, 0, 0, 0.3, 0.3, 0.3);
   enemyTrigger->setDimensions(0, 0, 0, 1, 1, 1);
-  doorObj->AddComponent(sampleDoor);
-  keyObj->AddComponent(sampleKey);
   enemyGameObject->AddComponent(enemyTrigger);
-  doorNode.AddGameObject(doorObj);
-  keyNode.AddGameObject(keyObj);
 
-  doorNode.Scale(0.5, 1, 1);
-  doorNode.Translate(-30, 0, 0);
-
-  keyNode.Scale(0.3, 0.3, 0.3);
-  keyNode.Translate(-80, 0, 0);
-
-  // Koniec triggerow
 
   leftPlayerCollider->setDimensions(-0.12, 0, 0.25, 2.3, 2, 3.05);
   rightPlayerCollider->setDimensions(-0.12, 0, 0.25, 2.3, 2, 3.05);
 
-  
   leftPlayerObjWithCollider->AddComponent(leftPlayerCollider);
   rightPlayerObjWithCollider->AddComponent(rightPlayerCollider);
-  
+
   leftPlayerNode.AddGameObject(leftPlayerObjWithCollider);
   rightPlayerNode.AddGameObject(rightPlayerObjWithCollider);
 
   leftPlayerNodeForModel.AddGameObject(leftPlayerObj);
   rightPlayerNodeForModel.AddGameObject(rightPlayerObj);
 
-
-  Collider *box2Collider = new Collider(hexObj2->transform);
-  box2Collider->setDimensions(0, 0, 0, 2, 2, 2);
-  hexObj2->AddComponent(box2Collider);
-  Collider *box3Collider = new Collider(hexObj3->transform);
-  box3Collider->setDimensions(0, 0, 0, 2, 2, 2);
-  hexObj3->AddComponent(box3Collider);
-
   Enemy_Node_For_Model.AddGameObject(enemyGameObject);
-  box2.AddGameObject(hexObj2);
-  box3.AddGameObject(hexObj3);
 
-  float floorTransform = ConfigUtils::GetValueFromMap<float>("FloorTranslation", ConfigMap);
-  float TileScale = ConfigUtils::GetValueFromMap<float>("TileScale", ConfigMap);
-
-  //  FloorNode_new.Translate(0, floorTransform, 0);
+  float floorTransform = ConfigUtils::GetValueFromMap<float>("FloorTranslation", ConfigUtils::GlobalConfigMap);
+  float TileScale = ConfigUtils::GetValueFromMap<float>("TileScale", ConfigUtils::GlobalConfigMap);
 
   leftPlayerNode.Scale(PlayerScale);
   rightPlayerNode.Scale(PlayerScale);
@@ -210,8 +205,7 @@ void Game::Granko()
   leftPlayerNode.Translate(0, PlayerYOffset, 0);
   rightPlayerNode.Translate(0, PlayerYOffset, 0);
   playerObj = new Player(&leftPlayerNode, 3, *shaderProgram, &leftScene);
-  box2.Translate(5, 0, 0);
-  box3.Translate(-5, 0, 0);
+
 
   leftPlayerNode.AddChild(&leftPlayerNodeForModel);
   rightPlayerNode.AddChild(&rightPlayerNodeForModel);
@@ -219,19 +213,18 @@ void Game::Granko()
   Enemy_Node.AddChild(&Enemy_Node_For_Model);
   sNodes.push_back(&Enemy_Node);
 
-  //sNodes.push_back(&FloorNode_new);
-  sNodes.push_back(&box2);
-  sNodes.push_back(&box3);
+  enemyController = new EnemyController(Enemy_Node,
+										leftPlayerNode , 
+										GridLocation{ static_cast<int>(Corners[0].x),static_cast<int>(Corners[0].y)}, //enemy start location
+										GridLocation{ static_cast<int>(Corners[1].x),static_cast<int>(Corners[1].y) }, //enemy firstTarget
+										grid,
+										mapTiles,
+									    MapSize); //reference for the map
 
-  sNodes.push_back(&doorNode);
-  sNodes.push_back(&keyNode);
 
-  glm::vec2 startLocation = FindFirstEmptyFloor(mapped);
-  start.x = startLocation.x;
-  start.y = startLocation.y;
-
-  Enemy_Node.Translate(start.x * EnemyScaleInverse, EnemyYoffset * 100, start.y * EnemyScaleInverse);
-  leftPlayerNode.Translate(start.x * PlayerScaleInverse, 0, start.y * PlayerScaleInverse);
+  Enemy_Node.Translate(Corners[0].x * EnemyScaleInverse, EnemyYoffset * 100, Corners[0].y * EnemyScaleInverse);
+  leftPlayerNode.Translate(Corners[3].x* PlayerScaleInverse, 0, Corners[3].y * PlayerScaleInverse);
+  rightPlayerNode.Translate(Corners[3].x* PlayerScaleInverse, 0, Corners[3].y * PlayerScaleInverse);
 
   if (debugPathFinding)
   {
@@ -247,7 +240,7 @@ void Game::Granko()
                             MapSize);
   }
 
-  for (auto &node : generator.leftnodes)
+  for (auto node : generator.leftnodes)
   {
     if (node != NULL)
       leftScene.AddChild(node);
@@ -273,7 +266,8 @@ void Game::Granko()
 
   sNodes.push_back(&leftPlayerNode);
   rightNodes.push_back(&rightPlayerNode);
-  gatherCollidableObjects(sNodes);
+  gatherCollidableObjects(leftScene.children);
+  std::cout<<collidableObjects.size()<<"\n";
   gatherTriggers(sNodes);
   std::vector<SceneNode *> enemyNode;
   SceneNode *enemyNodePtr = &Enemy_Node_For_Model;
@@ -299,9 +293,6 @@ void Game::Granko()
     Render();
   }
 
-  delete hexObj2;
-  delete hexObj3;
-  delete szescian;
 
   ImguiClear();
   glDeleteProgram(shaderProgram->shaderProgramID);
@@ -317,40 +308,28 @@ void Game::Update(float interpolation)
 
   if (!inputBlockade)
   {
-    if (leftSideActive)
-    {
-      ProcessInput(interpolation, camera);
-    }
-    else
-    {
-      ProcessInput(interpolation, camera2);
-    }
-
-    glm::vec2 start_poz = GetPositionOfset(Enemy_Node, MapSize, EnemyXoffset, EnemyZoffset, EnemyScaleInverse);
-    start.x = start_poz.x;
-    start.y = start_poz.y;
-
-    glm::vec2 end_poz = GetPositionOfset(leftPlayerNode, MapSize, PlayerXOffset, PlayerZOffset, PlayerScaleInverse);
-    goal.x = end_poz.x;
-    goal.y = end_poz.y;
-
-    ResetMapTilePath(mapTiles, grid, MapSize, &path);
-
-    if (path.size() > 1)
-      MoveNodeToMapTile(&Enemy_Node, path[1], interpolation, EnemyBaseSpeed, EnemyXoffset, EnemyZoffset); // TODO Add BaseSpeed
-
-    if (grid.passable(goal))
-    {
-      a_star_search(grid, start, goal, came_from, cost_so_far);
-      path = reconstruct_path(start, goal, came_from);
-    }
-
+ 
+	enemyController->Update(interpolation);
 
     if (leftSideActive)
       UpdatePlayer(leftPlayerNode, camera, interpolation);
     else
       UpdatePlayer(rightPlayerNode, camera2, interpolation);
   }
+
+  enemyModel->Update();
+  playerModel->Update();
+  player2Model->Update();
+
+  if (leftSideActive)
+  {
+	  ProcessInput(interpolation, camera);
+  }
+  else
+  {
+	  ProcessInput(interpolation, camera2);
+  }
+
 }
 
 void Game::Render()
@@ -364,7 +343,7 @@ void Game::Render()
 
   Transform originTransform = Transform::origin();
 
-  SetViewAndPerspective(camera);
+  SetViewAndPerspective(camera, leftPlayerNode.local, &Enemy_Node.local);
   // RENDER LEWEJ STRONY
   glViewport(0, 0, (Game::WINDOW_WIDTH / 2) + 125, Game::WINDOW_HEIGHT);
   glScissor(0, 0, (Game::WINDOW_WIDTH / 2) + offset, Game::WINDOW_HEIGHT);
@@ -373,7 +352,7 @@ void Game::Render()
   leftScene.Render(originTransform, true);
   Enemy_Node.Render(originTransform, true);
 
-  SetViewAndPerspective(camera2);
+  SetViewAndPerspective(camera2, rightPlayerNode.local, nullptr);
 
   // RENDER PRAWEJ STRONY
   glViewport((Game::WINDOW_WIDTH / 2) - 125, 0, (Game::WINDOW_WIDTH / 2) + 125, Game::WINDOW_HEIGHT);
@@ -547,6 +526,7 @@ void Game::ProcessInput(float interpolation, Camera &camera_update)
   ProcessMouse();
   if (glfwGetKey(okienko.window, GLFW_KEY_Q) == GLFW_PRESS && swapButtonPressed == false)
   {
+	  
     offset *= -1;
     leftSideActive = !leftSideActive;
     swapButtonPressed = true;
@@ -579,6 +559,8 @@ void Game::ProcessInput(float interpolation, Camera &camera_update)
   {
     Tab_Pressed = false;
   }
+
+  FixAnimation();
 }
 void Game::ProcessMouse()
 {
@@ -619,8 +601,9 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos)
 void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation)
 {
   Transform transformBeforeMove(player.gameObject->transform);
-  
+
   glm::vec3 movementDir(0);
+
 
   if (glfwGetKey(okienko.window, GLFW_KEY_W) == GLFW_PRESS)
     movementDir.z = -1;
@@ -631,18 +614,15 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation)
   if (glfwGetKey(okienko.window, GLFW_KEY_D) == GLFW_PRESS)
     movementDir.x = 1;
 
-    if (movementDir.z == -1 && movementDir.x == 0)
-      player.children[0]->local.SetRotation(0, 180, 0);
-    else if (movementDir.z == 1 && movementDir.x == 0 )
-       player.children[0]->local.SetRotation(0, 0, 0);
-    else if (movementDir.x == -1 && movementDir.y == 0 )
-       player.children[0]->local.SetRotation(0, 270, 0);
-    else if (movementDir.x == 1 && movementDir.y == 0 )
-      player.children[0]->local.SetRotation(0, 90, 0);
 
-   
-   //player.local.Translate(glm::vec3(0, -1.0f * player.local.getPosition().y * PlayerScale, 0));
-
+  if (leftSideActive)
+  {
+	  SetPlayerRotation(player, movementDir,playerModel);
+  }
+  else
+  {
+	  SetPlayerRotation(player, movementDir, player2Model);
+  }
   glm::vec3 move = movementDir * movementSpeedTimesPlayerScale * interpolation;
   player.Translate(move.x, move.y, move.z);
   Collider *playerCollider = (Collider *)player.gameObject->GetComponent(ComponentSystem::ComponentType::Collider);
@@ -686,6 +666,7 @@ void Game::gatherCollidableObjects(std::vector<SceneNode *> &nodes)
   {
     if (node->gameObject != nullptr)
     {
+     // std::cout<<node->gameObject->getTag()<<"\n";
 
       if (node->gameObject->getTag() != "player" && node->gameObject->getTag() != "enemy")
       {
@@ -694,10 +675,13 @@ void Game::gatherCollidableObjects(std::vector<SceneNode *> &nodes)
         {
           collidableObjects.push_back((Collider *)possibleCollider);
         }
-        gatherCollidableObjects(node->children);
+        
       }
+    
     }
+      gatherCollidableObjects(node->children);
   }
+
 }
 void Game::gatherTriggers(std::vector<SceneNode *> &nodes)
 {
@@ -757,23 +741,7 @@ GameObject *Game::findByTagSingle(const std::vector<SceneNode *> &data, std::str
   return nullptr;
 }
 
-void Game::LoadConfig()
-{
-  tinyxml2::XMLDocument doc;
-  doc.LoadFile("Configuration/CaleTe.xml");
-
-  tinyxml2::XMLElement *pRoot = doc.FirstChildElement();
-
-  if (pRoot != nullptr)
-  {
-    for (tinyxml2::XMLElement *e = pRoot->FirstChildElement(); e != nullptr; e = e->NextSiblingElement())
-    {
-      ConfigUtils::GetVariantValueAndInsertToMap(e, ConfigMap);
-    }
-  }
-}
-
-void Game::SetViewAndPerspective(Camera &aCamera)
+void Game::SetViewAndPerspective(Camera &aCamera, Transform &player, Transform *enemy)
 {
   projection = glm::perspective(aCamera.Zoom, (float)Game::WINDOW_WIDTH / (float)Game::WINDOW_HEIGHT, 0.1f, 100.0f);
   view = aCamera.GetViewMatrix();
@@ -787,8 +755,22 @@ void Game::SetViewAndPerspective(Camera &aCamera)
   shaderProgram_For_Model->setMat4("view", view);
   shaderProgram_For_Model->setFloat("FogDensity", FogDensity);
   shaderProgram_For_Model->setFloat("viewSpaceZOffset", cameraZOffset);
-
-  
+  shaderProgram_For_Model->setVec3("viewPos", aCamera.Position);
+  auto lightPos = player.getPosition()*player.getScale();
+  lightPos.y = 0.5;
+  shaderProgram_For_Model->setVec3("pointLights[0].position", lightPos);
+  glm::vec3 enemyLightPos;
+  if (enemy != nullptr)
+  {
+	  enemyLightPos = enemy->getPosition()*enemy->getScale();
+	  enemyLightPos.y = 0.5;
+  }
+  else
+  {
+	  //we don't want this light to be visible
+	  enemyLightPos.y = -1;
+  }
+  shaderProgram_For_Model->setVec3("pointLights[1].position", enemyLightPos);
 
   shaderViewCone->use();
   shaderViewCone->setMat4("projection", projection);
@@ -797,7 +779,7 @@ void Game::SetViewAndPerspective(Camera &aCamera)
   shaderAnimatedModel->use();
   shaderAnimatedModel->setMat4("projection", projection);
   shaderAnimatedModel->setMat4("view", view);
-  shaderAnimatedModel->setFloat("FogDensity", FogDensity);
+  //shaderAnimatedModel->setFloat("FogDensity", FogDensity);
   shaderAnimatedModel->setFloat("viewSpaceZOffset", cameraZOffset);
 }
 
@@ -875,59 +857,7 @@ void Game::DisplayImage(const char *path, const char *text)
   imageNode.Render(originTransform, true);
 }
 
-void Game::MoveNodeToMapTile(SceneNode *sceneNode, GridLocation mapTile, float interpolation, float speed, float NodeXOffset, float NodeZOffset)
-{
-  glm::vec2 positionA{sceneNode->local.getPosition().x, sceneNode->local.getPosition().z};
-  glm::vec2 positionB{NodeXOffset + mapTile.x * EnemyScaleInverse, NodeZOffset + mapTile.y * EnemyScaleInverse};
 
-  glm::vec2 diffVec = positionB - positionA;
-
-  glm::vec3 diffVec3D = {diffVec.x, sceneNode->local.getPosition().y, diffVec.y};
-
-  double veclenght = sqrt(diffVec.x * diffVec.x + diffVec.y * diffVec.y);
-  float angle = atan(diffVec3D.y, diffVec3D.x) * 180.0f / 3.14f;
-
-  if (veclenght != 0)
-  {
-    diffVec.x = diffVec.x / veclenght;
-    diffVec.y = diffVec.y / veclenght;
-  }
-  else
-  {
-    diffVec = glm::vec2(0, 0);
-  }
-
-  vector2DHelper = glm::vec2(positionB.x, positionB.y);
-  vector2DHelper2 = glm::vec2(positionA.x, positionA.y);
-
-  float value = interpolation * speed;
-  diffVec *= value;
-
-  SceneNode *roationChild = sceneNode->children[0];
-  sceneNode->Translate(diffVec.x, 0, diffVec.y);
-  if (abs(diffVec.y) > abs(diffVec.x))
-  {
-    if (diffVec.y < 0)
-    {
-      roationChild->local.SetRotation(0, 180, 0);
-    }
-    else
-    {
-      roationChild->local.SetRotation(0, 0, 0);
-    }
-  }
-  else
-  {
-    if (diffVec.x < 0)
-    {
-      roationChild->local.SetRotation(0, 270, 0);
-    }
-    else
-    {
-      roationChild->local.SetRotation(0, 90, 0);
-    }
-  }
-}
 
 void Game::ImguiDrawData()
 {
@@ -952,56 +882,43 @@ void Game::ImGuiFunctions()
     ImGui::Text("Q - zmiana strony");
     ImGui::Text("Strzalki - ruch postaci");
 
-    if (path.size() > 1)
-      ImGui::Text("Next MapTile ID = %i, %i", path[1].x, path[1].y);
+
     ImGui::Text("Vector to move = %f, %f", vector2DHelper.x, vector2DHelper.y);
-    ImGui::Text("Enemy position = %f, %f", Enemy_Node.local.getPosition().x, Enemy_Node.local.getPosition().z);
-    ImGui::Text("Player position = %f, %f", leftPlayerNode.local.getPosition().x, leftPlayerNode.local.getPosition().z);
+    ImGui::Text("Enemy position = %f, %f", Enemy_Node.local.getPosition().x*EnemyScale, Enemy_Node.local.getPosition().z*EnemyScale);
+    ImGui::Text("Player position = %f, %f", leftPlayerNode.local.getPosition().x*PlayerScale, leftPlayerNode.local.getPosition().z*PlayerScale);
     ImGui::SliderFloat("CameraZOffset", &cameraZOffset, 0, 5);
     ImGui::SliderFloat("CameraYOffset", &cameraYOffset, 0, 5);
     ImGui::SliderFloat("FogDensity", &FogDensity, 0, 1);
-	ImGui::SliderFloat("CameraYaw", &camera.Yaw, -180, 180);
-	ImGui::SliderFloat("CameraPitch", &camera.Pitch, -180, 180);
+	ImGui::SliderFloat("EnemyInterestMeter", &enemyController->InterestMeter,0,2000 );
+	ImGui::SliderFloat("EnemyPlayerDistance", &enemyController->EnemyPlayerDistance, 0, 5000);
+    ImGui::SliderFloat("CameraYaw", &camera.Yaw, -180, 180);
+    ImGui::SliderFloat("CameraPitch", &camera.Pitch, -180, 180);
 
-	camera.updateCameraVectors();
-	camera2.updateCameraVectors();
+    camera.updateCameraVectors();
+    camera2.updateCameraVectors();
 
-    if (ImGui::Button("Printf Path"))
-    {
-      draw_grid(grid, 3, nullptr, nullptr, &path);
-    }
+ 
     if (ImGui::Button("List Model AnimationNames"))
     {
-      if (animatedModel != nullptr)
-        DisplayAnimationInfo(animatedModel);
+		if (enemyModel != nullptr && playerModel != nullptr )
+		{
+			DisplayAnimationInfo(enemyModel);
+			DisplayAnimationInfo(playerModel);
+		}
     }
 
     if (ImGui::Button("Swtich Enemy Animation"))
     {
-      if (animatedModel != nullptr)
+      if (enemyModel != nullptr)
       {
-        if (animatedModel->GetAnimationNR() == 1)
+        if (enemyModel->GetAnimationNR() == 1)
         {
-          animatedModel->SelectAnimation(0);
+          enemyModel->SelectAnimation(0);
         }
         else
         {
-          animatedModel->SelectAnimation(1);
+          enemyModel->SelectAnimation(1);
         }
-      }
-    }
-    if (ImGui::Button("Update Path and use A_Star_Search"))
-    {
-      if (grid.passable(goal))
-      {
-        a_star_search(grid, start, goal, came_from, cost_so_far);
-        path = reconstruct_path(start, goal, came_from);
-      }
-      else
-      {
-        std::cout << "Target not passable"
-                  << "\n";
-        //TODO find closest pasable
       }
     }
 
@@ -1018,6 +935,48 @@ void Game::ImguiClear()
 void Game::DisplayAnimationInfo(AnimatedModel *model)
 {
   model->ListAnimationNames();
+}
+
+void Game::SetPlayerRotation(SceneNode & aPlayer, glm::vec3 movementDir,AnimatedModel * aPlayerModel)
+{
+
+	if (movementDir.x == 1 || movementDir.z == 1 || movementDir.x == -1 || movementDir.z == -1)
+	{
+		aPlayerModel->SelectAnimation("Player_Walk");
+	}
+	else
+	{
+		aPlayerModel->SelectAnimation("player_idle");
+	}
+
+	if (movementDir.z == -1 && movementDir.x == 0)
+		aPlayer.children[0]->local.SetRotation(0, 180, 0);
+	else if (movementDir.z == 1 && movementDir.x == 0)
+		aPlayer.children[0]->local.SetRotation(0, 0, 0);
+	else if (movementDir.x == -1 && movementDir.z == 0)
+		aPlayer.children[0]->local.SetRotation(0, 270, 0);
+	else if (movementDir.x == 1 && movementDir.z == 0)
+		aPlayer.children[0]->local.SetRotation(0, 90, 0);
+	else if (movementDir.x == 1 && movementDir.z == -1)
+		aPlayer.children[0]->local.SetRotation(0, 135, 0);
+	else if (movementDir.x == -1 && movementDir.z == -1)
+		aPlayer.children[0]->local.SetRotation(0, 225, 0);
+	else if (movementDir.x == -1 && movementDir.z == 1)
+		aPlayer.children[0]->local.SetRotation(0, 315, 0);
+	else if (movementDir.x == 1 && movementDir.z == 1)
+		aPlayer.children[0]->local.SetRotation(0, 45, 0);
+
+}
+void Game::FixAnimation()
+{
+	if (leftSideActive)
+	{
+		player2Model->SelectAnimation("player_idle");
+	}
+	else
+	{
+		playerModel->SelectAnimation("player_idle");
+	}
 }
 
 void Game::SetupPlayersColiders()

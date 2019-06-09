@@ -110,11 +110,30 @@ class AnimatedModel : public ComponentSystem::Component
   unsigned m_Buffers[NUM_VBs];
   bool m_Animate;
   unsigned m_AnimationNubmer;
+
+
+  //blending
+  long long m_lastTime;
+  float animationTime0;
+  float animationTime1;
+  float blendingTime;
+  float blendingTimeMul;
+  unsigned prevAnimIndex;
+  bool updateBoth;
+  bool temporary;
+  float playTime;
+  unsigned currentAnimation;
   
+
+  long long GetCurrentTimeMillis();
+  bool SetAnimIndex(unsigned index, bool updateBoth = true, float blendDuration = 0.3f, bool temporary = false, float time = 0.f);
+
 public:
   void Clear();
   AnimatedModel(std::string &path, Shader &aShaderProgram, bool gammaCorrection);
+  AnimatedModel(AnimatedModel &) = default;
   void Draw(glm::mat4 &transform);
+  void Update();
   Shader &ShaderProgram;
   void SelectAnimation(const std::string & aName);
   void SelectAnimation(unsigned aNumer);
@@ -143,7 +162,8 @@ private:
   bool gammaCorrection;
 
   void BoneTransform(float TimeInSeconds, std::vector<Matrix4f>& Transforms);
-  void ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const Matrix4f& ParentTransform);
+  void ReadNodeHeirarchy(float AnimationTime0, const aiNode *pNode, const Matrix4f &ParentTransform, int animLevel);
+  void ReadNodeHeirarchy(float AnimationTime0, float AnimationTime1, const aiNode *pNode, const Matrix4f &ParentTransform, int animLevel);
   const aiNodeAnim* FindNodeAnim(const aiAnimation* pAnimation, const std::string NodeName);
   void CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
   void CalcInterpolatedScaling(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);

@@ -10,15 +10,52 @@
         <Name>WINDOW_WIDTH</Name>
         <Value>1920</Value>
     </ConfigParameter>
+
+    <ConfigParameter>
+        <Type>S</Type>
+        <Name>Game_Name</Name>
+        <Value>Between_Dimensions</Value>
+    </ConfigParameter>
+
     <ConfigParameter>
         <Type>S</Type>
         <Name>Enemy_Animated_Model</Name>
         <Value>enemy_walk_run.FBX</Value>
     </ConfigParameter>
+
+
+    <!--      Enemy Interest Levels             -->
+
+
+    <ConfigParameter>
+        <Type>F</Type>
+        <Name>MinNotInterested</Name>
+        <Value>100</Value>
+    </ConfigParameter>
+
+    <ConfigParameter>
+        <Type>F</Type>
+        <Name>MinInterested</Name>
+        <Value>200</Value>
+    </ConfigParameter>
+
+    <ConfigParameter>
+        <Type>F</Type>
+        <Name>MinFollowing</Name>
+        <Value>500</Value>
+    </ConfigParameter>
+
+    <ConfigParameter>
+        <Type>F</Type>
+        <Name>MinAlwaysFollow</Name>
+        <Value>2000</Value>
+    </ConfigParameter>
+
+    <!--      #####################             -->
     <ConfigParameter>
         <Type>F</Type>
         <Name>PlayerSpeed</Name>
-        <Value>15.5</Value>
+        <Value>5</Value>
     </ConfigParameter>
 
     <ConfigParameter>
@@ -26,6 +63,33 @@
         <Name>MapScale</Name>
         <Value>300</Value>
     </ConfigParameter>
+
+<!-- Enemy Interest Levels   /-->
+
+   <ConfigParameter>
+        <Type>F</Type>
+        <Name>MaxNotInterested</Name>
+        <Value>500</Value>
+    </ConfigParameter>
+
+       <ConfigParameter>
+        <Type>F</Type>
+        <Name>MaxInterested</Name>
+        <Value>1000</Value>
+    </ConfigParameter>
+
+       <ConfigParameter>
+        <Type>F</Type>
+        <Name>MaxFollowing</Name>
+        <Value>1500</Value>
+    </ConfigParameter>
+
+       <ConfigParameter>
+        <Type>F</Type>
+        <Name>MaxAlwaysFollow</Name>
+        <Value>2000</Value>
+    </ConfigParameter>
+<!-- ####################### /-->
 
     <ConfigParameter>
         <Type>F</Type>
@@ -62,22 +126,28 @@
         <Value>10</Value>
     </ConfigParameter>
 
-    <ConfigParameter>
+        <ConfigParameter>
         <Type>F</Type>
-        <Name>PlayerXOffset</Name>
-        <Value>0</Value>
-    </ConfigParameter>
-
-    <ConfigParameter>
-        <Type>F</Type>
-        <Name>PlayerYOffset</Name>
+        <Name>EnemyRunSpeed</Name>
         <Value>10</Value>
     </ConfigParameter>
 
     <ConfigParameter>
         <Type>F</Type>
-        <Name>PlayerZOffset</Name>
+        <Name>PlayerXOffset</Name>
+        <Value>7</Value>
+    </ConfigParameter>
+
+    <ConfigParameter>
+        <Type>F</Type>
+        <Name>PlayerYOffset</Name>
         <Value>0</Value>
+    </ConfigParameter>
+
+    <ConfigParameter>
+        <Type>F</Type>
+        <Name>PlayerZOffset</Name>
+        <Value>5</Value>
     </ConfigParameter>
 
     <ConfigParameter>

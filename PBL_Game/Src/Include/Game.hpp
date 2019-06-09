@@ -7,14 +7,15 @@
 #include "Key.hpp"
 #include "Door.hpp"
 #include "EnemyTrigger.hpp"
-#include "ConfigUtils.hpp"
+#include "Configuration/ConfigUtils.hpp"
 #include "Component/ConeRenderer.hpp"
 #include "PathFinding/MapTile.hpp"
 #include "PathFinding/MapTileRenderUtils.cpp"
 #include "Component/AnimatedModel.hpp"
 #include "Player.hpp"
+#include "AI/EnemyController.hpp"
 
-const int TICKS_PER_SECOND = 32;
+const int TICKS_PER_SECOND = 64;
 const int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
 const int MAX_FRAMESKIP = 5;
 
@@ -60,7 +61,6 @@ class Game
   //PathFinding
   #pragma region PathFindingAndMapGenerationUtils
   std::vector<MapTile *> mapTiles;
-  std::vector<GridLocation> path;
   GridWithWeights grid;
   unsigned MapSize = 0;
   unsigned MapScale = 0;
@@ -70,7 +70,7 @@ class Game
   GridLocation goal{8, 5};
   std::unordered_map<GridLocation, GridLocation> came_from;
   std::unordered_map<GridLocation, double> cost_so_far;
-
+  std::vector<glm::vec2> Corners;
   #pragma endregion PathFindingAndMapGenerationUtils
 
 
@@ -81,13 +81,12 @@ class Game
   SceneNode Enemy_Node; //Rotation + scale
   SceneNode Enemy_Node_For_Model;
 
-  void LoadConfig();
+  EnemyController *enemyController;
+
   void InitializeConfig();
   //How to get value from config
-  //ConfigUtils::GetValueFromMap<TYPE>(NAME,ConfigMap) 
-  std::unordered_map<std::string,VariantType> ConfigMap;
+  //ConfigUtils::GetValueFromMap<TYPE>(NAME,ConfigUtils::GlobalConfigMap) 
   
-
   float floorTransform;
   float TileScale;
   float TileScaleTimes100;
@@ -133,7 +132,9 @@ class Game
   int offset = 125; // Jak bardzo maja sie roznic rozmiary kamery, szerokosc aktywnej to pol okna + offset, szerokosc nieaktywnej to pol okna - offset
 
 //ModelPtrs
-AnimatedModel *animatedModel = nullptr;
+AnimatedModel *enemyModel = nullptr;
+AnimatedModel *playerModel = nullptr;
+AnimatedModel *player2Model = nullptr;
 	
 	//Player handling
 	Player* playerObj;
@@ -173,8 +174,11 @@ public:
   void ImguiStartEndDraw();
   void ImguiDrawData();
   void ImguiClear();
-  void SetupPlayersColiders();
 
+  //Player
+  void SetupPlayersColiders();
+  void SetPlayerRotation(SceneNode & sceneNode,glm::vec3 Direction_vec, AnimatedModel * playerModel);
+  void FixAnimation();
 private:
   void SerializeFaza1(std::map<SceneNode *,unsigned long long> &map);
   void SerializeFaza2(std::map<SceneNode *,unsigned long long> &map, std::vector<SceneNode> &temp);
@@ -182,10 +186,9 @@ private:
   void SerializeZapisz(std::string serialized);
   void DeserializeOrderPointers(std::map<unsigned long long, SceneNode *> &map);
 
-  void MoveNodeToMapTile(SceneNode * sceneNode,GridLocation mapTile,float interpolation,float speed,float NodeXOffset,
-  float NodeZOffset);
 
-  void SetViewAndPerspective(Camera &aCamera);
+
+  void SetViewAndPerspective(Camera &aCamera, Transform &player, Transform *enemy);
   void Plot();
   void DisplayImage(const char * path, const char * text);
   void DisplayAnimationInfo(AnimatedModel * model);

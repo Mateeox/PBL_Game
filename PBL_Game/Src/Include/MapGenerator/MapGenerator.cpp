@@ -136,6 +136,8 @@ void MapGenerator::FinishGeneration()
 		mapRoot->AddChild(maps[i]->GenerateNode(leftnodes, mapRoot, floor, wall, door, key, chest, door_index));
 	}
 	leftnodes.push_back(mapRoot);
+
+
 	SceneNode *mapRoot2 = new SceneNode();
 	for (int i = 0; i < maps.size(); i++)
 	{
@@ -291,6 +293,8 @@ void MapGenerator::PickDoors()
 	int doorsCount = CountDoors();
 	if (Doors > doorsCount)
 		Doors = doorsCount;
+	else if (doorsCount < 0 || doorsCount == NULL)
+		return;
 	do
 	{
 		int index = GetRandomIndex(doors.size());
@@ -387,7 +391,7 @@ void MapGenerator::DefineModels()
 	floor = new Model("Models/House/StaticNormal_Floor.obj", *shader, false);
 	wall = new Model("Models/House/StaticSimpleDestroyedWall.obj", *shader, false);
 	door = new Model("Models/House/StaticDoor.obj", *shader, false);
-	key = new Model("Models/House/StaticDoor.obj", *shader, false);
+	key = new Model("Models/Key/key.obj", *shader, false);
 	chest = new Model("Models/Chest/Chest.obj", *shader, false);
 }
 

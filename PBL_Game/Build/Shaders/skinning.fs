@@ -5,7 +5,8 @@ const int MAX_SPOT_LIGHTS = 2;
 
 in vec2 TexCoord0;
 in vec3 Normal0;                                                                   
-in vec3 WorldPos0;                                                                 
+in vec3 WorldPos0;
+in vec4 viewSpace;                                                                 
 
 struct VSOutput
 {
@@ -149,7 +150,7 @@ void main()
     // }          
 
 
-  dist = abs(WorldPos0.z-viewSpaceZOffset);
+  dist = abs(viewSpace.z-viewSpaceZOffset);
 
     fogFactor = (80 - dist)/(80 - 20);
    fogFactor = clamp( fogFactor, 0.0, 1.0 );
