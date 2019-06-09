@@ -13,7 +13,7 @@ class MapElement {
 	float floor_offset = 1.0f;
 	float wall_offset = 0.5f;
 	bool mirror = false;
-	std::pair<SceneNode*, SceneNode*> keydoor;
+	SceneNode* door;
 	std::vector<SceneNode*>* sNodes;
 
 	public:

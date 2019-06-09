@@ -1,7 +1,8 @@
 #include "MapGenerator/MapElement.hpp"
 #include "Collider.hpp"
+#include "Key.hpp"
 
-MapElement::MapElement(std::vector<SceneNode*>&aNodes):nodes(aNodes) {
+MapElement::MapElement(std::vector<SceneNode*>&aNodes):nodes(aNodes),door(nullptr) {
 	this->Position = glm::vec2();
 	this->Doors = glm::vec4();
 }
@@ -105,7 +106,7 @@ SceneNode* MapElement::CreateDoor(SceneNode* parent, Model* doorModel, Model* ke
 {
 	if (!mirror) {
 
-		SceneNode* door = NodeWithModelFactory::CreateNode(door_index,"Door"+std::to_string(door_index), doorModel);
+		door = NodeWithModelFactory::CreateNode(door_index,"Door"+std::to_string(door_index), doorModel);
 		door->Translate(Position.x + direction_x * wall_offset, 0, Position.y + direction_y * wall_offset);
 		door->Rotate(direction_y == 0 ? -90.0f : 0, glm::vec3(0, 1, 0));
 		door->Scale(0.0254f, 0.0254f, 0.01f);
@@ -120,6 +121,11 @@ SceneNode* MapElement::CreateDoor(SceneNode* parent, Model* doorModel, Model* ke
 		key->Translate(Position.x + direction_x * wall_offset, 0.1, Position.y + direction_y * wall_offset);
 		key->Scale(0.025f, 0.025f, 0.025f);
 		key->AddParent(parent);
+		Key *aKey = new Key(door->local,door); 
+		aKey->setDimensions(0,0,0,0.25,0.25,0.25);
+		key->gameObject->AddComponent(std::move(aKey));
+
+		sNodes->push_back(key);
 		return key;
 	}
 }
