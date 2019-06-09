@@ -4,7 +4,7 @@
 #include "Component/Model.hpp"
 #include "Shapes.hpp"
 #include "PathFinding/PathFindingUtils.hpp"
-#include "KeyDoorFactory.hpp"
+#include "NodeWithModelFactory.hpp"
 #include "EnemyKills.hpp"
 #include <random>
 #include <chrono> 

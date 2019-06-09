@@ -82,8 +82,8 @@ add_executable(PBL_Game
 		Src/Include/Player.cpp
 		#Enemy/AI
 		Src/Include/AI/EnemyController.cpp
-		#KeyChestFactory
-		Src/Include/KeyDoorFactory.cpp
+		#Factorys
+		Src/Include/NodeWithModelFactory.cpp
 	  #Stb_image
 	  Src/Include/stb_image.cpp
 	  #ImGui

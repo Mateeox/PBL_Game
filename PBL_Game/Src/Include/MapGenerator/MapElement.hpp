@@ -4,7 +4,7 @@
 #include "../SceneNode.hpp"
 #include "Shapes.hpp"
 #include "Component/Model.hpp"
-#include "KeyDoorFactory.hpp"
+#include "NodeWithModelFactory.hpp"
 class MapElement {
 	private:
 	std::vector<SceneNode*>& nodes;
