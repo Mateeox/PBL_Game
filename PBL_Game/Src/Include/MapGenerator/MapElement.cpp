@@ -34,8 +34,9 @@ std::vector<glm::vec2> MapElement::GetNeighbours()
 	return neighbours;
 }
 
-SceneNode* MapElement::GenerateNode(std::vector<SceneNode*>& aNodes, SceneNode* parent, Model* floorMod, Model* wallMod, Model* doorMod, Model* keyMod, Model* chest,  int& door_index, bool mirror)
+SceneNode* MapElement::GenerateNode(std::vector<SceneNode*>& aNodes, SceneNode* parent, Model* floorMod, Model* wallMod, Model* doorMod, Model* keyMod, Model* chest, int& door_index, std::vector<SceneNode*>* sNodes, bool mirror)
 {
+	this->sNodes = sNodes;
 	this->mirror = mirror;
 	SceneNode* element = new SceneNode();
 	element->AddParent(parent);
@@ -90,7 +91,7 @@ SceneNode* MapElement::CreateWall(SceneNode* parent, Model* model, float directi
 	Collider * collider = new Collider(wall->local);
 	collider->setDimensions(0,0,0,parent->local.getScale().x *1/0.02545f, parent->local.getScale().y * 1/0.0254f, parent->local.getScale().z * 0.01f);
 	wallObj->AddComponent(model);
-	//wallObj->AddComponent(collider);
+	wallObj->AddComponent(collider);
 	
 	wall->AddParent(parent);
 	return std::move(wall);
@@ -99,7 +100,7 @@ SceneNode* MapElement::CreateWall(SceneNode* parent, Model* model, float directi
 SceneNode* MapElement::CreateDoor(SceneNode* parent, Model* model, Model* key, int& door_index, float direction_x, float direction_y)
 {
 	if (!mirror) {
-		keydoor = KeyDoorFactory::Create(door_index, model, key);
+		keydoor = KeyDoorFactory::Create(door_index, model, key, this->sNodes);
 		SceneNode* door = keydoor.first;
 		door->Translate(Position.x + direction_x * wall_offset, 0, Position.y + direction_y * wall_offset);
 		door->Rotate(direction_y == 0 ? -90.0f : 0, glm::vec3(0, 1, 0));
@@ -112,8 +113,9 @@ SceneNode* MapElement::CreateDoor(SceneNode* parent, Model* model, Model* key, i
 	else
 	{
 		SceneNode* key = keydoor.second;
-		key->Translate(Position.x - direction_x, 0.2f, Position.y - direction_y);
 		key->Scale(0.15f, 0.15f, 0.15f);
+		key->Translate(Position.x + direction_x, 0, Position.y + direction_y);
+		
 		key->AddParent(parent);
 		return key;
 	}

@@ -1,7 +1,7 @@
 #include "KeyDoorFactory.hpp"
 #include "Key.hpp"
 
-std::pair<SceneNode *, SceneNode *> KeyDoorFactory::Create(int aNumber, ComponentSystem::Component *aKeyModel, ComponentSystem::Component *aDoorModel)
+std::pair<SceneNode *, SceneNode *> KeyDoorFactory::Create(int aNumber, ComponentSystem::Component *aKeyModel, ComponentSystem::Component *aDoorModel, std::vector<SceneNode*>* sNodes)
 {
     //Create nodes
     SceneNode *KeyNode = new SceneNode();
@@ -23,6 +23,6 @@ std::pair<SceneNode *, SceneNode *> KeyDoorFactory::Create(int aNumber, Componen
 
     //Add key and door components to gameobjects
     KeyGamObj->AddComponent(aKey);
-
+	sNodes->push_back(KeyNode);
     return std::pair<SceneNode *, SceneNode *>(KeyNode, DoorNode);
 }

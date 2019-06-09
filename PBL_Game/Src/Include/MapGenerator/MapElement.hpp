@@ -14,6 +14,7 @@ class MapElement {
 	float wall_offset = 0.5f;
 	bool mirror = false;
 	std::pair<SceneNode*, SceneNode*> keydoor;
+	std::vector<SceneNode*>* sNodes;
 
 	public:
 	glm::vec2 Position;
@@ -31,7 +32,7 @@ class MapElement {
 	void RemoveDoor(glm::vec4 doors);
 	void RemoveDoor(int order);
 	std::vector<glm::vec2> GetNeighbours();
-	SceneNode* GenerateNode(std::vector<SceneNode*>& nodes, SceneNode* parent, Model* floor, Model* wall, Model* door, Model* key, Model* chest, int& door_index, bool mirror = false);
+	SceneNode* GenerateNode(std::vector<SceneNode*>& nodes, SceneNode* parent, Model* floor, Model* wall, Model* door, Model* key, Model* chest, int& door_index, std::vector<SceneNode*>* sNodes, bool mirror = false);
 	SceneNode* AddFloor(Model* model);
 	std::vector<SceneNode*> AddWalls(SceneNode* node, Model* model);
 	std::vector<SceneNode*> AddDoors(SceneNode* node, Model* model, Model* key, int& door_index);

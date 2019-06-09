@@ -7,5 +7,5 @@
 class KeyDoorFactory
 {
 public:
-static std::pair<SceneNode*,SceneNode*> Create(int aNumber, ComponentSystem::Component * aKeyModel,ComponentSystem::Component * aDoorModel);
+static std::pair<SceneNode*,SceneNode*> Create(int aNumber, ComponentSystem::Component * aKeyModel,ComponentSystem::Component * aDoorModel, std::vector<SceneNode*>* sNodes);
 };

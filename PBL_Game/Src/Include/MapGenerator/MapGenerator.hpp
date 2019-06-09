@@ -10,6 +10,7 @@ class MapGenerator //: public Script
 	std::vector<glm::vec2> positions;
 	std::vector<MapElement*> doors;
 	std::vector<MapKey*> mapped;
+	std::vector<SceneNode*>* sNodes;
 	Shader* shader;
 
 	//models
@@ -48,7 +49,7 @@ class MapGenerator //: public Script
 	std::vector<SceneNode*> leftnodes;
 	std::vector<SceneNode*> rightnodes;
 	MapGenerator(Shader* shaderProgram);
-	MapGenerator(Shader* shaderProgram, int squares, int doors, int chests, bool glass_door);
+	MapGenerator(Shader* shaderProgram, int squares, int doors, int chests, bool glass_door, std::vector<SceneNode*>* sNodes);
 	void TransformToPositive();
 	std::vector<MapKey*> GetConverted();
 };
