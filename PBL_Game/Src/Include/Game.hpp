@@ -105,6 +105,8 @@ class Game
   float PlayerScaleInverse;
 
   float TrapScale;
+  int trapPieces = 0;		// Ilosc posiadanych elementow pu³apki
+  int requredPieces = 4;	// Ilosc wymaganych elementow pu³apki
 
   float movementSpeedTimesPlayerScale;
 
@@ -150,6 +152,7 @@ public:
   float cameraYOffset;
   float cameraAngle;
 
+  int imgMode = 1;		// 1 - Wyswietlaj grafiki fabularne | 2 - Wyswietlaj GUI | 0 - Nie wyswietlaj nic
   int plotNumber = 1;	// Zmienna wskazujaca na obecna wstawke fabularna
   bool inputBlockade = true;	// Zmienna  blokujaca mozliwosci gracza (domyslnie na czas wstawek fabularnych)
 
@@ -190,6 +193,6 @@ private:
 
   void SetViewAndPerspective(Camera &aCamera, Transform &player, Transform *enemy);
   void Plot();
-  void DisplayImage(const char * path, const char * text);
+  void DisplayImage(const char * path, const char * text, Texture * imageTex);
   void DisplayAnimationInfo(AnimatedModel * model);
 };

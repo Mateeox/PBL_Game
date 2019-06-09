@@ -300,7 +300,7 @@ void Game::Granko()
 }
 void Game::CheckPlayerDeath()
 {
-	std::cout << "Monster position * scale: " << Enemy_Node.local.getPosition().x * Enemy_Node.local.getScale().x << ", " << Enemy_Node.local.getPosition().z * Enemy_Node.local.getScale().z << std::endl;
+	//std::cout << "Monster position * scale: " << Enemy_Node.local.getPosition().x * Enemy_Node.local.getScale().x << ", " << Enemy_Node.local.getPosition().z * Enemy_Node.local.getScale().z << std::endl;
 }
 void Game::Update(float interpolation)
 {
@@ -334,47 +334,47 @@ void Game::Update(float interpolation)
 
 void Game::Render()
 {
-  glfwPollEvents();
-  glScissor(0, 0, Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT);
-  glEnable(GL_SCISSOR_TEST);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glfwPollEvents();
+		glScissor(0, 0, Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT);
+		glEnable(GL_SCISSOR_TEST);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  ImguiStartEndDraw();
+		ImguiStartEndDraw();
 
-  Transform originTransform = Transform::origin();
+		Transform originTransform = Transform::origin();
 
-  SetViewAndPerspective(camera, leftPlayerNode.local, &Enemy_Node.local);
-  // RENDER LEWEJ STRONY
-  glViewport(0, 0, (Game::WINDOW_WIDTH / 2) + 125, Game::WINDOW_HEIGHT);
-  glScissor(0, 0, (Game::WINDOW_WIDTH / 2) + offset, Game::WINDOW_HEIGHT);
-  glClearColor(0, 0, 0, 1);
-  glClear(GL_COLOR_BUFFER_BIT);
-  leftScene.Render(originTransform, true);
-  Enemy_Node.Render(originTransform, true);
+		SetViewAndPerspective(camera, leftPlayerNode.local, &Enemy_Node.local);
+		// RENDER LEWEJ STRONY
+		glViewport(0, 0, (Game::WINDOW_WIDTH / 2) + 125, Game::WINDOW_HEIGHT);
+		glScissor(0, 0, (Game::WINDOW_WIDTH / 2) + offset, Game::WINDOW_HEIGHT);
+		glClearColor(0, 0, 0, 1);
+		glClear(GL_COLOR_BUFFER_BIT);
+		leftScene.Render(originTransform, true);
+		Enemy_Node.Render(originTransform, true);
 
-  SetViewAndPerspective(camera2, rightPlayerNode.local, nullptr);
+		SetViewAndPerspective(camera2, rightPlayerNode.local, nullptr);
 
-  // RENDER PRAWEJ STRONY
-  glViewport((Game::WINDOW_WIDTH / 2) - 125, 0, (Game::WINDOW_WIDTH / 2) + 125, Game::WINDOW_HEIGHT);
-  glScissor((Game::WINDOW_WIDTH / 2) + offset, 0, (Game::WINDOW_WIDTH / 2) - offset, Game::WINDOW_HEIGHT);
-  glClearColor(0, 0, 0, 1);
-  glClear(GL_COLOR_BUFFER_BIT);
-  rightScene.Render(originTransform, true);
+		// RENDER PRAWEJ STRONY
+		glViewport((Game::WINDOW_WIDTH / 2) - 125, 0, (Game::WINDOW_WIDTH / 2) + 125, Game::WINDOW_HEIGHT);
+		glScissor((Game::WINDOW_WIDTH / 2) + offset, 0, (Game::WINDOW_WIDTH / 2) - offset, Game::WINDOW_HEIGHT);
+		glClearColor(0, 0, 0, 1);
+		glClear(GL_COLOR_BUFFER_BIT);
+		rightScene.Render(originTransform, true);
 
-  // RENDER PASKA ODDZIELAJACAEGO KAMERY - TODO
-  glViewport((Game::WINDOW_WIDTH / 2) + offset - 5, 0, 10, Game::WINDOW_HEIGHT);
-  glScissor((Game::WINDOW_WIDTH / 2) + offset - 5, 0, 10, Game::WINDOW_HEIGHT);
-  glEnable(GL_SCISSOR_TEST);
-  glClearColor(0, 0, 0, 1);
-  glClear(GL_COLOR_BUFFER_BIT);
+		// RENDER PASKA ODDZIELAJACAEGO KAMERY - TODO
+		glViewport((Game::WINDOW_WIDTH / 2) + offset - 5, 0, 10, Game::WINDOW_HEIGHT);
+		glScissor((Game::WINDOW_WIDTH / 2) + offset - 5, 0, 10, Game::WINDOW_HEIGHT);
+		glEnable(GL_SCISSOR_TEST);
+		glClearColor(0, 0, 0, 1);
+		glClear(GL_COLOR_BUFFER_BIT);
 
-  // Render grafik
-  Plot();
+	// Render grafik
+	Plot();
 
-  ImguiDrawData();
+	ImguiDrawData();
 
-  // Swap buffers
-  glfwSwapBuffers(okienko.window);
+	// Swap buffers
+	glfwSwapBuffers(okienko.window);
 }
 
 void Game::Serialize()
@@ -786,75 +786,122 @@ void Game::SetViewAndPerspective(Camera &aCamera, Transform &player, Transform *
 // Funkcje do wyswietlania grafik
 void Game::Plot()
 {
-  if (plotNumber == 0)
-  {
-    inputBlockade = false;
-    return;
-  }
+	if (imgMode == 0)
+	{
+		inputBlockade = false;
+		return;
+	}
 
-  inputBlockade = true;
+	if (imgMode == 1)
+	{
+		static std::string path;
+		inputBlockade = true;
 
-  static int imageNumber = 1;
-  static bool keyPressed = false;
-  if (glfwGetKey(okienko.window, GLFW_KEY_ENTER) == GLFW_PRESS && !keyPressed)
-  {
-    imageNumber++;
-    keyPressed = true;
-  }
-  else if (!glfwGetKey(okienko.window, GLFW_KEY_ENTER) == GLFW_PRESS && keyPressed)
-    keyPressed = false;
+		static int currentPlotImage = 1;
+		static int existingPlotImage = 1;
+		static int currentPlotNumber = 1;
 
-  switch (plotNumber)
-  {
-  case 1:
-    std::string path = "Textures/1_#.png";
+		static bool keyPressed = false;
+		if (glfwGetKey(okienko.window, GLFW_KEY_ENTER) == GLFW_PRESS && !keyPressed)
+		{
+			currentPlotImage++;
+			keyPressed = true;
+		}
+		else if (!glfwGetKey(okienko.window, GLFW_KEY_ENTER) == GLFW_PRESS && keyPressed)
+			keyPressed = false;
 
-    path[11] = imageNumber + 48;
-    if (FILE *file = fopen(path.c_str(), "r"))
-    {
-      fclose(file);
-      DisplayImage(path.c_str(), "Napis");
-    }
-    else
-    {
-      imageNumber = 0;
-      plotNumber = 0;
-    }
+		if (currentPlotNumber != plotNumber)
+		{
+			currentPlotImage = 1;
+			existingPlotImage = 0;
+			currentPlotNumber = plotNumber;
+		}
 
-    break;
-  }
+		path = "Textures/" + std::to_string(plotNumber) + "_" + std::to_string(currentPlotImage) +".png";
+
+		static Texture *tex;
+		if (currentPlotImage == existingPlotImage)
+		{
+			existingPlotImage++;
+			if (FILE *file = fopen(path.c_str(), "r"))
+			{
+				std::cout << "OTWARTO PLIK Z GRAFIKA FABULARNA : " << path << std::endl;
+				tex = new Texture(path.c_str(), GL_NEAREST_MIPMAP_NEAREST);
+				tex->Load();
+				fclose(file);
+			} else {
+				currentPlotImage = 1;
+				existingPlotImage = 0;
+				currentPlotNumber++;
+				imgMode = 2;
+			}
+		}
+		if (tex != nullptr)
+		{
+			std::cout << "Nie jest nullptr" << std::endl;
+			DisplayImage(path.c_str(), "Napis", tex);
+		}
+		else
+		{
+			std::cout << "JEST NULLPTR" << std::endl;
+		}
+	}
+
+	if (imgMode == 2)
+	{
+		inputBlockade = false;
+		switch (trapPieces)
+		{
+		case 0:
+
+			break;
+		case 1:
+
+			break;
+		case 2:
+
+			break;
+		case 3:
+
+			break;
+		case 4:
+
+			break;
+		}
+	}
 }
-void Game::DisplayImage(const char *path, const char *text)
+void Game::DisplayImage(const char *path, const char *text, Texture *imageTex)
 {
   glViewport(0, 0, Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT);
   glScissor(0, 0, Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT);
   glEnable(GL_SCISSOR_TEST);
-  glClearColor(0, 0, 0, 0);
+  glClearColor(1, 0.5, 0.5, 0);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  Texture *imageTex = new Texture(path, GL_NEAREST_MIPMAP_NEAREST);
-  imageTex->Load();
-
-  SceneNode imageNode;
-  GameObject *imageObj = new GameObject(imageNode.world);
+  SceneNode *imageNode = new SceneNode();
+  GameObject *imageObj = new GameObject(imageNode->world);
 
   ShapeRenderer3D *image = new ShapeRenderer3D(
       Shapes::RainBow_Square,
       Shapes::RB_Square_indices,
       sizeof(Shapes::RainBow_Square),
       sizeof(Shapes::RB_Square_indices),
-      *shaderProgram_For_Model,
-      imageTex, "PlotImage");
+      *shaderProgram,
+      imageTex, "Image");
 
   imageObj->AddComponent(image);
-  imageNode.AddGameObject(imageObj);
+  imageNode->AddGameObject(imageObj);
 
-  imageNode.Translate(camera.Position.x, camera.Position.y - 0.184f, camera.Position.z - 0.1f);
-  imageNode.Rotate(camera.Pitch, glm::vec3(1, 0, 0));
-  imageNode.Scale(12.8f / 30.0f, 7.2f / 30.0f, 1);
+  imageNode->Translate(camera.Position.x, camera.Position.y - 0.184f, camera.Position.z - 0.1f);
+  imageNode->Rotate(camera.Pitch, glm::vec3(1, 0, 0));
+  imageNode->Scale(12.8f / 30.0f, 7.2f / 30.0f, 1);
 
-  Transform originTransform = Transform::origin();
-  imageNode.Render(originTransform, true);
+  imageNode->Render(Transform::origin(), true);
+  
+  //delete imageTex;
+  delete imageNode;
+  delete imageObj;
+  delete image;
 }
 
 
