@@ -15,6 +15,7 @@ SceneNode::SceneNode(GameObject *aGameobject) : local(Transform::origin()), dirt
 
 void SceneNode::AddGameObject(GameObject *aGameObject)
 {
+  aGameObject->node = this;
   aGameObject->transform = world;
   gameObject = aGameObject;
 }
@@ -25,6 +26,11 @@ void SceneNode::AddParent(SceneNode *aSceneNode)
 void SceneNode::AddChild(SceneNode *aSceneNode)
 {
   children.push_back(aSceneNode);
+}
+void SceneNode::RemoveGameObject()
+{
+  delete gameObject;
+  gameObject = nullptr;
 }
 
 void SceneNode::Render(Transform &parentWorld, bool aDirty_Flag)

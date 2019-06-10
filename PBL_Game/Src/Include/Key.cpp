@@ -13,8 +13,8 @@ void Key::ActivateTrigger()
 	if (!activated)
 	{
 		std::cout << "Podniesiono klucz" << std::endl;
-		transform.Translate(glm::vec3(0, 100.0f, 0));
-		door->Scale(3, 1, 0.2);
+		door->RemoveGameObject();
+		gameobject->Destroy();
 		activated = true;
 	}
 }

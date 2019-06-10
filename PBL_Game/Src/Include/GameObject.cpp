@@ -3,7 +3,8 @@
 #include "Component/ShapeRenderer3D.hpp"
 #include <algorithm>
 
-GameObject::GameObject(Transform &trans) : transform(trans) {}
+
+GameObject::GameObject(Transform &trans) : transform(trans),node(nullptr) {}
 
 void GameObject::AddComponent(ComponentSystem::Component *compo)
 {
@@ -20,6 +21,12 @@ void GameObject::RemoveComponent(ComponentSystem::ComponentType type)
     });
 
     components.erase(to_erase);
+}
+
+void GameObject::Destroy()
+{
+    if(node != nullptr)
+    node->RemoveGameObject();
 }
 
 ComponentSystem::Component *GameObject::GetComponent(ComponentSystem::ComponentType type)

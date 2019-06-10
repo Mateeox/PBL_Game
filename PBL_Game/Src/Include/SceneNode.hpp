@@ -26,6 +26,7 @@ class SceneNode
     void AddChild(SceneNode *aSceneNode);
     void AddGameObject(GameObject *aGameObject);
     void Render(Transform& parentWorld, bool aDirty_Flag);
+    void RemoveGameObject();
 
     void Scale(float x, float y, float z);
     void Scale(float value);
