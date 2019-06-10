@@ -122,7 +122,7 @@ SceneNode* MapElement::CreateDoor(SceneNode* parent, Model* doorModel, Model* ke
 		key->Scale(0.025f, 0.025f, 0.025f);
 		key->AddParent(parent);
 		Key *aKey = new Key(door->local,door); 
-		aKey->setDimensions(0,0,0,0.25,0.25,0.25);
+		aKey->setDimensions(0,0,0,0.35,0.35,0.35);
 		key->gameObject->AddComponent(std::move(aKey));
 
 		sNodes->push_back(key);

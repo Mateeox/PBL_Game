@@ -6,10 +6,9 @@ SceneNode * NodeWithModelFactory::CreateNode(int aNumber,std::string tag, Compon
 
     SceneNode *node = new SceneNode();
     GameObject *gameObj = new GameObject(node->local);
-	node->gameObject = std::move(gameObj);
-
-    gameObj->setTag(tag + std::to_string(aNumber));
-    gameObj->AddComponent(model);
+	gameObj->setTag(tag + std::to_string(aNumber));
+	gameObj->AddComponent(model);
+	node->AddGameObject(std::move(gameObj));
 
     return std::move(node);
 
