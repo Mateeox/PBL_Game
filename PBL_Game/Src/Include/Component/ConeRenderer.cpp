@@ -173,8 +173,7 @@ void ConeRenderer::collectObjectsInCone(const glm::vec2 &startPoint, const glm::
 					combinedTransform = node->gameObject->transform.combine(transform);
 					for (auto& mesh : *model->getMeshes())
 					{
-						if (collectObjectsInConeInternal(&mesh, startPoint, endPointLeft, endPointRight, node, combinedTransform, isTransformsCombined, radiusSquared))
-							break;
+						collectObjectsInConeInternal(&mesh, startPoint, endPointLeft, endPointRight, node, combinedTransform, isTransformsCombined, radiusSquared);
 					}
 				}
 			}
