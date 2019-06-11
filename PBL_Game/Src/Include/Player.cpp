@@ -1,4 +1,5 @@
 #include "Player.hpp"
+#include "Triggers/EnemyDies.hpp"
 
 Player::Player(SceneNode* aPlayer, int aPartsLimit, Shader& aShader, SceneNode* aNode)
 {
@@ -39,7 +40,9 @@ SceneNode* Player::CreateTrap(float scale)
 {
 	SceneNode* trap = new SceneNode();
 	GameObject* trapObj = new GameObject(trap->local);
+	EnemyDies* trapTrig = new EnemyDies(trap->local, nullptr);			//dodaæ przeciwnika
 	trapObj->AddComponent(trapMod);
+	trapObj->AddComponent(trapTrig);
 	trap->AddGameObject(trapObj);
 	glm::vec3 Position = player->local.getPosition();
 	trap->Scale(scale);

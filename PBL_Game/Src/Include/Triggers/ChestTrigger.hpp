@@ -1,17 +1,16 @@
 #pragma once
 #include "Component/Component.hpp"
-#include "SceneNode.hpp"
 #include "Transform.hpp"
 #include "Trigger.hpp"
+#include "SceneNode.hpp"
 
 //using namespace ComponentSystem;
 class GameObject;
 
-class EnemyTrigger : public Trigger {
-
-	SceneNode *leftPlayerNode;
-
+class ChestTrigger : public Trigger {
+//private:
+//	SceneNode* chest;
 public:
-	EnemyTrigger(Transform& transform, SceneNode *leftPlayerNode);
+	ChestTrigger(Transform& transform);
 	virtual void ActivateTrigger();
 };

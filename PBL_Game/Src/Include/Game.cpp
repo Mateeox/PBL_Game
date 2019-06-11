@@ -5,7 +5,7 @@
 #include "Shapes.hpp"
 #include "PathFinding/PathFindingUtils.hpp"
 #include "NodeWithModelFactory.hpp"
-#include "EnemyKills.hpp"
+#include "Triggers/EnemyKills.hpp"
 #include <random>
 #include <chrono> 
 

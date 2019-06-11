@@ -1,6 +1,7 @@
 #include "MapGenerator/MapElement.hpp"
 #include "Collider.hpp"
-#include "Key.hpp"
+#include "Triggers/Key.hpp"
+#include "Triggers/ChestTrigger.hpp"
 
 MapElement::MapElement(std::vector<SceneNode*>&aNodes):nodes(aNodes),door(nullptr) {
 	this->Position = glm::vec2();
@@ -214,7 +215,9 @@ SceneNode* MapElement::CreateChest(SceneNode* parent, Model* model)
 {
 	SceneNode* chest = new SceneNode();
 	GameObject* oFloor = new GameObject(chest->local);
+	ChestTrigger* chestT = new ChestTrigger(chest->local);
 	oFloor->AddComponent(model);
+	oFloor->AddComponent(chestT);
 	chest->AddGameObject(oFloor);
 	chest->Translate(Position.x, 0, Position.y);
 	chest->Scale(0.007f, 0.007f, 0.007f);

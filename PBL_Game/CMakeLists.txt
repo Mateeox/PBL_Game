@@ -56,9 +56,10 @@ add_executable(PBL_Game
 	  Src/Include/SceneNode.cpp
 		Src/Include/Collider.cpp
 		Src/Include/Trigger.cpp
-		Src/Include/EnemyTrigger.cpp
-		Src/Include/Key.cpp
-		Src/Include/EnemyKills.cpp
+		Src/Include/Triggers/Key.cpp
+		Src/Include/Triggers/EnemyKills.cpp
+		Src/Include/Triggers/EnemyDies.hpp
+		Src/Include/Triggers/ChestTrigger.cpp
 		#ConfigUtils
 		Src/Include/Configuration/ConfigUtils.cpp
 		#PathFinding
