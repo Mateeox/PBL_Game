@@ -12,6 +12,7 @@ protected:
 	glm::vec3 dimensions;
 
 public:
+	bool Enabled = true;
 	Transform& transform;
 	Collider(Transform& transform);
 	ComponentSystem::ComponentType GetComponentType() override;

@@ -13,20 +13,24 @@ ComponentType Collider::GetComponentType()
 
 bool Collider::checkCollision(Collider* other)
 {
-	glm::vec3 translatedCoords = coords + transform.getPosition() * transform.getScale();
-	glm::vec3 otherTranslatedCoords {0};
-	otherTranslatedCoords.x = other->coords.x + other->transform.getPosition().x;// *other->transform.getScale().x;
-	otherTranslatedCoords.z = other->coords.z + other->transform.getPosition().z; //* other->transform.getScale().z;
+	if (Enabled) {
+		glm::vec3 translatedCoords = coords + transform.getPosition() * transform.getScale();
+		glm::vec3 otherTranslatedCoords{ 0 };
+		otherTranslatedCoords.x = other->coords.x + other->transform.getPosition().x;// *other->transform.getScale().x;
+		otherTranslatedCoords.z = other->coords.z + other->transform.getPosition().z; //* other->transform.getScale().z;
 
-	if((translatedCoords.x <= otherTranslatedCoords.x + other->dimensions.x) && (translatedCoords.x + dimensions.x >= otherTranslatedCoords.x) &&
-		(translatedCoords.z <= otherTranslatedCoords.z + other->dimensions.z) && (translatedCoords.z + dimensions.z >= otherTranslatedCoords.z))
-	{
+		if ((translatedCoords.x <= otherTranslatedCoords.x + other->dimensions.x) && (translatedCoords.x + dimensions.x >= otherTranslatedCoords.x) &&
+			(translatedCoords.z <= otherTranslatedCoords.z + other->dimensions.z) && (translatedCoords.z + dimensions.z >= otherTranslatedCoords.z))
+		{
 
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	} else {
 		return true;
-	}
-	else
-	{
-		return false;
 	}
 
 }

@@ -626,13 +626,22 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation, 
   {
     if (playerCollider->checkCollision(collider))
     {
-      player.local = transformBeforeMove;
-      playerCollider->transform = transformBeforeMove;
+		if (collider->gameobject->getTag().find("Door") != std::string::npos) {
+			if (isLeft)
+			{
+				player.local = transformBeforeMove;
+				playerCollider->transform = transformBeforeMove;
+			}
+		} else {
+			player.local = transformBeforeMove;
+			playerCollider->transform = transformBeforeMove;
+		}
       break;
     }
   }
   for (Trigger *trigger : triggers)
   {
+	if(trigger->gameobject != nullptr)
     if (playerCollider->checkCollision(trigger))
     {
 		if (trigger->gameobject->getTag().find("Key") != std::string::npos) {

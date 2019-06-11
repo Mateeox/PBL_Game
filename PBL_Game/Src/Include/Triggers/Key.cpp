@@ -13,7 +13,13 @@ void Key::ActivateTrigger()
 	if (!activated)
 	{
 		std::cout << "Podniesiono klucz" << std::endl;
-		door->RemoveGameObject();
-		gameobject->Destroy();
+		for (Component* comp : door->gameObject->components)
+		{
+			if (comp->GetComponentType() == ComponentType::Collider)
+				((Collider*)comp)->Enabled = false;
+		}
+		door->Scale(0);
+		gameobject->transform.ScaleTransform(0, 0, 0);
+//		gameobject->Destroy();
 	}
 }

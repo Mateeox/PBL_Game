@@ -108,6 +108,12 @@ SceneNode* MapElement::CreateDoor(SceneNode* parent, Model* doorModel, Model* ke
 	if (!mirror) {
 
 		door = NodeWithModelFactory::CreateNode(door_index,"Door"+std::to_string(door_index), doorModel);
+		Collider* collider = new Collider(door->local);
+		if (direction_y != 0)
+			collider->setDimensions(0, 0, 10 * parent->local.getScale().x, parent->local.getScale().x * 1 / 0.02545f, 0 * 1 / 0.0254f, parent->local.getScale().z * 0.01f);
+		else
+			collider->setDimensions(-5 * parent->local.getScale().z, 0, 0, parent->local.getScale().z * 0.01f, 0, parent->local.getScale().x * 1 / 0.02545f);
+		door->gameObject->AddComponent(collider);
 		door->Translate(Position.x + direction_x * wall_offset, 0, Position.y + direction_y * wall_offset);
 		door->Rotate(direction_y == 0 ? -90.0f : 0, glm::vec3(0, 1, 0));
 		door->Scale(0.0254f, 0.0254f, 0.01f);
