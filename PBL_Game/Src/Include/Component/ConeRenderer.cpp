@@ -101,6 +101,16 @@ void ConeRenderer::rotateLeft()
 	directionAngle = tmpAngle;
 }
 
+double ConeRenderer::getDirectionAngle()
+{
+	return directionAngle;
+}
+
+double ConeRenderer::getAngle()
+{
+	return angle;
+}
+
 bool ConeRenderer::isOnLeftSide(const glm::vec2 &startPoint, const glm::vec2 &endPoint, const glm::vec2 &pointToCheck) {
 	return ((endPoint.x - startPoint.x)*(pointToCheck.y - startPoint.y) - (endPoint.y - startPoint.y)*(pointToCheck.x - startPoint.x)) < 0;
 }

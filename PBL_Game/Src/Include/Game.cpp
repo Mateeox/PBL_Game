@@ -96,7 +96,6 @@ Game::Game(Window &aOkno) : okienko(aOkno),
   shaderProgram_For_Model->setFloat("spotLight.quadratic", 0.20);
   shaderProgram_For_Model->setFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
   shaderProgram_For_Model->setFloat("spotLight.outerCutOff", glm::cos(glm::radians(15.5f)));
-    shaderProgram_For_Model->setVec3("spotLight.direction", glm::vec3(1,0,0));
 
   //enemy
   shaderProgram_For_Model->setVec3("pointLights[1].ambient", 1, 1, 1);
@@ -673,6 +672,12 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation, 
       coneRenderer->rotateLeft();
     if (glfwGetKey(okienko.window, GLFW_KEY_RIGHT) == GLFW_PRESS)
       coneRenderer->rotateRight();
+
+	auto angle = coneRenderer->getDirectionAngle();
+	angle += coneRenderer->getAngle() / 2;
+	angle = fmod(angle, 2 * M_PI);
+	shaderProgram_For_Model->use();
+	shaderProgram_For_Model->setVec3("spotLight.direction", glm::vec3(cos(angle), 0, sin(angle)));
   }
   camera.Position.x = player.local.getPosition().x * PlayerScale;
   camera.Position.y = cameraYOffset;

@@ -35,6 +35,8 @@ public:
 	void Draw(glm::mat4 &transform) override;
 	void rotateRight();
 	void rotateLeft();
+	double getDirectionAngle();
+	double getAngle();
 
 	static const double EPSILON;
 };
