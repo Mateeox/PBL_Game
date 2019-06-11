@@ -881,7 +881,7 @@ void Game::Plot()
 }
 void Game::DisplayImage(const char *path, const char *text, Texture *imageTex)
 {
-  glViewport(0, 0, Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT);
+ /* glViewport(0, 0, Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT);
   glScissor(0, 0, Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT);
   glEnable(GL_SCISSOR_TEST);
   //glClearColor(1, 0.5, 0.5, 0);
@@ -901,16 +901,66 @@ void Game::DisplayImage(const char *path, const char *text, Texture *imageTex)
   imageObj->AddComponent(image);
   imageNode->AddGameObject(imageObj);
 
+
   imageNode->Translate(camera.Position.x, camera.Position.y - 0.184f, camera.Position.z - 0.1f);
   imageNode->Rotate(camera.Pitch, glm::vec3(1, 0, 0));
   imageNode->Scale(12.8f / 42.0f, 7.2f / 42.0f, 1);
 
+  std::cout << "Camera: " << camera.Position.x << ", " << camera.Position.y << ", " << camera.Position.z << std::endl;
+  std::cout << "Image : " << imageNode->local.getPosition().x << ", " << imageNode->local.getPosition().y << ", " << imageNode->local.getPosition().z << std::endl;
+  
   Transform origin = Transform::origin();
   imageNode->Render(origin, true);
 
   delete imageNode;
   delete imageObj;
-  delete image;
+  delete image;*/
+
+	glViewport(0, 0, Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT);
+	glScissor(0, 0, Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT);
+	glEnable(GL_SCISSOR_TEST);
+	//glClearColor(1, 0.5, 0.5, 0);
+	//glClear(GL_COLOR_BUFFER_BIT);
+
+	SceneNode *imageNode = new SceneNode();
+	GameObject *imageObj = new GameObject(imageNode->world);
+
+	ShapeRenderer3D *image = new ShapeRenderer3D(
+		Shapes::RainBow_Square,
+		Shapes::RB_Square_indices,
+		sizeof(Shapes::RainBow_Square),
+		sizeof(Shapes::RB_Square_indices),
+		*shaderProgram,
+		imageTex, "Image");
+
+	imageObj->AddComponent(image);
+	imageNode->AddGameObject(imageObj);
+
+	float x = camera.Position.x;
+	float y = camera.Position.y;
+	float z = camera.Position.z;
+
+	camera.Position.x = 0;
+	camera.Position.y = 3.5;
+	camera.Position.z = 7;
+
+	imageNode->Translate(camera.Position.x, camera.Position.y - 0.184f, camera.Position.z - 0.11f);
+	imageNode->Rotate(camera.Pitch, glm::vec3(1, 0, 0));
+	imageNode->Scale(12.8f / 30.0f, 7.2f / 30.0f, 1);
+
+	std::cout << "Camera: " << camera.Position.x << ", " << camera.Position.y << ", " << camera.Position.z << std::endl;
+	std::cout << "Image : " << imageNode->local.getPosition().x << ", " << imageNode->local.getPosition().y << ", " << imageNode->local.getPosition().z << std::endl;
+
+	Transform origin = Transform::origin();
+	imageNode->Render(origin, true);
+
+	camera.Position.x = x;
+	camera.Position.y = y;
+	camera.Position.z = z;
+
+	delete imageNode;
+	delete imageObj;
+	delete image;
 }
 
 
