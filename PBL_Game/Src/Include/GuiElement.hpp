@@ -1,5 +1,7 @@
 #pragma once
 #include <string>
+#include <map>
+#include <Texture.hpp>
 #include <Shader.hpp>
 // Include GLEW
 #include <GL/gl3w.h>
@@ -28,11 +30,19 @@ namespace  SimpleGUI
 
 class GuiElement
 {
-    unsigned int texture1;
+
+    std::map<std::string, Texture *> textures;
+    Texture * currentTexture = nullptr;
+    
     unsigned int VBO, VAO, EBO;
     glm::mat4 transform;
+    bool visible = true;
+
 
     public:
+    void AddTexture(std::string aPtah,std::string aName);
+    void SwitchTexture(std::string aName);
+    void SwtichVisiblity();
     GuiElement(std::string texturepath,glm::mat4 aTRansform);
     void Draw(Shader * shader);
     void setTransform(glm::mat4 transform);
