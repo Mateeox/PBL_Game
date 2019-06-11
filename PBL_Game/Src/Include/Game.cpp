@@ -837,8 +837,10 @@ void Game::Plot()
 				existingPlotImage = 0;
 				currentPlotNumber++;
 				imgMode = 2;
+				inputBlockade = false;
 			}
 		}
+		
 		if (tex != nullptr)
 		{
 			DisplayImage(path.c_str(), "Napis", tex);
@@ -847,24 +849,33 @@ void Game::Plot()
 
 	if (imgMode == 2)
 	{
-		inputBlockade = false;
-		switch (trapPieces)
+		static int displayedAmount = -1;
+		static Texture *tex;
+		static std::string path;
+
+		if (displayedAmount != trapPieces)
 		{
-		case 0:
+			displayedAmount = trapPieces;
+			path = "Textures/" + std::to_string(displayedAmount) + "per4.png";
+			std::cout << "Zaladowano teksture " << path << std::endl;
+			tex = new Texture(path.c_str(), GL_NEAREST_MIPMAP_NEAREST);
+			tex->Load();
 
-			break;
-		case 1:
+			if (FILE *file = fopen(path.c_str(), "r"))
+			{
+				std::cout << "OTWARTO PLIK Z GRAFIKA FABULARNA : " << path << std::endl;
+				fclose(file);
+			}
+			else
+			{
+				std::cout << "NIE MA PLIKU : " << path << std::endl;
+			}
+		}
 
-			break;
-		case 2:
-
-			break;
-		case 3:
-
-			break;
-		case 4:
-
-			break;
+		
+		if (tex != nullptr)
+		{
+			DisplayImage(path.c_str(), "Napis", tex);
 		}
 	}
 }
@@ -873,8 +884,8 @@ void Game::DisplayImage(const char *path, const char *text, Texture *imageTex)
   glViewport(0, 0, Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT);
   glScissor(0, 0, Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT);
   glEnable(GL_SCISSOR_TEST);
-  glClearColor(1, 0.5, 0.5, 0);
-  glClear(GL_COLOR_BUFFER_BIT);
+  //glClearColor(1, 0.5, 0.5, 0);
+  //glClear(GL_COLOR_BUFFER_BIT);
 
   SceneNode *imageNode = new SceneNode();
   GameObject *imageObj = new GameObject(imageNode->world);
@@ -892,12 +903,11 @@ void Game::DisplayImage(const char *path, const char *text, Texture *imageTex)
 
   imageNode->Translate(camera.Position.x, camera.Position.y - 0.184f, camera.Position.z - 0.1f);
   imageNode->Rotate(camera.Pitch, glm::vec3(1, 0, 0));
-  imageNode->Scale(12.8f / 30.0f, 7.2f / 30.0f, 1);
+  imageNode->Scale(12.8f / 42.0f, 7.2f / 42.0f, 1);
 
   Transform origin = Transform::origin();
   imageNode->Render(origin, true);
-  
-  //delete imageTex;
+
   delete imageNode;
   delete imageObj;
   delete image;

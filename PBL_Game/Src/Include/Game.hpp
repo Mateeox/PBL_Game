@@ -105,7 +105,7 @@ class Game
 
   float TrapScale;
   int trapPieces = 0;		// Ilosc posiadanych elementow pu³apki
-  int requredPieces = 4;	// Ilosc wymaganych elementow pu³apki
+  int requiredPieces = 4;	// Ilosc wymaganych elementow pu³apki
 
   float movementSpeedTimesPlayerScale;
 
@@ -193,5 +193,6 @@ private:
   void SetViewAndPerspective(Camera &aCamera, Transform &player, Transform *enemy);
   void Plot();
   void DisplayImage(const char * path, const char * text, Texture * imageTex);
+  void TrapCounter();
   void DisplayAnimationInfo(AnimatedModel * model);
 };
