@@ -39,7 +39,7 @@ void SceneNode::RemoveGameObject()
   gameObject = nullptr;
 }
 
-void SceneNode::Render(Transform &parentWorld, bool aDirty_Flag)
+void SceneNode::Render(Transform &parentWorld,Shader * shader, bool aDirty_Flag)
 {
 
   aDirty_Flag |= dirty_flag;
@@ -51,7 +51,7 @@ void SceneNode::Render(Transform &parentWorld, bool aDirty_Flag)
   }
   if (gameObject != nullptr)
   {
-
+	  
     ShapeRenderer3D *shape = (ShapeRenderer3D *)gameObject->GetComponent(ComponentSystem::ShapeRenderer3D);
     if (shape != nullptr)
     {
@@ -64,11 +64,23 @@ void SceneNode::Render(Transform &parentWorld, bool aDirty_Flag)
       mapTile->Draw(world.GetTransform());
     }
 
-    Model *model = (Model *)gameObject->GetComponent(ComponentSystem::Model);
-    if (model != nullptr)
-    {
-      model->Draw(world.GetTransform());
-    }
+	if (shader == nullptr)
+	{
+		Model *model = (Model *)gameObject->GetComponent(ComponentSystem::Model);
+			if (model != nullptr)
+			{
+				model->Draw(world.GetTransform(),nullptr);
+			}
+			
+	}
+	else
+	{
+		Model *model = (Model *)gameObject->GetComponent(ComponentSystem::Model);
+		if (model != nullptr)
+		{
+			model->Draw(world.GetTransform(),shader);
+		}
+	}
 
     AnimatedModel *animModel = (AnimatedModel *)gameObject->GetComponent(ComponentSystem::AnimatedModel);
     if (animModel != nullptr)
@@ -85,7 +97,7 @@ void SceneNode::Render(Transform &parentWorld, bool aDirty_Flag)
   }
   for (SceneNode *sn : children)
   {
-    sn->Render(world, aDirty_Flag);
+    sn->Render(world,shader, aDirty_Flag);
   }
 }
 

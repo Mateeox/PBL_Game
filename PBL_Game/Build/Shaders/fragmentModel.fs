@@ -51,6 +51,7 @@ in vec2 TexCoords;
 in vec4 viewSpace;
 in vec3 FragPos;
 in vec3 Normal;
+in vec4 FragPosLightSpace;
 
 uniform sampler2D texture_diffuse1;
 uniform vec3 viewPos;
@@ -58,6 +59,8 @@ uniform vec3 viewPos;
 uniform PointLight pointLights[NR_POINT_LIGHTS];
 uniform SpotLight spotLight;
 uniform Material material;
+
+uniform sampler2D shadowMap;
 
 float dist = 0;
 float fogFactor = 0;
@@ -74,9 +77,16 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir);
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 
+
+float ShadowCalculation(vec4 fragPosLightSpace);
+
+
+
 void main()
 {    
     dist = abs(viewSpace.z-viewSpaceZOffset);
+
+  vec3 color = texture(texture_diffuse1, TexCoords).rgb;;
 
     fogFactor = (80 - dist)/(80 - 20);
    fogFactor = clamp( fogFactor, 0.0, 1.0 );
@@ -89,14 +99,16 @@ void main()
     vec3 norm = normalize(Normal);
     vec3 viewDir = normalize(viewPos - FragPos);
     
-	vec3 result;
+	vec3 result = vec3(0,0,0);
     for(int i = 0; i < NR_POINT_LIGHTS; ++i)
 		result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);    	 
 
         result+= CalcSpotLight(spotLight,norm,FragPos,viewDir);
+	float shadow = ShadowCalculation(FragPosLightSpace);
+	result = result * ( 1- shadow);
 
-    //finalColor = finalColor * texture(texture_diffuse1, TexCoords);
-    FragColor = texture(texture_diffuse1, TexCoords) * vec4(result, 1);
+                          
+    FragColor =  vec4(result * color , 1);
 }
 
 
@@ -163,3 +175,20 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     specular *= attenuation * intensity;
     return (ambient + diffuse + specular);
 }
+
+float ShadowCalculation(vec4 fragPosLightSpace)
+{
+    // perform perspective divide
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    // transform to [0,1] range
+    projCoords = projCoords * 0.5 + 0.5;
+    // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
+    float closestDepth = texture(shadowMap, projCoords.xy).r; 
+    // get depth of current fragment from light's perspective
+    float currentDepth = projCoords.z;
+    // check whether current frag pos is in shadow
+    float shadow = currentDepth > closestDepth  ? 1.0 : 0.0;
+
+    return shadow;
+}
+

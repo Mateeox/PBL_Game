@@ -14,6 +14,14 @@
 
 static bool leftSideActive = true;
 static bool swapButtonPressed = false;
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+
+unsigned int quadVAO = 0;
+unsigned int quadVBO;
+void renderQuad();
+
+const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+
 
 void Game::InitializeConfig()
 {
@@ -73,6 +81,9 @@ Game::Game(Window &aOkno) : okienko(aOkno),
   shaderProgram_For_Model = new Shader("Shaders/vertexModel.vs", "Shaders/fragmentModel.fs");
   shaderAnimatedModel = new Shader("Shaders/skinning.vs", "Shaders/skinning.fs");
   shaderViewCone = new Shader("Shaders/viewCone.vs", "Shaders/viewCone.fs");
+
+  simpleDepthShader = new Shader("Shaders/skinning.vs", "Shaders/skinning.fs");
+  debugDepthQuad = new Shader("Shaders/viewCone.vs", "Shaders/viewCone.fs");
 
   shaderProgram_For_Model->use();
   shaderProgram_For_Model->setVec3("material.ambient", 0.1,0.1,0.1);
@@ -280,6 +291,35 @@ void Game::Granko()
   std::cout<<"Colliders gathered: " << collidableObjects.size() << std::endl;
   gatherTriggers(sNodes);
   std::cout << "Triggers gathered: " << triggers.size() << std::endl;
+
+
+
+  
+  glGenFramebuffers(1, &depthMapFBO);
+  // create depth texture
+
+  glGenTextures(1, &depthMap);
+  glBindTexture(GL_TEXTURE_2D, depthMap);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  // attach depth texture as FBO's depth buffer
+  glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+  glDrawBuffer(GL_NONE);
+  glReadBuffer(GL_NONE);
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+  shaderProgram_For_Model->use();
+  shaderProgram_For_Model->setInt("diffuseTexture", 0);
+  shaderProgram_For_Model->setInt("shadowMap", 1);
+  debugDepthQuad->use();
+  debugDepthQuad->setInt("depthMap", 0);
+
+
+
   while (glfwGetKey(okienko.window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
          glfwWindowShouldClose(okienko.window) == 0)
   {
@@ -356,8 +396,49 @@ void Game::Render()
 		glScissor(0, 0, (Game::WINDOW_WIDTH / 2) + offset, Game::WINDOW_HEIGHT);
 		glClearColor(0, 0, 0, 1);
 		glClear(GL_COLOR_BUFFER_BIT);
-		leftScene.Render(originTransform, true);
-		Enemy_Node.Render(originTransform, true);
+
+
+		// 1. render depth of scene to texture (from light's perspective)
+// --------------------------------------------------------------
+		glm::mat4 lightProjection, lightView;
+		glm::mat4 lightSpaceMatrix;
+		float near_plane = 1.0f, far_plane = 7.5f;
+		lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+		lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+		lightSpaceMatrix = lightProjection * lightView;
+		// render scene from light's point of view
+		simpleDepthShader->use();
+		simpleDepthShader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
+
+		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+
+
+		leftScene.Render(originTransform, simpleDepthShader, true);
+		
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+		glViewport(0, 0, 1920, 1080);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		shaderProgram_For_Model->use();
+		// set light uniforms
+		shaderProgram_For_Model->setVec3("lightPos", lightPos);
+		shaderProgram_For_Model->setMat4("lightSpaceMatrix", lightSpaceMatrix);
+		leftScene.Render(originTransform, nullptr, true);
+
+
+		debugDepthQuad->use();
+		debugDepthQuad->setFloat("near_plane", near_plane);
+		debugDepthQuad->setFloat("far_plane", far_plane);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, depthMap);
+
+
+		Enemy_Node.Render(originTransform, nullptr, true);
+
+
+
 
 		SetViewAndPerspective(camera2, rightPlayerNode.local, nullptr);
 
@@ -366,7 +447,7 @@ void Game::Render()
 		glScissor((Game::WINDOW_WIDTH / 2) + offset, 0, (Game::WINDOW_WIDTH / 2) - offset, Game::WINDOW_HEIGHT);
 		glClearColor(0, 0, 0, 1);
 		glClear(GL_COLOR_BUFFER_BIT);
-		rightScene.Render(originTransform, true);
+		rightScene.Render(originTransform,nullptr, true);
 
 		// RENDER PASKA ODDZIELAJACAEGO KAMERY - TODO
 		glViewport((Game::WINDOW_WIDTH / 2) + offset - 5, 0, 10, Game::WINDOW_HEIGHT);
@@ -773,7 +854,7 @@ void Game::SetViewAndPerspective(Camera &aCamera, Transform &player, Transform *
   shaderProgram_For_Model->setFloat("FogDensity", FogDensity);
   shaderProgram_For_Model->setFloat("viewSpaceZOffset", cameraZOffset);
   shaderProgram_For_Model->setVec3("viewPos", aCamera.Position);
-  auto lightPos = player.getPosition()*player.getScale();
+  lightPos = player.getPosition()*player.getScale();
   lightPos.y = 0.5;
   shaderProgram_For_Model->setVec3("pointLights[0].position", lightPos);
   lightPos.y = 0.25;
@@ -911,7 +992,7 @@ void Game::DisplayImage(const char *path, const char *text, Texture *imageTex)
   imageNode->Scale(12.8f / 30.0f, 7.2f / 30.0f, 1);
 
   Transform origin = Transform::origin();
-  imageNode->Render(origin, true);
+  imageNode->Render(origin,nullptr, true);
   
   //delete imageTex;
   delete imageNode;
@@ -1043,4 +1124,38 @@ void Game::FixAnimation()
 
 void Game::SetupPlayersColiders()
 {
+}
+
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+	// make sure the viewport matches the new window dimensions; note that width and 
+	// height will be significantly larger than specified on retina displays.
+	glViewport(0, 0, width, height);
+}
+
+void renderQuad()
+{
+	if (quadVAO == 0)
+	{
+		float quadVertices[] = {
+			// positions        // texture Coords
+			-1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+			-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+			 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+			 1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+		};
+		// setup plane VAO
+		glGenVertexArrays(1, &quadVAO);
+		glGenBuffers(1, &quadVBO);
+		glBindVertexArray(quadVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	}
+	glBindVertexArray(quadVAO);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	glBindVertexArray(0);
 }

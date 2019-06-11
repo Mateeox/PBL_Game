@@ -64,9 +64,16 @@ void Model::loadModel(std::string &path)
     processNode(scene->mRootNode, scene);
 }
 
-void Model::Draw(glm::mat4 &transform)
+void Model::Draw(glm::mat4 &transform,Shader * shader)
 {
-    ShaderProgram.use();
+	if (shader == nullptr)
+	{
+		ShaderProgram.use();
+	}
+	else
+	{
+		shader->use();
+	}
     //Set transform
     unsigned int transformLoc = glGetUniformLocation(ShaderProgram.shaderProgramID, "transform");
     glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));

@@ -38,12 +38,19 @@ class Game
   glm::vec2 vector2DHelper2{0,0};
 
 
+
+
   //
   Window &okienko;
   Shader *shaderProgram;
   Shader *shaderProgram_For_Model;
   Shader *shaderAnimatedModel;
   Shader *shaderViewCone;
+
+  Shader * simpleDepthShader;
+  Shader * debugDepthQuad;
+
+
   SceneNode wholeScene;
 
   SceneNode leftScene;
@@ -88,6 +95,10 @@ class Game
   float floorTransform;
   float TileScale;
   float TileScaleTimes100;
+
+  glm::vec3 lightPos;
+  unsigned int depthMapFBO;
+  unsigned int depthMap;
 
   float movementSpeed; //Move to PlayerData
   float EnemyBaseSpeed;
