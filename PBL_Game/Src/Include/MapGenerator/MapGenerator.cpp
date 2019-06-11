@@ -290,13 +290,29 @@ int MapGenerator::CountDoors()
 	return count;
 }
 
+void MapGenerator::SingleDoor()
+{
+	for (MapElement* node : doors)
+	{
+		if (node->CountDoors() > 1)
+		{
+			node->RemoveDoor(GetRandomIndex(1));
+		}
+	}
+}
+
 void MapGenerator::PickDoors()
 {
+	SingleDoor();
 	int doorsCount = CountDoors();
-	if (Doors > doorsCount)
+	if (Doors > doorsCount) {
 		Doors = doorsCount;
-	else if (doorsCount < 0 || doorsCount == NULL)
 		return;
+	}
+	else if (doorsCount < 0 || doorsCount == NULL) {
+		Doors = 0;
+		return;
+	}
 	do
 	{
 		int index = GetRandomIndex(doors.size());
@@ -305,11 +321,6 @@ void MapGenerator::PickDoors()
 		{
 			doors[index]->CleanDoors();
 			doorsCount -= count;
-		}
-		else
-		{
-			doors[index]->RemoveDoor(GetRandomIndex(1));
-			doorsCount--;
 		}
 	} while (Doors != doorsCount);
 }

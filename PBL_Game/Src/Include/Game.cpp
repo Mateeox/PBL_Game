@@ -307,9 +307,9 @@ void Game::Update(float interpolation)
 	enemyController->Update(interpolation);
 
     if (leftSideActive)
-      UpdatePlayer(leftPlayerNode, camera, interpolation);
+      UpdatePlayer(leftPlayerNode, camera, interpolation, true);
     else
-      UpdatePlayer(rightPlayerNode, camera2, interpolation);
+      UpdatePlayer(rightPlayerNode, camera2, interpolation, false);
   }
 
   enemyModel->Update();
@@ -593,7 +593,7 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos)
   posy = ypos;
 }
 
-void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation)
+void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation, bool isLeft)
 {
   Transform transformBeforeMove(player.gameObject->transform);
 
@@ -635,7 +635,12 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation)
   {
     if (playerCollider->checkCollision(trigger))
     {
-      trigger->ActivateTrigger();
+		if (trigger->gameobject->getTag().find("Key") != std::string::npos) {
+			if(!isLeft)
+				trigger->ActivateTrigger();
+		} else {
+			trigger->ActivateTrigger();
+		}
     }
   }
 

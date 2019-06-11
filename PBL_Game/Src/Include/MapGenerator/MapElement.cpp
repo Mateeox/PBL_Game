@@ -118,12 +118,12 @@ SceneNode* MapElement::CreateDoor(SceneNode* parent, Model* doorModel, Model* ke
 	else
 	{
 		SceneNode* key = NodeWithModelFactory::CreateNode(door_index,"Key"+std::to_string(door_index), keyModel);
+		Key *aKey = new Key(key->local, door);
+		aKey->setDimensions(0, 0, 0, 0.35, 0.35, 0.35);
+		key->gameObject->AddComponent(std::move(aKey));
 		key->Translate(Position.x + direction_x * wall_offset, 0.1, Position.y + direction_y * wall_offset);
 		key->Scale(0.025f, 0.025f, 0.025f);
 		key->AddParent(parent);
-		Key *aKey = new Key(door->local,door); 
-		aKey->setDimensions(0,0,0,0.35,0.35,0.35);
-		key->gameObject->AddComponent(std::move(aKey));
 		sNodes->push_back(key); 
 		door_index++;
 		return key;

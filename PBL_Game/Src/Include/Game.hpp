@@ -164,7 +164,7 @@ public:
   void Render();
   void Serialize();
   void Deserialize(std::string path);
-  void UpdatePlayer(SceneNode &player, Camera &camera,float interpolation);
+  void UpdatePlayer(SceneNode &player, Camera &camera,float interpolation, bool isLeft);
   void gatherCollidableObjects(std::vector<SceneNode *> &nodes);
   void gatherTriggers(std::vector<SceneNode*>& nodes);
   std::vector<GameObject*> findByTag(const std::vector<SceneNode*>& data, std::string tag);

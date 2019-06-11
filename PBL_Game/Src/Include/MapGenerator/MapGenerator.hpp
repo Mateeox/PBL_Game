@@ -26,6 +26,7 @@ class MapGenerator //: public Script
 	void ValidateDoors();
 	void ClearDoors();
 	int CountDoors();
+	void SingleDoor();
 	void PickDoors();
 	void GenerateMap(int n);
 	void FinishGeneration();
