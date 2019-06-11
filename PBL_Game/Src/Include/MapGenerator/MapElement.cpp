@@ -1,7 +1,6 @@
 #include "MapGenerator/MapElement.hpp"
 #include "Collider.hpp"
 #include "Triggers/Key.hpp"
-#include "Triggers/ChestTrigger.hpp"
 
 MapElement::MapElement(std::vector<SceneNode*>&aNodes):nodes(aNodes),door(nullptr) {
 	this->Position = glm::vec2();
@@ -36,7 +35,7 @@ std::vector<glm::vec2> MapElement::GetNeighbours()
 	return neighbours;
 }
 
-SceneNode* MapElement::GenerateNode(std::vector<SceneNode*>& aNodes, SceneNode* parent, Model* floorMod, Model* wallMod, Model* doorMod, Model* keyMod, Model* chest, int& door_index, std::vector<SceneNode*>* sNodes, bool mirror)
+SceneNode* MapElement::GenerateNode(std::vector<SceneNode*>& aNodes, SceneNode* parent, Model* floorMod, Model* wallMod, Model* doorMod, Model* keyMod, Model* chest, int& door_index, std::vector<SceneNode*>* sNodes, Player* player, bool mirror)
 {
 	this->sNodes = sNodes;
 	this->mirror = mirror;
@@ -53,7 +52,7 @@ SceneNode* MapElement::GenerateNode(std::vector<SceneNode*>& aNodes, SceneNode* 
 	for (int i = 0; i < doors.size(); i++)
 		element->AddChild(doors[i]);
 	if (Chest) {
-		SceneNode* chestNode = CreateChest(floor, chest);
+		SceneNode* chestNode = CreateChest(floor, chest, player);
 		element->AddChild(chestNode);
 		nodes.push_back(element);
 	}
@@ -216,16 +215,18 @@ void MapElement::CleanDoors()
 	Doors = glm::vec4();
 }
 
-SceneNode* MapElement::CreateChest(SceneNode* parent, Model* model)
+SceneNode* MapElement::CreateChest(SceneNode* parent, Model* model, Player* player)
 {
 	SceneNode* chest = new SceneNode();
 	GameObject* oFloor = new GameObject(chest->local);
-	ChestTrigger* chestT = new ChestTrigger(chest->local);
+	ChestTrigger* chestT = new ChestTrigger(chest->local, player);
+	chestT->setDimensions(0, 0, 0, 0.5f, 0.5f, 0.5f);
 	oFloor->AddComponent(model);
 	oFloor->AddComponent(chestT);
 	chest->AddGameObject(oFloor);
 	chest->Translate(Position.x, 0, Position.y);
 	chest->Scale(0.007f, 0.007f, 0.007f);
 	nodes.push_back(chest);
+	sNodes->push_back(chest);
 	return chest;
 }

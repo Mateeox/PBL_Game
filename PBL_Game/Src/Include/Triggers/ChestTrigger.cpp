@@ -3,8 +3,9 @@
 
 using namespace ComponentSystem;
 
-ChestTrigger::ChestTrigger(Transform & transform) : Trigger(transform)
+ChestTrigger::ChestTrigger(Transform & transform, Player* player) : Trigger(transform)
 {
+	this->player = player;
 }
 
 void ChestTrigger::ActivateTrigger()
@@ -12,7 +13,8 @@ void ChestTrigger::ActivateTrigger()
 	if (!activated)
 	{
 		std::cout << "Otwieranie skrzyni" << std::endl;
-		/*chest->RemoveGameObject();
-		gameobject->Destroy();*/
+		player->AddTrap();
+		transform.ScaleTransform(0, 0, 0);
+		activated = true;
 	}
 }

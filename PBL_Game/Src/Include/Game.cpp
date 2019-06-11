@@ -110,7 +110,8 @@ Game::Game(Window &aOkno) : okienko(aOkno),
 
 void Game::Granko()
 {
-  MapGenerator generator(shaderProgram_For_Model, MapScale, 10, 4, false, &sNodes);
+  playerObj = new Player(&leftPlayerNode, 0, *shaderProgram, &leftScene, &Enemy_Node);
+  MapGenerator generator(shaderProgram_For_Model, MapScale, 10, 1, false, &sNodes, playerObj);
 
   std::vector<MapKey *> mapped = generator.GetConverted();
 
@@ -213,7 +214,7 @@ void Game::Granko()
 
   leftPlayerNode.Translate(0, PlayerYOffset, 0);
   rightPlayerNode.Translate(0, PlayerYOffset, 0);
-  playerObj = new Player(&leftPlayerNode, 3, *shaderProgram, &leftScene);
+  
 
 
   leftPlayerNode.AddChild(&leftPlayerNodeForModel);
@@ -635,6 +636,8 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation, 
   //check if there are any collisions, if yes - abort the move
   for (Collider *collider : collidableObjects)
   {
+    if(collider != nullptr)
+	if(collider->Enabled)
     if (playerCollider->checkCollision(collider))
     {
 		if (collider->gameobject->getTag().find("Door") != std::string::npos) {

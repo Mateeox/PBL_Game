@@ -45,7 +45,7 @@ bool Collider::checkCollision(Collider* other)
 					(translatedCoords.z <= otherTranslatedCoords.z + other->dimensions.z) && (translatedCoords.z + dimensions.z >= otherTranslatedCoords.z);
 		}
 	} else {
-		return true;
+		return false;
 	}
 
 }

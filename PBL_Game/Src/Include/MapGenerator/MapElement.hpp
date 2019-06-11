@@ -5,6 +5,8 @@
 #include "Shapes.hpp"
 #include "Component/Model.hpp"
 #include "NodeWithModelFactory.hpp"
+#include "Triggers/ChestTrigger.hpp"
+
 class MapElement {
 	private:
 	std::vector<SceneNode*>& nodes;
@@ -32,11 +34,11 @@ class MapElement {
 	void RemoveDoor(glm::vec4 doors);
 	void RemoveDoor(int order);
 	std::vector<glm::vec2> GetNeighbours();
-	SceneNode* GenerateNode(std::vector<SceneNode*>& nodes, SceneNode* parent, Model* floor, Model* wall, Model* door, Model* key, Model* chest, int& door_index, std::vector<SceneNode*>* sNodes, bool mirror = false);
+	SceneNode* GenerateNode(std::vector<SceneNode*>& nodes, SceneNode* parent, Model* floor, Model* wall, Model* door, Model* key, Model* chest, int& door_index, std::vector<SceneNode*>* sNodes, Player* player, bool mirror = false);
 	SceneNode* AddFloor(Model* model);
 	std::vector<SceneNode*> AddWalls(SceneNode* node, Model* model);
 	std::vector<SceneNode*> AddDoors(SceneNode* node, Model* model, Model* key, int& door_index);
 	SceneNode* CreateWall(SceneNode* parent, Model* model, float direction_x, float direction_y);
 	SceneNode* CreateDoor(SceneNode* parent, Model* model, Model* key, int& door_index, float direction_x, float direction_y);
-	SceneNode* CreateChest(SceneNode* parent, Model* model);
+	SceneNode* CreateChest(SceneNode* parent, Model* model, Player* player);
 };

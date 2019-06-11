@@ -15,7 +15,7 @@ MapGenerator::MapGenerator(Shader *shaderProgram)
 	this->doors.clear();
 }
 
-MapGenerator::MapGenerator(Shader *shaderProgram, int squares, int doors, int chests, bool glass_doors, std::vector<SceneNode*>* sNodes)
+MapGenerator::MapGenerator(Shader *shaderProgram, int squares, int doors, int chests, bool glass_doors, std::vector<SceneNode*>* sNodes, Player* player)
 {
 	this->Squares = squares;
 	this->Doors = doors;
@@ -23,6 +23,7 @@ MapGenerator::MapGenerator(Shader *shaderProgram, int squares, int doors, int ch
 	this->GlassDoor = glass_doors;
 	this->shader = shaderProgram;
 	this->sNodes = sNodes;
+	this->player = player;
 	DefineModels();
 	srand(time(NULL));
 	GenerateMap(squares);
@@ -134,7 +135,7 @@ void MapGenerator::FinishGeneration()
 	int door_index = 0;
 	for (int i = 0; i < maps.size(); i++)
 	{
-		mapRoot->AddChild(maps[i]->GenerateNode(leftnodes, mapRoot, floor, wall, door, key, chest, door_index, sNodes));
+		mapRoot->AddChild(maps[i]->GenerateNode(leftnodes, mapRoot, floor, wall, door, key, chest, door_index, sNodes, player));
 	}
 	leftnodes.push_back(mapRoot);
 
@@ -143,7 +144,7 @@ void MapGenerator::FinishGeneration()
 	SceneNode *mapRoot2 = new SceneNode();
 	for (int i = 0; i < maps.size(); i++)
 	{
-		mapRoot2->AddChild(maps[i]->GenerateNode(rightnodes, mapRoot, floor, wall, door, key, chest, door_index, sNodes, true));
+		mapRoot2->AddChild(maps[i]->GenerateNode(rightnodes, mapRoot, floor, wall, door, key, chest, door_index, sNodes, player, true));
 	}
 	rightnodes.push_back(mapRoot2);
 }
