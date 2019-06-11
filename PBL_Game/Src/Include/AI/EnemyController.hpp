@@ -39,7 +39,7 @@ class EnemyController
 	std::vector<GridLocation> path;
 	std::vector<MapTile *>& mapTiles;
 
-	bool debugPathFinding = false;
+	bool debugPathFinding = true;
 	bool StopEnemy = false;
     bool LastFirstFlag = true;
 
@@ -63,7 +63,8 @@ public:
     float GetPlayerDistance();
     void Update(float interpolation);
     void SwtichStartWithEnd();
-	void MoveNodeToMapTile(SceneNode *sceneNode, GridLocation mapTile, float interpolation, float speed, float NodeXOffset, float NodeZOffset);
+	void MoveEnemyToMapTile(SceneNode *enemyNode, GridLocation mapTile, float interpolation, float speed, float NodeXOffset, float NodeZOffset);
+	void MoveEnemyToNode(SceneNode *enemyNode, SceneNode * targetNode, float interpolation, float speed);
     void LoadFromConfig();
 
 	float EnemyPlayerDistance;
