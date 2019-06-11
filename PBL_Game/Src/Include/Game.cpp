@@ -88,6 +88,16 @@ Game::Game(Window &aOkno) : okienko(aOkno),
   shaderProgram_For_Model->setFloat("pointLights[0].linear", 0.35);
   shaderProgram_For_Model->setFloat("pointLights[0].quadratic", 0.44);
 
+    shaderProgram_For_Model->setVec3("spotLight.ambient", 1, 1, 1);
+  shaderProgram_For_Model->setVec3("spotLight.diffuse", 1, 1, 1);
+  shaderProgram_For_Model->setVec3("spotLight.specular", 1, 1, 1);
+  shaderProgram_For_Model->setFloat("spotLight.constant", 1.0f);
+  shaderProgram_For_Model->setFloat("spotLight.linear", 0.22);
+  shaderProgram_For_Model->setFloat("spotLight.quadratic", 0.20);
+  shaderProgram_For_Model->setFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
+  shaderProgram_For_Model->setFloat("spotLight.outerCutOff", glm::cos(glm::radians(15.5f)));
+    shaderProgram_For_Model->setVec3("spotLight.direction", glm::vec3(1,0,0));
+
   //enemy
   shaderProgram_For_Model->setVec3("pointLights[1].ambient", 1, 1, 1);
   shaderProgram_For_Model->setVec3("pointLights[1].diffuse", 1, 1, 1);
@@ -764,6 +774,8 @@ void Game::SetViewAndPerspective(Camera &aCamera, Transform &player, Transform *
   auto lightPos = player.getPosition()*player.getScale();
   lightPos.y = 0.5;
   shaderProgram_For_Model->setVec3("pointLights[0].position", lightPos);
+  lightPos.y = 0.25;
+  shaderProgram_For_Model->setVec3("spotLight.position", lightPos);
   glm::vec3 enemyLightPos;
   if (enemy != nullptr)
   {

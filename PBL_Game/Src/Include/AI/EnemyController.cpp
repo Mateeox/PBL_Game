@@ -86,8 +86,21 @@ void EnemyController::Update(float  interpolation)
 	if (debugPathFinding)
 		ResetMapTilePath(mapTiles, grid, mapSize, &path);
 
-	if (path.size() > 1 && !StopEnemy)
-		MoveNodeToMapTile(&enemy, path[1], interpolation, enemySpeed, 3, 5); // TODO Add BaseSpeed
+	if (!StopEnemy)
+	{
+		if (EnemyPlayerDistance > 25)
+		{
+			if (path.size() > 1)
+			{
+				MoveEnemyToMapTile(&enemy, path[1], interpolation, enemySpeed, 3, 5); // TODO Add BaseSpeed
+			}
+		}
+		else
+		{
+			std::cout << "Move to Node :" << "\n";
+			MoveEnemyToNode(&enemy, &player, interpolation, enemySpeed);
+		}
+	}
 
 	start = GetPositionOfset(enemy, mapSize, 3, 5);
 	CheckIFNotOnEnd();
@@ -176,7 +189,7 @@ void EnemyController::SetStateFromInterestLevel()
     }
 }
 
-void EnemyController::MoveNodeToMapTile(SceneNode *sceneNode, GridLocation mapTile, float interpolation, float speed, float NodeXOffset, float NodeZOffset)
+void EnemyController::MoveEnemyToMapTile(SceneNode *sceneNode, GridLocation mapTile, float interpolation, float speed, float NodeXOffset, float NodeZOffset)
 {
 	glm::vec2 positionA{ sceneNode->local.getPosition().x, sceneNode->local.getPosition().z };
 	glm::vec2 positionB{ NodeXOffset + mapTile.x * 400, NodeZOffset + mapTile.y * 400 };
@@ -204,7 +217,11 @@ void EnemyController::MoveNodeToMapTile(SceneNode *sceneNode, GridLocation mapTi
 
 	SceneNode *roationChild = sceneNode->children[0];
 	sceneNode->Translate(diffVec.x, 0, diffVec.y);
-	if (abs(diffVec.y) > abs(diffVec.x))
+
+	float playerRotation = atan2(-diffVec.y, diffVec.x);
+	roationChild->local.SetRotation(0, playerRotation * 58 +90, 0);
+
+	/*if (abs(diffVec.y) > abs(diffVec.x))
 	{
 		if (diffVec.y < 0)
 		{
@@ -226,4 +243,39 @@ void EnemyController::MoveNodeToMapTile(SceneNode *sceneNode, GridLocation mapTi
 			roationChild->local.SetRotation(0, 90, 0);
 		}
 	}
+	*/
+}
+
+void EnemyController::MoveEnemyToNode(SceneNode *sceneNode, SceneNode* targetNode, float interpolation, float speed)
+{
+	glm::vec2 positionA{ sceneNode->local.getPosition().x * sceneNode->local.getScale().x, sceneNode->local.getPosition().z * sceneNode->local.getScale().z };
+	glm::vec2 positionB{ targetNode->local.getPosition().x * targetNode->local.getScale().x, targetNode->local.getPosition().z * targetNode->local.getScale().z };
+
+	glm::vec2 diffVec = positionB - positionA;
+	glm::vec2 diffNormalized;
+
+	glm::vec3 diffVec3D = { diffVec.x, sceneNode->local.getPosition().y, diffVec.y };
+
+	double veclenght = sqrt(diffVec.x * diffVec.x + diffVec.y * diffVec.y);
+	float angle = atan2f(diffVec3D.y, diffVec3D.x) * 180.0f / 3.14f;
+
+	if (veclenght != 0)
+	{
+		diffNormalized.x = diffVec.x / veclenght;
+		diffNormalized.y = diffVec.y / veclenght;
+	}
+	else
+	{
+		diffNormalized = glm::vec2(0, 0);
+	}
+
+
+	float value = interpolation * speed;
+	diffNormalized *= value;
+
+	SceneNode *roationChild = sceneNode->children[0];
+	sceneNode->Translate(diffNormalized.x, 0, diffNormalized.y);
+
+	float playerRotation = atan2(-diffNormalized.y, diffNormalized.x);
+	roationChild->local.SetRotation(0, playerRotation* 58+90, 0);
 }

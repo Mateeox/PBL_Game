@@ -20,6 +20,6 @@ void Key::ActivateTrigger()
 		}
 		door->Scale(0);
 		gameobject->transform.ScaleTransform(0, 0, 0);
-//		gameobject->Destroy();
+		activated = true;
 	}
 }

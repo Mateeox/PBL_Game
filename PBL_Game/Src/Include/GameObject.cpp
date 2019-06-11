@@ -26,7 +26,10 @@ void GameObject::RemoveComponent(ComponentSystem::ComponentType type)
 void GameObject::Destroy()
 {
     if(node != nullptr)
+    {
+    components.clear();
     node->RemoveGameObject();
+    }
 }
 
 ComponentSystem::Component *GameObject::GetComponent(ComponentSystem::ComponentType type)
