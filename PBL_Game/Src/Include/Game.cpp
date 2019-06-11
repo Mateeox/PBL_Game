@@ -158,6 +158,7 @@ void Game::Granko()
   GameObject *rightPlayerObjWithCollider = new GameObject(rightPlayerNode.local);
   leftPlayerObjWithCollider->setTag("player");
   rightPlayerObjWithCollider->setTag("player");
+  enemyGameObject->setTag("enemy");
 
 
   std::string PlayerModelPath = "Models/Player/player_animations.fbx";
@@ -188,6 +189,7 @@ void Game::Granko()
   EnemyKills* killer = new EnemyKills(Enemy_Node.local, &leftPlayerNode);
   enemyGameObject->AddComponent(killer);
 
+  killer->setDimensions(-0.12, 0, 0.25, 2.3 / 10, 2, 3.05 / 10);
   leftPlayerCollider->setDimensions(-0.12, 0, 0.25, 2.3/15, 2, 3.05/15);
   rightPlayerCollider->setDimensions(-0.12, 0, 0.25, 2.3/15, 2, 3.05/15);
 
