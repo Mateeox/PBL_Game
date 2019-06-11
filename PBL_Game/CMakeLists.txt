@@ -86,7 +86,9 @@ add_executable(PBL_Game
 		#Factorys
 		Src/Include/NodeWithModelFactory.cpp
 	  #Stb_image
-	  Src/Include/stb_image.cpp
+		Src/Include/stb_image.cpp
+		#Gui
+		Src/Include/GuiElement.cpp
 	  #ImGui
 	  external/Imgui/examples/libs/gl3w/GL/gl3w.c
 	  external/Imgui/Include/imgui.cpp

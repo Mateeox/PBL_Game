@@ -12,6 +12,7 @@
 #include "Component/AnimatedModel.hpp"
 #include "Player.hpp"
 #include "AI/EnemyController.hpp"
+#include "GuiElement.hpp"
 
 const int TICKS_PER_SECOND = 64;
 const int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
@@ -44,6 +45,7 @@ class Game
   Shader *shaderProgram_For_Model;
   Shader *shaderAnimatedModel;
   Shader *shaderViewCone;
+  Shader * guiShader;
   SceneNode wholeScene;
 
   SceneNode leftScene;
@@ -54,6 +56,14 @@ class Game
   std::vector<Collider *> collidableObjects;
   std::vector<Trigger *> triggers;
   std::map<int,bool> KeyInEq;
+
+
+//Gui test
+unsigned int texture1;
+unsigned int VBO, VAO, EBO;
+
+
+
 
 
   //PathFinding
@@ -103,8 +113,8 @@ class Game
   float PlayerScaleInverse;
 
   float TrapScale;
-  int trapPieces = 0;		// Ilosc posiadanych elementow pu³apki
-  int requredPieces = 4;	// Ilosc wymaganych elementow pu³apki
+  int trapPieces = 0;		// Ilosc posiadanych elementow puï¿½apki
+  int requredPieces = 4;	// Ilosc wymaganych elementow puï¿½apki
 
   float movementSpeedTimesPlayerScale;
 
@@ -122,6 +132,9 @@ class Game
 
   Camera camera;
   Camera camera2;
+
+ //Gui
+ SimpleGUI::GuiElement * guiElement = nullptr;
 
   //Imgui
   bool show_demo_window = true;
