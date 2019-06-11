@@ -19,6 +19,12 @@ void SceneNode::AddGameObject(GameObject *aGameObject)
   aGameObject->transform = world;
   gameObject = aGameObject;
 }
+
+void SceneNode::RemoveChildNoRecursive(SceneNode *aSceneNode)
+{
+  children.erase(std::remove(children.begin(), children.end(), aSceneNode), children.end());
+}
+
 void SceneNode::AddParent(SceneNode *aSceneNode)
 {
   parent = aSceneNode;

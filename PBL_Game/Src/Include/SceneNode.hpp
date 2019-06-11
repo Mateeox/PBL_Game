@@ -24,6 +24,7 @@ class SceneNode
 
 	void AddParent(SceneNode *aSceneNode);
     void AddChild(SceneNode *aSceneNode);
+	void RemoveChildNoRecursive(SceneNode *aSceneNode);
     void AddGameObject(GameObject *aGameObject);
     void Render(Transform& parentWorld, bool aDirty_Flag);
     void RemoveGameObject();
