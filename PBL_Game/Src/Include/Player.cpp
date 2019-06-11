@@ -42,7 +42,7 @@ SceneNode* Player::CreateTrap(float scale)
 	GameObject* trapObj = new GameObject(trap->local);
 	EnemyDies* trapTrig = new EnemyDies(trap->local, nullptr);			//dodaæ przeciwnika
 	trapObj->AddComponent(trapMod);
-	trapObj->AddComponent(trapTrig);
+	trapObj->AddComponent(trapTrig); 
 	trap->AddGameObject(trapObj);
 	glm::vec3 Position = player->local.getPosition();
 	trap->Scale(scale);

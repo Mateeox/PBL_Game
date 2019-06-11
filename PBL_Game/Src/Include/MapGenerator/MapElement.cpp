@@ -112,7 +112,6 @@ SceneNode* MapElement::CreateDoor(SceneNode* parent, Model* doorModel, Model* ke
 		door->Rotate(direction_y == 0 ? -90.0f : 0, glm::vec3(0, 1, 0));
 		door->Scale(0.0254f, 0.0254f, 0.01f);
 		door->AddParent(parent);
-		
 		door_index++;
 		return door;
 	}
@@ -125,8 +124,8 @@ SceneNode* MapElement::CreateDoor(SceneNode* parent, Model* doorModel, Model* ke
 		Key *aKey = new Key(door->local,door); 
 		aKey->setDimensions(0,0,0,0.35,0.35,0.35);
 		key->gameObject->AddComponent(std::move(aKey));
-
-		sNodes->push_back(key);
+		sNodes->push_back(key); 
+		door_index++;
 		return key;
 	}
 }

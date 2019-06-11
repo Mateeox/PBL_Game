@@ -138,6 +138,7 @@ void MapGenerator::FinishGeneration()
 	}
 	leftnodes.push_back(mapRoot);
 
+	door_index = 0;
 
 	SceneNode *mapRoot2 = new SceneNode();
 	for (int i = 0; i < maps.size(); i++)

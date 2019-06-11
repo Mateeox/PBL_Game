@@ -1,6 +1,6 @@
-#include "EnemyKills.hpp"
+#include "EnemyDies.hpp"
 
-EnemyKills::EnemyKills(Transform& transform, SceneNode* player) : Trigger(transform)
+EnemyDies::EnemyDies(Transform& transform, SceneNode* enemy) : Trigger(transform)
 {
-	this->Player = player;
+	this->Enemy = enemy;
 }
