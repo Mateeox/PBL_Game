@@ -15,5 +15,6 @@ void Key::ActivateTrigger()
 		std::cout << "Podniesiono klucz" << std::endl;
 		door->RemoveGameObject();
 		gameobject->Destroy();
+		activated = true;
 	}
 }
