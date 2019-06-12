@@ -34,11 +34,10 @@ class GuiElement
     std::map<std::string, Texture *> textures;
     Texture * currentTexture = nullptr;
     
-
 	Shader * shader;
     unsigned int VBO, VAO, EBO;
     glm::mat4 transform;
-    bool visible = true;
+    bool visible = false;
 	bool fadeToColor = false;
 	bool fadeFromTransparent = false;
 

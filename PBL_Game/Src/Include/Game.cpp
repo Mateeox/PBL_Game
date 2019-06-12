@@ -110,6 +110,13 @@ Game::Game(Window &aOkno) : okienko(aOkno),
 
 void Game::Granko()
 {
+
+  glm::mat4 guiTransfom{1.f};
+  guiElement = new SimpleGUI::GuiElement("Textures/DeathTr.png", glm::scale(guiTransfom, glm::vec3(2, 2, 2)),guiShader);
+  DeathBcg = new SimpleGUI::GuiElement("Textures/DeathBg.png", glm::scale(guiTransfom, glm::vec3(2, 2, 2)), guiShader);
+
+
+
   playerObj = new Player(&leftPlayerNode, 0, *shaderProgram, &leftScene, &Enemy_Node);
   MapGenerator generator(shaderProgram_For_Model, MapScale, 10, 1, false, &sNodes, playerObj);
 
@@ -182,7 +189,7 @@ void Game::Granko()
   Collider *leftPlayerCollider = new Collider(leftPlayerObjWithCollider->transform);
   Collider *rightPlayerCollider = new Collider(rightPlayerObjWithCollider->transform);
 
-  EnemyKills *killer = new EnemyKills(Enemy_Node.local, &leftPlayerNode);
+  EnemyKills *killer = new EnemyKills(Enemy_Node.local, &leftPlayerNode,DeathBcg,guiElement);
   enemyGameObject->AddComponent(killer);
 
   killer->setDimensions(-0.12, 0, 0.25, 2.3 / 10, 2, 3.05 / 10);
@@ -275,16 +282,6 @@ void Game::Granko()
   gatherTriggers(sNodes);
   std::cout << "Triggers gathered: " << triggers.size() << std::endl;
 
-  glm::mat4 guiTransfom{1.f};
-  //guiTransfom = glm::translate(guiTransfom,glm::vec3(-0.7,0.8,0));
-  //guiTransfom = glm::scale(guiTransfom,glm::vec3(0.1,0.1,0.1));
-  guiElement = new SimpleGUI::GuiElement("Textures/DeathTr.png", glm::scale(guiTransfom, glm::vec3(2, 2, 2)),guiShader);
-  DeathBcg = new SimpleGUI::GuiElement("Textures/DeathBg.png", glm::scale(guiTransfom, glm::vec3(2, 2, 2)), guiShader);
-  //guiElement->SwtichVisiblity();
-  guiElement->FadeFromTransparent(1);
-  guiElement->FadeToColor(glm::vec3(1.0,0.02,0.02),50);
-  DeathBcg->FadeFromTransparent(2);
-  //DeathBcg->SwtichVisiblity();
 
 
   while (glfwGetKey(okienko.window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&

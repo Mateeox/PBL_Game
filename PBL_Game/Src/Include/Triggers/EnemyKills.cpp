@@ -1,6 +1,7 @@
 #include "EnemyKills.hpp"
 
-EnemyKills::EnemyKills(Transform& transform, SceneNode* player) : Trigger(transform)
+EnemyKills::EnemyKills(Transform& transform, SceneNode* player,SimpleGUI::GuiElement * aBack,SimpleGUI::GuiElement * aLost) : 
+Trigger(transform),background(aBack),lostScreen(aLost)
 {
 	this->Player = player;
 }

@@ -41,7 +41,7 @@ void main()
         }
         else if (fadeToColor && fadeFromTransparent)
         {
-            FragColor = mix(fadeToColorVec4,fadeToTransparentVec4,0.75);
+            FragColor = mix(fadeToColorVec4,fadeToTransparentVec4,0.75) * 2;
         }
         else
         {

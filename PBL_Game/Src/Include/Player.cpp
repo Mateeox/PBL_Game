@@ -40,10 +40,13 @@ void Player::Update(PBLGame::Window *okienko, float scale)
 		}
 	}
 
+
 	if (enemyTrigger != nullptr && trigger != nullptr)
 	{
 		if (enemyTrigger->checkCollision(trigger))
+		{
 			trigger->ActivateTrigger();
+		}
 	}
 	
 }

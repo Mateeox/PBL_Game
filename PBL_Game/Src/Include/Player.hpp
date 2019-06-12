@@ -4,6 +4,7 @@
 #include "Component/Model.hpp"
 #include "Collider.hpp"
 #include "Trigger.hpp"
+#include "GuiElement.hpp"
 
 class Player
 {
