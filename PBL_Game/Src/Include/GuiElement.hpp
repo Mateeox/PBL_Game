@@ -34,17 +34,30 @@ class GuiElement
     std::map<std::string, Texture *> textures;
     Texture * currentTexture = nullptr;
     
+
+	Shader * shader;
     unsigned int VBO, VAO, EBO;
     glm::mat4 transform;
     bool visible = true;
+	bool fadeToColor = false;
+	bool fadeFromTransparent = false;
 
+	float fadeFromTransparentSpeed = 0;
+	float fadeToColorSpeed = 0;
 
     public:
+
+	glm::vec3 ColorFade;
+	float FadeToColorValue = 0.0f;
+	float FadeFromTransparentValue = 0.0f;
+
     void AddTexture(std::string aPtah,std::string aName);
     void SwitchTexture(std::string aName);
     void SwtichVisiblity();
-    GuiElement(std::string texturepath,glm::mat4 aTRansform);
-    void Draw(Shader * shader);
+	void FadeToColor(glm::vec3 aColorFade,float speed);
+	void FadeFromTransparent(float speed);
+    GuiElement(std::string texturepath,glm::mat4 aTRansform,Shader * defaultShader);
+    void Draw();
     void setTransform(glm::mat4 transform);
 
 };

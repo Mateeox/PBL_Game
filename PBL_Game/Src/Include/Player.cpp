@@ -40,11 +40,6 @@ void Player::Update(PBLGame::Window *okienko, float scale)
 		}
 	}
 
-	if(enemyTrigger == nullptr)
-	{
-		std::cout<<"No collider \n";
-	}
-
 	if (enemyTrigger != nullptr && trigger != nullptr)
 	{
 		if (enemyTrigger->checkCollision(trigger))

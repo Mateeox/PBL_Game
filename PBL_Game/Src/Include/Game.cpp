@@ -276,9 +276,16 @@ void Game::Granko()
   std::cout << "Triggers gathered: " << triggers.size() << std::endl;
 
   glm::mat4 guiTransfom{1.f};
-  guiTransfom = glm::translate(guiTransfom,glm::vec3(-0.7,0.8,0));
-  guiTransfom = glm::scale(guiTransfom,glm::vec3(0.1,0.1,0.1));
-  guiElement = new SimpleGUI::GuiElement("Textures/icons8-gear-48.png",guiTransfom);
+  //guiTransfom = glm::translate(guiTransfom,glm::vec3(-0.7,0.8,0));
+  //guiTransfom = glm::scale(guiTransfom,glm::vec3(0.1,0.1,0.1));
+  guiElement = new SimpleGUI::GuiElement("Textures/DeathTr.png", glm::scale(guiTransfom, glm::vec3(2, 2, 2)),guiShader);
+  DeathBcg = new SimpleGUI::GuiElement("Textures/DeathBg.png", glm::scale(guiTransfom, glm::vec3(2, 2, 2)), guiShader);
+  //guiElement->SwtichVisiblity();
+  guiElement->FadeFromTransparent(1);
+  guiElement->FadeToColor(glm::vec3(1.0,0.02,0.02),50);
+  DeathBcg->FadeFromTransparent(2);
+  //DeathBcg->SwtichVisiblity();
+
 
   while (glfwGetKey(okienko.window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
          glfwWindowShouldClose(okienko.window) == 0)
@@ -383,7 +390,8 @@ void Game::Render()
   glViewport(0, 0, Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT);
   glDisable(GL_DEPTH_TEST);
 
-  guiElement->Draw(guiShader);
+  DeathBcg->Draw();
+  guiElement->Draw();
   
   
   // Render grafik

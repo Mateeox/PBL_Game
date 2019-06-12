@@ -135,6 +135,7 @@ unsigned int VBO, VAO, EBO;
 
  //Gui
  SimpleGUI::GuiElement * guiElement = nullptr;
+ SimpleGUI::GuiElement * DeathBcg = nullptr;
 
   //Imgui
   bool show_demo_window = true;
