@@ -113,15 +113,13 @@ void Game::Granko()
 {
 
   glm::mat4 guiTransfom{1.f};
-  guiElement = new SimpleGUI::GuiElement("Textures/DeathTr.png", glm::scale(guiTransfom, glm::vec3(2, 2, 2)),guiShader);
+  guiElement = new SimpleGUI::GuiElement("Textures/DeathTr.png", glm::scale(guiTransfom, glm::vec3(2, 2, 2)), guiShader);
   DeathBcg = new SimpleGUI::GuiElement("Textures/DeathBg.png", glm::scale(guiTransfom, glm::vec3(2, 2, 2)), guiShader);
 
-  guiElement2 = new SimpleGUI::GuiElement("Textures/DeathTr.png", glm::scale(guiTransfom, glm::vec3(2, 2, 2)),guiShader);
+  guiElement2 = new SimpleGUI::GuiElement("Textures/DeathTr.png", glm::scale(guiTransfom, glm::vec3(2, 2, 2)), guiShader);
   WinBcg = new SimpleGUI::GuiElement("Textures/WinBg.png", glm::scale(guiTransfom, glm::vec3(2, 2, 2)), guiShader);
 
-
-
-  playerObj = new Player(&leftPlayerNode, 0, *shaderProgram, &leftScene, &Enemy_Node,WinBcg,guiElement2);
+  playerObj = new Player(&leftPlayerNode, 0, *shaderProgram, &leftScene, &Enemy_Node, WinBcg, guiElement2);
   MapGenerator generator(shaderProgram_For_Model, MapScale, 10, 1, false, &sNodes, playerObj);
 
   std::vector<MapKey *> mapped = generator.GetConverted();
@@ -193,12 +191,12 @@ void Game::Granko()
   Collider *leftPlayerCollider = new Collider(leftPlayerObjWithCollider->transform);
   Collider *rightPlayerCollider = new Collider(rightPlayerObjWithCollider->transform);
 
-  EnemyKills *killer = new EnemyKills(Enemy_Node.local, &leftPlayerNode,DeathBcg,guiElement);
+  EnemyKills *killer = new EnemyKills(Enemy_Node.local, &leftPlayerNode, DeathBcg, guiElement);
   enemyGameObject->AddComponent(killer);
 
   killer->setDimensions(-0.12, 0, 0.25, 2.3 / 10, 2, 3.05 / 10);
-  leftPlayerCollider->setDimensions(-0.12, 0, 0.25, 2.3/15, 2, 3.05/15);
-  rightPlayerCollider->setDimensions(-0.12, 0, 0.25, 2.3/15, 2, 3.05/15);
+  leftPlayerCollider->setDimensions(-0.12, 0, 0.25, 2.3 / 15, 2, 3.05 / 15);
+  rightPlayerCollider->setDimensions(-0.12, 0, 0.25, 2.3 / 15, 2, 3.05 / 15);
 
   leftPlayerObjWithCollider->AddComponent(leftPlayerCollider);
   rightPlayerObjWithCollider->AddComponent(rightPlayerCollider);
@@ -221,7 +219,6 @@ void Game::Granko()
 
   leftPlayerNode.Translate(0, PlayerYOffset, 0);
   rightPlayerNode.Translate(0, PlayerYOffset, 0);
-  
 
   leftPlayerNode.AddChild(&leftPlayerNodeForModel);
   rightPlayerNode.AddChild(&rightPlayerNodeForModel);
@@ -229,8 +226,9 @@ void Game::Granko()
   Enemy_Node.AddChild(&Enemy_Node_For_Model);
   sNodes.push_back(&Enemy_Node);
 
-  enemyController = new EnemyController(Enemy_Node,
+  enemyController = new EnemyController(this,Enemy_Node,
                                         leftPlayerNode,
+                                        rightPlayerNode,
                                         GridLocation{static_cast<int>(Corners[0].x), static_cast<int>(Corners[0].y)}, //enemy start location
                                         GridLocation{static_cast<int>(Corners[1].x), static_cast<int>(Corners[1].y)}, //enemy firstTarget
                                         grid,
@@ -262,7 +260,7 @@ void Game::Granko()
   }
 
   leftScene.AddChild(&leftPlayerNode);
-  leftScene.AddChild(&Enemy_Node);
+  //leftScene.AddChild(&Enemy_Node);
 
   for (auto &node : generator.rightnodes)
   {
@@ -285,8 +283,6 @@ void Game::Granko()
   std::cout << "Colliders gathered: " << collidableObjects.size() << std::endl;
   gatherTriggers(sNodes);
   std::cout << "Triggers gathered: " << triggers.size() << std::endl;
-
-
 
   while (glfwGetKey(okienko.window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
          glfwWindowShouldClose(okienko.window) == 0)
@@ -357,23 +353,46 @@ void Game::Render()
 
   Transform originTransform = Transform::origin();
 
+ if (EnemyOnLefSide)
+  {
   SetViewAndPerspective(camera, leftPlayerNode.local, &Enemy_Node.local);
+  }
+  else
+  {
+    SetViewAndPerspective(camera, leftPlayerNode.local, nullptr);
+  }
+  
   // RENDER LEWEJ STRONY
   glViewport(0, 0, (Game::WINDOW_WIDTH / 2) + 125, Game::WINDOW_HEIGHT);
   glScissor(0, 0, (Game::WINDOW_WIDTH / 2) + offset, Game::WINDOW_HEIGHT);
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT);
-  leftScene.Render(originTransform, true);
-  Enemy_Node.Render(originTransform, true);
 
-  SetViewAndPerspective(camera2, rightPlayerNode.local, nullptr);
+  leftScene.Render(originTransform, true);
+  if (EnemyOnLefSide)
+  {
+    Enemy_Node.Render(originTransform, true);
+  }
+   if (!EnemyOnLefSide)
+  {
+  SetViewAndPerspective(camera2, rightPlayerNode.local, &Enemy_Node.local);
+  }
+  else
+  {
+    SetViewAndPerspective(camera2, rightPlayerNode.local, nullptr);
+  }
 
   // RENDER PRAWEJ STRONY
   glViewport((Game::WINDOW_WIDTH / 2) - 125, 0, (Game::WINDOW_WIDTH / 2) + 125, Game::WINDOW_HEIGHT);
   glScissor((Game::WINDOW_WIDTH / 2) + offset, 0, (Game::WINDOW_WIDTH / 2) - offset, Game::WINDOW_HEIGHT);
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT);
+
   rightScene.Render(originTransform, true);
+  if (!EnemyOnLefSide)
+  {
+    Enemy_Node.Render(originTransform, true);
+  }
 
   // RENDER PASKA ODDZIELAJACAEGO KAMERY - TODO
   glViewport((Game::WINDOW_WIDTH / 2) + offset - 5, 0, 10, Game::WINDOW_HEIGHT);
@@ -393,8 +412,10 @@ void Game::Render()
 
   DeathBcg->Draw();
   guiElement->Draw();
-  
-  
+
+  WinBcg->Draw();
+  guiElement2->Draw();
+
   // Render grafik
   Plot();
 
@@ -563,9 +584,8 @@ void Game::ProcessInput(float interpolation, Camera &camera_update)
     swapButtonPressed = false;
   }
 
-  if (!Tab_Pressed)
-  {
-    if (glfwGetKey(okienko.window, GLFW_KEY_TAB) == GLFW_PRESS)
+
+    if (glfwGetKey(okienko.window, GLFW_KEY_TAB) == GLFW_PRESS && !Tab_Pressed) 
     {
       Tab_Pressed = true;
 
@@ -580,13 +600,11 @@ void Game::ProcessInput(float interpolation, Camera &camera_update)
         glfwSetInputMode(okienko.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
       }
     }
-  }
-
-  if (glfwGetKey(okienko.window, GLFW_KEY_TAB) == GLFW_RELEASE)
-  {
-    Tab_Pressed = false;
-  }
-
+    else if (!glfwGetKey(okienko.window, GLFW_KEY_ENTER) == GLFW_PRESS && Tab_Pressed)
+    {
+      Tab_Pressed =false;
+    }
+  
   FixAnimation();
 }
 void Game::ProcessMouse()
@@ -641,7 +659,7 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation, 
     movementDir.x = 1;
 
   auto velocity = movementSpeedTimesPlayerScale;
-  if(glfwGetKey(okienko.window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+  if (glfwGetKey(okienko.window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
   {
     velocity += velocity;
   }
@@ -661,35 +679,41 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation, 
   //check if there are any collisions, if yes - abort the move
   for (Collider *collider : collidableObjects)
   {
-    if(collider != nullptr)
-	if(collider->Enabled)
-    if (playerCollider->checkCollision(collider))
-    {
-		if (collider->gameobject->getTag().find("Door") != std::string::npos) {
-			if (isLeft)
-			{
-				player.local = transformBeforeMove;
-				playerCollider->transform = transformBeforeMove;
-			}
-		} else {
-			player.local = transformBeforeMove;
-			playerCollider->transform = transformBeforeMove;
-		}
-      break;
-    }
+    if (collider != nullptr)
+      if (collider->Enabled)
+        if (playerCollider->checkCollision(collider))
+        {
+          if (collider->gameobject->getTag().find("Door") != std::string::npos)
+          {
+            if (isLeft)
+            {
+              player.local = transformBeforeMove;
+              playerCollider->transform = transformBeforeMove;
+            }
+          }
+          else
+          {
+            player.local = transformBeforeMove;
+            playerCollider->transform = transformBeforeMove;
+          }
+          break;
+        }
   }
   for (Trigger *trigger : triggers)
   {
-	if(trigger->gameobject != nullptr)
-    if (playerCollider->checkCollision(trigger))
-    {
-		if (trigger->gameobject->getTag().find("Key") != std::string::npos) {
-			if(!isLeft)
-				trigger->ActivateTrigger();
-		} else {
-			trigger->ActivateTrigger();
-		}
-    }
+    if (trigger->gameobject != nullptr)
+      if (playerCollider->checkCollision(trigger))
+      {
+        if (trigger->gameobject->getTag().find("Key") != std::string::npos)
+        {
+          if (!isLeft)
+            trigger->ActivateTrigger();
+        }
+        else
+        {
+          trigger->ActivateTrigger();
+        }
+      }
   }
 
   //view cone
@@ -701,11 +725,11 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation, 
     if (glfwGetKey(okienko.window, GLFW_KEY_RIGHT) == GLFW_PRESS)
       coneRenderer->rotateRight();
 
-	auto angle = coneRenderer->getDirectionAngle();
-	angle += coneRenderer->getAngle() / 2;
-	angle = fmod(angle, 2 * M_PI);
-	shaderProgram_For_Model->use();
-	shaderProgram_For_Model->setVec3("spotLight.direction", glm::vec3(cos(angle), 0, sin(angle)));
+    auto angle = coneRenderer->getDirectionAngle();
+    angle += coneRenderer->getAngle() / 2;
+    angle = fmod(angle, 2 * M_PI);
+    shaderProgram_For_Model->use();
+    shaderProgram_For_Model->setVec3("spotLight.direction", glm::vec3(cos(angle), 0, sin(angle)));
   }
   camera.Position.x = player.local.getPosition().x * PlayerScale;
   camera.Position.y = cameraYOffset;
@@ -800,8 +824,6 @@ void Game::SetViewAndPerspective(Camera &aCamera, Transform &player, Transform *
   shaderProgram_For_Model->use();
   shaderProgram_For_Model->setMat4("projection", projection);
   shaderProgram_For_Model->setMat4("view", view);
-  shaderProgram_For_Model->setFloat("FogDensity", FogDensity);
-  shaderProgram_For_Model->setFloat("viewSpaceZOffset", cameraZOffset);
   shaderProgram_For_Model->setVec3("viewPos", aCamera.Position);
   auto lightPos = player.getPosition() * player.getScale();
   lightPos.y = 0.5;
@@ -828,8 +850,6 @@ void Game::SetViewAndPerspective(Camera &aCamera, Transform &player, Transform *
   shaderAnimatedModel->use();
   shaderAnimatedModel->setMat4("projection", projection);
   shaderAnimatedModel->setMat4("view", view);
-  //shaderAnimatedModel->setFloat("FogDensity", FogDensity);
-  shaderAnimatedModel->setFloat("viewSpaceZOffset", cameraZOffset);
 }
 
 // Funkcje do wyswietlania grafik

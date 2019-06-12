@@ -3,32 +3,35 @@
 #include "../PathFinding/MapTileRenderUtils.hpp"
 #include "Configuration/ConfigUtils.hpp"
 
-EnemyController::EnemyController(SceneNode &aEnemy,
-	SceneNode &aPlayer,
-	GridLocation aStart,
-	GridLocation aFirstTarget,
-	GridWithWeights& aGrid,
-	std::vector<MapTile *>&aMapTiles,
-	int aMapSize) : enemy(aEnemy),
-	player(aPlayer),
-	start(aStart),
-	firstStart(aStart),
-	firstTarget(aFirstTarget),
-	Currenttarget(aFirstTarget),
-	grid(aGrid),
-	mapTiles(aMapTiles),
-	mapSize(aMapSize)
+
+EnemyController::EnemyController(Game * aGame,SceneNode &aEnemy,
+								 SceneNode &aLPlayer,
+								 SceneNode &aRPlayer,
+								 GridLocation aStart,
+								 GridLocation aFirstTarget,
+								 GridWithWeights &aGrid,
+								 std::vector<MapTile *> &aMapTiles,
+								 int aMapSize) : 
+								 				 game(aGame),
+												 enemy(aEnemy),
+												 currentPlayer(&aLPlayer),
+												 leftplayer(aLPlayer),
+												 rightplayer(aRPlayer),
+												 start(aStart),
+												 firstStart(aStart),
+												 firstTarget(aFirstTarget),
+												 Currenttarget(aFirstTarget),
+												 grid(aGrid),
+												 mapTiles(aMapTiles),
+												 mapSize(aMapSize)
 {
 
 	LoadFromConfig();
-
-
 }
-
 
 void EnemyController::LoadFromConfig()
 {
-		using namespace ConfigUtils;
+	using namespace ConfigUtils;
 	MinNotInterested = GetValueFromMap<float>("MinNotInterested", GlobalConfigMap);
 	MinInterested = GetValueFromMap<float>("MinInterested", GlobalConfigMap);
 	MinFollowing = GetValueFromMap<float>("MinFollowing", GlobalConfigMap);
@@ -36,52 +39,63 @@ void EnemyController::LoadFromConfig()
 	enemySpeed = GetValueFromMap<float>("EnemyBaseSpeed", GlobalConfigMap);
 	enemyRunSpeed = GetValueFromMap<float>("EnemyRunSpeed", GlobalConfigMap);
 	enemyWalkSpeed = GetValueFromMap<float>("EnemyBaseSpeed", GlobalConfigMap);
-
 }
 
 void EnemyController::ChangeEnemyState(EnemyState aState)
 {
-    state = aState;
+	state = aState;
 }
 float EnemyController::GetPlayerDistance()
 {
 
-    int x1 = enemy.local.getPosition().x * enemy.local.getScale().x;
-    int x2 = player.local.getPosition().x * player.local.getScale().x;
+	int x1 = enemy.local.getPosition().x * enemy.local.getScale().x;
+	int x2 = currentPlayer->local.getPosition().x * currentPlayer->local.getScale().x;
 
-    int z1 = enemy.local.getPosition().z * enemy.local.getScale().z;
-    int z2 = player.local.getPosition().z * player.local.getScale().z;
+	int z1 = enemy.local.getPosition().z * enemy.local.getScale().z;
+	int z2 = currentPlayer->local.getPosition().z * currentPlayer->local.getScale().z;
 
-    return sqrt((x1 - x2) * (x1 - x2) + (z1 - z2) * (z1 - z2)) * 10;
+	return sqrt((x1 - x2) * (x1 - x2) + (z1 - z2) * (z1 - z2)) * 10;
 }
-void EnemyController::Update(float  interpolation)
+
+void EnemyController::SwtichPlayer()
 {
+	if (currentPlayer == &leftplayer)
+	{
+		currentPlayer = &rightplayer;
+	}
+	else
+	{
+		currentPlayer = &leftplayer;
+	}
+}
+void EnemyController::Update(float interpolation)
+{
+
 	EnemyPlayerDistance = GetPlayerDistance();
-    if (EnemyPlayerDistance < InterestDistance && InterestMeter < MinAlwaysFollow)
-    {
-        if (EnemyPlayerDistance > minPlayerDistance && EnemyPlayerDistance != 0)
-        {
-            InterestMeter += InterestMeterIncrement * (1 / (EnemyPlayerDistance * DistanceToInterestRatio));
-        }
-        else
-        {
-            InterestMeter = MinAlwaysFollow;
-        }
-    }
-    else
-    {
-        if (state != AlwaysFollow && InterestMeter > 0)
-        {
-            InterestMeter -= InterestMeterIncrement *(1 / (EnemyPlayerDistance * DistanceToInterestRatio));
+	if (EnemyPlayerDistance < InterestDistance && InterestMeter < MinAlwaysFollow)
+	{
+		if (EnemyPlayerDistance > minPlayerDistance && EnemyPlayerDistance != 0)
+		{
+			InterestMeter += InterestMeterIncrement * (1 / (EnemyPlayerDistance * DistanceToInterestRatio));
+		}
+		else
+		{
+			InterestMeter = MinAlwaysFollow;
+		}
+	}
+	else
+	{
+		if (state != AlwaysFollow && InterestMeter > 0)
+		{
+			InterestMeter -= InterestMeterIncrement * (1 / (EnemyPlayerDistance * DistanceToInterestRatio));
 			if (InterestMeter < 0)
 			{
 				InterestMeter = 0;
 			}
-        }
-    }
-    SetStateFromInterestLevel();
-    SetTarget();
-    
+		}
+	}
+	SetStateFromInterestLevel();
+	SetTarget();
 
 	if (debugPathFinding)
 		ResetMapTilePath(mapTiles, grid, mapSize, &path);
@@ -97,7 +111,7 @@ void EnemyController::Update(float  interpolation)
 		}
 		else
 		{
-			MoveEnemyToNode(&enemy, &player, interpolation, enemySpeed);
+			MoveEnemyToNode(&enemy, currentPlayer, interpolation, enemySpeed);
 		}
 	}
 
@@ -109,7 +123,6 @@ void EnemyController::Update(float  interpolation)
 		a_star_search(grid, start, Currenttarget, came_from, cost_so_far);
 		path = reconstruct_path(start, Currenttarget, came_from);
 	}
-
 }
 
 void EnemyController::CheckIFNotOnEnd()
@@ -128,74 +141,86 @@ void EnemyController::CheckIFNotOnEnd()
 
 void EnemyController::SwtichStartWithEnd()
 {
-    if(Currenttarget == firstStart)
-    {
-        Currenttarget = firstTarget;
-    }
-    else
-    {
-        Currenttarget = firstStart;
-    }
+	
+	if (Currenttarget == firstStart)
+	{
+		Currenttarget = firstTarget;
+		if(GetPlayerDistance() <25)
+		{
+		game->EnemyOnLefSide = !game->EnemyOnLefSide;
+		SwtichPlayer();
+		}
+	}
+	else
+	{
+		Currenttarget = firstStart;
+		if(GetPlayerDistance() <25)
+		{
+		game->EnemyOnLefSide = !game->EnemyOnLefSide ;
+		SwtichPlayer();
+		}
+	}
+
 	
 }
 
 void EnemyController::SetTarget()
 {
-    switch (state)
-    {
-    case NotInteresed:
+	switch (state)
+	{
+	case NotInteresed:
 		StopEnemy = false;
-        break;
+		break;
 
-    case Interested:
-		Currenttarget = GetPositionOfset(player, mapSize, 7, 5);
+	case Interested:
+		Currenttarget = GetPositionOfset(*currentPlayer, mapSize, 7, 5);
 		StopEnemy = true;
-        break;
+		break;
 
-    case Following:
-        Currenttarget = GetPositionOfset(player, mapSize, 7, 5);
+	case Following:
+		Currenttarget = GetPositionOfset(*currentPlayer, mapSize, 7, 5);
 		StopEnemy = false;
 		enemySpeed = enemyWalkSpeed;
-        break;
+		break;
 
-    case AlwaysFollow:
-		Currenttarget = GetPositionOfset(player, mapSize, 7, 5);
+	case AlwaysFollow:
+		Currenttarget = GetPositionOfset(*currentPlayer, mapSize, 7, 5);
 		StopEnemy = false;
 		enemySpeed = enemyRunSpeed;
-        break;
-    }
+		break;
+	}
 }
 void EnemyController::SetStateFromInterestLevel()
 {
-    if (InterestMeter < MinAlwaysFollow)
-    {
-        if (InterestMeter >= 0 && InterestMeter < MinNotInterested)
-        {
-            state = NotInteresed;
-        }
-        else if (InterestMeter >= MinInterested && InterestMeter < MinFollowing)
-        {
-            state = Interested;
-        }
-        else if (InterestMeter >= MinFollowing && InterestMeter < MinAlwaysFollow)
-        {
-            state = Following;
-        }
-    }
-    else
-    {
-        state = AlwaysFollow;
-    }
+	if (InterestMeter < MinAlwaysFollow)
+	{
+		if (InterestMeter >= 0 && InterestMeter < MinNotInterested)
+		{
+			state = NotInteresed;
+		}
+		else if (InterestMeter >= MinInterested && InterestMeter < MinFollowing)
+		{
+			state = Interested;
+		}
+		else if (InterestMeter >= MinFollowing && InterestMeter < MinAlwaysFollow)
+		{
+			state = Following;
+		}
+	}
+	else
+	{
+		state = AlwaysFollow;
+	}
 }
 
 void EnemyController::MoveEnemyToMapTile(SceneNode *sceneNode, GridLocation mapTile, float interpolation, float speed, float NodeXOffset, float NodeZOffset)
 {
-	glm::vec2 positionA{ sceneNode->local.getPosition().x, sceneNode->local.getPosition().z };
-	glm::vec2 positionB{ NodeXOffset + mapTile.x * 400, NodeZOffset + mapTile.y * 400 };
+	glm::vec2 positionA{sceneNode->local.getPosition().x, sceneNode->local.getPosition().z};
+	glm::vec2 positionB{NodeXOffset + mapTile.x * 400, NodeZOffset + mapTile.y * 400};
 
 	glm::vec2 diffVec = positionB - positionA;
 
-	glm::vec3 diffVec3D = { diffVec.x, sceneNode->local.getPosition().y, diffVec.y };
+	glm::vec3 diffVec3D = {diffVec.x, sceneNode->local.getPosition().y, diffVec.y};
 
 	double veclenght = sqrt(diffVec.x * diffVec.x + diffVec.y * diffVec.y);
 	float angle = atan2f(diffVec3D.y, diffVec3D.x) * 180.0f / 3.14f;
@@ -210,7 +235,6 @@ void EnemyController::MoveEnemyToMapTile(SceneNode *sceneNode, GridLocation mapT
 		diffVec = glm::vec2(0, 0);
 	}
 
-
 	float value = interpolation * speed;
 	diffVec *= value;
 
@@ -218,7 +242,7 @@ void EnemyController::MoveEnemyToMapTile(SceneNode *sceneNode, GridLocation mapT
 	sceneNode->Translate(diffVec.x, 0, diffVec.y);
 
 	float playerRotation = atan2(-diffVec.y, diffVec.x);
-	roationChild->local.SetRotation(0, playerRotation * 58 +90, 0);
+	roationChild->local.SetRotation(0, playerRotation * 58 + 90, 0);
 
 	/*if (abs(diffVec.y) > abs(diffVec.x))
 	{
@@ -245,15 +269,15 @@ void EnemyController::MoveEnemyToMapTile(SceneNode *sceneNode, GridLocation mapT
 	*/
 }
 
-void EnemyController::MoveEnemyToNode(SceneNode *sceneNode, SceneNode* targetNode, float interpolation, float speed)
+void EnemyController::MoveEnemyToNode(SceneNode *sceneNode, SceneNode *targetNode, float interpolation, float speed)
 {
-	glm::vec2 positionA{ sceneNode->local.getPosition().x * sceneNode->local.getScale().x, sceneNode->local.getPosition().z * sceneNode->local.getScale().z };
-	glm::vec2 positionB{ targetNode->local.getPosition().x * targetNode->local.getScale().x, targetNode->local.getPosition().z * targetNode->local.getScale().z };
+	glm::vec2 positionA{sceneNode->local.getPosition().x * sceneNode->local.getScale().x, sceneNode->local.getPosition().z * sceneNode->local.getScale().z};
+	glm::vec2 positionB{targetNode->local.getPosition().x * targetNode->local.getScale().x, targetNode->local.getPosition().z * targetNode->local.getScale().z};
 
 	glm::vec2 diffVec = positionB - positionA;
 	glm::vec2 diffNormalized;
 
-	glm::vec3 diffVec3D = { diffVec.x, sceneNode->local.getPosition().y, diffVec.y };
+	glm::vec3 diffVec3D = {diffVec.x, sceneNode->local.getPosition().y, diffVec.y};
 
 	double veclenght = sqrt(diffVec.x * diffVec.x + diffVec.y * diffVec.y);
 	float angle = atan2f(diffVec3D.y, diffVec3D.x) * 180.0f / 3.14f;
@@ -268,7 +292,6 @@ void EnemyController::MoveEnemyToNode(SceneNode *sceneNode, SceneNode* targetNod
 		diffNormalized = glm::vec2(0, 0);
 	}
 
-
 	float value = interpolation * speed;
 	diffNormalized *= value;
 
@@ -276,5 +299,5 @@ void EnemyController::MoveEnemyToNode(SceneNode *sceneNode, SceneNode* targetNod
 	sceneNode->Translate(diffNormalized.x, 0, diffNormalized.y);
 
 	float playerRotation = atan2(-diffNormalized.y, diffNormalized.x);
-	roationChild->local.SetRotation(0, playerRotation* 58+90, 0);
+	roationChild->local.SetRotation(0, playerRotation * 58 + 90, 0);
 }

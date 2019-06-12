@@ -1,6 +1,9 @@
+#pragma once
 #include <SceneNode.hpp>
 #include <PathFinding/PathFindingUtils.hpp>
+#include "Game.hpp"
 
+class Game;
 enum EnemyState
 {
     NotInteresed, // 0-200
@@ -32,7 +35,10 @@ class EnemyController
     
     const float InterestMeterIncrement = 100;
     SceneNode &enemy;
-    SceneNode &player;
+    SceneNode *currentPlayer;
+
+    SceneNode &leftplayer;
+    SceneNode &rightplayer;
 	GridWithWeights& grid;
 	std::unordered_map<GridLocation, GridLocation> came_from;
 	std::unordered_map<GridLocation, double> cost_so_far;
@@ -49,10 +55,12 @@ class EnemyController
     void SetStateFromInterestLevel();
     void SetTarget();
     void CheckIFNotOnEnd();
+    Game * game;
 
 public:
-    EnemyController(SceneNode &enemy,
-		            SceneNode &player,
+    EnemyController(Game * game,SceneNode &enemy,
+		            SceneNode &Leftplayer,
+                    SceneNode &Rightplayer,
 		            GridLocation aStart,
 		            GridLocation aFirstTarget,
 		            GridWithWeights& grid,
@@ -61,6 +69,7 @@ public:
 
     void ChangeEnemyState(EnemyState state);
     float GetPlayerDistance();
+    void SwtichPlayer();
     void Update(float interpolation);
     void SwtichStartWithEnd();
 	void MoveEnemyToMapTile(SceneNode *enemyNode, GridLocation mapTile, float interpolation, float speed, float NodeXOffset, float NodeZOffset);

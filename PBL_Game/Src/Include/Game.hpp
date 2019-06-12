@@ -20,16 +20,21 @@ const int MAX_FRAMESKIP = 5;
 
 using namespace PBLGame;
 
+
+
 static bool mouseToUpdate = false;
 static double posx;
 static double posy;
 
 static bool First_tab_push = false;
 static bool Tab_Pressed = false;
+static bool Enemy_Swtiched = false;
+
 
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 
 
+class EnemyController;
 class Game
 {
 
@@ -159,6 +164,8 @@ AnimatedModel *player2Model = nullptr;
 
 public:
 
+
+  bool EnemyOnLefSide = true;
   Game(Window &okienko);
 
   unsigned WINDOW_WIDTH = 0;
