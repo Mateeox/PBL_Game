@@ -59,7 +59,7 @@ SceneNode *Player::CreateTrap(float scale)
 	GameObject *trapObj = new GameObject(trap->local);
 	trapObj->setTag("trap");
 	trigger = new EnemyDies(trap->local, enemy); //doda� przeciwnika
-	trigger->setDimensions(0, 0, 0, 2.0f, 2.0f, 2.0f);
+	trigger->setDimensions(0, 0, 0, 1.0f, 1.0f, 1.0f);
 	trapObj->AddComponent(trapMod);
 	trapObj->AddComponent(trigger);
 	trap->AddGameObject(trapObj);

@@ -39,7 +39,7 @@ class EnemyController
 	std::vector<GridLocation> path;
 	std::vector<MapTile *>& mapTiles;
 
-	bool debugPathFinding = true;
+	bool debugPathFinding = false;
 	bool StopEnemy = false;
     bool LastFirstFlag = true;
 
