@@ -9,7 +9,7 @@
 class Player
 {
 public:
-	Player(SceneNode* player, int amountOfParts, Shader& shader, SceneNode* node, SceneNode* enemy);
+	Player(SceneNode* player, int amountOfParts, Shader& shader, SceneNode* node, SceneNode* enemy,SimpleGUI::GuiElement * background,SimpleGUI::GuiElement * win);
 	void Update(PBLGame::Window* okienko, float scale);
 	int Parts();
 	bool Trap();
@@ -18,6 +18,8 @@ private:
 	SceneNode* parentNode;
 	SceneNode* player;
 	SceneNode* enemy;
+	SimpleGUI::GuiElement * win;
+	SimpleGUI::GuiElement * background;
 	Model* trapMod;
 	int partsLimit;
 	int PartsAmount;

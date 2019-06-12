@@ -48,6 +48,5 @@ void main()
             FragColor = texture(texture1, TexCoord);
         }
 
-        
 
 }

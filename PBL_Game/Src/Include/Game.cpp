@@ -74,6 +74,7 @@ Game::Game(Window &aOkno) : okienko(aOkno),
   shaderAnimatedModel = new Shader("Shaders/skinning.vs", "Shaders/skinning.fs");
   shaderViewCone = new Shader("Shaders/viewCone.vs", "Shaders/viewCone.fs");
   guiShader = new Shader("Shaders/GuiShader.vs", "Shaders/GuiShader.fs");
+
   shaderProgram_For_Model->use();
   shaderProgram_For_Model->setVec3("material.ambient", 0.1, 0.1, 0.1);
   shaderProgram_For_Model->setVec3("material.diffuse", 0.9, 0.9, 0.9);
@@ -115,9 +116,12 @@ void Game::Granko()
   guiElement = new SimpleGUI::GuiElement("Textures/DeathTr.png", glm::scale(guiTransfom, glm::vec3(2, 2, 2)),guiShader);
   DeathBcg = new SimpleGUI::GuiElement("Textures/DeathBg.png", glm::scale(guiTransfom, glm::vec3(2, 2, 2)), guiShader);
 
+  guiElement2 = new SimpleGUI::GuiElement("Textures/DeathTr.png", glm::scale(guiTransfom, glm::vec3(2, 2, 2)),guiShader);
+  WinBcg = new SimpleGUI::GuiElement("Textures/WinBg.png", glm::scale(guiTransfom, glm::vec3(2, 2, 2)), guiShader);
 
 
-  playerObj = new Player(&leftPlayerNode, 0, *shaderProgram, &leftScene, &Enemy_Node);
+
+  playerObj = new Player(&leftPlayerNode, 0, *shaderProgram, &leftScene, &Enemy_Node,WinBcg,guiElement2);
   MapGenerator generator(shaderProgram_For_Model, MapScale, 10, 1, false, &sNodes, playerObj);
 
   std::vector<MapKey *> mapped = generator.GetConverted();
@@ -636,6 +640,12 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation, 
   if (glfwGetKey(okienko.window, GLFW_KEY_D) == GLFW_PRESS)
     movementDir.x = 1;
 
+  auto velocity = movementSpeedTimesPlayerScale;
+  if(glfwGetKey(okienko.window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+  {
+    velocity += velocity;
+  }
+
   if (leftSideActive)
   {
     SetPlayerRotation(player, movementDir, playerModel);
@@ -644,7 +654,8 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation, 
   {
     SetPlayerRotation(player, movementDir, player2Model);
   }
-  glm::vec3 move = movementDir * movementSpeedTimesPlayerScale * interpolation;
+  glm::vec3 move = movementDir * velocity * interpolation;
+  //move.x *= (((Game::WINDOW_WIDTH / 2) + offset)/ (Game::WINDOW_HEIGHT)) +1;
   player.Translate(move.x, move.y, move.z);
   Collider *playerCollider = (Collider *)player.gameObject->GetComponent(ComponentSystem::ComponentType::Collider);
   //check if there are any collisions, if yes - abort the move

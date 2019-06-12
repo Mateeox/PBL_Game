@@ -2,7 +2,8 @@
 #include "Triggers/EnemyDies.hpp"
 #include "Component/Component.hpp"
 
-Player::Player(SceneNode *aPlayer, int aPartsLimit, Shader &aShader, SceneNode *aNode, SceneNode *enemy)
+Player::Player(SceneNode *aPlayer, int aPartsLimit, Shader &aShader, SceneNode *aNode, SceneNode *enemy,
+SimpleGUI::GuiElement * aBackground,SimpleGUI::GuiElement * aWin):background(aBackground),win(aWin)
 {
 	parentNode = aNode;
 	player = aPlayer;
@@ -56,7 +57,7 @@ SceneNode *Player::CreateTrap(float scale)
 	SceneNode *trap = new SceneNode();
 	GameObject *trapObj = new GameObject(trap->local);
 	trapObj->setTag("trap");
-	trigger = new EnemyDies(trap->local, enemy); //doda� przeciwnika
+	trigger = new EnemyDies(trap->local, enemy,background,win); //doda� przeciwnika
 	trigger->setDimensions(0, 0, 0, 1.0f, 1.0f, 1.0f);
 	trapObj->AddComponent(trapMod);
 	trapObj->AddComponent(trigger);
