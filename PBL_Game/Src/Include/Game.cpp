@@ -275,7 +275,10 @@ void Game::Granko()
   gatherTriggers(sNodes);
   std::cout << "Triggers gathered: " << triggers.size() << std::endl;
 
-  guiElement = new SimpleGUI::GuiElement("Textures/SlowerTile.png", glm::mat4(1.0f));
+  glm::mat4 guiTransfom{1.f};
+  guiTransfom = glm::translate(guiTransfom,glm::vec3(-0.7,0.8,0));
+  guiTransfom = glm::scale(guiTransfom,glm::vec3(0.1,0.1,0.1));
+  guiElement = new SimpleGUI::GuiElement("Textures/icons8-gear-48.png",guiTransfom);
 
   while (glfwGetKey(okienko.window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
          glfwWindowShouldClose(okienko.window) == 0)
