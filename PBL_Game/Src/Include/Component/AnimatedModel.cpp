@@ -667,7 +667,7 @@ void AnimatedModel::InitMesh(unsigned MeshIndex,
 
 		Positions.push_back(Vector3f(pPos->x, pPos->y, pPos->z));
 		Normals.push_back(Vector3f(pNormal->x, pNormal->y, pNormal->z));
-		TexCoords.push_back(Vector2f(pTexCoord->x, pTexCoord->y));
+		TexCoords.push_back(Vector2f(pTexCoord->x, -pTexCoord->y));
 	}
 
 	LoadBones(MeshIndex, paiMesh, Bones);
