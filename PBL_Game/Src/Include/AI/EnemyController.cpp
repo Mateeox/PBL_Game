@@ -97,7 +97,6 @@ void EnemyController::Update(float  interpolation)
 		}
 		else
 		{
-			std::cout << "Move to Node :" << "\n";
 			MoveEnemyToNode(&enemy, &player, interpolation, enemySpeed);
 		}
 	}

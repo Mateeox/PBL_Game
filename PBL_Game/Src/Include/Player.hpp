@@ -20,7 +20,9 @@ private:
 	Model* trapMod;
 	int partsLimit;
 	int PartsAmount;
+bool trapSet = false;
+
 	SceneNode* CreateTrap(float scale);
-	Collider* enemyCollider;
+	Trigger* enemyTrigger;
 	Trigger* trigger;
 };
