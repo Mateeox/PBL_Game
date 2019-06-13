@@ -402,9 +402,9 @@ int MapGenerator::FindAnyNeighbour(int boundry, int& move)
 
 void MapGenerator::DefineModels()
 {
-	floor = new Model("Models/House/StaticNormal_Floor.obj", *shader, false);
-	wall = new Model("Models/House/StaticSimpleDestroyedWall.obj", *shader, false);
-	door = new Model("Models/House/StaticDoor.obj", *shader, false);
+	floor = new Model("Models/House/floor_left.obj", *shader, false);
+	wall = new Model("Models/House/wall_left.obj", *shader, false);
+	door = new Model("Models/House/door_left.obj", *shader, false);
 	key = new Model("Models/Key/key.obj", *shader, false);
 	chest = new Model("Models/Chest/Chest.obj", *shader, false);
 }
