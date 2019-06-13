@@ -878,6 +878,10 @@ void Game::Plot()
     }
     else if (!glfwGetKey(okienko.window, GLFW_KEY_ENTER) == GLFW_PRESS && keyPressed)
       keyPressed = false;
+	if (glfwGetKey(okienko.window, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS)
+	{
+		currentPlotImage++;
+	}
 
     if (currentPlotNumber != plotNumber)
     {
@@ -889,6 +893,8 @@ void Game::Plot()
     path = "Textures/" + std::to_string(plotNumber) + "_" + std::to_string(currentPlotImage) + ".png";
 
     static Texture *tex;
+	static glm::mat4 guiTransfom{ 1.f };
+	static SimpleGUI::GuiElement *image; 
     if (currentPlotImage == existingPlotImage)
     {
       existingPlotImage++;
@@ -896,6 +902,8 @@ void Game::Plot()
       {
         std::cout << "OTWARTO PLIK Z GRAFIKA FABULARNA : " << path << std::endl;
         tex = new Texture(path.c_str(), GL_NEAREST_MIPMAP_NEAREST);
+		image = new SimpleGUI::GuiElement(path, glm::scale(guiTransfom, glm::vec3(2, 2, 2)), guiShader);
+		image->SwtichVisiblity();
         tex->Load();
         fclose(file);
       }
@@ -909,7 +917,9 @@ void Game::Plot()
     }
     if (tex != nullptr)
     {
-      DisplayImage(path.c_str(), "Napis", tex);
+      //DisplayImage(path.c_str(), "Napis", tex);
+		
+		image->Draw();
     }
   }
 
@@ -960,7 +970,7 @@ void Game::DisplayImage(const char *path, const char *text, Texture *imageTex)
 
   imageNode->Translate(camera.Position.x, camera.Position.y - 0.184f, camera.Position.z - 0.1f);
   imageNode->Rotate(camera.Pitch, glm::vec3(1, 0, 0));
-  imageNode->Scale(12.8f / 30.0f, 7.2f / 30.0f, 1);
+  imageNode->Scale(12.8f / 32.0f, 7.2f / 32.0f, 1);
 
   Transform origin = Transform::origin();
   imageNode->Render(origin, true);
