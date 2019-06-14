@@ -33,6 +33,8 @@ void Game::InitializeConfig()
   PlayerYOffset = GetValueFromMap<float>("PlayerYOffset", GlobalConfigMap);
   PlayerZOffset = GetValueFromMap<float>("PlayerZOffset", GlobalConfigMap);
 
+  debugMode = GetValueFromMap<int>("Debug", GlobalConfigMap);
+
   floorTransform = GetValueFromMap<float>("FloorTranslation", GlobalConfigMap);
   TileScale = GetValueFromMap<float>("TileScale", GlobalConfigMap);
   EnemyScale = GetValueFromMap<float>("EnemyScale", GlobalConfigMap);
@@ -284,6 +286,9 @@ void Game::Granko()
   gatherTriggers(sNodes);
   std::cout << "Triggers gathered: " << triggers.size() << std::endl;
 
+
+      UpdatePlayer(leftPlayerNode, camera, interpolation, true);
+      UpdatePlayer(rightPlayerNode, camera2, interpolation, true);
   while (glfwGetKey(okienko.window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
          glfwWindowShouldClose(okienko.window) == 0)
   {
@@ -304,7 +309,9 @@ void Game::Granko()
     Render();
   }
 
+  if(debugMode)
   ImguiClear();
+
   glDeleteProgram(shaderProgram->shaderProgramID);
   glfwTerminate();
 }
@@ -349,6 +356,7 @@ void Game::Render()
   glEnable(GL_SCISSOR_TEST);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+  if(debugMode)
   ImguiStartEndDraw();
 
   Transform originTransform = Transform::origin();
@@ -419,6 +427,7 @@ void Game::Render()
   // Render grafik
   Plot();
 
+  if(debugMode)
   ImguiDrawData();
 
   // Swap buffers
@@ -571,7 +580,9 @@ void Game::SetCamera(Camera aCamera, int camera)
 void Game::ProcessInput(float interpolation, Camera &camera_update)
 {
 
+ if(debugMode)
   ProcessMouse();
+
   if (glfwGetKey(okienko.window, GLFW_KEY_Q) == GLFW_PRESS && swapButtonPressed == false)
   {
 
@@ -672,6 +683,20 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation, 
   {
     SetPlayerRotation(player, movementDir, player2Model);
   }
+
+  //movementDir = glm::normalize(movementDir);
+  double veclenght = sqrt(movementDir.x * movementDir.x + movementDir.z * movementDir.z);
+
+	if (veclenght != 0)
+	{
+		movementDir.x = movementDir.x / veclenght;
+		movementDir.z = movementDir.z / veclenght;
+	}
+	else
+	{
+		movementDir = glm::vec3(0);
+	}
+
   glm::vec3 move = movementDir * velocity * interpolation;
   //move.x *= (((Game::WINDOW_WIDTH / 2) + offset)/ (Game::WINDOW_HEIGHT)) +1;
   player.Translate(move.x, move.y, move.z);

@@ -156,6 +156,12 @@
         <Value>0</Value>
     </ConfigParameter>
 
+    <ConfigParameter>
+        <Type>I</Type>
+        <Name>Debug</Name>
+        <Value>0</Value>
+    </ConfigParameter>
+
     <!--- Enemy Scale/-->
 
     <ConfigParameter>

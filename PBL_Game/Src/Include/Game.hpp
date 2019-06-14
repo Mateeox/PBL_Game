@@ -42,6 +42,7 @@ class Game
 
   glm::vec2 vector2DHelper{0,0};
   glm::vec2 vector2DHelper2{0,0};
+  bool debugMode = false;
 
 
   //
