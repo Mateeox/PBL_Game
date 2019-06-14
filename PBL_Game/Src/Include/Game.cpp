@@ -336,6 +336,8 @@ void Game::Update(float interpolation)
       UpdatePlayer(rightPlayerNode, camera2, interpolation, false);
   }
 
+
+  //animation Update
   enemyModel->Update();
   playerModel->Update();
   player2Model->Update();
@@ -744,20 +746,17 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation, 
   }
 
   //view cone
-  auto coneRenderer = (ConeRenderer *)(player.children[0]->gameObject->GetComponent(ComponentSystem::ComponentType::ConeRenderer));
+
+
+    auto coneRenderer = (ConeRenderer *)(player.children[0]->gameObject->GetComponent(ComponentSystem::ComponentType::ConeRenderer));
   if (coneRenderer != nullptr)
   {
     if (glfwGetKey(okienko.window, GLFW_KEY_LEFT) == GLFW_PRESS)
       coneRenderer->rotateLeft();
     if (glfwGetKey(okienko.window, GLFW_KEY_RIGHT) == GLFW_PRESS)
       coneRenderer->rotateRight();
-
-    auto angle = coneRenderer->getDirectionAngle();
-    angle += coneRenderer->getAngle() / 2;
-    angle = fmod(angle, 2 * M_PI);
-    shaderProgram_For_Model->use();
-    shaderProgram_For_Model->setVec3("spotLight.direction", glm::vec3(cos(angle), 0, sin(angle)));
   }
+  
   camera.Position.x = player.local.getPosition().x * PlayerScale;
   camera.Position.y = cameraYOffset;
   camera.Position.z = player.local.getPosition().z * PlayerScale + cameraZOffset;
@@ -869,6 +868,26 @@ void Game::SetViewAndPerspective(Camera &aCamera, Transform &player, Transform *
     enemyLightPos.y = -1;
   }
   shaderProgram_For_Model->setVec3("pointLights[1].position", enemyLightPos);
+
+ConeRenderer * coneRenderer = nullptr;
+
+if(leftSideActive)
+ coneRenderer = (ConeRenderer *)(leftPlayerNode.children[0]->gameObject->GetComponent(ComponentSystem::ComponentType::ConeRenderer));
+else
+ coneRenderer = (ConeRenderer *)(rightPlayerNode.children[0]->gameObject->GetComponent(ComponentSystem::ComponentType::ConeRenderer));
+  
+  if (coneRenderer != nullptr)
+  {
+    auto angle = coneRenderer->getDirectionAngle();
+    angle += coneRenderer->getAngle() / 2;
+    angle = fmod(angle, 2 * M_PI);
+    if(leftSideActive)
+    {
+    shaderProgram_For_Model->use();
+    shaderProgram_For_Model->setVec3("spotLight.direction", glm::vec3(cos(angle), 0, sin(angle)));
+    }
+  }
+
 
   shaderViewCone->use();
   shaderViewCone->setMat4("projection", projection);
