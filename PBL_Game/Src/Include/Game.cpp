@@ -184,8 +184,10 @@ void Game::Granko()
                                                       FreeTileTexture, "Basic");
 
   ConeRenderer *coneRendererLeft = new ConeRenderer(*shaderViewCone, &leftScene);
+  ConeRenderer *coneRendererRight = new ConeRenderer(*shaderViewCone, &rightScene);
 
   leftPlayerObj->AddComponent(coneRendererLeft);
+  rightPlayerObj->AddComponent(coneRendererRight);
   leftPlayerObj->AddComponent(playerModel);
   rightPlayerObj->AddComponent(player2Model);
   enemyGameObject->AddComponent(enemyModel);
