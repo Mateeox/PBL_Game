@@ -12,7 +12,7 @@ newmtl gold
 	Kd 0.5882 0.5882 0.5882
 	Ks 0.0000 0.0000 0.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka maps\key_toSubstance_wire_006135006_Diffuse.png
-	map_Kd maps\key_toSubstance_wire_006135006_Diffuse.png
-	map_Ks maps\key_toSubstance_wire_006135006_Specular.png
-	map_bump -bm 0.3000 maps\Map__7_Normal Bump.png
+	map_Ka maps/key_toSubstance_wire_006135006_Diffuse.png
+	map_Kd maps/key_toSubstance_wire_006135006_Diffuse.png
+	map_Ks maps/key_toSubstance_wire_006135006_Specular.png
+	map_bump -bm 0.3000 maps/Map__7_Normal Bump.png
