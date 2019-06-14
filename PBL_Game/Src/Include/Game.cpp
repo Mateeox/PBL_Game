@@ -51,6 +51,10 @@ void Game::InitializeConfig()
 
   TrapScale = GetValueFromMap<float>("TrapScale", GlobalConfigMap);
 
+  floorTransform = ConfigUtils::GetValueFromMap<float>("FloorTranslation", ConfigUtils::GlobalConfigMap);
+  TileScale = ConfigUtils::GetValueFromMap<float>("TileScale", ConfigUtils::GlobalConfigMap);
+
+
   TileScaleTimes100 = TileScale * 100;
   EnemyScaleInverse = 1 / EnemyScale;
 
@@ -113,20 +117,48 @@ Game::Game(Window &aOkno) : okienko(aOkno),
 
 void Game::Granko()
 {
+  #pragma region PathFindingDebugTiles
+	Texture *BlockedTileTexture = new Texture("Textures/BlockedTile.png", GL_LINEAR);
+	Texture *FreeTileTexture = new Texture("Textures/FreeTile.png", GL_LINEAR);
+	Texture *SlowerTileTexture = new Texture("Textures/SlowerTile.png", GL_LINEAR);
+	Texture *PathTileTexture = new Texture("Textures/PathTile.png", GL_LINEAR);
 
-  glm::mat4 guiTransfom{1.f};
-  guiElement = new SimpleGUI::GuiElement("Textures/DeathTr.png", glm::scale(guiTransfom, glm::vec3(2, 2, 2)), guiShader);
-  DeathBcg = new SimpleGUI::GuiElement("Textures/DeathBg.png", glm::scale(guiTransfom, glm::vec3(2, 2, 2)), guiShader);
+	BlockedTileTexture->Load();
+	FreeTileTexture->Load();
+	SlowerTileTexture->Load();
+	PathTileTexture->Load();
 
-  guiElement2 = new SimpleGUI::GuiElement("Textures/DeathTr.png", glm::scale(guiTransfom, glm::vec3(2, 2, 2)), guiShader);
-  WinBcg = new SimpleGUI::GuiElement("Textures/WinBg.png", glm::scale(guiTransfom, glm::vec3(2, 2, 2)), guiShader);
+  #pragma endregion
 
-  playerObj = new Player(&leftPlayerNode, 0, *shaderProgram, &leftScene, &Enemy_Node, WinBcg, guiElement2);
-  MapGenerator generator(shaderProgram_For_Model, MapScale, 10, 1, false, &sNodes, playerObj);
+  #pragma region DeathAndWinScreenTextures
+	glm::mat4 guiTransfom{ 1.f };
+	guiElement = new SimpleGUI::GuiElement("Textures/DeathTr.png", glm::scale(guiTransfom, glm::vec3(2, 2, 2)), guiShader);
+	DeathBcg = new SimpleGUI::GuiElement("Textures/DeathBg.png", glm::scale(guiTransfom, glm::vec3(2, 2, 2)), guiShader);
 
-  std::vector<MapKey *> mapped = generator.GetConverted();
+	guiElement2 = new SimpleGUI::GuiElement("Textures/DeathTr.png", glm::scale(guiTransfom, glm::vec3(2, 2, 2)), guiShader);
+	WinBcg = new SimpleGUI::GuiElement("Textures/WinBg.png", glm::scale(guiTransfom, glm::vec3(2, 2, 2)), guiShader);
 
-  MapSize = generator.maxSize;
+  #pragma endregion
+
+  #pragma region ModelLoading
+	std::string PlayerModelPath = "Models/Player/player_animations.fbx";
+	std::string AnimatedEnemyPAth = "Models/" + ConfigUtils::GetValueFromMap<std::string>("Enemy_Animated_Model", ConfigUtils::GlobalConfigMap);
+
+	playerModel = new AnimatedModel(PlayerModelPath, *shaderAnimatedModel, false);
+	player2Model = new AnimatedModel(*playerModel);
+	enemyModel = new AnimatedModel(AnimatedEnemyPAth, *shaderAnimatedModel, false);
+
+  #pragma endregion
+
+	leftScene = new SceneNode();
+	rightScene = new SceneNode();
+
+  playerObj = new Player(&leftPlayerNode, 0, *shaderProgram, leftScene, &Enemy_Node, WinBcg, guiElement2);
+
+  generator = new MapGenerator(shaderProgram_For_Model, MapScale, 10, 1, false, &sNodes, playerObj);
+  mapped = generator->GetConverted();
+
+  MapSize = generator->maxSize;
   grid = make_diagramFromGeneratedMap(mapped, MapSize);
 
   glm::vec2 leftDown = FindFirstFromLeftDownCorner(mapped, MapSize);
@@ -134,48 +166,30 @@ void Game::Granko()
   glm::vec2 leftUp = FindFirstFromLeftUpCorner(mapped, MapSize);
   glm::vec2 rightUp = FindFirstFromRightUpCorner(mapped, MapSize);
 
-  std::cout << " leftDown "
-            << "x: " << leftDown.x << " y: " << leftDown.y << "\n";
-  std::cout << " rightDown "
-            << "x: " << rightDown.x << " y: " << rightDown.y << "\n";
-  std::cout << " leftUp "
-            << "x: " << leftUp.x << " y: " << leftUp.y << "\n";
-  std::cout << " rightUp"
-            << "x: " << rightUp.x << " y: " << rightUp.y << "\n";
-
   Corners = {leftDown, rightDown, leftUp, rightUp};
   srand(time(0));
   unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
   shuffle(Corners.begin(), Corners.end(), std::default_random_engine(seed));
 
-  Texture *BlockedTileTexture = new Texture("Textures/BlockedTile.png", GL_LINEAR);
-  Texture *FreeTileTexture = new Texture("Textures/FreeTile.png", GL_LINEAR);
-  Texture *SlowerTileTexture = new Texture("Textures/SlowerTile.png", GL_LINEAR);
-  Texture *PathTileTexture = new Texture("Textures/PathTile.png", GL_LINEAR);
-
-  BlockedTileTexture->Load();
-  FreeTileTexture->Load();
-  SlowerTileTexture->Load();
-  PathTileTexture->Load();
-
+  //PLAYERLEFT PLAYERRIGHT ENEMY GAMEOBJECTS
   GameObject *enemyGameObject = new GameObject(Enemy_Node_For_Model.local);
-
   GameObject *leftPlayerObj = new GameObject(leftPlayerNodeForModel.local);
   GameObject *rightPlayerObj = new GameObject(rightPlayerNodeForModel.local);
 
+
+  //PLAYERLEFT PLAYERRIGHT COLLIDERS AND TAGS
   GameObject *leftPlayerObjWithCollider = new GameObject(leftPlayerNode.local);
   GameObject *rightPlayerObjWithCollider = new GameObject(rightPlayerNode.local);
   leftPlayerObjWithCollider->setTag("player");
   rightPlayerObjWithCollider->setTag("player");
+
+  //ENEMY TAG
   enemyGameObject->setTag("enemy");
 
-  std::string PlayerModelPath = "Models/Player/player_animations.fbx";
-  std::string AnimatedEnemyPAth = "Models/" + ConfigUtils::GetValueFromMap<std::string>("Enemy_Animated_Model", ConfigUtils::GlobalConfigMap);
+ 
 
-  playerModel = new AnimatedModel(PlayerModelPath, *shaderAnimatedModel, false);
-  player2Model = new AnimatedModel(*playerModel);
-  enemyModel = new AnimatedModel(AnimatedEnemyPAth, *shaderAnimatedModel, false);
-
+ 
+  //BASIC TILE RENDERER FOR DEBUG AND SIMPLE RENDER
   ShapeRenderer3D *TileRenderer = new ShapeRenderer3D(Shapes::RainBow_Square,
                                                       Shapes::RB_Square_indices,
                                                       sizeof(Shapes::RainBow_Square),
@@ -183,11 +197,20 @@ void Game::Granko()
                                                       *shaderProgram,
                                                       FreeTileTexture, "Basic");
 
-  ConeRenderer *coneRendererLeft = new ConeRenderer(*shaderViewCone, &leftScene);
-  ConeRenderer *coneRendererRight = new ConeRenderer(*shaderViewCone, &rightScene);
+  /*
+  Create ConeRenderer and Add to Players
+  */
+  #pragma region ConeRenderer
+
+  ConeRenderer *coneRendererLeft = new ConeRenderer(*shaderViewCone, leftScene);
+  ConeRenderer *coneRendererRight = new ConeRenderer(*shaderViewCone, rightScene);
 
   leftPlayerObj->AddComponent(coneRendererLeft);
   rightPlayerObj->AddComponent(coneRendererRight);
+  #pragma endregion
+
+
+
   leftPlayerObj->AddComponent(playerModel);
   rightPlayerObj->AddComponent(player2Model);
   enemyGameObject->AddComponent(enemyModel);
@@ -213,8 +236,7 @@ void Game::Granko()
 
   Enemy_Node_For_Model.AddGameObject(enemyGameObject);
 
-  float floorTransform = ConfigUtils::GetValueFromMap<float>("FloorTranslation", ConfigUtils::GlobalConfigMap);
-  float TileScale = ConfigUtils::GetValueFromMap<float>("TileScale", ConfigUtils::GlobalConfigMap);
+  
 
   leftPlayerNode.Scale(PlayerScale);
   rightPlayerNode.Scale(PlayerScale);
@@ -245,7 +267,7 @@ void Game::Granko()
 
   if (debugPathFinding)
   {
-    AddMapTilesToSceneNodes(mapTiles, leftScene,
+    AddMapTilesToSceneNodes(mapTiles, *leftScene,
                             grid,
                             FreeTileTexture,    //Texture 1
                             PathTileTexture,    //Texture 2
@@ -257,23 +279,23 @@ void Game::Granko()
                             MapSize);
   }
 
-  for (auto node : generator.leftnodes)
+  for (auto node : generator->leftnodes)
   {
     if (node != NULL)
-      leftScene.AddChild(node);
+      leftScene->AddChild(node);
   }
 
-  leftScene.AddChild(&leftPlayerNode);
+  leftScene->AddChild(&leftPlayerNode);
   //leftScene.AddChild(&Enemy_Node);
 
-  for (auto &node : generator.rightnodes)
+  for (auto &node : generator->rightnodes)
   {
     if (node != NULL)
     {
-      rightScene.AddChild(node);
+      rightScene->AddChild(node);
     }
   }
-  rightScene.AddChild(&rightPlayerNode);
+  rightScene->AddChild(&rightPlayerNode);
 
   shaderProgram->use();
 
@@ -283,10 +305,11 @@ void Game::Granko()
 
   sNodes.push_back(&leftPlayerNode);
   rightNodes.push_back(&rightPlayerNode);
-  gatherCollidableObjects(leftScene.children);
+  gatherCollidableObjects(leftScene->children);
   std::cout << "Colliders gathered: " << collidableObjects.size() << std::endl;
   gatherTriggers(sNodes);
   std::cout << "Triggers gathered: " << triggers.size() << std::endl;
+
 
 
       UpdatePlayer(leftPlayerNode, camera, interpolation, true);
@@ -380,7 +403,7 @@ void Game::Render()
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  leftScene.Render(originTransform, true);
+  leftScene->Render(originTransform, true);
   if (EnemyOnLefSide)
   {
     Enemy_Node.Render(originTransform, true);
@@ -400,7 +423,7 @@ void Game::Render()
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  rightScene.Render(originTransform, true);
+  rightScene->Render(originTransform, true);
   if (!EnemyOnLefSide)
   {
     Enemy_Node.Render(originTransform, true);
@@ -429,7 +452,7 @@ void Game::Render()
   guiElement2->Draw();
 
   // Render grafik
-  Plot();
+  //Plot();
 
   if(debugMode)
   ImguiDrawData();
@@ -673,10 +696,11 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation, 
   if (glfwGetKey(okienko.window, GLFW_KEY_D) == GLFW_PRESS)
     movementDir.x = 1;
 
+
   auto velocity = movementSpeedTimesPlayerScale;
   if (glfwGetKey(okienko.window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
   {
-    velocity += velocity;
+    velocity += velocity/2;
   }
 
   if (leftSideActive)
@@ -992,40 +1016,7 @@ void Game::Plot()
     }
   }
 }
-void Game::DisplayImage(const char *path, const char *text, Texture *imageTex)
-{
-  glViewport(0, 0, Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT);
-  glScissor(0, 0, Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT);
-  glEnable(GL_SCISSOR_TEST);
-  glClearColor(1, 0.5, 0.5, 0);
-  glClear(GL_COLOR_BUFFER_BIT);
 
-  SceneNode *imageNode = new SceneNode();
-  GameObject *imageObj = new GameObject(imageNode->world);
-
-  ShapeRenderer3D *image = new ShapeRenderer3D(
-      Shapes::RainBow_Square,
-      Shapes::RB_Square_indices,
-      sizeof(Shapes::RainBow_Square),
-      sizeof(Shapes::RB_Square_indices),
-      *shaderProgram,
-      imageTex, "Image");
-
-  imageObj->AddComponent(image);
-  imageNode->AddGameObject(imageObj);
-
-  imageNode->Translate(camera.Position.x, camera.Position.y - 0.184f, camera.Position.z - 0.1f);
-  imageNode->Rotate(camera.Pitch, glm::vec3(1, 0, 0));
-  imageNode->Scale(12.8f / 32.0f, 7.2f / 32.0f, 1);
-
-  Transform origin = Transform::origin();
-  imageNode->Render(origin, true);
-
-  //delete imageTex;
-  delete imageNode;
-  delete imageObj;
-  delete image;
-}
 
 void Game::ImguiDrawData()
 {
