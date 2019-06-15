@@ -132,10 +132,10 @@ void Game::Granko()
 
   #pragma region DeathAndWinScreenTextures
 	glm::mat4 guiTransfom{ 1.f };
-	guiElement = new SimpleGUI::GuiElement("Textures/DeathTr.png", glm::scale(guiTransfom, glm::vec3(2, 2, 2)), guiShader);
-	DeathBcg = new SimpleGUI::GuiElement("Textures/DeathBg.png", glm::scale(guiTransfom, glm::vec3(2, 2, 2)), guiShader);
+	LostText = new SimpleGUI::GuiElement("Textures/DeathTr.png", glm::scale(guiTransfom, glm::vec3(2, 2, 2)), guiShader);
+	LostBcg = new SimpleGUI::GuiElement("Textures/DeathBg.png", glm::scale(guiTransfom, glm::vec3(2, 2, 2)), guiShader);
 
-	guiElement2 = new SimpleGUI::GuiElement("Textures/DeathTr.png", glm::scale(guiTransfom, glm::vec3(2, 2, 2)), guiShader);
+	WinText = new SimpleGUI::GuiElement("Textures/DeathTr.png", glm::scale(guiTransfom, glm::vec3(2, 2, 2)), guiShader);
 	WinBcg = new SimpleGUI::GuiElement("Textures/WinBg.png", glm::scale(guiTransfom, glm::vec3(2, 2, 2)), guiShader);
 
   #pragma endregion
@@ -153,7 +153,7 @@ void Game::Granko()
 	leftScene = new SceneNode();
 	rightScene = new SceneNode();
 
-  playerObj = new Player(&leftPlayerNode, 0, *shaderProgram, leftScene, &Enemy_Node, WinBcg, guiElement2);
+  playerObj = new Player(&leftPlayerNode, 0, *shaderProgram, leftScene, &Enemy_Node, WinBcg, WinText);
 
   generator = new MapGenerator(shaderProgram_For_Model, MapScale, 10, 1, false, &sNodes, playerObj);
   mapped = generator->GetConverted();
@@ -218,7 +218,7 @@ void Game::Granko()
   Collider *leftPlayerCollider = new Collider(leftPlayerObjWithCollider->transform);
   Collider *rightPlayerCollider = new Collider(rightPlayerObjWithCollider->transform);
 
-  EnemyKills *killer = new EnemyKills(Enemy_Node.local, &leftPlayerNode, DeathBcg, guiElement);
+  killer = new EnemyKills(Enemy_Node.local, &leftPlayerNode, LostBcg, LostText);
   enemyGameObject->AddComponent(killer);
 
   killer->setDimensions(-0.12, 0, 0.25, 2.3 / 10, 2, 3.05 / 10);
@@ -340,13 +340,57 @@ void Game::Granko()
   glDeleteProgram(shaderProgram->shaderProgramID);
   glfwTerminate();
 }
-void Game::CheckPlayerDeath()
+void Game::ResetGame()
 {
-  //std::cout << "Monster position * scale: " << Enemy_Node.local.getPosition().x * Enemy_Node.local.getScale().x << ", " << Enemy_Node.local.getPosition().z * Enemy_Node.local.getScale().z << std::endl;
+	glm::vec2 leftDown = FindFirstFromLeftDownCorner(mapped, MapSize);
+	glm::vec2 rightDown = FindFirstFromRightDownCorner(mapped, MapSize);
+	glm::vec2 leftUp = FindFirstFromLeftUpCorner(mapped, MapSize);
+	glm::vec2 rightUp = FindFirstFromRightUpCorner(mapped, MapSize);
+
+	Corners = { leftDown, rightDown, leftUp, rightUp };
+	srand(time(0));
+	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+	shuffle(Corners.begin(), Corners.end(), std::default_random_engine(seed));
+
+	std::cout << "Cale te:" << "\n";
+	Enemy_Node.SetPosition(Corners[0].x * EnemyScaleInverse, EnemyYoffset * 100, Corners[0].y * EnemyScaleInverse);
+	leftPlayerNode.SetPosition(Corners[3].x * PlayerScaleInverse, 0, Corners[3].y * PlayerScaleInverse);
+	rightPlayerNode.SetPosition(Corners[3].x * PlayerScaleInverse, 0, Corners[3].y  * PlayerScaleInverse);
+	
+	std::cout << "After transform" << "\n";
+
+	enemyController = new EnemyController(this, Enemy_Node,
+		leftPlayerNode,
+		rightPlayerNode,
+		GridLocation{ static_cast<int>(Corners[0].x), static_cast<int>(Corners[0].y) }, //enemy start location
+		GridLocation{ static_cast<int>(Corners[1].x), static_cast<int>(Corners[1].y) }, //enemy firstTarget
+		grid,
+		mapTiles,
+		MapSize);
+
+	std::cout << "CaleTe v2" << "\n";
+
+	camera.Position.x = leftPlayerNode.local.getPosition().x * PlayerScale;
+	camera.Position.y = cameraYOffset;
+	camera.Position.z = leftPlayerNode.local.getPosition().z * PlayerScale + cameraZOffset;
+
+	camera2.Position.x = rightPlayerNode.local.getPosition().x * PlayerScale;
+	camera2.Position.y = cameraYOffset;
+	camera2.Position.z = rightPlayerNode.local.getPosition().z * PlayerScale + cameraZOffset;
+
+	LostText->Reset();
+	LostBcg->Reset();
+
+	WinText->Reset();
+	WinBcg->Reset();
+
+
+
+
 }
 void Game::Update(float interpolation)
 {
-  CheckPlayerDeath();
+ 
 
   if (!inputBlockade)
   {
@@ -445,11 +489,13 @@ void Game::Render()
   glViewport(0, 0, Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT);
   glDisable(GL_DEPTH_TEST);
 
-  DeathBcg->Draw();
-  guiElement->Draw();
+  LostBcg->Draw();
+  LostText->Draw();
 
   WinBcg->Draw();
-  guiElement2->Draw();
+  WinText->Draw();
+
+
 
   // Render grafik
   //Plot();
@@ -697,6 +743,9 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation, 
     movementDir.x = 1;
 
 
+  if (glfwGetKey(okienko.window, GLFW_KEY_R) == GLFW_PRESS)
+	  ResetGame();
+
   auto velocity = movementSpeedTimesPlayerScale;
   if (glfwGetKey(okienko.window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
   {
@@ -784,6 +833,8 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation, 
   camera.Position.x = player.local.getPosition().x * PlayerScale;
   camera.Position.y = cameraYOffset;
   camera.Position.z = player.local.getPosition().z * PlayerScale + cameraZOffset;
+
+  killer->SetActivated(false);
 
   playerObj->Update(&okienko, TrapScale);
 }

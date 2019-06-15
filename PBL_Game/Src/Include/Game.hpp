@@ -13,6 +13,7 @@
 #include "Player.hpp"
 #include "AI/EnemyController.hpp"
 #include "GuiElement.hpp"
+#include "Triggers/EnemyKills.hpp"
 
 const int TICKS_PER_SECOND = 64;
 const int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
@@ -101,6 +102,8 @@ std::vector<MapKey *> mapped;
   SceneNode Enemy_Node_For_Model;
 
   EnemyController *enemyController;
+  EnemyKills *killer;
+
 
   void InitializeConfig();
   //How to get value from config
@@ -144,11 +147,11 @@ std::vector<MapKey *> mapped;
    Camera camera2;
 
    //Gui
-   SimpleGUI::GuiElement * guiElement = nullptr;
-   SimpleGUI::GuiElement * DeathBcg = nullptr;
+   SimpleGUI::GuiElement * LostText = nullptr;
+   SimpleGUI::GuiElement * LostBcg = nullptr;
 
    //Gui
-   SimpleGUI::GuiElement * guiElement2 = nullptr;
+   SimpleGUI::GuiElement * WinText = nullptr;
    SimpleGUI::GuiElement * WinBcg = nullptr;
 
   //Imgui
@@ -190,7 +193,6 @@ std::vector<MapKey *> mapped;
   void ResetGame();
 
   void Granko();
-  void CheckPlayerDeath();
   void Update(float interpolation);
   void Render();
   void Serialize();

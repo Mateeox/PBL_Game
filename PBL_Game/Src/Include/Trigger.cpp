@@ -12,6 +12,11 @@ ComponentType Trigger::GetComponentType()
 	return ComponentType::Trigger;
 }
 
+void Trigger::SetActivated(bool status)
+{
+	activated = status;
+}
+
 void Trigger::ActivateTrigger()
 {
 }

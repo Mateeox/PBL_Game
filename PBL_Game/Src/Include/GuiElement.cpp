@@ -59,6 +59,17 @@ void GuiElement::FadeFromTransparent(float aFadeSpeed)
 	shader->use();
 	shader->setBool("fadeFromTransparent", fadeFromTransparent);
 }
+void GuiElement::Reset()
+{
+	FadeFromTransparentValue = 0.0f;
+	FadeToColorValue = 0.0f;
+	fadeFromTransparent = false;
+
+	fadeToColor = false;
+	visible = false;
+
+}
+
 void GuiElement::FadeToColor(glm::vec3 aColor,float aFadeSpeed)
 {
 	ColorFade = aColor;

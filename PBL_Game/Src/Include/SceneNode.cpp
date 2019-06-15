@@ -116,10 +116,12 @@ void SceneNode::Translate(float x, float y, float z)
   dirty_flag = true;
 }
 
+
 void SceneNode::SetPosition(float x, float y, float z)
 {
-	local = Transform::origin();
-	local.Translate(glm::vec3(x, y, z));
+	
+	local.SetPosition(x, y, z);
+	std::cout << "Position set:" << " " << x << " " << y << " " << z << "\n";
 	dirty_flag = true;
 }
 void SceneNode::Rotate(float value, glm::vec3 axis)

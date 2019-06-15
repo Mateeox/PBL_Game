@@ -16,6 +16,18 @@ Transform Transform::origin()
   return Transform();
 }
 
+void Transform::SetPosition(float x, float y, float z)
+{
+
+	glm::mat4 position = glm::mat4(1.0f);
+	Position = glm::vec3(x, y, z);
+	position = glm::scale(position, Scale);
+	position = glm::translate(position, glm::vec3(x,y,z));
+
+	transform = position;
+
+}
+
 Transform Transform::combine(Transform &other)
 {
   Transform t;
