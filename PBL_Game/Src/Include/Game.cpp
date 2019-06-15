@@ -900,11 +900,10 @@ void Game::SetViewAndPerspective(Camera &aCamera, SceneNode &player, Transform *
     auto angle = coneRenderer->getDirectionAngle();
     angle += coneRenderer->getAngle() / 2;
     angle = fmod(angle, 2 * M_PI);
-    if(leftSideActive)
-    {
+
     shaderProgram_For_Model->use();
     shaderProgram_For_Model->setVec3("spotLight.direction", glm::vec3(cos(angle), 0, sin(angle)));
-    }
+  
   }
 
 
