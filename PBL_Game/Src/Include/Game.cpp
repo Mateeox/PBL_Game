@@ -390,11 +390,11 @@ void Game::Render()
 
  if (EnemyOnLefSide)
   {
-  SetViewAndPerspective(camera, leftPlayerNode.local, &Enemy_Node.local);
+  SetViewAndPerspective(camera, leftPlayerNode, &Enemy_Node.local);
   }
   else
   {
-    SetViewAndPerspective(camera, leftPlayerNode.local, nullptr);
+    SetViewAndPerspective(camera, leftPlayerNode, nullptr);
   }
   
   // RENDER LEWEJ STRONY
@@ -410,11 +410,11 @@ void Game::Render()
   }
    if (!EnemyOnLefSide)
   {
-  SetViewAndPerspective(camera2, rightPlayerNode.local, &Enemy_Node.local);
+  SetViewAndPerspective(camera2, rightPlayerNode, &Enemy_Node.local);
   }
   else
   {
-    SetViewAndPerspective(camera2, rightPlayerNode.local, nullptr);
+    SetViewAndPerspective(camera2, rightPlayerNode, nullptr);
   }
 
   // RENDER PRAWEJ STRONY
@@ -862,7 +862,7 @@ GameObject *Game::findByTagSingle(const std::vector<SceneNode *> &data, std::str
   return nullptr;
 }
 
-void Game::SetViewAndPerspective(Camera &aCamera, Transform &player, Transform *enemy)
+void Game::SetViewAndPerspective(Camera &aCamera, SceneNode &player, Transform *enemy)
 {
   projection = glm::perspective(aCamera.Zoom, (float)Game::WINDOW_WIDTH / (float)Game::WINDOW_HEIGHT, 0.1f, 100.0f);
   view = aCamera.GetViewMatrix();
@@ -875,7 +875,7 @@ void Game::SetViewAndPerspective(Camera &aCamera, Transform &player, Transform *
   shaderProgram_For_Model->setMat4("projection", projection);
   shaderProgram_For_Model->setMat4("view", view);
   shaderProgram_For_Model->setVec3("viewPos", aCamera.Position);
-  auto lightPos = player.getPosition() * player.getScale();
+  auto lightPos = player.local.getPosition() * player.local.getScale();
   lightPos.y = 0.5;
   shaderProgram_For_Model->setVec3("pointLights[0].position", lightPos);
   lightPos.y = 0.25;
@@ -893,13 +893,8 @@ void Game::SetViewAndPerspective(Camera &aCamera, Transform &player, Transform *
   }
   shaderProgram_For_Model->setVec3("pointLights[1].position", enemyLightPos);
 
-ConeRenderer * coneRenderer = nullptr;
+  ConeRenderer* coneRenderer = (ConeRenderer *)(player.children[0]->gameObject->GetComponent(ComponentSystem::ComponentType::ConeRenderer));
 
-if(leftSideActive)
- coneRenderer = (ConeRenderer *)(leftPlayerNode.children[0]->gameObject->GetComponent(ComponentSystem::ComponentType::ConeRenderer));
-else
- coneRenderer = (ConeRenderer *)(rightPlayerNode.children[0]->gameObject->GetComponent(ComponentSystem::ComponentType::ConeRenderer));
-  
   if (coneRenderer != nullptr)
   {
     auto angle = coneRenderer->getDirectionAngle();
