@@ -352,12 +352,10 @@ void Game::ResetGame()
 	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 	shuffle(Corners.begin(), Corners.end(), std::default_random_engine(seed));
 
-	std::cout << "Cale te:" << "\n";
 	Enemy_Node.SetPosition(Corners[0].x * EnemyScaleInverse, EnemyYoffset * 100, Corners[0].y * EnemyScaleInverse);
 	leftPlayerNode.SetPosition(Corners[3].x * PlayerScaleInverse, 0, Corners[3].y * PlayerScaleInverse);
 	rightPlayerNode.SetPosition(Corners[3].x * PlayerScaleInverse, 0, Corners[3].y  * PlayerScaleInverse);
 	
-	std::cout << "After transform" << "\n";
 
 	enemyController = new EnemyController(this, Enemy_Node,
 		leftPlayerNode,
@@ -368,7 +366,6 @@ void Game::ResetGame()
 		mapTiles,
 		MapSize);
 
-	std::cout << "CaleTe v2" << "\n";
 
 	camera.Position.x = leftPlayerNode.local.getPosition().x * PlayerScale;
 	camera.Position.y = cameraYOffset;
@@ -384,7 +381,7 @@ void Game::ResetGame()
 	WinText->Reset();
 	WinBcg->Reset();
 
-
+	killer->SetActivated(false);
 
 
 }
@@ -833,8 +830,6 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation, 
   camera.Position.x = player.local.getPosition().x * PlayerScale;
   camera.Position.y = cameraYOffset;
   camera.Position.z = player.local.getPosition().z * PlayerScale + cameraZOffset;
-
-  killer->SetActivated(false);
 
   playerObj->Update(&okienko, TrapScale);
 }
