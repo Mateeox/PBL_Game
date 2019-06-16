@@ -377,6 +377,10 @@ void Game::ResetGame()
 	camera2.Position.z = rightPlayerNode.local.getPosition().z * PlayerScale + cameraZOffset;
 
 	playerObj->trapSet = false;
+	if (debugMode)
+	{
+		playerObj->PartsAmount = playerObj->partsLimit;
+	}
 	RemoveNodeWithGameObjectTag("trap", leftScene);
 
 	LostText->Reset();

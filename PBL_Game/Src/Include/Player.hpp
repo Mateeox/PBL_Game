@@ -15,6 +15,8 @@ public:
 	bool Trap();
 	void AddTrap();
 	bool trapSet = false;
+	int partsLimit;
+	int PartsAmount;
 private:
 	SceneNode* parentNode;
 	SceneNode* player;
@@ -22,8 +24,7 @@ private:
 	SimpleGUI::GuiElement * win;
 	SimpleGUI::GuiElement * background;
 	Model* trapMod;
-	int partsLimit;
-	int PartsAmount;
+
 
 
 	SceneNode* CreateTrap(float scale);
