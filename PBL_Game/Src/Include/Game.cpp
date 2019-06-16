@@ -390,6 +390,7 @@ void Game::ResetGame()
 	if (debugMode)
 	{
 		playerObj->PartsAmount = playerObj->partsLimit;
+		TrapPartInfo->SwitchTexture("Parts4");
 	}
 	RemoveNodeWithGameObjectTag("trap", leftScene);
 
