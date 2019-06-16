@@ -65,11 +65,6 @@ class Game
   std::map<int,bool> KeyInEq;
 
 
-//Gui test
-unsigned int texture1;
-unsigned int VBO, VAO, EBO;
-
-
 //Map Generation
 MapGenerator * generator = nullptr;
 std::vector<MapKey *> mapped;
@@ -146,14 +141,6 @@ std::vector<MapKey *> mapped;
    Camera camera;
    Camera camera2;
 
-   //Gui
-   SimpleGUI::GuiElement * LostText = nullptr;
-   SimpleGUI::GuiElement * LostBcg = nullptr;
-
-   //Gui
-   SimpleGUI::GuiElement * WinText = nullptr;
-   SimpleGUI::GuiElement * WinBcg = nullptr;
-
   //Imgui
   bool show_demo_window = true;
   bool printf_path = false;
@@ -171,6 +158,16 @@ std::vector<MapKey *> mapped;
   Player* playerObj;
 
   public:
+
+	  //Gui
+	  SimpleGUI::GuiElement * LostText = nullptr;
+	  SimpleGUI::GuiElement * LostBcg = nullptr;
+
+	  //Gui
+	  SimpleGUI::GuiElement * WinText = nullptr;
+	  SimpleGUI::GuiElement * WinBcg = nullptr;
+
+	  SimpleGUI::GuiElement * TrapPartInfo = nullptr;
 
 		
   bool EnemyOnLefSide = true;

@@ -1,9 +1,10 @@
 #include "Player.hpp"
 #include "Triggers/EnemyDies.hpp"
 #include "Component/Component.hpp"
+#include "Game.hpp"
 
 Player::Player(SceneNode *aPlayer, int aPartsLimit, Shader &aShader, SceneNode *aNode, SceneNode *enemy,
-SimpleGUI::GuiElement * aBackground,SimpleGUI::GuiElement * aWin):background(aBackground),win(aWin)
+SimpleGUI::GuiElement * aBackground,SimpleGUI::GuiElement * aWin, Game * aGame):game(aGame),background(aBackground),win(aWin)
 {
 	parentNode = aNode;
 	player = aPlayer;
@@ -24,9 +25,28 @@ bool Player::Trap()
 	return PartsAmount == partsLimit;
 }
 
-void Player::AddTrap()
+void Player::AddTrapPart()
 {
 	PartsAmount++;
+	
+	switch (PartsAmount)
+	{
+	case 1:
+		game->TrapPartInfo->SwitchTexture("Parts1");
+			break;
+	case 2:
+		game->TrapPartInfo->SwitchTexture("Parts2");
+		break;
+	case 3:
+		game->TrapPartInfo->SwitchTexture("Parts3");
+		break;
+	case 4:
+		game->TrapPartInfo->SwitchTexture("Parts4");
+		break;
+	default:
+		game->TrapPartInfo->SwitchTexture("default");
+		break;
+	}
 }
 
 void Player::Update(PBLGame::Window *okienko, float scale)
@@ -35,7 +55,7 @@ void Player::Update(PBLGame::Window *okienko, float scale)
 	{
 		if (!trapSet)
 		{
-			PartsAmount -= partsLimit;
+			PartsAmount = 0;
 			parentNode->AddChild(CreateTrap(scale));
 			trapSet =true;
 		}

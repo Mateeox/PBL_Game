@@ -13,7 +13,7 @@ void ChestTrigger::ActivateTrigger()
 	if (!activated)
 	{
 		std::cout << "Otwieranie skrzyni" << std::endl;
-		player->AddTrap();
+		player->AddTrapPart();
 		transform.ScaleTransform(0, 0, 0);
 		activated = true;
 	}

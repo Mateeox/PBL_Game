@@ -138,6 +138,16 @@ void Game::Granko()
 	WinText = new SimpleGUI::GuiElement("Textures/DeathTr.png", glm::scale(guiTransfom, glm::vec3(2, 2, 2)), guiShader);
 	WinBcg = new SimpleGUI::GuiElement("Textures/WinBg.png", glm::scale(guiTransfom, glm::vec3(2, 2, 2)), guiShader);
 
+	glm::mat4 TrapPartInfoTransform{ 1.f };
+	TrapPartInfoTransform = glm::translate(TrapPartInfoTransform, glm::vec3(-0.8,0.85,0));
+	TrapPartInfo = new SimpleGUI::GuiElement("Textures/Parts0.png", glm::scale(TrapPartInfoTransform, glm::vec3(0.5, 0.5, 0.5)), guiShader);
+	
+	TrapPartInfo->AddTexture("Textures/Parts1.png", "Parts1");
+	TrapPartInfo->AddTexture("Textures/Parts2.png", "Parts2");
+	TrapPartInfo->AddTexture("Textures/Parts3.png", "Parts3");
+	TrapPartInfo->AddTexture("Textures/Parts4.png", "Parts4");
+	TrapPartInfo->SwtichVisiblity();
+
   #pragma endregion
 
   #pragma region ModelLoading
@@ -153,9 +163,9 @@ void Game::Granko()
 	leftScene = new SceneNode();
 	rightScene = new SceneNode();
 
-  playerObj = new Player(&leftPlayerNode, 0, *shaderProgram, leftScene, &Enemy_Node, WinBcg, WinText);
+  playerObj = new Player(&leftPlayerNode, 4, *shaderProgram, leftScene, &Enemy_Node, WinBcg, WinText,this);
 
-  generator = new MapGenerator(shaderProgram_For_Model, MapScale, 10, 1, false, &sNodes, playerObj);
+  generator = new MapGenerator(shaderProgram_For_Model, MapScale, 10, 4, false, &sNodes, playerObj);
   mapped = generator->GetConverted();
 
   MapSize = generator->maxSize;
@@ -383,6 +393,7 @@ void Game::ResetGame()
 	}
 	RemoveNodeWithGameObjectTag("trap", leftScene);
 
+
 	LostText->Reset();
 	LostBcg->Reset();
 
@@ -494,12 +505,15 @@ void Game::Render()
   glViewport(0, 0, Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT);
   glDisable(GL_DEPTH_TEST);
 
+  TrapPartInfo->Draw();
+
   LostBcg->Draw();
   LostText->Draw();
 
   WinBcg->Draw();
   WinText->Draw();
 
+ 
 
 
   // Render grafik
