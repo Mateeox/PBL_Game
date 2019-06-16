@@ -20,6 +20,7 @@ void Transform::SetScale(float x, float y, float z)
 {
 	glm::mat4 position = glm::mat4(1.0f);
 
+	Scale = glm::vec3(x, y, z);
 	position = glm::scale(position, glm::vec3(x,y,z));
 	position = glm::translate(position, glm::vec3(Position.x, Position.y, Position.z));
 
