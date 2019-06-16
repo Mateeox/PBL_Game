@@ -26,7 +26,7 @@ private:
 	SimpleGUI::GuiElement * win;
 	SimpleGUI::GuiElement * background;
 	Model* trapMod;
-
+	bool isAdding = false;
 
 
 	SceneNode* CreateTrap(float scale);

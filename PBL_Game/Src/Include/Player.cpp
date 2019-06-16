@@ -27,25 +27,29 @@ bool Player::Trap()
 
 void Player::AddTrapPart()
 {
-	PartsAmount++;
-	
-	switch (PartsAmount)
+	if (!isAdding)
 	{
-	case 1:
-		game->TrapPartInfo->SwitchTexture("Parts1");
+		isAdding = true;
+		PartsAmount++;
+	
+		switch (PartsAmount)
+		{
+		case 1:
+			game->TrapPartInfo->SwitchTexture("Parts1");
+				break;
+		case 2:
+			game->TrapPartInfo->SwitchTexture("Parts2");
 			break;
-	case 2:
-		game->TrapPartInfo->SwitchTexture("Parts2");
-		break;
-	case 3:
-		game->TrapPartInfo->SwitchTexture("Parts3");
-		break;
-	case 4:
-		game->TrapPartInfo->SwitchTexture("Parts4");
-		break;
-	default:
-		game->TrapPartInfo->SwitchTexture("default");
-		break;
+		case 3:
+			game->TrapPartInfo->SwitchTexture("Parts3");
+			break;
+		case 4:
+			game->TrapPartInfo->SwitchTexture("Parts4");
+			break;
+		default:
+			game->TrapPartInfo->SwitchTexture("default");
+			break;
+		}
 	}
 }
 
