@@ -27,6 +27,7 @@ public:
   void SetTransform(glm::mat4 transform);
   void SetRotation(float x, float y, float z);
   void SetPosition(float x, float y, float z);
+  void SetScale(float x, float y, float z);
 
   static  Transform origin();
 

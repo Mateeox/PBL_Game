@@ -61,7 +61,7 @@
     <ConfigParameter>
         <Type>U</Type>
         <Name>MapScale</Name>
-        <Value>300</Value>
+        <Value>150</Value>
     </ConfigParameter>
 
 <!-- Enemy Interest Levels   /-->
@@ -159,7 +159,7 @@
     <ConfigParameter>
         <Type>I</Type>
         <Name>Debug</Name>
-        <Value>0</Value>
+        <Value>1</Value>
     </ConfigParameter>
 
     <!--- Enemy Scale/-->

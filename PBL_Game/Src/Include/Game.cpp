@@ -353,6 +353,7 @@ void Game::ResetGame()
 	shuffle(Corners.begin(), Corners.end(), std::default_random_engine(seed));
 
 	Enemy_Node.SetPosition(Corners[0].x * EnemyScaleInverse, EnemyYoffset * 100, Corners[0].y * EnemyScaleInverse);
+	Enemy_Node.SetScale(EnemyScale, EnemyScale, EnemyScale);
 	leftPlayerNode.SetPosition(Corners[3].x * PlayerScaleInverse, 0, Corners[3].y * PlayerScaleInverse);
 	rightPlayerNode.SetPosition(Corners[3].x * PlayerScaleInverse, 0, Corners[3].y  * PlayerScaleInverse);
 	
@@ -374,6 +375,9 @@ void Game::ResetGame()
 	camera2.Position.x = rightPlayerNode.local.getPosition().x * PlayerScale;
 	camera2.Position.y = cameraYOffset;
 	camera2.Position.z = rightPlayerNode.local.getPosition().z * PlayerScale + cameraZOffset;
+
+	playerObj->trapSet = false;
+	RemoveNodeWithGameObjectTag("trap", leftScene);
 
 	LostText->Reset();
 	LostBcg->Reset();
@@ -1177,4 +1181,27 @@ void Game::FixAnimation()
 
 void Game::SetupPlayersColiders()
 {
+}
+
+
+void Game::RemoveNodeWithGameObjectTag(std::string tag, SceneNode * parentNode)
+{
+	auto &NodeChildren = parentNode->children;
+	
+	for (auto& value : NodeChildren)
+	{
+		if (value->gameObject != nullptr)
+		{
+			if (value->gameObject->getTag() == tag)
+			{
+				NodeChildren.erase(std::remove(NodeChildren.begin(), NodeChildren.end(), value), NodeChildren.end());
+				std::cout << "Trap Removed" << "\n";
+				return;
+			}
+
+		}
+
+	}
+
+
 }

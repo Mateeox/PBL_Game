@@ -221,6 +221,8 @@ private:
   void DeserializeOrderPointers(std::map<unsigned long long, SceneNode *> &map);
 
 
+  void RemoveNodeWithGameObjectTag(std::string tag,SceneNode * parentNode);
+
 
   void SetViewAndPerspective(Camera &aCamera, SceneNode &player, Transform *enemy);
   void Plot();

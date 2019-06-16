@@ -104,6 +104,12 @@ void SceneNode::Scale(float x, float y, float z)
   dirty_flag = true;
 }
 
+void SceneNode::SetScale(float x, float y, float z)
+{
+	local.SetScale(x, y, z);
+	dirty_flag = true;
+}
+
 void SceneNode::Scale(float value)
 {
   local.ScaleTransform(value, value, value);

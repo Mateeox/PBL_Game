@@ -16,11 +16,23 @@ Transform Transform::origin()
   return Transform();
 }
 
+void Transform::SetScale(float x, float y, float z)
+{
+	glm::mat4 position = glm::mat4(1.0f);
+
+	position = glm::scale(position, glm::vec3(x,y,z));
+	position = glm::translate(position, glm::vec3(Position.x, Position.y, Position.z));
+
+	transform = position;
+
+}
+
 void Transform::SetPosition(float x, float y, float z)
 {
 
 	glm::mat4 position = glm::mat4(1.0f);
 	Position = glm::vec3(x, y, z);
+
 	position = glm::scale(position, Scale);
 	position = glm::translate(position, glm::vec3(x,y,z));
 

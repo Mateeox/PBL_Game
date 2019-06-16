@@ -14,6 +14,7 @@ public:
 	int Parts();
 	bool Trap();
 	void AddTrap();
+	bool trapSet = false;
 private:
 	SceneNode* parentNode;
 	SceneNode* player;
@@ -23,7 +24,7 @@ private:
 	Model* trapMod;
 	int partsLimit;
 	int PartsAmount;
-bool trapSet = false;
+
 
 	SceneNode* CreateTrap(float scale);
 	Trigger* enemyTrigger;
