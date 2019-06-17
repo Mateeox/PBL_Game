@@ -226,8 +226,8 @@ void Game::Granko()
   rightPlayerObj->AddComponent(player2Model);
   enemyGameObject->AddComponent(enemyModel);
 
-  PlayerCollider *leftPlayerCollider = new PlayerCollider(leftPlayerObjWithCollider->transform);
-  PlayerCollider *rightPlayerCollider = new PlayerCollider(rightPlayerObjWithCollider->transform);
+  PlayerCollider *leftPlayerCollider = new PlayerCollider(this,leftPlayerObjWithCollider->transform);
+  PlayerCollider *rightPlayerCollider = new PlayerCollider(this,rightPlayerObjWithCollider->transform);
 
   killer = new TrapTriggerXD(Enemy_Node.local, &leftPlayerNode, LostBcg, LostText);
   enemyGameObject->AddComponent(killer);
