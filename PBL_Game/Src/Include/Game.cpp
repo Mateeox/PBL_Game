@@ -525,7 +525,7 @@ void Game::Render()
 
 
   // Render grafik
-  //Plot();
+  Plot();
 
   if(debugMode)
   ImguiDrawData();
