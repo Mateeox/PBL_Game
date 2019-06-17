@@ -1,20 +1,46 @@
 #include "EnemyTrigger.hpp"
 
-EnemyTrigger::EnemyTrigger(Transform& transform, SceneNode* player,SimpleGUI::GuiElement * aBack,SimpleGUI::GuiElement * aLost) : 
-Trigger(transform),background(aBack),lostScreen(aLost)
+EnemyTrigger::EnemyTrigger(Transform& transform, SceneNode* enemy,SimpleGUI::GuiElement * aBackground,SimpleGUI::GuiElement * aWin) : Trigger(transform),background(aBackground),win(aWin)
 {
-	this->Player = player;
+	this->Enemy = enemy;
 }
 
 bool EnemyTrigger::checkCollision(Collider* other)
 {
 	if (Enabled) {
 
+		std::cout << "EnemyTrigger" << "\n";
+		if (other->gameobject->getTag() != "enemy" && other->gameobject->getTag() != "trap")
+		{
+			glm::vec3 translatedCoords = coords + transform.getPosition() * transform.getScale();
+			glm::vec3 otherTranslatedCoords{ 0 };
+			otherTranslatedCoords.x = other->coords.x + other->transform.getPosition().x;// *other->transform.getScale().x;
+			otherTranslatedCoords.z = other->coords.z + other->transform.getPosition().z; //* other->transform.getScale().z;
+
+			if ((translatedCoords.x <= otherTranslatedCoords.x + other->dimensions.x) && (translatedCoords.x + dimensions.x >= otherTranslatedCoords.x) &&
+				(translatedCoords.z <= otherTranslatedCoords.z + other->dimensions.z) && (translatedCoords.z + dimensions.z >= otherTranslatedCoords.z))
+			{
+
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+
 			glm::vec3 translatedCoords = coords + transform.getPosition() * transform.getScale();
 			glm::vec3 otherTranslatedCoords = other->coords + other->transform.getPosition() * other->transform.getScale();
 			return
-			(translatedCoords.x <= otherTranslatedCoords.x + other->dimensions.x) && (translatedCoords.x + dimensions.x >= otherTranslatedCoords.x) &&
-			(translatedCoords.y <= otherTranslatedCoords.y + other->dimensions.y) && (translatedCoords.y + dimensions.y >= otherTranslatedCoords.y) &&
+				(translatedCoords.x <= otherTranslatedCoords.x + other->dimensions.x) && (translatedCoords.x + dimensions.x >= otherTranslatedCoords.x) &&
+				(translatedCoords.y <= otherTranslatedCoords.y + other->dimensions.y) && (translatedCoords.y + dimensions.y >= otherTranslatedCoords.y) &&
 				(translatedCoords.z <= otherTranslatedCoords.z + other->dimensions.z) && (translatedCoords.z + dimensions.z >= otherTranslatedCoords.z);
+		}
 	}
+	else {
+		return false;
+	}
+
 }

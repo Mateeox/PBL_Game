@@ -10,6 +10,7 @@ bool PlayerCollider::checkCollision(Collider* other)
 {
 	if (Enabled) {
 
+
 		if (other->gameobject->getTag() != "enemy" && other->gameobject->getTag() != "trap")
 		{
 			glm::vec3 translatedCoords = coords + transform.getPosition() * transform.getScale();
