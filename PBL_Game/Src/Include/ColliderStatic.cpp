@@ -1,25 +1,11 @@
-#include <iostream>
-#include "ChestTrigger.hpp"
+#include "ColliderStatic.hpp"
 
-using namespace ComponentSystem;
-
-ChestTrigger::ChestTrigger(Transform & transform, Player* player) : Trigger(transform)
+ColliderStatic::ColliderStatic(Transform & transform) : Collider(transform)
 {
-	this->player = player;
+
 }
 
-void ChestTrigger::ActivateTrigger()
-{
-	if (!activated)
-	{
-		std::cout << "Otwieranie skrzyni" << std::endl;
-		player->AddTrapPart();
-		transform.ScaleTransform(0, 0, 0);
-		activated = true;
-	}
-}
-
-bool ChestTrigger::checkCollision(Collider* other)
+bool ColliderStatic::checkCollision(Collider* other)
 {
 	if (Enabled) {
 

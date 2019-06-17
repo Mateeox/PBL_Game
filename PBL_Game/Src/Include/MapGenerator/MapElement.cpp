@@ -1,6 +1,7 @@
 #include "MapGenerator/MapElement.hpp"
 #include "Collider.hpp"
 #include "Triggers/Key.hpp"
+#include "ColliderStatic.hpp"
 
 MapElement::MapElement(std::vector<SceneNode*>&aNodes):nodes(aNodes),door(nullptr) {
 	this->Position = glm::vec2();
@@ -101,7 +102,7 @@ SceneNode* MapElement::CreateWall(SceneNode* parent, Model* model, std::vector<S
 
 	aNodes.push_back(roof);
 
-	Collider * collider = new Collider(wall->local);
+	ColliderStatic * collider = new ColliderStatic(wall->local);
 	if (direction_y != 0)
 	collider->setDimensions(0,0,10 * parent->local.getScale().x,parent->local.getScale().x *1/0.02545f, 0 * 1/0.0254f, parent->local.getScale().z * 0.01f);
 	else
@@ -119,7 +120,7 @@ SceneNode* MapElement::CreateDoor(SceneNode* parent, Model* doorModel, Model* ke
 	if (!mirror) {
 
 		door = NodeWithModelFactory::CreateNode(door_index,"Door"+std::to_string(door_index), doorModel);
-		Collider* collider = new Collider(door->local);
+		ColliderStatic* collider = new ColliderStatic(door->local);
 		if (direction_y != 0)
 			collider->setDimensions(0, 0, 10 * parent->local.getScale().x, parent->local.getScale().x * 1 / 0.02545f, 0 * 1 / 0.0254f, parent->local.getScale().z * 0.01f);
 		else

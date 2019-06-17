@@ -1,25 +1,11 @@
-#include <iostream>
-#include "ChestTrigger.hpp"
+#include "TrapTrigger.hpp"
 
-using namespace ComponentSystem;
-
-ChestTrigger::ChestTrigger(Transform & transform, Player* player) : Trigger(transform)
+TrapTrigger::TrapTrigger(Transform& transform, SceneNode* enemy,SimpleGUI::GuiElement * aBackground,SimpleGUI::GuiElement * aWin) : Trigger(transform),background(aBackground),win(aWin)
 {
-	this->player = player;
+	this->Enemy = enemy;
 }
 
-void ChestTrigger::ActivateTrigger()
-{
-	if (!activated)
-	{
-		std::cout << "Otwieranie skrzyni" << std::endl;
-		player->AddTrapPart();
-		transform.ScaleTransform(0, 0, 0);
-		activated = true;
-	}
-}
-
-bool ChestTrigger::checkCollision(Collider* other)
+bool TrapTrigger::checkCollision(Collider* other)
 {
 	if (Enabled) {
 

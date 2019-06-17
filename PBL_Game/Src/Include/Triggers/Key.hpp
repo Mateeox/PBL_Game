@@ -12,5 +12,6 @@ private:
 	SceneNode* door;
 public:
 	Key(Transform& transform, SceneNode* door);
+	bool checkCollision(Collider* other) override;
 	virtual void ActivateTrigger();
 };
