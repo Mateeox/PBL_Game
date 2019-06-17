@@ -18,6 +18,7 @@ class EnemyKills : public Trigger {
 public:
 	EnemyKills(Transform& transform, SceneNode* player,SimpleGUI::GuiElement * background,
 	SimpleGUI::GuiElement * lost);
+	bool checkCollision(Collider* other) override;
 	void ActivateTrigger() {
 		if (!activated) 
 		{

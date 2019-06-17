@@ -7,11 +7,9 @@ class GameObject;
 
 class Collider : public ComponentSystem::Component {
 
-protected:
+public:
 	glm::vec3 coords;
 	glm::vec3 dimensions;
-
-public:
 	bool Enabled = true;
 	Transform& transform;
 	Collider(Transform& transform);
