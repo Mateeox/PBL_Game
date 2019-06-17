@@ -190,8 +190,8 @@ void Game::Granko()
   //PLAYERLEFT PLAYERRIGHT COLLIDERS AND TAGS
   GameObject *leftPlayerObjWithCollider = new GameObject(leftPlayerNode.local);
   GameObject *rightPlayerObjWithCollider = new GameObject(rightPlayerNode.local);
-  leftPlayerObjWithCollider->setTag("player");
-  rightPlayerObjWithCollider->setTag("player");
+  leftPlayerObjWithCollider->setTag("leftPlayer");
+  rightPlayerObjWithCollider->setTag("rightPlayer");
 
   //ENEMY TAG
   enemyGameObject->setTag("enemy");
