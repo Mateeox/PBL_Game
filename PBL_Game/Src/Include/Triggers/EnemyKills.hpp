@@ -19,7 +19,8 @@ public:
 	EnemyKills(Transform& transform, SceneNode* player,SimpleGUI::GuiElement * background,
 	SimpleGUI::GuiElement * lost);
 	void ActivateTrigger() {
-		if (!activated) {
+		if (!activated) 
+		{
 			background->SwtichVisiblity();
 			lostScreen->SwtichVisiblity();
 
@@ -28,7 +29,7 @@ public:
 			lostScreen->FadeToColor(glm::vec3(1,0,0),1);
 
 			std::cout << "Player killed" << std::endl;
-			Player->Scale(0);
+			//Player->Scale(0);
 			activated = true;
 		}
 	}

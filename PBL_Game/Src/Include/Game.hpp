@@ -13,6 +13,7 @@
 #include "Player.hpp"
 #include "AI/EnemyController.hpp"
 #include "GuiElement.hpp"
+#include "Triggers/EnemyKills.hpp"
 
 const int TICKS_PER_SECOND = 64;
 const int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
@@ -42,6 +43,7 @@ class Game
 
   glm::vec2 vector2DHelper{0,0};
   glm::vec2 vector2DHelper2{0,0};
+  bool debugMode = false;
 
 
   //
@@ -53,8 +55,8 @@ class Game
   Shader * guiShader;
   SceneNode wholeScene;
 
-  SceneNode leftScene;
-  SceneNode rightScene;
+  SceneNode *leftScene;
+  SceneNode *rightScene;
   
   std::vector<SceneNode *> sNodes;
   std::vector<SceneNode *> rightNodes;
@@ -63,12 +65,9 @@ class Game
   std::map<int,bool> KeyInEq;
 
 
-//Gui test
-unsigned int texture1;
-unsigned int VBO, VAO, EBO;
-
-
-
+//Map Generation
+MapGenerator * generator = nullptr;
+std::vector<MapKey *> mapped;
 
 
   //PathFinding
@@ -84,6 +83,9 @@ unsigned int VBO, VAO, EBO;
   std::unordered_map<GridLocation, GridLocation> came_from;
   std::unordered_map<GridLocation, double> cost_so_far;
   std::vector<glm::vec2> Corners;
+
+  float floorTransform;
+  float TileScale;
   #pragma endregion PathFindingAndMapGenerationUtils
 
 
@@ -95,13 +97,14 @@ unsigned int VBO, VAO, EBO;
   SceneNode Enemy_Node_For_Model;
 
   EnemyController *enemyController;
+  EnemyKills *killer;
+
 
   void InitializeConfig();
   //How to get value from config
   //ConfigUtils::GetValueFromMap<TYPE>(NAME,ConfigUtils::GlobalConfigMap) 
   
-  float floorTransform;
-  float TileScale;
+
   float TileScaleTimes100;
 
   float movementSpeed; //Move to PlayerData
@@ -126,25 +129,17 @@ unsigned int VBO, VAO, EBO;
   float FogDensity = 0.35;
  
 
-  bool mouseCallBack = true;
-  bool firstMouse = true;
-  double lastY;
-  double lastX;
+   bool mouseCallBack = true;
+   bool firstMouse = true;
+   double lastY;
+   double lastX;
 
-  //camera
-  glm::mat4 view;
-  glm::mat4 projection;
+   //camera
+   glm::mat4 view;
+   glm::mat4 projection;
 
-  Camera camera;
-  Camera camera2;
-
- //Gui
- SimpleGUI::GuiElement * guiElement = nullptr;
- SimpleGUI::GuiElement * DeathBcg = nullptr;
-
- //Gui
- SimpleGUI::GuiElement * guiElement2 = nullptr;
- SimpleGUI::GuiElement * WinBcg = nullptr;
+   Camera camera;
+   Camera camera2;
 
   //Imgui
   bool show_demo_window = true;
@@ -154,17 +149,27 @@ unsigned int VBO, VAO, EBO;
   //
   int offset = 125; // Jak bardzo maja sie roznic rozmiary kamery, szerokosc aktywnej to pol okna + offset, szerokosc nieaktywnej to pol okna - offset
 
-//ModelPtrs
-AnimatedModel *enemyModel = nullptr;
-AnimatedModel *playerModel = nullptr;
-AnimatedModel *player2Model = nullptr;
+  //ModelPtrs
+  AnimatedModel *enemyModel = nullptr;
+  AnimatedModel *playerModel = nullptr;
+  AnimatedModel *player2Model = nullptr;
 	
-	//Player handling
-	Player* playerObj;
+  //Player handling
+  Player* playerObj;
 
-public:
+  public:
 
+	  //Gui
+	  SimpleGUI::GuiElement * LostText = nullptr;
+	  SimpleGUI::GuiElement * LostBcg = nullptr;
 
+	  //Gui
+	  SimpleGUI::GuiElement * WinText = nullptr;
+	  SimpleGUI::GuiElement * WinBcg = nullptr;
+
+	  SimpleGUI::GuiElement * TrapPartInfo = nullptr;
+
+		
   bool EnemyOnLefSide = true;
   Game(Window &okienko);
 
@@ -177,14 +182,14 @@ public:
 
   int imgMode = 1;		// 1 - Wyswietlaj grafiki fabularne | 2 - Wyswietlaj GUI | 0 - Nie wyswietlaj nic
   int plotNumber = 1;	// Zmienna wskazujaca na obecna wstawke fabularna
-  bool inputBlockade = true;	// Zmienna  blokujaca mozliwosci gracza (domyslnie na czas wstawek fabularnych)
+  bool inputBlockade = false;	// Zmienna  blokujaca mozliwosci gracza (domyslnie na czas wstawek fabularnych)
 
   void SetCamera(Camera camera, int camera_nr);
   void ProcessMouse();
   void ProcessInput(float interpolation, Camera &camera_update);
+  void ResetGame();
 
   void Granko();
-  void CheckPlayerDeath();
   void Update(float interpolation);
   void Render();
   void Serialize();
@@ -213,9 +218,10 @@ private:
   void DeserializeOrderPointers(std::map<unsigned long long, SceneNode *> &map);
 
 
+  void RemoveNodeWithGameObjectTag(std::string tag,SceneNode * parentNode);
 
-  void SetViewAndPerspective(Camera &aCamera, Transform &player, Transform *enemy);
+
+  void SetViewAndPerspective(Camera &aCamera, SceneNode &player, Transform *enemy);
   void Plot();
-  void DisplayImage(const char * path, const char * text, Texture * imageTex);
   void DisplayAnimationInfo(AnimatedModel * model);
 };

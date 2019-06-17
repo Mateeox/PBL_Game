@@ -21,9 +21,8 @@ public:
 			background->SwtichVisiblity();
 			win->SwtichVisiblity();
 
-
-			background->FadeFromTransparent(2);
-			win->FadeFromTransparent(1);
+			background->FadeFromTransparent(4);
+			win->FadeFromTransparent(3);
 			win->FadeToColor(glm::vec3(1,0,0),1);
 
 			Enemy->Scale(0);

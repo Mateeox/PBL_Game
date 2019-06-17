@@ -3,16 +3,14 @@
 #include "../PathFinding/MapTileRenderUtils.hpp"
 #include "Configuration/ConfigUtils.hpp"
 
-
-EnemyController::EnemyController(Game * aGame,SceneNode &aEnemy,
+EnemyController::EnemyController(Game *aGame, SceneNode &aEnemy,
 								 SceneNode &aLPlayer,
 								 SceneNode &aRPlayer,
 								 GridLocation aStart,
 								 GridLocation aFirstTarget,
 								 GridWithWeights &aGrid,
 								 std::vector<MapTile *> &aMapTiles,
-								 int aMapSize) : 
-								 				 game(aGame),
+								 int aMapSize) : game(aGame),
 												 enemy(aEnemy),
 												 currentPlayer(&aLPlayer),
 												 leftplayer(aLPlayer),
@@ -141,27 +139,24 @@ void EnemyController::CheckIFNotOnEnd()
 
 void EnemyController::SwtichStartWithEnd()
 {
-	
-	if (Currenttarget == firstStart)
-	{
-		Currenttarget = firstTarget;
-		if(GetPlayerDistance() <25)
-		{
-		game->EnemyOnLefSide = !game->EnemyOnLefSide;
-		SwtichPlayer();
-		}
-	}
-	else
-	{
-		Currenttarget = firstStart;
-		if(GetPlayerDistance() <25)
-		{
-		game->EnemyOnLefSide = !game->EnemyOnLefSide ;
-		SwtichPlayer();
-		}
-	}
 
-	
+	if (GetPlayerDistance() > 25)
+	{
+		if (Currenttarget == firstStart)
+		{
+			Currenttarget = firstTarget;
+
+			game->EnemyOnLefSide = !game->EnemyOnLefSide;
+			SwtichPlayer();
+		}
+		else
+		{
+			Currenttarget = firstStart;
+
+			game->EnemyOnLefSide = !game->EnemyOnLefSide;
+			SwtichPlayer();
+		}
+	}
 }
 
 void EnemyController::SetTarget()
@@ -243,30 +238,6 @@ void EnemyController::MoveEnemyToMapTile(SceneNode *sceneNode, GridLocation mapT
 
 	float playerRotation = atan2(-diffVec.y, diffVec.x);
 	roationChild->local.SetRotation(0, playerRotation * 58 + 90, 0);
-
-	/*if (abs(diffVec.y) > abs(diffVec.x))
-	{
-		if (diffVec.y < 0)
-		{
-			roationChild->local.SetRotation(0, 180, 0);
-		}
-		else
-		{
-			roationChild->local.SetRotation(0, 0, 0);
-		}
-	}
-	else
-	{
-		if (diffVec.x < 0)
-		{
-			roationChild->local.SetRotation(0, 270, 0);
-		}
-		else
-		{
-			roationChild->local.SetRotation(0, 90, 0);
-		}
-	}
-	*/
 }
 
 void EnemyController::MoveEnemyToNode(SceneNode *sceneNode, SceneNode *targetNode, float interpolation, float speed)

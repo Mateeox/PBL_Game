@@ -12,9 +12,9 @@ newmtl Box_Wood
 	Kd 0.5882 0.5882 0.5882
 	Ks 0.0000 0.0000 0.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka maps\Chest_Box_Wood_Diffuse.png
-	map_Kd maps\Chest_Box_Wood_Diffuse.png
-	map_bump -bm 0.3000 maps\Map__15_Normal Bump.png
+	map_Ka maps/Chest_Box_Wood_Diffuse.png
+	map_Kd maps/Chest_Box_Wood_Diffuse.png
+	map_bump -bm 0.3000 maps/Map__15_Normal Bump.png
 
 newmtl Box_Metal
 	Ns 10.0000
@@ -27,9 +27,9 @@ newmtl Box_Metal
 	Kd 0.5882 0.5882 0.5882
 	Ks 0.0000 0.0000 0.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka maps\Chest_Box_Metal_Diffuse.png
-	map_Kd maps\Chest_Box_Metal_Diffuse.png
-	map_bump -bm 0.3000 maps\Map__17_Normal Bump.png
+	map_Ka maps/Chest_Box_Metal_Diffuse.png
+	map_Kd maps/Chest_Box_Metal_Diffuse.png
+	map_bump -bm 0.3000 maps/Map__17_Normal Bump.png
 
 newmtl Box_Inside
 	Ns 10.0000
@@ -42,8 +42,8 @@ newmtl Box_Inside
 	Kd 0.5882 0.5882 0.5882
 	Ks 0.0000 0.0000 0.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka maps\Chest_Box_Inside_Diffuse.png
-	map_Kd maps\Chest_Box_Inside_Diffuse.png
+	map_Ka maps/Chest_Box_Inside_Diffuse.png
+	map_Kd maps/Chest_Box_Inside_Diffuse.png
 
 newmtl Lid_Wood
 	Ns 10.0000
@@ -56,9 +56,9 @@ newmtl Lid_Wood
 	Kd 0.5882 0.5882 0.5882
 	Ks 0.0000 0.0000 0.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka maps\Chest_Lid_Wood_Diffuse.png
-	map_Kd maps\Chest_Lid_Wood_Diffuse.png
-	map_bump -bm 0.3000 maps\Map__13_Normal Bump.png
+	map_Ka maps/Chest_Lid_Wood_Diffuse.png
+	map_Kd maps/Chest_Lid_Wood_Diffuse.png
+	map_bump -bm 0.3000 maps/Map__13_Normal Bump.png
 
 newmtl Lid_Metal
 	Ns 10.0000
@@ -71,9 +71,9 @@ newmtl Lid_Metal
 	Kd 0.5882 0.5882 0.5882
 	Ks 0.0000 0.0000 0.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka maps\Chest_Lid_metal_Diffuse.png
-	map_Kd maps\Chest_Lid_metal_Diffuse.png
-	map_bump -bm 0.3000 maps\Map__8_Normal Bump.png
+	map_Ka maps/Chest_Lid_metal_Diffuse.png
+	map_Kd maps/Chest_Lid_metal_Diffuse.png
+	map_bump -bm 0.3000 maps/Map__8_Normal Bump.png
 
 newmtl Lock
 	Ns 10.0000
@@ -86,8 +86,8 @@ newmtl Lock
 	Kd 0.5882 0.5882 0.5882
 	Ks 0.0000 0.0000 0.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka maps\Chest_Lock_Specular.png
-	map_Kd maps\Chest_Lock_Specular.png
+	map_Ka maps/Chest_Lock_Specular.png
+	map_Kd maps/Chest_Lock_Specular.png
 
 newmtl Circle
 	Ns 10.0000
@@ -100,8 +100,8 @@ newmtl Circle
 	Kd 0.5882 0.5882 0.5882
 	Ks 0.0000 0.0000 0.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka maps\Chest_Lock_Specular.png
-	map_Kd maps\Chest_Lock_Specular.png
+	map_Ka maps/Chest_Lock_Specular.png
+	map_Kd maps/Chest_Lock_Specular.png
 
 newmtl Padlock
 	Ns 10.0000
@@ -114,5 +114,5 @@ newmtl Padlock
 	Kd 0.1843 0.1843 0.1843
 	Ks 0.0000 0.0000 0.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka maps\Chest_Padlock_Glossiness.png
-	map_Kd maps\Chest_Padlock_Glossiness.png
+	map_Ka maps/Chest_Padlock_Glossiness.png
+	map_Kd maps/Chest_Padlock_Glossiness.png

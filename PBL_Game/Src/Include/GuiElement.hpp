@@ -50,6 +50,8 @@ class GuiElement
 	float FadeToColorValue = 0.0f;
 	float FadeFromTransparentValue = 0.0f;
 
+	void Reset();
+
     void AddTexture(std::string aPtah,std::string aName);
     void SwitchTexture(std::string aName);
     void SwtichVisiblity();
