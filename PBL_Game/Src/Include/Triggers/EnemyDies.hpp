@@ -15,6 +15,7 @@ class EnemyDies : public Trigger {
 	SimpleGUI::GuiElement *win;
 public:
 	EnemyDies(Transform& transform, SceneNode* enemy,SimpleGUI::GuiElement * aBackground,SimpleGUI::GuiElement * aWin);
+	bool checkCollision(Collider* other) override;
 	void ActivateTrigger() {
 		if (!activated) {
 			std::cout << "Enemy killed" << std::endl;

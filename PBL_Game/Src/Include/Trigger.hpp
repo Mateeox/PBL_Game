@@ -13,6 +13,7 @@ protected:
 public:
 	void SetActivated(bool status);
 	Trigger(Transform& transform);
+	virtual bool checkCollision(Collider* other) = 0;
 	ComponentSystem::ComponentType GetComponentType() override;
 	virtual void ActivateTrigger() = 0;
 };

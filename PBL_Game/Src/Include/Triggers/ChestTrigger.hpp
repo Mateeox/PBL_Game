@@ -12,6 +12,7 @@ class ChestTrigger : public Trigger {
 private:
 	Player* player;
 public:
+	bool checkCollision(Collider* other) override;
 	ChestTrigger(Transform& transform, Player* player);
 	virtual void ActivateTrigger();
 };

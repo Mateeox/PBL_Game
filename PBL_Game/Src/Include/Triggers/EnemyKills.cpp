@@ -8,6 +8,6 @@ Trigger(transform),background(aBack),lostScreen(aLost)
 
 bool EnemyKills::checkCollision(Collider* other)
 {
-
+	std::cout << "Dupaaa" << "\n";
 	return false;
 }
