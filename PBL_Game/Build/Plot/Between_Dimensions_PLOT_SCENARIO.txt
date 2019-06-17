@@ -3,11 +3,7 @@ PROLOG:
 1.
 	"OHMMMMMMMMMMM"
 	
-	(Co jest?)
-	
-	(Gdzie ja jestem?)
-	
-	(Dlaczego jestem związany? Dlaczego niosą mnie jacyś dziwni zakapturzeni ludzie?)
+	(Co jest? Gdzie ja jestem?)
 	
 	"Obudziłeś się? Dobrze. Możesz się radować. Dostąpisz zaszczytu zostania ofiarą dla wielkiego Apgariona."
 	
@@ -15,31 +11,23 @@ PROLOG:
 	
 2.
 	"Idź."
-	
-	(O co tu chodzi? Ci ludzie to jacyś świrnięci kultyści.)
-	
+
 	(Wepchnęli mnie do ciemnego domu i zatrzasnęli za mną drzwi. Wyjąłem latarkę z kieszeni. Dom wyglądał na stary i zniszczony.)
 	
 	(Wtedy poświeciłem na ścianę obok mnie. Znajdowała się na niej ogromna plama krwii. Z przerażenia upuściłem latarkę, a dźwięk uderzenia o podłogę rozbrzmiał echem po całym domu.)
 	
 	GHHRHRHRRHH
 	
-	SZRRRRR
-	
-	(Coś usłyszałem.)
-	
 3.
 	(Kiedy zaświeciłem w kierunku, z którego dochodziły odgłosy, dostrzegłem, jak z drzwi wyłania się to... to coś)
-	
-	(W czarnej ręce zakończonej pazurami trzymał niedbale świecznik, a kaptur zasłaniał twarz. A w zasadzie to, co powinno być twarzą.)
-	
+
 	(Roztaczał wokół siebie złowrogą aurę niczym potwór z horroru. To nie był człowiek.)
 	
 	(W tej popieprzonej sytuacji tego jednego mogłem być pewnien.)
 	
 	(To coś nie miało prawa być człowiekiem.)
 	
-	(Potwór zaczął się zbliżać, więc nie zastanawiając się dwa razy rzuciłem się do ucieczki.)
+	(Rzuciłem się do ucieczki.)
 	
 	(Wtedy...)
 	
@@ -54,12 +42,8 @@ PROLOG:
 	
 	(Odgłosy potwora ucichły. Postanowiłem zatrzymać się na chwilę i złapać oddech.)
 	
-	(Wtedy to dostrzegłem.)
-	
-	(Moje odbicie w lustrze się nie zgadzało.)
-	
-	("Ja" po drugiej stronie to nie było odbiciem prawdziwego "mnie".)
-	
+	(Wtedy to dostrzegłem. Moje odbicie w lustrze się nie zgadzało.)
+
 	Co tu się odwala?
 	
 	GHRHRHRHRRRRRR
@@ -67,10 +51,6 @@ PROLOG:
 	Cholera, nie ma czasu się zastanawiać.
 	
 	(Schowałem jeden odłamek lustra do kieszeni i zacząłem uciekać dalej.)
-	
-	Nie dam rady wiecznie uciekać. Muszę się stąd wydostać, ale to coś mi na to nie pozwoli.
-	
-	Muszę się tego pozbyć. Ale nie dam rady walczyć z tym czymś.
 	
 	GHRRR
 	
@@ -98,9 +78,7 @@ AKT 1:
 	(Spojżałem na truchło leżące obok mnie, ale już go nie było.)
 	
 	GHRRSHHHHHHHRRH
-	
-	O nie.
-	
+
 	Tylko nie to.
 	
 	(Zza drzwi wyłoniła się czarna dłoń zakończona długimi ostrymi szponami.)
@@ -168,20 +146,16 @@ EPILOG:
 	Nie martw się. Nie zabiję cie od razu. W końcu wtedy znowu sie odrodzisz.
 	
 	(Wyjąłem z kieszeni odłamek lustra i zacząłem nim dźgać potwora.)
-	
-	(Kiedy wbijałem odłamek w ciało demona, wydawał on z siebie cichy dźwięk bólu.)
-	
+
 	Boli? Dobrze. To i tak nic w porównaniu z ranami, jakich doznał mój umysł.
 	
-	(Twarz zaczynała mnie boleć od nienaturalnie szerokiego uśmiechu. ALe nie mogłem przestać. Z każdym ciosem czułem się coraz lepiej.)
+	(Twarz zaczynała mnie boleć od nienaturalnie szerokiego uśmiechu. Ale nie mogłem przestać. Z każdym ciosem czułem się coraz lepiej.)
 	
 	(Nachyliłem się nad potworem i zapytałem:)
 	
 	Powiedz no, jeśli cię teraz zabiję, to będziesz miał ochotę dalej wstawać?
 	
-	(To był błąd.)
-	
-	(Potwór szybkim ruchem ręki wbił mi swoje szpony w klatkę piersiową.)
+	(To był błąd. Potwór szybkim ruchem ręki wbił mi swoje szpony w klatkę piersiową.)
 	
 	AAAAAAAAAAAAAAAAHHHHH!!!
 	
