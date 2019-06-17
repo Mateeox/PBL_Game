@@ -44,7 +44,7 @@ SceneNode* MapElement::GenerateNode(std::vector<SceneNode*>& aNodes, SceneNode* 
 	SceneNode* floor = AddFloor(floorMod);
 	floor->AddParent(element);
 	element->AddChild(floor);
-	std::vector<SceneNode*> walls = AddWalls(floor, wallMod);
+	std::vector<SceneNode*> walls = AddWalls(floor, wallMod, aNodes);
 	for (int i = 0; i < walls.size(); i++)
 		element->AddChild(walls[i]);
 	walls.clear();
@@ -74,7 +74,7 @@ SceneNode* MapElement::AddFloor(Model* model)
 	return floor;
 }
 
-SceneNode* MapElement::CreateWall(SceneNode* parent, Model* model, float direction_x, float direction_y)
+SceneNode* MapElement::CreateWall(SceneNode* parent, Model* model, std::vector<SceneNode*>& aNodes, float direction_x, float direction_y)
 {
 	SceneNode* wall = new SceneNode();
 	GameObject* wallObj = new GameObject(wall->local);
@@ -88,6 +88,18 @@ SceneNode* MapElement::CreateWall(SceneNode* parent, Model* model, float directi
 	
 	wall->Rotate(direction_y == 0 ? 90.0f : 0, glm::vec3(0, 1, 0));
 	wall->Scale(0.0255f, 0.0255f, 0.01f);
+
+	SceneNode* roof = new SceneNode();
+	GameObject* roofObj = new GameObject(roof->local);
+	roofObj->setTag("Roof");
+	roofObj->AddComponent(model);
+	roof->AddGameObject(roofObj);
+	roof->Translate(Position.x + direction_x - 0.05f, 0.98f, Position.y + direction_y - 0.5f);
+
+	roof->Rotate(90.0f, glm::vec3(1, 0, 0));
+	roof->Scale(0.0255f, 0.0255f, 0.01f);
+
+	aNodes.push_back(roof);
 
 	Collider * collider = new Collider(wall->local);
 	if (direction_y != 0)
@@ -135,17 +147,17 @@ SceneNode* MapElement::CreateDoor(SceneNode* parent, Model* doorModel, Model* ke
 	}
 }
 
-std::vector<SceneNode*> MapElement::AddWalls(SceneNode* node, Model* model)
+std::vector<SceneNode*> MapElement::AddWalls(SceneNode* node, Model* model, std::vector<SceneNode*>& aNodes)
 {
 	std::vector<SceneNode*> temp;
 	if (Walls.x > 0)
-		temp.push_back(CreateWall(node, model, 0, 1.0f));
+		temp.push_back(CreateWall(node, model, aNodes, 0, 1.0f));
 	if (Walls.y > 0)
-		temp.push_back(CreateWall(node, model, 1.0f, 0));
+		temp.push_back(CreateWall(node, model, aNodes, 1.0f, 0));
 	if (Walls.z > 0)
-		temp.push_back(CreateWall(node, model, 0, -1.0f));
+		temp.push_back(CreateWall(node, model, aNodes, 0, -1.0f));
 	if (Walls.w > 0)
-		temp.push_back(CreateWall(node, model, -1.0f, 0));
+		temp.push_back(CreateWall(node, model, aNodes, -1.0f, 0));
 	return temp;
 }
 

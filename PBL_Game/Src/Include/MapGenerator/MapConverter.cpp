@@ -1,8 +1,9 @@
 #include "MapConverter.hpp"
 
-MapConverter::MapConverter(std::vector<MapElement*>* elements)
+MapConverter::MapConverter(std::vector<MapElement*>* elements, std::vector<SceneNode*>* nodes)
 {
 	this->elements = elements;
+	this->nodes = nodes;
 }
 
 std::vector<MapKey*> MapConverter::Convert()
@@ -51,6 +52,17 @@ void MapConverter::AddWall(glm::vec2 pos)
 	if (!CheckIfExists(pos)) {
 		MapKey* key = new MapKey(pos.x, pos.y, MapType::Wall);
 		mapped.push_back(key);
+
+		SceneNode* wall = new SceneNode();
+		GameObject* wallObj = new GameObject(wall->local);
+		wallObj->setTag("Roof");
+
+		wall->AddGameObject(wallObj);
+		wall->Translate(pos.x, 0, pos.y);
+
+		wall->Rotate(90.0f, glm::vec3(1, 0, 0));
+		wall->Scale(0.0255f, 0.0255f, 0.01f);
+		nodes->push_back(wall);
 	}
 }
 
