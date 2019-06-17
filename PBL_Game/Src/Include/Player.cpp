@@ -29,7 +29,7 @@ void Player::AddTrapPart()
 {
 	if (!isAdding)
 	{
-		isAdding = true;
+		isAdding = false;
 		PartsAmount++;
 	
 		switch (PartsAmount)
