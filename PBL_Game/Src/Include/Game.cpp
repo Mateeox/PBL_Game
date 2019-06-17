@@ -8,6 +8,7 @@
 #include "Triggers/EnemyKills.hpp"
 #include <random>
 #include <chrono>
+#include "PlayerCollider.hpp"
 
 #include <fstream>
 #include <iterator>
@@ -225,8 +226,8 @@ void Game::Granko()
   rightPlayerObj->AddComponent(player2Model);
   enemyGameObject->AddComponent(enemyModel);
 
-  Collider *leftPlayerCollider = new Collider(leftPlayerObjWithCollider->transform);
-  Collider *rightPlayerCollider = new Collider(rightPlayerObjWithCollider->transform);
+  PlayerCollider *leftPlayerCollider = new PlayerCollider(leftPlayerObjWithCollider->transform);
+  PlayerCollider *rightPlayerCollider = new PlayerCollider(rightPlayerObjWithCollider->transform);
 
   killer = new EnemyKills(Enemy_Node.local, &leftPlayerNode, LostBcg, LostText);
   enemyGameObject->AddComponent(killer);

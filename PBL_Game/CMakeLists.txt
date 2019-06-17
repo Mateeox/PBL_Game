@@ -55,6 +55,8 @@ add_executable(PBL_Game
 	  Src/Include/Texture.cpp
 	  Src/Include/SceneNode.cpp
 		Src/Include/Collider.cpp
+		Src/Include/ColliderStatic.cpp
+		Src/Include/PlayerCollider.cpp
 		Src/Include/Trigger.cpp
 		Src/Include/Triggers/Key.cpp
 		Src/Include/Triggers/EnemyKills.cpp

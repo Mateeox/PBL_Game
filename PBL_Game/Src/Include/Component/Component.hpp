@@ -15,7 +15,7 @@ enum ComponentType
 	AnimatedModel,
 	ModelMesh,
 	ConeRenderer,
-	MapTile
+	MapTile,
 };
 
 class Component

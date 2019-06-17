@@ -14,6 +14,6 @@ public:
 	Transform& transform;
 	Collider(Transform& transform);
 	ComponentSystem::ComponentType GetComponentType() override;
-	virtual bool checkCollision(Collider* other);
+	virtual bool checkCollision(Collider* other) = 0;
 	void setDimensions(double xOffset, double yOffset, double zOffset, double width, double height, double depth);
 };
