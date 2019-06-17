@@ -59,8 +59,8 @@ add_executable(PBL_Game
 		Src/Include/PlayerCollider.cpp
 		Src/Include/Trigger.cpp
 		Src/Include/Triggers/Key.cpp
-		Src/Include/Triggers/EnemyKills.cpp
-		Src/Include/Triggers/EnemyDies.cpp
+		Src/Include/Triggers/EnemyTrigger.cpp
+		Src/Include/Triggers/TrapTrigger.cpp
 		Src/Include/Triggers/ChestTrigger.cpp
 		#ConfigUtils
 		Src/Include/Configuration/ConfigUtils.cpp

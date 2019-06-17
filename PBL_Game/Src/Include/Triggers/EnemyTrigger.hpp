@@ -9,14 +9,14 @@
 //using namespace ComponentSystem;
 class GameObject;
 
-class EnemyKills : public Trigger {
+class EnemyTrigger : public Trigger {
 
 	SceneNode* Player;
 	SimpleGUI::GuiElement * background;
 	SimpleGUI::GuiElement * lostScreen;
 	
 public:
-	EnemyKills(Transform& transform, SceneNode* player,SimpleGUI::GuiElement * background,
+	EnemyTrigger(Transform& transform, SceneNode* player,SimpleGUI::GuiElement * background,
 	SimpleGUI::GuiElement * lost);
 	bool checkCollision(Collider* other) override;
 	void ActivateTrigger() {

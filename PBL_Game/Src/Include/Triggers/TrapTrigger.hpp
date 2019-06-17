@@ -8,13 +8,13 @@
 //using namespace ComponentSystem;
 class GameObject;
 
-class EnemyDies : public Trigger {
+class TrapTrigger : public Trigger {
 
 	SceneNode* Enemy;
 	SimpleGUI::GuiElement *background;
 	SimpleGUI::GuiElement *win;
 public:
-	EnemyDies(Transform& transform, SceneNode* enemy,SimpleGUI::GuiElement * aBackground,SimpleGUI::GuiElement * aWin);
+	TrapTrigger(Transform& transform, SceneNode* enemy,SimpleGUI::GuiElement * aBackground,SimpleGUI::GuiElement * aWin);
 	bool checkCollision(Collider* other) override;
 	void ActivateTrigger() {
 		if (!activated) {

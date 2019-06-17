@@ -13,7 +13,7 @@
 #include "Player.hpp"
 #include "AI/EnemyController.hpp"
 #include "GuiElement.hpp"
-#include "Triggers/EnemyKills.hpp"
+#include "Triggers/EnemyTrigger.hpp"
 
 const int TICKS_PER_SECOND = 64;
 const int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
@@ -97,7 +97,7 @@ std::vector<MapKey *> mapped;
   SceneNode Enemy_Node_For_Model;
 
   EnemyController *enemyController;
-  EnemyKills *killer;
+  EnemyTrigger *killer;
 
 
   void InitializeConfig();

@@ -1,11 +1,11 @@
-#include "EnemyDies.hpp"
+#include "TrapTrigger.hpp"
 
-EnemyDies::EnemyDies(Transform& transform, SceneNode* enemy,SimpleGUI::GuiElement * aBackground,SimpleGUI::GuiElement * aWin) : Trigger(transform),background(aBackground),win(aWin)
+TrapTrigger::TrapTrigger(Transform& transform, SceneNode* enemy,SimpleGUI::GuiElement * aBackground,SimpleGUI::GuiElement * aWin) : Trigger(transform),background(aBackground),win(aWin)
 {
 	this->Enemy = enemy;
 }
 
-bool EnemyDies::checkCollision(Collider* other)
+bool TrapTrigger::checkCollision(Collider* other)
 {
 	if (Enabled) {
 

@@ -5,7 +5,7 @@
 #include "Shapes.hpp"
 #include "PathFinding/PathFindingUtils.hpp"
 #include "NodeWithModelFactory.hpp"
-#include "Triggers/EnemyKills.hpp"
+#include "Triggers/EnemyTrigger.hpp"
 #include <random>
 #include <chrono>
 #include "PlayerCollider.hpp"
@@ -229,7 +229,7 @@ void Game::Granko()
   PlayerCollider *leftPlayerCollider = new PlayerCollider(leftPlayerObjWithCollider->transform);
   PlayerCollider *rightPlayerCollider = new PlayerCollider(rightPlayerObjWithCollider->transform);
 
-  killer = new EnemyKills(Enemy_Node.local, &leftPlayerNode, LostBcg, LostText);
+  killer = new EnemyTrigger(Enemy_Node.local, &leftPlayerNode, LostBcg, LostText);
   enemyGameObject->AddComponent(killer);
 
   killer->setDimensions(-0.12, 0, 0.25, 2.3 / 10, 2, 3.05 / 10);

@@ -1,5 +1,5 @@
 #include "Player.hpp"
-#include "Triggers/EnemyDies.hpp"
+#include "Triggers/TrapTrigger.hpp"
 #include "Component/Component.hpp"
 #include "Game.hpp"
 
@@ -81,7 +81,7 @@ SceneNode *Player::CreateTrap(float scale)
 	SceneNode *trap = new SceneNode();
 	GameObject *trapObj = new GameObject(trap->local);
 	trapObj->setTag("trap");
-	trigger = new EnemyDies(trap->local, enemy,background,win); //doda� przeciwnika
+	trigger = new TrapTrigger(trap->local, enemy,background,win); //doda� przeciwnika
 	trigger->setDimensions(0, 0, 0, 1.0f, 1.0f, 1.0f);
 	trapObj->AddComponent(trapMod);
 	trapObj->AddComponent(trigger);

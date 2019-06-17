@@ -5,6 +5,7 @@
 #include "Collider.hpp"
 #include "Trigger.hpp"
 #include "GuiElement.hpp"
+#include "Triggers/TrapTrigger.hpp"
 
 class Game;
 class Player
