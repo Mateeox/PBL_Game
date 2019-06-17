@@ -10,9 +10,9 @@ class ConeRenderer : public Drawable
 {
 	SceneNode* rootNode;
 	double anglePerSegment;
-	double radius = 6.0;
+	double radius = 5.0;
 	double directionAngle = 3;
-	const int segmentsNumber = 60;
+	const int segmentsNumber = 10;
 	const double angle = 1.2;
 	const double coneHeight = 0.2;
 	const double rotationSpeed = 0.1;
