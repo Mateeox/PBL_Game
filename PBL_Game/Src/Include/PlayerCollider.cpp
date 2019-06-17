@@ -11,7 +11,7 @@ bool PlayerCollider::checkCollision(Collider* other)
 	if (Enabled) {
 
 
-		if (other->gameobject->getTag() != "enemy" && other->gameobject->getTag() != "trap")
+		if (other->gameobject->getTag() != "enemy" )
 		{
 			glm::vec3 translatedCoords = coords + transform.getPosition() * transform.getScale();
 			glm::vec3 otherTranslatedCoords{ 0 };
@@ -39,11 +39,11 @@ bool PlayerCollider::checkCollision(Collider* other)
 				(translatedCoords.y <= otherTranslatedCoords.y + other->dimensions.y) && (translatedCoords.y + dimensions.y >= otherTranslatedCoords.y) &&
 				(translatedCoords.z <= otherTranslatedCoords.z + other->dimensions.z) && (translatedCoords.z + dimensions.z >= otherTranslatedCoords.z))
 			{
-				if (game->EnemyOnLefSide && gameobject->getTag() == "playerLeft")
+				if (game->EnemyOnLefSide && gameobject->getTag() == "leftPlayer")
 				{
 					return true;
 				}
-				else if (!game->EnemyOnLefSide && gameobject->getTag() == "playerRight")
+				else if (!game->EnemyOnLefSide && gameobject->getTag() == "rightPlayer")
 				{
 					return true;
 				}
