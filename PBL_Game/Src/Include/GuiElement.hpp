@@ -37,7 +37,7 @@ class GuiElement
 	Shader * shader;
     unsigned int VBO, VAO, EBO;
     glm::mat4 transform;
-    bool visible = false;
+ 
 	bool fadeToColor = false;
 	bool fadeFromTransparent = false;
 
@@ -46,6 +46,7 @@ class GuiElement
 
     public:
 
+    bool visible = false;
 	glm::vec3 ColorFade;
 	float FadeToColorValue = 0.0f;
 	float FadeFromTransparentValue = 0.0f;

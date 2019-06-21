@@ -30,7 +30,7 @@ public:
 			lostScreen->FadeToColor(glm::vec3(1,0,0),1);
 
 			std::cout << "Enemy killed" << std::endl;
-			enemy->Scale(0);
+			enemy->Scale(0.0001);
 			activated = true;
 		}
 	}

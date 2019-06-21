@@ -163,9 +163,10 @@ std::vector<MapKey *> mapped;
 	  SimpleGUI::GuiElement * LostText = nullptr;
 	  SimpleGUI::GuiElement * LostBcg = nullptr;
 
-	  //Gui
 	  SimpleGUI::GuiElement * WinText = nullptr;
 	  SimpleGUI::GuiElement * WinBcg = nullptr;
+
+    SimpleGUI::GuiElement * TrapCollector = nullptr;
 
 	  SimpleGUI::GuiElement * TrapPartInfo = nullptr;
 
@@ -198,6 +199,7 @@ std::vector<MapKey *> mapped;
   void UpdatePlayer(SceneNode &player, Camera &camera,float interpolation, bool isLeft);
   void gatherCollidableObjects(std::vector<SceneNode *> &nodes);
   void gatherTriggers(std::vector<SceneNode*>& nodes);
+  void RemoveNodesWithGameObjectTag(std::string tag,SceneNode * parentNode);
   std::vector<GameObject*> findByTag(const std::vector<SceneNode*>& data, std::string tag);
   GameObject * findByTagSingle(const std::vector<SceneNode*>& data, std::string tag);
 
@@ -219,8 +221,7 @@ private:
   void DeserializeOrderPointers(std::map<unsigned long long, SceneNode *> &map);
 
 
-  void RemoveNodesWithGameObjectTag(std::string tag,SceneNode * parentNode);
-
+ 
 
   void SetViewAndPerspective(Camera &aCamera, SceneNode &player, Transform *enemy);
   void Plot();

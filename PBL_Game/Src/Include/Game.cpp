@@ -142,6 +142,9 @@ void Game::Granko()
 	TrapPartInfoTransform = glm::translate(TrapPartInfoTransform, glm::vec3(-0.8,0.85,0));
 	TrapPartInfo = new SimpleGUI::GuiElement("Textures/Parts0.png", glm::scale(TrapPartInfoTransform, glm::vec3(0.5, 0.5, 0.5)), guiShader);
 	
+  glm::mat4 TrapCollectorTransform{ 1.f };
+  TrapCollector = new SimpleGUI::GuiElement("Textures/TrapCollector.png", TrapCollectorTransform, guiShader);
+
 	TrapPartInfo->AddTexture("Textures/Parts1.png", "Parts1");
 	TrapPartInfo->AddTexture("Textures/Parts2.png", "Parts2");
 	TrapPartInfo->AddTexture("Textures/Parts3.png", "Parts3");
@@ -163,7 +166,7 @@ void Game::Granko()
 	leftScene = new SceneNode();
 	rightScene = new SceneNode();
 
-  playerObj = new Player(&leftPlayerNode,&rightPlayerNode, 4, *shaderProgram, leftScene,rightScene, &Enemy_Node, WinBcg, WinText,this);
+  playerObj = new Player(&leftPlayerNode,&rightPlayerNode, 4, *shaderProgram, leftScene,rightScene, &Enemy_Node, WinBcg, WinText,TrapCollector,this);
 
   generator = new MapGenerator(shaderProgram_For_Model, MapScale, 10, 4, false, &sNodes, playerObj);
   mapped = generator->GetConverted();
@@ -404,11 +407,14 @@ void Game::ResetGame()
 	}
 
 
+  
 	LostText->Reset();
 	LostBcg->Reset();
 
 	WinText->Reset();
 	WinBcg->Reset();
+
+
 
 	killer->SetActivated(false);
 
@@ -516,6 +522,8 @@ void Game::Render()
   glDisable(GL_DEPTH_TEST);
 
   TrapPartInfo->Draw();
+
+  TrapCollector->Draw();
 
   LostBcg->Draw();
   LostText->Draw();
@@ -1223,6 +1231,7 @@ void Game::RemoveNodesWithGameObjectTag(std::string tag, SceneNode * parentNode)
 		{
 			if (value->gameObject->getTag() == tag)
 			{
+        value->gameObject->components.clear();
 				NodeChildren.erase(std::remove(NodeChildren.begin(), NodeChildren.end(), value), NodeChildren.end());
 				std::cout << "Trap Removed" << "\n";
 			}

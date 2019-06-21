@@ -1,6 +1,7 @@
 #include "Player.hpp"
 #include "Triggers/TrapTrigger.hpp"
 #include "Component/Component.hpp"
+#include "PlayerCollider.hpp"
 #include "Game.hpp"
 
 Player::Player(SceneNode *aLeftPlayer,
@@ -11,18 +12,21 @@ Player::Player(SceneNode *aLeftPlayer,
 			   SceneNode *aRightScene,
 			   SceneNode *aEnemy,
 			   SimpleGUI::GuiElement *aBackground,
-			   SimpleGUI::GuiElement *aWin, Game *aGame) : game(aGame),
-														   background(aBackground),
-														   win(aWin),
-														   leftPlayer(aLeftPlayer),
-														   rightPlayer(aRightPlayer),
-														   leftScene(aLeftScene),
-														   rightScene(aRightScene),
-														   enemy(aEnemy),
-														   partsLimit(aPartsLimit),
-														   PartsAmount(0),
-														   trigger(nullptr),
-														   trapMod(new Model("Models/Trap/Trap_Anim.fbx", aShader, false)) {}
+			   SimpleGUI::GuiElement *aWin,
+			   SimpleGUI::GuiElement *aTrapCollector,
+			   Game *aGame) : game(aGame),
+							  background(aBackground),
+							  win(aWin),
+							  trapCollector(aTrapCollector),
+							  leftPlayer(aLeftPlayer),
+							  rightPlayer(aRightPlayer),
+							  leftScene(aLeftScene),
+							  rightScene(aRightScene),
+							  enemy(aEnemy),
+							  partsLimit(aPartsLimit),
+							  PartsAmount(0),
+							  trigger(nullptr),
+							  trapMod(new Model("Models/Trap/Trap_Anim.fbx", aShader, false)) {}
 
 int Player::Parts()
 {
@@ -36,37 +40,42 @@ bool Player::Trap()
 
 void Player::AddTrapPart()
 {
-	if (!isAdding)
+	if (PartsAmount != partsLimit)
 	{
-		isAdding = false;
-		PartsAmount++;
-
-		switch (PartsAmount)
+		if (!isAdding)
 		{
-		case 1:
-			game->TrapPartInfo->SwitchTexture("Parts1");
-			break;
-		case 2:
-			game->TrapPartInfo->SwitchTexture("Parts2");
-			break;
-		case 3:
-			game->TrapPartInfo->SwitchTexture("Parts3");
-			break;
-		case 4:
-			game->TrapPartInfo->SwitchTexture("Parts4");
-			break;
-		default:
-			game->TrapPartInfo->SwitchTexture("default");
-			break;
+			isAdding = false;
+			PartsAmount++;
+
+			switch (PartsAmount)
+			{
+			case 1:
+				game->TrapPartInfo->SwitchTexture("Parts1");
+				break;
+			case 2:
+				game->TrapPartInfo->SwitchTexture("Parts2");
+				break;
+			case 3:
+				game->TrapPartInfo->SwitchTexture("Parts3");
+				break;
+			case 4:
+				game->TrapPartInfo->SwitchTexture("Parts4");
+				break;
+			default:
+				game->TrapPartInfo->SwitchTexture("default");
+				break;
+			}
 		}
 	}
 }
 
 void Player::Update(PBLGame::Window *okienko, float scale)
 {
+
 	if (glfwGetKey(okienko->window, GLFW_KEY_SPACE) == GLFW_PRESS && Trap())
 	{
-		if (!trapSet)
+
+		if (!trapSet && trap_SET_PICK_Enabled)
 		{
 			PartsAmount = 0;
 
@@ -80,6 +89,7 @@ void Player::Update(PBLGame::Window *okienko, float scale)
 			}
 			game->TrapPartInfo->SwitchTexture("default");
 			trapSet = true;
+			trap_SET_PICK_Enabled = false;
 		}
 	}
 
@@ -89,6 +99,47 @@ void Player::Update(PBLGame::Window *okienko, float scale)
 		{
 			trigger->ActivateTrigger();
 		}
+	}
+
+	if (trapSet && trap_SET_PICK_Enabled)
+	{
+		PlayerCollider *playerCollider = nullptr;
+		if (game->leftSideActive)
+		{
+			playerCollider = (PlayerCollider *)leftPlayer->gameObject->GetComponent(ComponentSystem::Collider);
+		}
+		else
+		{
+			playerCollider = (PlayerCollider *)rightPlayer->gameObject->GetComponent(ComponentSystem::Collider);
+		}
+
+		if ((playerCollider->gameobject->getTag() == "leftPlayer" && game->leftSideActive) ||
+			(playerCollider->gameobject->getTag() == "rightPlayer" && !game->leftSideActive))
+			if (playerCollider->checkCollision(trigger))
+			{
+				trapCollector->visible = true;
+				if (glfwGetKey(okienko->window, GLFW_KEY_SPACE) == GLFW_PRESS)
+				{
+					if (game->leftSideActive)
+						game->RemoveNodesWithGameObjectTag("trap", leftScene);
+					else
+						game->RemoveNodesWithGameObjectTag("trap", rightScene);
+					PartsAmount = partsLimit;
+					game->TrapPartInfo->SwitchTexture("Parts4");
+					trapSet = false;
+					trapCollector->visible = false;
+					trap_SET_PICK_Enabled = false;
+				}
+			}
+			else
+			{
+				trapCollector->visible = false;
+			}
+	}
+
+	if (glfwGetKey(okienko->window, GLFW_KEY_SPACE) == GLFW_RELEASE)
+	{
+		trap_SET_PICK_Enabled = true;
 	}
 }
 
