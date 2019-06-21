@@ -164,7 +164,7 @@ void Game::Granko()
 	leftScene = new SceneNode();
 	rightScene = new SceneNode();
 
-  playerObj = new Player(&leftPlayerNode, 4, *shaderProgram, leftScene, &Enemy_Node, WinBcg, WinText,this);
+  playerObj = new Player(&leftPlayerNode,&rightPlayerNode, 4, *shaderProgram, leftScene,rightScene, &Enemy_Node, WinBcg, WinText,this);
 
   generator = new MapGenerator(shaderProgram_For_Model, MapScale, 10, 4, false, &sNodes, playerObj);
   mapped = generator->GetConverted();

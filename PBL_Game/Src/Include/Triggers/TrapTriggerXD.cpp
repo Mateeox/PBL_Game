@@ -10,7 +10,6 @@ bool TrapTriggerXD::checkCollision(Collider* other)
 {
 	if (Enabled) {
 
-		std::cout << "TrapTrigger "<< "\n";
 			glm::vec3 translatedCoords = coords + transform.getPosition() * transform.getScale();
 			glm::vec3 otherTranslatedCoords = other->coords + other->transform.getPosition() * other->transform.getScale();
 			return
