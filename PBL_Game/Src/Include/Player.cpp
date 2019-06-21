@@ -70,8 +70,6 @@ void Player::Update(PBLGame::Window *okienko, float scale)
 		{
 			PartsAmount = 0;
 
-
-
 			if (game->leftSideActive)
 			{
 				leftScene->AddChild(CreateTrap(scale));

@@ -11,12 +11,12 @@ class GameObject;
 
 class TrapTrigger : public Trigger {
 
-	SceneNode* Player;
+	SceneNode* enemy;
 	SimpleGUI::GuiElement * background;
 	SimpleGUI::GuiElement * lostScreen;
 	
 public:
-	TrapTrigger(Transform& transform, SceneNode* player,SimpleGUI::GuiElement * background,
+	TrapTrigger(Transform& transform, SceneNode* enemy,SimpleGUI::GuiElement * background,
 	SimpleGUI::GuiElement * lost);
 	bool checkCollision(Collider* other) override;
 	void ActivateTrigger() {
@@ -29,8 +29,8 @@ public:
 			lostScreen->FadeFromTransparent(1);
 			lostScreen->FadeToColor(glm::vec3(1,0,0),1);
 
-			std::cout << "Player killed" << std::endl;
-			//Player->Scale(0);
+			std::cout << "Enemy killed" << std::endl;
+			enemy->Scale(0);
 			activated = true;
 		}
 	}

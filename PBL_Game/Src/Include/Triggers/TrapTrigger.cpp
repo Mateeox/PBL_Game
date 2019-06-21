@@ -1,9 +1,8 @@
 #include "TrapTrigger.hpp"
 
-TrapTrigger::TrapTrigger(Transform& transform, SceneNode* player,SimpleGUI::GuiElement * aBack,SimpleGUI::GuiElement * aLost) : 
-Trigger(transform),background(aBack),lostScreen(aLost)
+TrapTrigger::TrapTrigger(Transform& transform, SceneNode* aEnemy,SimpleGUI::GuiElement * aBack,SimpleGUI::GuiElement * aLost) : 
+Trigger(transform),background(aBack),lostScreen(aLost),enemy(aEnemy)
 {
-	this->Player = player;
 }
 
 bool TrapTrigger::checkCollision(Collider* other)

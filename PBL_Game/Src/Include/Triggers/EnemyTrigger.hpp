@@ -18,7 +18,7 @@ public:
 	bool checkCollision(Collider* other) override;
 	void ActivateTrigger() {
 		if (!activated) {
-			std::cout << "Enemy killed" << std::endl;
+			std::cout << "Player killed" << std::endl;
 			background->SwtichVisiblity();
 			win->SwtichVisiblity();
 
@@ -26,7 +26,7 @@ public:
 			win->FadeFromTransparent(3);
 			win->FadeToColor(glm::vec3(1,0,0),1);
 
-			Enemy->Scale(0);
+			Enemy->Scale(0.0001);
 			activated = true;
 		}
 	}
