@@ -399,8 +399,8 @@ void Game::ResetGame()
 		TrapPartInfo->SwitchTexture("default");
 
 	}
-	RemoveNodeWithGameObjectTag("trap", leftScene);
-
+	RemoveNodesWithGameObjectTag("trap", leftScene);
+  RemoveNodesWithGameObjectTag("trap", rightScene);
 
 	LostText->Reset();
 	LostBcg->Reset();
@@ -1210,7 +1210,7 @@ void Game::SetupPlayersColiders()
 }
 
 
-void Game::RemoveNodeWithGameObjectTag(std::string tag, SceneNode * parentNode)
+void Game::RemoveNodesWithGameObjectTag(std::string tag, SceneNode * parentNode)
 {
 	auto &NodeChildren = parentNode->children;
 	
@@ -1222,7 +1222,6 @@ void Game::RemoveNodeWithGameObjectTag(std::string tag, SceneNode * parentNode)
 			{
 				NodeChildren.erase(std::remove(NodeChildren.begin(), NodeChildren.end(), value), NodeChildren.end());
 				std::cout << "Trap Removed" << "\n";
-				return;
 			}
 
 		}
