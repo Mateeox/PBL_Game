@@ -362,6 +362,10 @@ void Game::ResetGame()
 	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 	shuffle(Corners.begin(), Corners.end(), std::default_random_engine(seed));
 
+	RemoveNodesWithGameObjectTag("trap", leftScene);
+  RemoveNodesWithGameObjectTag("trap", rightScene);
+
+
 	Enemy_Node.SetPosition(Corners[0].x * EnemyScaleInverse, EnemyYoffset * 100, Corners[0].y * EnemyScaleInverse);
 	Enemy_Node.SetScale(EnemyScale, EnemyScale, EnemyScale);
 	leftPlayerNode.SetPosition(Corners[3].x * PlayerScaleInverse, 0, Corners[3].y * PlayerScaleInverse);
@@ -398,8 +402,7 @@ void Game::ResetGame()
 		TrapPartInfo->SwitchTexture("default");
 
 	}
-	RemoveNodesWithGameObjectTag("trap", leftScene);
-  RemoveNodesWithGameObjectTag("trap", rightScene);
+
 
 	LostText->Reset();
 	LostBcg->Reset();
