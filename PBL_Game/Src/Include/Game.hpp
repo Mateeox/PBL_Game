@@ -97,7 +97,7 @@ std::vector<MapKey *> mapped;
   SceneNode Enemy_Node_For_Model;
 
   EnemyController *enemyController;
-  TrapTriggerXD *killer;
+  TrapTrigger *killer;
 
 
   void InitializeConfig();

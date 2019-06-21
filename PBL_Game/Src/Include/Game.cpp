@@ -5,7 +5,7 @@
 #include "Shapes.hpp"
 #include "PathFinding/PathFindingUtils.hpp"
 #include "NodeWithModelFactory.hpp"
-#include "Triggers/TrapTriggerXD.hpp"
+#include "Triggers/TrapTrigger.hpp"
 #include <random>
 #include <chrono>
 #include "PlayerCollider.hpp"
@@ -228,7 +228,7 @@ void Game::Granko()
   PlayerCollider *leftPlayerCollider = new PlayerCollider(this,leftPlayerObjWithCollider->transform);
   PlayerCollider *rightPlayerCollider = new PlayerCollider(this,rightPlayerObjWithCollider->transform);
 
-  killer = new TrapTriggerXD(Enemy_Node.local, &leftPlayerNode, LostBcg, LostText);
+  killer = new TrapTrigger(Enemy_Node.local, &leftPlayerNode, LostBcg, LostText);
   enemyGameObject->AddComponent(killer);
 
   killer->setDimensions(-0.12, 0, 0.25, 2.3 / 10, 2, 3.05 / 10);

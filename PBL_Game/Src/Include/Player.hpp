@@ -5,7 +5,7 @@
 #include "Collider.hpp"
 #include "Trigger.hpp"
 #include "GuiElement.hpp"
-#include "Triggers/TrapTriggerXD.hpp"
+#include "Triggers/TrapTrigger.hpp"
 #include "Triggers/EnemyTrigger.hpp"
 
 class Game;
@@ -43,5 +43,5 @@ private:
 
 	SceneNode *CreateTrap(float scale);
 	EnemyTrigger *enemyTrigger;
-	TrapTriggerXD *trigger;
+	TrapTrigger *trigger;
 };

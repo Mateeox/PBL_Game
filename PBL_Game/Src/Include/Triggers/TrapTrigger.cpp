@@ -1,12 +1,12 @@
-#include "TrapTriggerXD.hpp"
+#include "TrapTrigger.hpp"
 
-TrapTriggerXD::TrapTriggerXD(Transform& transform, SceneNode* player,SimpleGUI::GuiElement * aBack,SimpleGUI::GuiElement * aLost) : 
+TrapTrigger::TrapTrigger(Transform& transform, SceneNode* player,SimpleGUI::GuiElement * aBack,SimpleGUI::GuiElement * aLost) : 
 Trigger(transform),background(aBack),lostScreen(aLost)
 {
 	this->Player = player;
 }
 
-bool TrapTriggerXD::checkCollision(Collider* other)
+bool TrapTrigger::checkCollision(Collider* other)
 {
 	if (Enabled) {
 
