@@ -22,7 +22,7 @@ Player::Player(SceneNode *aLeftPlayer,
 														   partsLimit(aPartsLimit),
 														   PartsAmount(0),
 														   trigger(nullptr),
-														   trapMod(new Model("Models/Trap/Trap_Anim.fbx", aShader, false)){}
+														   trapMod(new Model("Models/Trap/Trap_Anim.fbx", aShader, false)) {}
 
 int Player::Parts()
 {
@@ -69,7 +69,10 @@ void Player::Update(PBLGame::Window *okienko, float scale)
 		if (!trapSet)
 		{
 			PartsAmount = 0;
-			if (game->EnemyOnLefSide)
+
+
+
+			if (game->leftSideActive)
 			{
 				leftScene->AddChild(CreateTrap(scale));
 			}
@@ -104,7 +107,7 @@ SceneNode *Player::CreateTrap(float scale)
 	trapObj->AddComponent(trigger);
 	trap->AddGameObject(trapObj);
 
-	if (game->EnemyOnLefSide)
+	if (game->leftSideActive)
 	{
 		Position = leftPlayer->local.getPosition();
 	}

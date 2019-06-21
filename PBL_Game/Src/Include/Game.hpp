@@ -171,6 +171,7 @@ std::vector<MapKey *> mapped;
 
 		
   bool EnemyOnLefSide = true;
+  bool leftSideActive = true;
   Game(Window &okienko);
 
   unsigned WINDOW_WIDTH = 0;

@@ -13,7 +13,6 @@
 #include <fstream>
 #include <iterator>
 
-static bool leftSideActive = true;
 static bool swapButtonPressed = false;
 
 void Game::InitializeConfig()
@@ -1111,6 +1110,7 @@ void Game::ImGuiFunctions()
     ImGui::Text("Q - zmiana strony");
     ImGui::Text("Strzalki - ruch postaci");
 
+    ImGui::Text("Left side active: %i", leftSideActive);
     ImGui::Text("Vector to move = %f, %f", vector2DHelper.x, vector2DHelper.y);
     ImGui::Text("Enemy position = %f, %f", Enemy_Node.local.getPosition().x * EnemyScale, Enemy_Node.local.getPosition().z * EnemyScale);
     ImGui::Text("Player position = %f, %f", leftPlayerNode.local.getPosition().x * PlayerScale, leftPlayerNode.local.getPosition().z * PlayerScale);
