@@ -531,10 +531,10 @@ void Game::Render()
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  leftScene->Render(originTransform, true);
+  leftScene->Render(originTransform,shaderProgram_For_Model, true);
   if (EnemyOnLefSide)
   {
-    Enemy_Node.Render(originTransform, true);
+    Enemy_Node.Render(originTransform,shaderProgram_For_Model, true);
   }
    if (!EnemyOnLefSide)
   {
@@ -551,10 +551,10 @@ void Game::Render()
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  rightScene->Render(originTransform, true);
+  rightScene->Render(originTransform,shaderProgram_For_Model, true);
   if (!EnemyOnLefSide)
   {
-    Enemy_Node.Render(originTransform, true);
+    Enemy_Node.Render(originTransform,shaderProgram_For_Model, true);
   }
 
   // RENDER PASKA ODDZIELAJACAEGO KAMERY - TODO

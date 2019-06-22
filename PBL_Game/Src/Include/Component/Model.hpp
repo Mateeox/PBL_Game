@@ -17,8 +17,8 @@ class Model : public ComponentSystem::Component
 
   public:
     Model(std::string path, Shader& aShaderProgram, bool gammaCorrection);
-    void Draw(glm::mat4 &  transform);
-    Shader & ShaderProgram;
+    void Draw(Shader * shaderProgram,glm::mat4 &  transform);
+    Shader & defaultShader;
 	std::vector<ModelMesh::Mesh>* getMeshes();
 
 

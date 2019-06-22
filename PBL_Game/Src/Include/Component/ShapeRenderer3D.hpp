@@ -39,7 +39,7 @@ public:
 
     ShapeRenderer3D *GetCopy();
 
-    void Draw(glm::mat4 &transform) override;
+    void Draw(Shader * shaderProgram,glm::mat4 &transform) override;
     void SwitchTexture(std::string aTextureName);
     void AsignTexture(Texture *aTexture, std::string aTextureName);
 

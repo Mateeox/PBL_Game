@@ -21,7 +21,7 @@ public:
     void SelectTileProfile(std::string mapProfile);
     std::string GetActiveProfile();
     
-    void Draw(glm::mat4 &transform) override;
+    void Draw(Shader * shader,glm::mat4 &transform) override;
     ComponentSystem::ComponentType GetComponentType() override;
   
 

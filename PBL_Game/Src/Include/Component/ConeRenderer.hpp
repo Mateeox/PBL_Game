@@ -32,7 +32,7 @@ class ConeRenderer : public Drawable
 public:
 	ConeRenderer(Shader &shaderProgram, SceneNode* rootNode);
 	ComponentSystem::ComponentType GetComponentType() override;
-	void Draw(glm::mat4 &transform) override;
+	void Draw(Shader * shader,glm::mat4 &transform) override;
 	void rotateRight();
 	void rotateLeft();
 	double getDirectionAngle();

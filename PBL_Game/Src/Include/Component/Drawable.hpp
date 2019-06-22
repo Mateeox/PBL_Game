@@ -6,13 +6,13 @@ class Drawable : public ComponentSystem::Component
 {
 public:
   unsigned int VAO, VBO, EBO;
-  Shader &ShaderProgram;
+  Shader & defaultShader;
 
-  Drawable(Shader &aShaderProgram) : ShaderProgram(aShaderProgram), Component(nullptr)
+  Drawable(Shader &aShaderProgram) : defaultShader(aShaderProgram), Component(nullptr)
   {
   }
 
-  virtual void Draw(glm::mat4 &  transform) = 0;
+  virtual void Draw(Shader * ShaderProgram,glm::mat4 &  transform) = 0;
 
   ComponentSystem::ComponentType GetComponentType() override
   {
