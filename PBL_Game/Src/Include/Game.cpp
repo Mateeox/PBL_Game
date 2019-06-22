@@ -407,35 +407,38 @@ void Game::ResetGame()
 	}
 
 	std::size_t found;
-	for (SceneNode* nodes : leftScene->children)
+	for (auto& node : leftScene->children)
 	{
-		if (nodes->gameObject != nullptr) {
-			found = nodes->gameObject->getTag().find("Door");
-			if (found != std::string::npos)
+		if (node->gameObject != nullptr) 
+    {
+
+      if(node->gameObject->getTag() != "Roof" && node->gameObject->getTag() != "floor")
+		std::cout<<"Tag: "<< node->gameObject->getTag()<<"\n";
+			if (node->gameObject->getTag() == "Door")
 			{
-				nodes->Scale(1.0f);
-				Collider* coll = (Collider*)nodes->gameObject->GetComponent(ComponentSystem::ComponentType::Collider);
+        std::cout<<"Scale set \n";
+				node->SetScale(1.0f,1.0f,1.0f);
+				Collider* coll = (Collider*)node->gameObject->GetComponent(ComponentSystem::ComponentType::Collider);
 				coll->Enabled = true;
 			}
-			found = nodes->gameObject->getTag().find("Chest");
-			if (found != std::string::npos)
+      else if(node->gameObject->getTag() == "Chest")
 			{
-				nodes->gameObject->transform.ScaleTransform(1.0f, 1.0f, 1.0f);
-				ChestTrigger* chest = (ChestTrigger*)nodes->gameObject->GetComponent(ComponentSystem::ComponentType::Trigger);
+				node->SetScale(1.0f, 1.0f, 1.0f);
+				ChestTrigger* chest = (ChestTrigger*)node->gameObject->GetComponent(ComponentSystem::ComponentType::Trigger);
 				chest->SetActivated(false);
 			}
 		}
 	}
 
-	for (SceneNode* nodes : rightScene->children)
+	for (auto& node : rightScene->children)
 	{
-		if (nodes->gameObject != nullptr) {
-			found = nodes->gameObject->getTag().find("Key");
-			if (found != std::string::npos)
+		if (node->gameObject != nullptr) 
+    {
+			if (node->gameObject->getTag() == "Key")
 			{
-				Key* key = (Key*)nodes->gameObject->GetComponent(ComponentSystem::ComponentType::Trigger);
+				Key* key = (Key*)node->gameObject->GetComponent(ComponentSystem::ComponentType::Trigger);
 				key->SetActivated(false);
-				nodes->gameObject->transform.ScaleTransform(1.0f, 1.0f, 1.0f);
+				node->SetScale(1.0f, 1.0f, 1.0f);
 			}
 		}
 	}
