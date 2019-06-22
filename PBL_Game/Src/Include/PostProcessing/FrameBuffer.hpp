@@ -6,10 +6,10 @@ class FrameBuffer
 {
 
     unsigned FramebufferObject;
-    unsigned frameBufferTexture;
     unsigned RenderBufferObject;
 
 public:
+    unsigned frameBufferTexture;
     FrameBuffer(unsigned Width, unsigned Height);
     void BindFrameBuffer();
     void bindBack();
