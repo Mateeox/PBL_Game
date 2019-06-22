@@ -57,7 +57,6 @@ SceneNode* MapElement::GenerateNode(std::vector<SceneNode*>& aNodes, SceneNode* 
 		element->AddChild(chestNode);
 		nodes.push_back(element);
 	}
-
 	return element;
 }
 

@@ -137,6 +137,7 @@ void MapGenerator::FinishGeneration()
 	{
 		mapRoot->AddChild(maps[i]->GenerateNode(leftnodes, mapRoot, floor, wall, door, key, chest, door_index, sNodes, player));
 	}
+	leftRoot = mapRoot;
 	leftnodes.push_back(mapRoot);
 
 	door_index = 0;
@@ -146,6 +147,7 @@ void MapGenerator::FinishGeneration()
 	{
 		mapRoot2->AddChild(maps[i]->GenerateNode(rightnodes, mapRoot, floor, wall, door, key, chest, door_index, sNodes, player, true));
 	}
+	rightRoot = mapRoot2;
 	rightnodes.push_back(mapRoot2);
 }
 

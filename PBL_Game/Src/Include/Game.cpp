@@ -365,8 +365,10 @@ void Game::ResetGame()
 	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 	shuffle(Corners.begin(), Corners.end(), std::default_random_engine(seed));
 
+
 	RemoveNodesWithGameObjectTag("leftSideTrap", leftScene);
-  RemoveNodesWithGameObjectTag("rightSideTrap", rightScene);
+	RemoveNodesWithGameObjectTag("rightSideTrap", rightScene);
+
 
 
 	Enemy_Node.SetPosition(Corners[0].x * EnemyScaleInverse, EnemyYoffset * 100, Corners[0].y * EnemyScaleInverse);
@@ -406,7 +408,57 @@ void Game::ResetGame()
 
 	}
 
-
+	std::size_t found;
+	SceneNode* nodesList = generator->leftRoot;
+	for (SceneNode* node : nodesList->children)
+		for(SceneNode* nodes : node->children)
+		{
+			if (nodes->gameObject != nullptr) {
+				found = nodes->gameObject->getTag().find("Door");
+				if (found != std::string::npos)
+				{
+					if (nodes->gameObject->transform.getScale() == glm::vec3()) {
+						nodes->SetScale(0.0254f, 0.0254f, 0.01f);
+						Collider* coll = (Collider*)nodes->gameObject->GetComponent(ComponentSystem::ComponentType::Collider);
+						coll->Enabled = true;
+					}
+				}
+				else {
+					found = nodes->gameObject->getTag().find("Chest");
+					if (found != std::string::npos)
+					{
+						if (nodes->gameObject->transform.getScale() == glm::vec3()) {
+							nodes->gameObject->transform.SetScale(0.007f, 0.007f, 0.007f);
+							ChestTrigger* chest = (ChestTrigger*)nodes->gameObject->GetComponent(ComponentSystem::ComponentType::Trigger);
+							chest->SetActivated(false);
+						}
+					}
+				}
+			}
+		}
+	
+	nodesList = generator->rightRoot;
+	for (SceneNode* node : nodesList->children)
+		for (SceneNode* nodes : node->children)
+		{
+			if (nodes->gameObject != nullptr) {
+				if (nodes->gameObject->getTag() == "floor")
+				{
+					for (SceneNode* node : nodes->children)
+					{
+						found = nodes->gameObject->getTag().find("Key");
+						if (found != std::string::npos)
+						{
+							if (nodes->gameObject->transform.getScale() == glm::vec3()) {
+								Key* key = (Key*)nodes->gameObject->GetComponent(ComponentSystem::ComponentType::Trigger);
+								key->SetActivated(false);
+								nodes->gameObject->transform.SetScale(0.025f, 0.025f, 0.025f);
+							}
+						}
+					}
+				}
+			}
+		}
   
 	LostText->Reset();
 	LostBcg->Reset();

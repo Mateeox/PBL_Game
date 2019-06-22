@@ -50,6 +50,8 @@ class MapGenerator //: public Script
 	bool GlassDoor = false;
 	std::vector<SceneNode*> leftnodes;
 	std::vector<SceneNode*> rightnodes;
+	SceneNode* leftRoot;
+	SceneNode* rightRoot;
 	MapGenerator(Shader* shaderProgram);
 	MapGenerator(Shader* shaderProgram, int squares, int doors, int chests, bool glass_door, std::vector<SceneNode*>* sNodes, Player* player);
 	void TransformToPositive();
