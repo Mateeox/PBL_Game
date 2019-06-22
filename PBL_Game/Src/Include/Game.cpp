@@ -366,7 +366,7 @@ void Game::ResetGame()
 	shuffle(Corners.begin(), Corners.end(), std::default_random_engine(seed));
 
 	RemoveNodesWithGameObjectTag("trap", leftScene);
-  RemoveNodesWithGameObjectTag("trap", rightScene);
+    RemoveNodesWithGameObjectTag("trap", rightScene);
 
 
 	Enemy_Node.SetPosition(Corners[0].x * EnemyScaleInverse, EnemyYoffset * 100, Corners[0].y * EnemyScaleInverse);
@@ -406,7 +406,39 @@ void Game::ResetGame()
 
 	}
 
+	std::size_t found;
+	for (SceneNode* nodes : leftScene->children)
+	{
+		if (nodes->gameObject != nullptr) {
+			found = nodes->gameObject->getTag().find("Door");
+			if (found != std::string::npos)
+			{
+				nodes->Scale(1.0f);
+				Collider* coll = (Collider*)nodes->gameObject->GetComponent(ComponentSystem::ComponentType::Collider);
+				coll->Enabled = true;
+			}
+			found = nodes->gameObject->getTag().find("Chest");
+			if (found != std::string::npos)
+			{
+				nodes->gameObject->transform.ScaleTransform(1.0f, 1.0f, 1.0f);
+				ChestTrigger* chest = (ChestTrigger*)nodes->gameObject->GetComponent(ComponentSystem::ComponentType::Trigger);
+				chest->SetActivated(false);
+			}
+		}
+	}
 
+	for (SceneNode* nodes : rightScene->children)
+	{
+		if (nodes->gameObject != nullptr) {
+			found = nodes->gameObject->getTag().find("Key");
+			if (found != std::string::npos)
+			{
+				Key* key = (Key*)nodes->gameObject->GetComponent(ComponentSystem::ComponentType::Trigger);
+				key->SetActivated(false);
+				nodes->gameObject->transform.ScaleTransform(1.0f, 1.0f, 1.0f);
+			}
+		}
+	}
   
 	LostText->Reset();
 	LostBcg->Reset();
