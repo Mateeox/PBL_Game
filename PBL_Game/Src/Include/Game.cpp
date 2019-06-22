@@ -543,8 +543,6 @@ void Game::Render()
   PostProcessShader->use();
   screenQuad->DrawEffect(framebuffer->frameBufferTexture);
 
-
-
   framebuffer->BindFrameBuffer();
   glEnable(GL_DEPTH_TEST);
   glClearColor(0, 0, 0, 1);
@@ -555,8 +553,6 @@ void Game::Render()
   {
     Enemy_Node.Render(originTransform, shaderProgram_For_Model, true);
   }
-
-
 
   framebuffer->bindBack();
 
@@ -572,8 +568,8 @@ void Game::Render()
   glClear(GL_COLOR_BUFFER_BIT);
 
   // RENDER PRAWEJ STRONY
-  glViewport((Game::WINDOW_WIDTH / 2) - 125, 0, (Game::WINDOW_WIDTH / 2) + 125, Game::WINDOW_HEIGHT);
-  glScissor((Game::WINDOW_WIDTH / 2) + offset, 0, (Game::WINDOW_WIDTH / 2) - offset, Game::WINDOW_HEIGHT);
+  glViewport((Game::WINDOW_WIDTH / 2) - 125, 0, (Game::WINDOW_WIDTH ) , Game::WINDOW_HEIGHT);
+  glScissor((Game::WINDOW_WIDTH / 2) + offset, 0, (Game::WINDOW_WIDTH ), Game::WINDOW_HEIGHT);
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT);
 
