@@ -81,11 +81,11 @@ void Player::Update(PBLGame::Window *okienko, float scale)
 
 			if (game->leftSideActive)
 			{
-				leftScene->AddChild(CreateTrap(scale));
+				leftScene->AddChild(CreateTrap(scale,"leftSideTrap"));
 			}
 			else
 			{
-				rightScene->AddChild(CreateTrap(scale));
+				rightScene->AddChild(CreateTrap(scale,"rightSideTrap"));
 			}
 			game->TrapPartInfo->SwitchTexture("default");
 			trapSet = true;
@@ -113,17 +113,15 @@ void Player::Update(PBLGame::Window *okienko, float scale)
 			playerCollider = (PlayerCollider *)rightPlayer->gameObject->GetComponent(ComponentSystem::Collider);
 		}
 
-		if ((playerCollider->gameobject->getTag() == "leftPlayer" && game->leftSideActive) ||
-			(playerCollider->gameobject->getTag() == "rightPlayer" && !game->leftSideActive))
 			if (playerCollider->checkCollision(trigger))
 			{
 				trapCollector->visible = true;
 				if (glfwGetKey(okienko->window, GLFW_KEY_SPACE) == GLFW_PRESS)
 				{
 					if (game->leftSideActive)
-						game->RemoveNodesWithGameObjectTag("trap", leftScene);
+						game->RemoveNodesWithGameObjectTag("leftSideTrap", leftScene);
 					else
-						game->RemoveNodesWithGameObjectTag("trap", rightScene);
+						game->RemoveNodesWithGameObjectTag("rightSideTrap", rightScene);
 					PartsAmount = partsLimit;
 					game->TrapPartInfo->SwitchTexture("Parts4");
 					trapSet = false;
@@ -143,13 +141,13 @@ void Player::Update(PBLGame::Window *okienko, float scale)
 	}
 }
 
-SceneNode *Player::CreateTrap(float scale)
+SceneNode *Player::CreateTrap(float scale,std::string tag)
 {
 	glm::vec3 Position;
 
 	SceneNode *trap = new SceneNode();
 	GameObject *trapObj = new GameObject(trap->local);
-	trapObj->setTag("trap");
+	trapObj->setTag(tag);
 	trigger = new TrapTrigger(trap->local, enemy, background, win); //doda� przeciwnika
 	trigger->setDimensions(0, 0, 0, 1.0f, 1.0f, 1.0f);
 	trapObj->AddComponent(trapMod);

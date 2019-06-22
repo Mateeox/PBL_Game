@@ -46,7 +46,7 @@ private:
 	Model *trapMod;
 	bool isAdding = false;
 
-	SceneNode *CreateTrap(float scale);
+	SceneNode *CreateTrap(float scale,std::string tag);
 	EnemyTrigger *enemyTrigger;
 	TrapTrigger *trigger;
 };
