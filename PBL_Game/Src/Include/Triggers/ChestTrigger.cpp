@@ -14,7 +14,8 @@ void ChestTrigger::ActivateTrigger()
 	{
 		std::cout << "Otwieranie skrzyni" << std::endl;
 		player->AddTrapPart();
-		transform.ScaleTransform(0, 0, 0);
+		glm::vec3 pos = gameobject->transform.getPosition();
+		gameobject->transform.SetPosition(pos.x, -500.0f, pos.z);
 		activated = true;
 	}
 }

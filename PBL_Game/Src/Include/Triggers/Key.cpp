@@ -29,8 +29,8 @@ void Key::ActivateTrigger()
 			if (comp->GetComponentType() == ComponentType::Collider)
 				((Collider*)comp)->Enabled = false;
 		}
-		door->gameObject->transform.ScaleTransform(0, 0, 0);
-		gameobject->transform.ScaleTransform(0, 0, 0);
+		door->local.Translate(glm::vec3(0, -500.0f, 0));
+		gameobject->node->local.Translate(glm::vec3(0, -500.0f, 0));
 		activated = true;
 	}
 }

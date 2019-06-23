@@ -417,8 +417,8 @@ void Game::ResetGame()
 				found = nodes->gameObject->getTag().find("Door");
 				if (found != std::string::npos)
 				{
-					if (nodes->gameObject->transform.getScale() == glm::vec3()) {
-						nodes->gameObject->transform.SetScale(0.0254f, 0.0254f, 0.01f);
+					if (nodes->local.getPosition().y < 0) {
+						nodes->local.Translate(glm::vec3(0, 500.0f, 0));
 						Collider* coll = (Collider*)nodes->gameObject->GetComponent(ComponentSystem::ComponentType::Collider);
 						coll->Enabled = true;
 					}
@@ -427,8 +427,8 @@ void Game::ResetGame()
 					found = nodes->gameObject->getTag().find("Chest");
 					if (found != std::string::npos)
 					{
-						if (nodes->gameObject->transform.getScale() == glm::vec3()) {
-							nodes->gameObject->transform.SetScale(0.007f, 0.007f, 0.007f);
+						if (nodes->local.getPosition().y < 0) {
+							nodes->local.Translate(glm::vec3(0, 500.0f, 0));
 							ChestTrigger* chest = (ChestTrigger*)nodes->gameObject->GetComponent(ComponentSystem::ComponentType::Trigger);
 							chest->SetActivated(false);
 						}
@@ -445,10 +445,10 @@ void Game::ResetGame()
 				found = nodes->gameObject->getTag().find("Key");
 				if (found != std::string::npos)
 				{
-					if (nodes->gameObject->transform.getScale() == glm::vec3()) {
+					if (nodes->local.getPosition().y < 0) {
 						Key* key = (Key*)nodes->gameObject->GetComponent(ComponentSystem::ComponentType::Trigger);
 						key->SetActivated(false);
-						nodes->gameObject->transform.SetScale(0.025f, 0.025f, 0.025f);
+						nodes->local.Translate(glm::vec3(0, 500.0f, 0));
 					}
 				}
 			}
