@@ -14,6 +14,7 @@
 #include <iterator>
 
 static bool swapButtonPressed = false;
+static bool Reset_BUTTON_PRESSED = false;
 
 void Game::InitializeConfig()
 {
@@ -826,8 +827,16 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation, 
     movementDir.x = 1;
 
 
-  if (glfwGetKey(okienko.window, GLFW_KEY_R) == GLFW_PRESS)
+  if (glfwGetKey(okienko.window, GLFW_KEY_R) == GLFW_PRESS && !Reset_BUTTON_PRESSED)
+  {
+	  Reset_BUTTON_PRESSED = true;
 	  ResetGame();
+  }
+
+  if (glfwGetKey(okienko.window, GLFW_KEY_R) == GLFW_RELEASE)
+  {
+	  Reset_BUTTON_PRESSED = false;
+  }
 
   auto velocity = movementSpeedTimesPlayerScale;
   if (glfwGetKey(okienko.window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
