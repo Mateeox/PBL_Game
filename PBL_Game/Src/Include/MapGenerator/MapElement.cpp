@@ -235,6 +235,7 @@ SceneNode* MapElement::CreateChest(SceneNode* parent, Model* model, Player* play
 	chestT->setDimensions(0, 0, 0, 0.5f, 0.5f, 0.5f);
 	oFloor->AddComponent(model);
 	oFloor->AddComponent(chestT);
+	oFloor->setTag("Chest");
 	chest->AddGameObject(oFloor);
 	chest->Translate(Position.x, 0, Position.y);
 	chest->Scale(0.007f, 0.007f, 0.007f);
