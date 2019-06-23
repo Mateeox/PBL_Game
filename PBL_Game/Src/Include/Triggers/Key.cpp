@@ -29,7 +29,7 @@ void Key::ActivateTrigger()
 			if (comp->GetComponentType() == ComponentType::Collider)
 				((Collider*)comp)->Enabled = false;
 		}
-		door->Scale(0);
+		door->gameObject->transform.ScaleTransform(0, 0, 0);
 		gameobject->transform.ScaleTransform(0, 0, 0);
 		activated = true;
 	}

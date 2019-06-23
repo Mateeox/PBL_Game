@@ -418,7 +418,7 @@ void Game::ResetGame()
 				if (found != std::string::npos)
 				{
 					if (nodes->gameObject->transform.getScale() == glm::vec3()) {
-						nodes->SetScale(0.0254f, 0.0254f, 0.01f);
+						nodes->gameObject->transform.SetScale(0.0254f, 0.0254f, 0.01f);
 						Collider* coll = (Collider*)nodes->gameObject->GetComponent(ComponentSystem::ComponentType::Collider);
 						coll->Enabled = true;
 					}
@@ -442,19 +442,13 @@ void Game::ResetGame()
 		for (SceneNode* nodes : node->children)
 		{
 			if (nodes->gameObject != nullptr) {
-				if (nodes->gameObject->getTag() == "floor")
+				found = nodes->gameObject->getTag().find("Key");
+				if (found != std::string::npos)
 				{
-					for (SceneNode* node : nodes->children)
-					{
-						found = nodes->gameObject->getTag().find("Key");
-						if (found != std::string::npos)
-						{
-							if (nodes->gameObject->transform.getScale() == glm::vec3()) {
-								Key* key = (Key*)nodes->gameObject->GetComponent(ComponentSystem::ComponentType::Trigger);
-								key->SetActivated(false);
-								nodes->gameObject->transform.SetScale(0.025f, 0.025f, 0.025f);
-							}
-						}
+					if (nodes->gameObject->transform.getScale() == glm::vec3()) {
+						Key* key = (Key*)nodes->gameObject->GetComponent(ComponentSystem::ComponentType::Trigger);
+						key->SetActivated(false);
+						nodes->gameObject->transform.SetScale(0.025f, 0.025f, 0.025f);
 					}
 				}
 			}
