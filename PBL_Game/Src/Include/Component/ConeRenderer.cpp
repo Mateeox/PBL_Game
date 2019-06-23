@@ -1,9 +1,7 @@
 #include "ConeRenderer.hpp"
 const double ConeRenderer::EPSILON = 1e-6;
 
-
-ConeRenderer::ConeRenderer(Shader &shaderProgram, SceneNode* rootNode) : 
-	Drawable(shaderProgram), rootNode(rootNode)
+ConeRenderer::ConeRenderer(Shader &shaderProgram, SceneNode *rootNode) : Drawable(shaderProgram), rootNode(rootNode)
 {
 	anglePerSegment = angle / segmentsNumber;
 	const int pointsInfinalVerticesNum = (segmentsNumber + 2) * 3;
@@ -27,9 +25,16 @@ ComponentSystem::ComponentType ConeRenderer::GetComponentType()
 	return ComponentSystem::ComponentType::ConeRenderer;
 }
 
-void ConeRenderer::Draw(glm::mat4 &transform)
+void ConeRenderer::Draw(Shader *shader, glm::mat4 &transform)
 {
-	ShaderProgram.use();
+	if (shader == nullptr)
+	{
+		defaultShader.use();
+	}
+	else
+	{
+		shader->use();
+	}
 
 	glm::vec2 startPoint(transform[3][0], transform[3][2]);
 	glm::vec2 endPointLeft = rotatePointAroundPoint(glm::vec2(startPoint.x + radius, startPoint.y), startPoint, directionAngle);
@@ -38,12 +43,12 @@ void ConeRenderer::Draw(glm::mat4 &transform)
 
 	objectsInCone.clear();
 	//don't judge me, this workaround is 10x faster than rewriting everything
-	std::vector<SceneNode*> rootVector{ rootNode };
+	std::vector<SceneNode *> rootVector{rootNode};
 	collectObjectsInCone(startPoint, endPointLeft, endPointRight, &rootVector, Transform::origin(), radiusSquared);
 	glm::vec2 right(endPointLeft);
 	finalVertices.clear();
 	addToFinalVertices(startPoint);
-	
+
 	auto pointsAfterTransformation = calculatePointsAfterTransformation(objectsInCone);
 	for (int i = 0; i < segmentsNumber; ++i)
 	{
@@ -76,7 +81,6 @@ void ConeRenderer::Draw(glm::mat4 &transform)
 		addToFinalVertices(left);
 	}
 	addToFinalVertices(right);
-
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, finalVertices.size() * sizeof(float), finalVertices.data());
@@ -111,23 +115,24 @@ double ConeRenderer::getAngle()
 	return angle;
 }
 
-bool ConeRenderer::isOnLeftSide(const glm::vec2 &startPoint, const glm::vec2 &endPoint, const glm::vec2 &pointToCheck) {
-	return ((endPoint.x - startPoint.x)*(pointToCheck.y - startPoint.y) - (endPoint.y - startPoint.y)*(pointToCheck.x - startPoint.x)) < 0;
-}
-bool ConeRenderer::areLinesIntersecting(const glm::vec2& aLineStart, const glm::vec2& aLineEnd, const glm::vec2& bLineStart, const glm::vec2& bLineEnd)
+bool ConeRenderer::isOnLeftSide(const glm::vec2 &startPoint, const glm::vec2 &endPoint, const glm::vec2 &pointToCheck)
 {
-	float ax = aLineEnd.x - aLineStart.x;     // direction of line a
-	float ay = aLineEnd.y - aLineStart.y;     // ax and ay as above
+	return ((endPoint.x - startPoint.x) * (pointToCheck.y - startPoint.y) - (endPoint.y - startPoint.y) * (pointToCheck.x - startPoint.x)) < 0;
+}
+bool ConeRenderer::areLinesIntersecting(const glm::vec2 &aLineStart, const glm::vec2 &aLineEnd, const glm::vec2 &bLineStart, const glm::vec2 &bLineEnd)
+{
+	float ax = aLineEnd.x - aLineStart.x; // direction of line a
+	float ay = aLineEnd.y - aLineStart.y; // ax and ay as above
 
-	float bx = bLineStart.x - bLineEnd.x;     // direction of line b, reversed
-	float by = bLineStart.y - bLineEnd.y;     // really -by and -by as above
+	float bx = bLineStart.x - bLineEnd.x; // direction of line b, reversed
+	float by = bLineStart.y - bLineEnd.y; // really -by and -by as above
 
-	float dx = bLineStart.x - aLineStart.x;   // right-hand side
+	float dx = bLineStart.x - aLineStart.x; // right-hand side
 	float dy = bLineStart.y - aLineStart.y;
 
 	float det = ax * by - ay * bx;
 
-	if (abs(det) < ConeRenderer::EPSILON) 
+	if (abs(det) < ConeRenderer::EPSILON)
 		return false;
 
 	float r = (dx * by - dy * bx) / det;
@@ -156,7 +161,7 @@ bool ConeRenderer::findLinesIntersectionPoint(glm::vec2 &intersectionPoint, cons
 	return false;
 }
 
-void ConeRenderer::collectObjectsInCone(const glm::vec2 &startPoint, const glm::vec2 &endPointLeft, const glm::vec2 &endPointRight, std::vector<SceneNode*> *nodes, Transform transform, double radiusSquared)
+void ConeRenderer::collectObjectsInCone(const glm::vec2 &startPoint, const glm::vec2 &endPointLeft, const glm::vec2 &endPointRight, std::vector<SceneNode *> *nodes, Transform transform, double radiusSquared)
 {
 	if (radiusSquared < 0)
 	{
@@ -169,7 +174,7 @@ void ConeRenderer::collectObjectsInCone(const glm::vec2 &startPoint, const glm::
 		bool isTransformsCombined = false;
 		if (node->gameObject != nullptr && node->gameObject->getTag() != "player" && node->gameObject->getTag() != "floor")
 		{
-			ConeRenderable* shapeRenderer = (ConeRenderable*)node->gameObject->GetComponent(ComponentSystem::ComponentType::ShapeRenderer3D);
+			ConeRenderable *shapeRenderer = (ConeRenderable *)node->gameObject->GetComponent(ComponentSystem::ComponentType::ShapeRenderer3D);
 			if (shapeRenderer != nullptr)
 			{
 				combinedTransform = node->gameObject->transform.combine(transform);
@@ -177,11 +182,11 @@ void ConeRenderer::collectObjectsInCone(const glm::vec2 &startPoint, const glm::
 			}
 			else
 			{
-				Model* model = (Model*)node->gameObject->GetComponent(ComponentSystem::ComponentType::Model);
+				Model *model = (Model *)node->gameObject->GetComponent(ComponentSystem::ComponentType::Model);
 				if (model != nullptr)
 				{
 					combinedTransform = node->gameObject->transform.combine(transform);
-					for (auto& mesh : *model->getMeshes())
+					for (auto &mesh : *model->getMeshes())
 					{
 						collectObjectsInConeInternal(&mesh, startPoint, endPointLeft, endPointRight, node, combinedTransform, isTransformsCombined, radiusSquared);
 					}
@@ -192,7 +197,7 @@ void ConeRenderer::collectObjectsInCone(const glm::vec2 &startPoint, const glm::
 	}
 }
 
-bool ConeRenderer::collectObjectsInConeInternal(ConeRenderable* shapeRenderer, const glm::vec2 &startPoint, const glm::vec2 &endPointLeft, const glm::vec2 &endPointRight, SceneNode* node, Transform& combinedTransform, bool& isTransformsCombined, double radiusSquared)
+bool ConeRenderer::collectObjectsInConeInternal(ConeRenderable *shapeRenderer, const glm::vec2 &startPoint, const glm::vec2 &endPointLeft, const glm::vec2 &endPointRight, SceneNode *node, Transform &combinedTransform, bool &isTransformsCombined, double radiusSquared)
 {
 	auto points = shapeRenderer->getExtrema();
 	isTransformsCombined = true;
@@ -222,31 +227,34 @@ bool ConeRenderer::collectObjectsInConeInternal(ConeRenderable* shapeRenderer, c
 		if (areLinesIntersecting(startPoint, endPointLeft, pointsAfterTransfomration[i], pointsAfterTransfomration[nextPointIndex]))
 		{
 			objectsInCone.push_back(std::make_pair(shapeRenderer, combinedTransform.GetTransform()));
-			return true;;
+			return true;
+			;
 		}
 		//check right border
 		if (areLinesIntersecting(startPoint, endPointRight, pointsAfterTransfomration[i], pointsAfterTransfomration[nextPointIndex]))
 		{
 			objectsInCone.push_back(std::make_pair(shapeRenderer, combinedTransform.GetTransform()));
-			return true;;
+			return true;
+			;
 		}
-		//check middle line (for an object intersecting with the curved area of the cone) 
+		//check middle line (for an object intersecting with the curved area of the cone)
 		if (areLinesIntersecting(startPoint, rotatePointAroundPoint(endPointLeft, startPoint, angle / 2.0), pointsAfterTransfomration[i], pointsAfterTransfomration[nextPointIndex]))
 		{
 			objectsInCone.push_back(std::make_pair(shapeRenderer, combinedTransform.GetTransform()));
-			return true;;
+			return true;
+			;
 		}
 	}
 	return false;
 }
 
-std::vector<std::vector<glm::vec2>> ConeRenderer::calculatePointsAfterTransformation(const std::vector<std::pair<ConeRenderable*, glm::mat4 >> &objects)
+std::vector<std::vector<glm::vec2>> ConeRenderer::calculatePointsAfterTransformation(const std::vector<std::pair<ConeRenderable *, glm::mat4>> &objects)
 {
 	std::vector<std::vector<glm::vec2>> results;
 	for (auto obj : objects)
 	{
 		std::vector<glm::vec2> points;
-		float* vertexData = obj.first->getVertexData();
+		float *vertexData = obj.first->getVertexData();
 		int verticesPositionStride = obj.first->getVerticesPositionStride();
 		int indicesSize = obj.first->getIndicesSize();
 		if (indicesSize != 0)
@@ -275,7 +283,6 @@ std::vector<std::vector<glm::vec2>> ConeRenderer::calculatePointsAfterTransforma
 	return results;
 }
 
-
 void ConeRenderer::addToFinalVertices(glm::vec2 point)
 {
 	finalVertices.push_back(point.x);
@@ -283,7 +290,7 @@ void ConeRenderer::addToFinalVertices(glm::vec2 point)
 	finalVertices.push_back(point.y);
 }
 
-void ConeRenderer::checkIntersection(double & distance, const glm::vec2 & startPointA, const glm::vec2 & endPointA, const glm::vec2 & startPointB, const glm::vec2 & endPointB)
+void ConeRenderer::checkIntersection(double &distance, const glm::vec2 &startPointA, const glm::vec2 &endPointA, const glm::vec2 &startPointB, const glm::vec2 &endPointB)
 {
 	glm::vec2 intersectionPoint;
 	if (findLinesIntersectionPoint(intersectionPoint, startPointA, endPointA, startPointB, endPointB))
@@ -301,7 +308,6 @@ glm::vec2 ConeRenderer::rotatePointAroundPoint(glm::vec2 point, glm::vec2 center
 	auto dx = point.x - center.x;
 	auto dy = point.y - center.y;
 	return glm::vec2(
-		cos(angle) * (dx) - sin(angle) * (dy) + center.x,
-		sin(angle) * (dx) + cos(angle) * (dy) + center.y
-	);
+		cos(angle) * (dx)-sin(angle) * (dy) + center.x,
+		sin(angle) * (dx) + cos(angle) * (dy) + center.y);
 }

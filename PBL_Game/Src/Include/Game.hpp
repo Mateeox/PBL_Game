@@ -14,6 +14,9 @@
 #include "AI/EnemyController.hpp"
 #include "GuiElement.hpp"
 #include "Triggers/EnemyTrigger.hpp"
+#include "PostProcessing/FrameBuffer.hpp"
+#include "PostProcessing/ScreenQuad.hpp"
+
 
 const int TICKS_PER_SECOND = 64;
 const int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
@@ -46,6 +49,10 @@ class Game
   bool debugMode = false;
 
 
+ //PostProcess
+ FrameBuffer* framebuffer;
+ ScreenQuad* screenQuad;
+
   //
   Window &okienko;
   Shader *shaderProgram;
@@ -53,6 +60,8 @@ class Game
   Shader *shaderAnimatedModel;
   Shader *shaderViewCone;
   Shader * guiShader;
+
+  Shader * PostProcessShader;
   SceneNode wholeScene;
 
   SceneNode *leftScene;

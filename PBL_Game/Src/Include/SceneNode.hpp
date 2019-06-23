@@ -26,7 +26,7 @@ class SceneNode
     void AddChild(SceneNode *aSceneNode);
 	void RemoveChildNoRecursive(SceneNode *aSceneNode);
     void AddGameObject(GameObject *aGameObject);
-    void Render(Transform& parentWorld, bool aDirty_Flag);
+    void Render(Transform& parentWorld,Shader *shaderProgram, bool aDirty_Flag);
     void RemoveGameObject();
 
     void Scale(float x, float y, float z);

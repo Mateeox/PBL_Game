@@ -37,7 +37,7 @@ class Mesh : public ConeRenderable
          vector<unsigned int> aIndices,
          vector<Texture> aTextures,
          Shader & aShaderProgram);
-    void Draw(glm::mat4 &  transform) override;
+    void Draw(Shader* shader,glm::mat4 &  transform) override;
 	std::string Serialize() {
 		return Drawable::Serialize();
 	}

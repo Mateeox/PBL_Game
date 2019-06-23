@@ -19,9 +19,9 @@ std::string MapTile::GetActiveProfile()
     return textureDisplayed;
 }
 
-void MapTile::Draw(glm::mat4 &transform)
+void MapTile::Draw(Shader * shader,glm::mat4 &transform)
 {
-    ShapeRenderer3D::Draw(transform);
+    ShapeRenderer3D::Draw(shader,transform);
 }
 
 ComponentSystem::ComponentType MapTile::GetComponentType()

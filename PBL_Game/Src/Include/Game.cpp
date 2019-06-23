@@ -55,7 +55,6 @@ void Game::InitializeConfig()
   floorTransform = ConfigUtils::GetValueFromMap<float>("FloorTranslation", ConfigUtils::GlobalConfigMap);
   TileScale = ConfigUtils::GetValueFromMap<float>("TileScale", ConfigUtils::GlobalConfigMap);
 
-
   TileScaleTimes100 = TileScale * 100;
   EnemyScaleInverse = 1 / EnemyScale;
 
@@ -81,6 +80,7 @@ Game::Game(Window &aOkno) : okienko(aOkno),
   shaderAnimatedModel = new Shader("Shaders/skinning.vs", "Shaders/skinning.fs");
   shaderViewCone = new Shader("Shaders/viewCone.vs", "Shaders/viewCone.fs");
   guiShader = new Shader("Shaders/GuiShader.vs", "Shaders/GuiShader.fs");
+  PostProcessShader = new Shader("Shaders/ScreenShader.vs", "Shaders/ScreenShader.fs");
 
   shaderProgram_For_Model->use();
   shaderProgram_For_Model->setVec3("material.ambient", 0.1, 0.1, 0.1);
@@ -118,56 +118,56 @@ Game::Game(Window &aOkno) : okienko(aOkno),
 
 void Game::Granko()
 {
-  #pragma region PathFindingDebugTiles
-	Texture *BlockedTileTexture = new Texture("Textures/BlockedTile.png", GL_LINEAR);
-	Texture *FreeTileTexture = new Texture("Textures/FreeTile.png", GL_LINEAR);
-	Texture *SlowerTileTexture = new Texture("Textures/SlowerTile.png", GL_LINEAR);
-	Texture *PathTileTexture = new Texture("Textures/PathTile.png", GL_LINEAR);
+#pragma region PathFindingDebugTiles
+  Texture *BlockedTileTexture = new Texture("Textures/BlockedTile.png", GL_LINEAR);
+  Texture *FreeTileTexture = new Texture("Textures/FreeTile.png", GL_LINEAR);
+  Texture *SlowerTileTexture = new Texture("Textures/SlowerTile.png", GL_LINEAR);
+  Texture *PathTileTexture = new Texture("Textures/PathTile.png", GL_LINEAR);
 
-	BlockedTileTexture->Load();
-	FreeTileTexture->Load();
-	SlowerTileTexture->Load();
-	PathTileTexture->Load();
+  BlockedTileTexture->Load();
+  FreeTileTexture->Load();
+  SlowerTileTexture->Load();
+  PathTileTexture->Load();
 
-  #pragma endregion
+#pragma endregion
 
-  #pragma region DeathAndWinScreenTextures
-	glm::mat4 guiTransfom{ 1.f };
-	LostText = new SimpleGUI::GuiElement("Textures/DeathTr.png", glm::scale(guiTransfom, glm::vec3(2, 2, 2)), guiShader);
-	LostBcg = new SimpleGUI::GuiElement("Textures/DeathBg.png", glm::scale(guiTransfom, glm::vec3(2, 2, 2)), guiShader);
+#pragma region DeathAndWinScreenTextures
+  glm::mat4 guiTransfom{1.f};
+  LostText = new SimpleGUI::GuiElement("Textures/DeathTr.png", glm::scale(guiTransfom, glm::vec3(2, 2, 2)), guiShader);
+  LostBcg = new SimpleGUI::GuiElement("Textures/DeathBg.png", glm::scale(guiTransfom, glm::vec3(2, 2, 2)), guiShader);
 
-	WinText = new SimpleGUI::GuiElement("Textures/DeathTr.png", glm::scale(guiTransfom, glm::vec3(2, 2, 2)), guiShader);
-	WinBcg = new SimpleGUI::GuiElement("Textures/WinBg.png", glm::scale(guiTransfom, glm::vec3(2, 2, 2)), guiShader);
+  WinText = new SimpleGUI::GuiElement("Textures/DeathTr.png", glm::scale(guiTransfom, glm::vec3(2, 2, 2)), guiShader);
+  WinBcg = new SimpleGUI::GuiElement("Textures/WinBg.png", glm::scale(guiTransfom, glm::vec3(2, 2, 2)), guiShader);
 
-	glm::mat4 TrapPartInfoTransform{ 1.f };
-	TrapPartInfoTransform = glm::translate(TrapPartInfoTransform, glm::vec3(-0.8,0.85,0));
-	TrapPartInfo = new SimpleGUI::GuiElement("Textures/Parts0.png", glm::scale(TrapPartInfoTransform, glm::vec3(0.5, 0.5, 0.5)), guiShader);
-	
-  glm::mat4 TrapCollectorTransform{ 1.f };
+  glm::mat4 TrapPartInfoTransform{1.f};
+  TrapPartInfoTransform = glm::translate(TrapPartInfoTransform, glm::vec3(-0.8, 0.85, 0));
+  TrapPartInfo = new SimpleGUI::GuiElement("Textures/Parts0.png", glm::scale(TrapPartInfoTransform, glm::vec3(0.5, 0.5, 0.5)), guiShader);
+
+  glm::mat4 TrapCollectorTransform{1.f};
   TrapCollector = new SimpleGUI::GuiElement("Textures/TrapCollector.png", TrapCollectorTransform, guiShader);
 
-	TrapPartInfo->AddTexture("Textures/Parts1.png", "Parts1");
-	TrapPartInfo->AddTexture("Textures/Parts2.png", "Parts2");
-	TrapPartInfo->AddTexture("Textures/Parts3.png", "Parts3");
-	TrapPartInfo->AddTexture("Textures/Parts4.png", "Parts4");
-	TrapPartInfo->SwtichVisiblity();
+  TrapPartInfo->AddTexture("Textures/Parts1.png", "Parts1");
+  TrapPartInfo->AddTexture("Textures/Parts2.png", "Parts2");
+  TrapPartInfo->AddTexture("Textures/Parts3.png", "Parts3");
+  TrapPartInfo->AddTexture("Textures/Parts4.png", "Parts4");
+  TrapPartInfo->SwtichVisiblity();
 
-  #pragma endregion
+#pragma endregion
 
-  #pragma region ModelLoading
-	std::string PlayerModelPath = "Models/Player/player_animations.fbx";
-	std::string AnimatedEnemyPAth = "Models/" + ConfigUtils::GetValueFromMap<std::string>("Enemy_Animated_Model", ConfigUtils::GlobalConfigMap);
+#pragma region ModelLoading
+  std::string PlayerModelPath = "Models/Player/player_animations.fbx";
+  std::string AnimatedEnemyPAth = "Models/" + ConfigUtils::GetValueFromMap<std::string>("Enemy_Animated_Model", ConfigUtils::GlobalConfigMap);
 
-	playerModel = new AnimatedModel(PlayerModelPath, *shaderAnimatedModel, false);
-	player2Model = new AnimatedModel(*playerModel);
-	enemyModel = new AnimatedModel(AnimatedEnemyPAth, *shaderAnimatedModel, false);
+  playerModel = new AnimatedModel(PlayerModelPath, *shaderAnimatedModel, false);
+  player2Model = new AnimatedModel(*playerModel);
+  enemyModel = new AnimatedModel(AnimatedEnemyPAth, *shaderAnimatedModel, false);
 
-  #pragma endregion
+#pragma endregion
 
-	leftScene = new SceneNode();
-	rightScene = new SceneNode();
+  leftScene = new SceneNode();
+  rightScene = new SceneNode();
 
-  playerObj = new Player(&leftPlayerNode,&rightPlayerNode, 4, *shaderProgram, leftScene,rightScene, &Enemy_Node, WinBcg, WinText,TrapCollector,this);
+  playerObj = new Player(&leftPlayerNode, &rightPlayerNode, 4, *shaderProgram, leftScene, rightScene, &Enemy_Node, WinBcg, WinText, TrapCollector, this);
 
   generator = new MapGenerator(shaderProgram_For_Model, MapScale, 10, 4, false, &sNodes, playerObj);
   mapped = generator->GetConverted();
@@ -190,7 +190,6 @@ void Game::Granko()
   GameObject *leftPlayerObj = new GameObject(leftPlayerNodeForModel.local);
   GameObject *rightPlayerObj = new GameObject(rightPlayerNodeForModel.local);
 
-
   //PLAYERLEFT PLAYERRIGHT COLLIDERS AND TAGS
   GameObject *leftPlayerObjWithCollider = new GameObject(leftPlayerNode.local);
   GameObject *rightPlayerObjWithCollider = new GameObject(rightPlayerNode.local);
@@ -200,9 +199,6 @@ void Game::Granko()
   //ENEMY TAG
   enemyGameObject->setTag("enemy");
 
- 
-
- 
   //BASIC TILE RENDERER FOR DEBUG AND SIMPLE RENDER
   ShapeRenderer3D *TileRenderer = new ShapeRenderer3D(Shapes::RainBow_Square,
                                                       Shapes::RB_Square_indices,
@@ -211,26 +207,24 @@ void Game::Granko()
                                                       *shaderProgram,
                                                       FreeTileTexture, "Basic");
 
-  /*
+/*
   Create ConeRenderer and Add to Players
   */
-  #pragma region ConeRenderer
+#pragma region ConeRenderer
 
   ConeRenderer *coneRendererLeft = new ConeRenderer(*shaderViewCone, leftScene);
   ConeRenderer *coneRendererRight = new ConeRenderer(*shaderViewCone, rightScene);
 
   leftPlayerObj->AddComponent(coneRendererLeft);
   rightPlayerObj->AddComponent(coneRendererRight);
-  #pragma endregion
-
-
+#pragma endregion
 
   leftPlayerObj->AddComponent(playerModel);
   rightPlayerObj->AddComponent(player2Model);
   enemyGameObject->AddComponent(enemyModel);
 
-  PlayerCollider *leftPlayerCollider = new PlayerCollider(this,leftPlayerObjWithCollider->transform);
-  PlayerCollider *rightPlayerCollider = new PlayerCollider(this,rightPlayerObjWithCollider->transform);
+  PlayerCollider *leftPlayerCollider = new PlayerCollider(this, leftPlayerObjWithCollider->transform);
+  PlayerCollider *rightPlayerCollider = new PlayerCollider(this, rightPlayerObjWithCollider->transform);
 
   killer = new EnemyTrigger(Enemy_Node.local, &leftPlayerNode, LostBcg, LostText);
   enemyGameObject->AddComponent(killer);
@@ -250,8 +244,6 @@ void Game::Granko()
 
   Enemy_Node_For_Model.AddGameObject(enemyGameObject);
 
-  
-
   leftPlayerNode.Scale(PlayerScale);
   rightPlayerNode.Scale(PlayerScale);
 
@@ -266,7 +258,7 @@ void Game::Granko()
   Enemy_Node.AddChild(&Enemy_Node_For_Model);
   sNodes.push_back(&Enemy_Node);
 
-  enemyController = new EnemyController(this,Enemy_Node,
+  enemyController = new EnemyController(this, Enemy_Node,
                                         leftPlayerNode,
                                         rightPlayerNode,
                                         GridLocation{static_cast<int>(Corners[0].x), static_cast<int>(Corners[0].y)}, //enemy start location
@@ -324,10 +316,11 @@ void Game::Granko()
   gatherTriggers(sNodes);
   std::cout << "Triggers gathered: " << triggers.size() << std::endl;
 
+  framebuffer = new FrameBuffer(1920, 1080);
+  screenQuad = new ScreenQuad();
 
-
-      UpdatePlayer(leftPlayerNode, camera, interpolation, true);
-      UpdatePlayer(rightPlayerNode, camera2, interpolation, true);
+  UpdatePlayer(leftPlayerNode, camera, interpolation, true);
+  UpdatePlayer(rightPlayerNode, camera2, interpolation, true);
   while (glfwGetKey(okienko.window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
          glfwWindowShouldClose(okienko.window) == 0)
   {
@@ -348,15 +341,15 @@ void Game::Granko()
     Render();
   }
 
-  if(debugMode)
-  ImguiClear();
+  if (debugMode)
+    ImguiClear();
 
   glDeleteProgram(shaderProgram->shaderProgramID);
   glfwTerminate();
 }
 void Game::ResetGame()
 {
-	glm::vec2 leftDown = FindFirstFromLeftDownCorner(mapped, MapSize);
+glm::vec2 leftDown = FindFirstFromLeftDownCorner(mapped, MapSize);
 	glm::vec2 rightDown = FindFirstFromRightDownCorner(mapped, MapSize);
 	glm::vec2 leftUp = FindFirstFromLeftUpCorner(mapped, MapSize);
 	glm::vec2 rightUp = FindFirstFromRightUpCorner(mapped, MapSize);
@@ -464,12 +457,9 @@ void Game::ResetGame()
 
 
 	killer->SetActivated(false);
-
-
 }
 void Game::Update(float interpolation)
 {
- 
 
   if (!inputBlockade)
   {
@@ -481,7 +471,6 @@ void Game::Update(float interpolation)
     else
       UpdatePlayer(rightPlayerNode, camera2, interpolation, false);
   }
-
 
   //animation Update
   enemyModel->Update();
@@ -501,58 +490,71 @@ void Game::Update(float interpolation)
 void Game::Render()
 {
   glfwPollEvents();
-  glEnable(GL_DEPTH_TEST);
+  
   glScissor(0, 0, Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT);
   glEnable(GL_SCISSOR_TEST);
+
+  framebuffer->BindFrameBuffer();
+  glEnable(GL_DEPTH_TEST);
+  glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  if(debugMode)
-  ImguiStartEndDraw();
+  if (debugMode)
+    ImguiStartEndDraw();
 
   Transform originTransform = Transform::origin();
 
- if (EnemyOnLefSide)
+  if (EnemyOnLefSide)
   {
-  SetViewAndPerspective(camera, leftPlayerNode, &Enemy_Node.local);
+    SetViewAndPerspective(camera, leftPlayerNode, &Enemy_Node.local);
   }
   else
   {
     SetViewAndPerspective(camera, leftPlayerNode, nullptr);
   }
-  
-  // RENDER LEWEJ STRONY
-  glViewport(0, 0, (Game::WINDOW_WIDTH / 2) + 125, Game::WINDOW_HEIGHT);
-  glScissor(0, 0, (Game::WINDOW_WIDTH / 2) + offset, Game::WINDOW_HEIGHT);
-  glClearColor(0, 0, 0, 1);
-  glClear(GL_COLOR_BUFFER_BIT);
 
-  leftScene->Render(originTransform, true);
+  leftScene->Render(originTransform, shaderProgram_For_Model, true);
   if (EnemyOnLefSide)
   {
-    Enemy_Node.Render(originTransform, true);
+    Enemy_Node.Render(originTransform, shaderProgram_For_Model, true);
   }
-   if (!EnemyOnLefSide)
+  if (!EnemyOnLefSide)
   {
-  SetViewAndPerspective(camera2, rightPlayerNode, &Enemy_Node.local);
+    SetViewAndPerspective(camera2, rightPlayerNode, &Enemy_Node.local);
   }
   else
   {
     SetViewAndPerspective(camera2, rightPlayerNode, nullptr);
   }
 
-  // RENDER PRAWEJ STRONY
-  glViewport((Game::WINDOW_WIDTH / 2) - 125, 0, (Game::WINDOW_WIDTH / 2) + 125, Game::WINDOW_HEIGHT);
-  glScissor((Game::WINDOW_WIDTH / 2) + offset, 0, (Game::WINDOW_WIDTH / 2) - offset, Game::WINDOW_HEIGHT);
+    framebuffer->bindBack();
+
+      // RENDER LEWEJ STRONY
+  glViewport(0, 0, (Game::WINDOW_WIDTH / 2) + 125, Game::WINDOW_HEIGHT);
+  glScissor(0, 0, (Game::WINDOW_WIDTH / 2) + offset, Game::WINDOW_HEIGHT);
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  rightScene->Render(originTransform, true);
+  glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+  glClear(GL_COLOR_BUFFER_BIT);
+  PostProcessShader->use();
+  screenQuad->DrawEffect(framebuffer->frameBufferTexture);
+
+  framebuffer->BindFrameBuffer();
+  glEnable(GL_DEPTH_TEST);
+  glClearColor(0, 0, 0, 1);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  rightScene->Render(originTransform, shaderProgram_For_Model, true);
   if (!EnemyOnLefSide)
   {
-    Enemy_Node.Render(originTransform, true);
+    Enemy_Node.Render(originTransform, shaderProgram_For_Model, true);
   }
 
-  // RENDER PASKA ODDZIELAJACAEGO KAMERY - TODO
+  framebuffer->bindBack();
+
+
+    // RENDER PASKA ODDZIELAJACAEGO KAMERY - TODO
   glViewport((Game::WINDOW_WIDTH / 2) + offset - 5, 0, 10, Game::WINDOW_HEIGHT);
   glScissor((Game::WINDOW_WIDTH / 2) + offset - 5, 0, 10, Game::WINDOW_HEIGHT);
   glEnable(GL_SCISSOR_TEST);
@@ -561,6 +563,17 @@ void Game::Render()
 
   glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
+
+  // RENDER PRAWEJ STRONY
+  glViewport((Game::WINDOW_WIDTH / 2) - 125, 0, (Game::WINDOW_WIDTH ) , Game::WINDOW_HEIGHT);
+  glScissor((Game::WINDOW_WIDTH / 2) + offset, 0, (Game::WINDOW_WIDTH ), Game::WINDOW_HEIGHT);
+  glClearColor(0, 0, 0, 1);
+  glClear(GL_COLOR_BUFFER_BIT);
+
+  glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+  glClear(GL_COLOR_BUFFER_BIT);
+  PostProcessShader->use();
+  screenQuad->DrawEffect(framebuffer->frameBufferTexture);
 
   //Render Gui
 
@@ -578,14 +591,11 @@ void Game::Render()
   WinBcg->Draw();
   WinText->Draw();
 
- 
-
-
   // Render grafik
   //Plot();
 
-  if(debugMode)
-  ImguiDrawData();
+  if (debugMode)
+    ImguiDrawData();
 
   // Swap buffers
   glfwSwapBuffers(okienko.window);
@@ -737,8 +747,8 @@ void Game::SetCamera(Camera aCamera, int camera)
 void Game::ProcessInput(float interpolation, Camera &camera_update)
 {
 
- if(debugMode)
-  ProcessMouse();
+  if (debugMode)
+    ProcessMouse();
 
   if (glfwGetKey(okienko.window, GLFW_KEY_Q) == GLFW_PRESS && swapButtonPressed == false)
   {
@@ -752,27 +762,26 @@ void Game::ProcessInput(float interpolation, Camera &camera_update)
     swapButtonPressed = false;
   }
 
+  if (glfwGetKey(okienko.window, GLFW_KEY_TAB) == GLFW_PRESS && !Tab_Pressed)
+  {
+    Tab_Pressed = true;
 
-    if (glfwGetKey(okienko.window, GLFW_KEY_TAB) == GLFW_PRESS && !Tab_Pressed) 
+    Cursor_Enabled = !Cursor_Enabled;
+    if (Cursor_Enabled)
     {
-      Tab_Pressed = true;
+      glfwSetInputMode(okienko.window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+      glfwSetCursorPos(okienko.window, okienko.iWidth / 2, okienko.iHeight / 2);
+    }
+    else
+    {
+      glfwSetInputMode(okienko.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    }
+  }
+  else if (!glfwGetKey(okienko.window, GLFW_KEY_ENTER) == GLFW_PRESS && Tab_Pressed)
+  {
+    Tab_Pressed = false;
+  }
 
-      Cursor_Enabled = !Cursor_Enabled;
-      if (Cursor_Enabled)
-      {
-        glfwSetInputMode(okienko.window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-        glfwSetCursorPos(okienko.window, okienko.iWidth / 2, okienko.iHeight / 2);
-      }
-      else
-      {
-        glfwSetInputMode(okienko.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-      }
-    }
-    else if (!glfwGetKey(okienko.window, GLFW_KEY_ENTER) == GLFW_PRESS && Tab_Pressed)
-    {
-      Tab_Pressed =false;
-    }
-  
   FixAnimation();
 }
 void Game::ProcessMouse()
@@ -841,7 +850,7 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation, 
   auto velocity = movementSpeedTimesPlayerScale;
   if (glfwGetKey(okienko.window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
   {
-    velocity += velocity/2;
+    velocity += velocity / 2;
   }
 
   if (leftSideActive)
@@ -856,15 +865,15 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation, 
   //movementDir = glm::normalize(movementDir);
   double veclenght = sqrt(movementDir.x * movementDir.x + movementDir.z * movementDir.z);
 
-	if (veclenght != 0)
-	{
-		movementDir.x = movementDir.x / veclenght;
-		movementDir.z = movementDir.z / veclenght;
-	}
-	else
-	{
-		movementDir = glm::vec3(0);
-	}
+  if (veclenght != 0)
+  {
+    movementDir.x = movementDir.x / veclenght;
+    movementDir.z = movementDir.z / veclenght;
+  }
+  else
+  {
+    movementDir = glm::vec3(0);
+  }
 
   glm::vec3 move = movementDir * velocity * interpolation;
   //move.x *= (((Game::WINDOW_WIDTH / 2) + offset)/ (Game::WINDOW_HEIGHT)) +1;
@@ -912,8 +921,7 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation, 
 
   //view cone
 
-
-    auto coneRenderer = (ConeRenderer *)(player.children[0]->gameObject->GetComponent(ComponentSystem::ComponentType::ConeRenderer));
+  auto coneRenderer = (ConeRenderer *)(player.children[0]->gameObject->GetComponent(ComponentSystem::ComponentType::ConeRenderer));
   if (coneRenderer != nullptr)
   {
     if (glfwGetKey(okienko.window, GLFW_KEY_LEFT) == GLFW_PRESS)
@@ -921,7 +929,7 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation, 
     if (glfwGetKey(okienko.window, GLFW_KEY_RIGHT) == GLFW_PRESS)
       coneRenderer->rotateRight();
   }
-  
+
   camera.Position.x = player.local.getPosition().x * PlayerScale;
   camera.Position.y = cameraYOffset;
   camera.Position.z = player.local.getPosition().z * PlayerScale + cameraZOffset;
@@ -1034,7 +1042,7 @@ void Game::SetViewAndPerspective(Camera &aCamera, SceneNode &player, Transform *
   }
   shaderProgram_For_Model->setVec3("pointLights[1].position", enemyLightPos);
 
-  ConeRenderer* coneRenderer = (ConeRenderer *)(player.children[0]->gameObject->GetComponent(ComponentSystem::ComponentType::ConeRenderer));
+  ConeRenderer *coneRenderer = (ConeRenderer *)(player.children[0]->gameObject->GetComponent(ComponentSystem::ComponentType::ConeRenderer));
 
   if (coneRenderer != nullptr)
   {
@@ -1044,9 +1052,7 @@ void Game::SetViewAndPerspective(Camera &aCamera, SceneNode &player, Transform *
 
     shaderProgram_For_Model->use();
     shaderProgram_For_Model->setVec3("spotLight.direction", glm::vec3(cos(angle), 0, sin(angle)));
-  
   }
-
 
   shaderViewCone->use();
   shaderViewCone->setMat4("projection", projection);
@@ -1083,10 +1089,10 @@ void Game::Plot()
     }
     else if (!glfwGetKey(okienko.window, GLFW_KEY_ENTER) == GLFW_PRESS && keyPressed)
       keyPressed = false;
-	if (glfwGetKey(okienko.window, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS)
-	{
-		currentPlotImage++;
-	}
+    if (glfwGetKey(okienko.window, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS)
+    {
+      currentPlotImage++;
+    }
 
     if (currentPlotNumber != plotNumber)
     {
@@ -1098,8 +1104,8 @@ void Game::Plot()
     path = "Textures/" + std::to_string(plotNumber) + "_" + std::to_string(currentPlotImage) + ".png";
 
     static Texture *tex;
-	static glm::mat4 guiTransfom{ 1.f };
-	static SimpleGUI::GuiElement *image; 
+    static glm::mat4 guiTransfom{1.f};
+    static SimpleGUI::GuiElement *image;
     if (currentPlotImage == existingPlotImage)
     {
       existingPlotImage++;
@@ -1107,8 +1113,8 @@ void Game::Plot()
       {
         std::cout << "OTWARTO PLIK Z GRAFIKA FABULARNA : " << path << std::endl;
         tex = new Texture(path.c_str(), GL_NEAREST_MIPMAP_NEAREST);
-		image = new SimpleGUI::GuiElement(path, glm::scale(guiTransfom, glm::vec3(2, 2, 2)), guiShader);
-		image->SwtichVisiblity();
+        image = new SimpleGUI::GuiElement(path, glm::scale(guiTransfom, glm::vec3(2, 2, 2)), guiShader);
+        image->SwtichVisiblity();
         tex->Load();
         fclose(file);
       }
@@ -1123,8 +1129,8 @@ void Game::Plot()
     if (tex != nullptr)
     {
       //DisplayImage(path.c_str(), "Napis", tex);
-		
-		image->Draw();
+
+      image->Draw();
     }
   }
 
@@ -1151,7 +1157,6 @@ void Game::Plot()
     }
   }
 }
-
 
 void Game::ImguiDrawData()
 {
@@ -1275,25 +1280,21 @@ void Game::SetupPlayersColiders()
 {
 }
 
-
-void Game::RemoveNodesWithGameObjectTag(std::string tag, SceneNode * parentNode)
+void Game::RemoveNodesWithGameObjectTag(std::string tag, SceneNode *parentNode)
 {
-	auto &NodeChildren = parentNode->children;
-	
-	for (auto& value : NodeChildren)
-	{
-		if (value->gameObject != nullptr)
-		{
-			if (value->gameObject->getTag() == tag)
-			{
+  auto &NodeChildren = parentNode->children;
+
+  for (auto &value : NodeChildren)
+  {
+    if (value->gameObject != nullptr)
+    {
+      if (value->gameObject->getTag() == tag)
+      {
         value->gameObject->components.clear();
-				NodeChildren.erase(std::remove(NodeChildren.begin(), NodeChildren.end(), value), NodeChildren.end());
-				std::cout << "Trap Removed" << "\n";
-			}
-
-		}
-
-	}
-
-
+        NodeChildren.erase(std::remove(NodeChildren.begin(), NodeChildren.end(), value), NodeChildren.end());
+        std::cout << "Trap Removed"
+                  << "\n";
+      }
+    }
+  }
 }

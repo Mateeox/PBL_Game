@@ -62,6 +62,9 @@ add_executable(PBL_Game
 		Src/Include/Triggers/TrapTrigger.cpp
 		Src/Include/Triggers/EnemyTrigger.cpp
 		Src/Include/Triggers/ChestTrigger.cpp
+		#PostProcessing
+		Src/Include/PostProcessing/FrameBuffer.cpp
+		Src/Include/PostProcessing/ScreenQuad.cpp
 		#ConfigUtils
 		Src/Include/Configuration/ConfigUtils.cpp
 		#PathFinding

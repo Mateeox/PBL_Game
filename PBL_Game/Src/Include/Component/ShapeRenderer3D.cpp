@@ -85,12 +85,23 @@ ShapeRenderer3D::ShapeRenderer3D(
 	glEnableVertexAttribArray(2);
 }
 
-void ShapeRenderer3D::Draw(glm::mat4 &transform)
+void ShapeRenderer3D::Draw(Shader * shader,glm::mat4 &transform)
 {
-
-	ShaderProgram.use();
-	unsigned int transformLoc = glGetUniformLocation(ShaderProgram.shaderProgramID, "transform");
+    if(shader == nullptr)
+	{
+	defaultShader.use();
+	unsigned int transformLoc = glGetUniformLocation(defaultShader.shaderProgramID, "transform");
 	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
+	}
+	else
+	{
+	shader->use();
+	unsigned int transformLoc = glGetUniformLocation(shader->shaderProgramID, "transform");
+	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
+		
+	}
+	
+	
 	if (textures.size() != 0)
 	{ 
 		textures[textureDisplayed]->Bind();
@@ -174,7 +185,7 @@ void ShapeRenderer3D::SwitchTexture(std::string textureName)
 
 ShapeRenderer3D *ShapeRenderer3D::GetCopy()
 {
-	ShapeRenderer3D *newCopy = new ShapeRenderer3D(g_vertex_buffer_data, indices, g_vertex_buffer_data_size, indices_size, ShaderProgram, textures[0], textureDisplayed);
+	ShapeRenderer3D *newCopy = new ShapeRenderer3D(g_vertex_buffer_data, indices, g_vertex_buffer_data_size, indices_size, defaultShader, textures[0], textureDisplayed);
 
 	return newCopy;
 }

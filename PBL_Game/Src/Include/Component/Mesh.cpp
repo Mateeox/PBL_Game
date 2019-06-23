@@ -8,7 +8,7 @@ namespace ModelMesh
 Mesh::Mesh(vector<Vertex> aVertices,
            vector<unsigned int> aIndices,
            vector<Texture> aTextures,
-           Shader &aShaderProgram) : ConeRenderable(aShaderProgram, reinterpret_cast<float*>(aVertices.data()), aVertices.size()*getVerticesPositionStride(), getVerticesPositionStride()),
+           Shader &aShaderProgram) : ConeRenderable(aShaderProgram, reinterpret_cast<float *>(aVertices.data()), aVertices.size() * getVerticesPositionStride(), getVerticesPositionStride()),
                                      Vertices(aVertices),
                                      Indices(aIndices),
                                      Textures(aTextures)
@@ -49,7 +49,7 @@ void Mesh::setupMesh()
 }
 
 // render the mesh
-void Mesh::Draw(glm::mat4 &transform)
+void Mesh::Draw(Shader *shader, glm::mat4 &transform)
 {
 
     // bind appropriate textures
@@ -73,49 +73,54 @@ void Mesh::Draw(glm::mat4 &transform)
             number = std::to_string(heightNr++); // transfer unsigned int to stream
 
         // now set the sampler to the correct texture unit
-        glUniform1i(glGetUniformLocation(ShaderProgram.shaderProgramID, (name + number).c_str()), i);
+        if (shader == nullptr)
+        {
+            glUniform1i(glGetUniformLocation(defaultShader.shaderProgramID, (name + number).c_str()), i);
+        }
+        else
+        {
+            glUniform1i(glGetUniformLocation(shader->shaderProgramID, (name + number).c_str()), i);
+        }
         // and finally bind the texture
         glBindTexture(GL_TEXTURE_2D, Textures[i].id);
     }
 
     // // draw mesh
-     glBindVertexArray(VAO);
-     glDrawElements(GL_TRIANGLES, Indices.size(), GL_UNSIGNED_INT, 0);
-     glBindVertexArray(0);
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, Indices.size(), GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
 
     // always good practice to set everything back to defaults once configured.
     glActiveTexture(GL_TEXTURE0);
-
- 
 }
-float* Mesh::getVertexData()
+float *Mesh::getVertexData()
 {
-	return reinterpret_cast<float*>(Vertices.data());
+    return reinterpret_cast<float *>(Vertices.data());
 }
 
 int Mesh::getVertexDataSize()
 {
-	return Vertices.size() * getVerticesPositionStride();
+    return Vertices.size() * getVerticesPositionStride();
 }
 
 int Mesh::getVerticesPositionStride()
 {
-	return 14;
+    return 14;
 }
 
-unsigned int * Mesh::getIndices()
+unsigned int *Mesh::getIndices()
 {
-	return Indices.data();
+    return Indices.data();
 }
 
 int Mesh::getIndicesSize()
 {
-	return Indices.size();
+    return Indices.size();
 }
 
-  ComponentSystem::ComponentType Mesh::GetComponentType()
-  {
-      return ComponentSystem::ComponentType::ModelMesh;
-  }
+ComponentSystem::ComponentType Mesh::GetComponentType()
+{
+    return ComponentSystem::ComponentType::ModelMesh;
+}
 
 } // namespace ModelMesh

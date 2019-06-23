@@ -39,7 +39,7 @@ void SceneNode::RemoveGameObject()
   gameObject = nullptr;
 }
 
-void SceneNode::Render(Transform &parentWorld, bool aDirty_Flag)
+void SceneNode::Render(Transform &parentWorld,Shader * shaderprogram, bool aDirty_Flag)
 {
 
   aDirty_Flag |= dirty_flag;
@@ -55,19 +55,19 @@ void SceneNode::Render(Transform &parentWorld, bool aDirty_Flag)
     ShapeRenderer3D *shape = (ShapeRenderer3D *)gameObject->GetComponent(ComponentSystem::ShapeRenderer3D);
     if (shape != nullptr)
     {
-      shape->Draw(world.GetTransform());
+      shape->Draw(nullptr,world.GetTransform());
     }
 
     MapTile *mapTile = (MapTile *)gameObject->GetComponent(ComponentSystem::MapTile);
     if (mapTile != nullptr)
     {
-      mapTile->Draw(world.GetTransform());
+      mapTile->Draw(nullptr,world.GetTransform());
     }
 
     Model *model = (Model *)gameObject->GetComponent(ComponentSystem::Model);
     if (model != nullptr)
     {
-      model->Draw(world.GetTransform());
+      model->Draw(shaderprogram,world.GetTransform());
     }
 
     AnimatedModel *animModel = (AnimatedModel *)gameObject->GetComponent(ComponentSystem::AnimatedModel);
@@ -79,13 +79,13 @@ void SceneNode::Render(Transform &parentWorld, bool aDirty_Flag)
 	ConeRenderer *coneRenderer = (ConeRenderer *)gameObject->GetComponent(ComponentSystem::ConeRenderer);
 	if (coneRenderer != nullptr)
 	{
-		coneRenderer->Draw(world.GetTransform());
+		coneRenderer->Draw(nullptr,world.GetTransform());
 	}
 
   }
   for (SceneNode *sn : children)
   {
-    sn->Render(world, aDirty_Flag);
+    sn->Render(world,shaderprogram, aDirty_Flag);
   }
 }
 
