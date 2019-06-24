@@ -65,6 +65,7 @@ add_executable(PBL_Game
 		#PostProcessing
 		Src/Include/PostProcessing/FrameBuffer.cpp
 		Src/Include/PostProcessing/ScreenQuad.cpp
+		Src/Include/PostProcessing/PostProcessShader.cpp
 		#ConfigUtils
 		Src/Include/Configuration/ConfigUtils.cpp
 		#PathFinding
