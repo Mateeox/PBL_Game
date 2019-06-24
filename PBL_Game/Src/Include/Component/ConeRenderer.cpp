@@ -206,6 +206,11 @@ bool ConeRenderer::collectObjectsInConeInternal(ConeRenderable *shapeRenderer, c
 	for (auto point : points)
 	{
 		auto transformedPoint = combinedTransform.GetTransform() * point;
+		if (transformedPoint.y < 0)
+		{
+			//lets omit objects that are below the surface
+			return false;
+		}
 		auto pointCastedToXZPlane = glm::vec2(transformedPoint.x, transformedPoint.z);
 		pointsAfterTransfomration.push_back(pointCastedToXZPlane);
 
@@ -228,21 +233,18 @@ bool ConeRenderer::collectObjectsInConeInternal(ConeRenderable *shapeRenderer, c
 		{
 			objectsInCone.push_back(std::make_pair(shapeRenderer, combinedTransform.GetTransform()));
 			return true;
-			;
 		}
 		//check right border
 		if (areLinesIntersecting(startPoint, endPointRight, pointsAfterTransfomration[i], pointsAfterTransfomration[nextPointIndex]))
 		{
 			objectsInCone.push_back(std::make_pair(shapeRenderer, combinedTransform.GetTransform()));
 			return true;
-			;
 		}
 		//check middle line (for an object intersecting with the curved area of the cone)
 		if (areLinesIntersecting(startPoint, rotatePointAroundPoint(endPointLeft, startPoint, angle / 2.0), pointsAfterTransfomration[i], pointsAfterTransfomration[nextPointIndex]))
 		{
 			objectsInCone.push_back(std::make_pair(shapeRenderer, combinedTransform.GetTransform()));
 			return true;
-			;
 		}
 	}
 	return false;
