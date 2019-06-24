@@ -10,11 +10,11 @@ class GameObject;
 
 class EnemyTrigger : public Trigger {
 
-	SceneNode* Enemy;
+	SceneNode* Player;
 	SimpleGUI::GuiElement *background;
 	SimpleGUI::GuiElement *win;
 public:
-	EnemyTrigger(Transform& transform, SceneNode* enemy,SimpleGUI::GuiElement * aBackground,SimpleGUI::GuiElement * aWin);
+	EnemyTrigger(Transform& transform, SceneNode* player,SimpleGUI::GuiElement * aBackground,SimpleGUI::GuiElement * aWin);
 	bool checkCollision(Collider* other) override;
 	void ActivateTrigger() {
 		if (!activated) {
@@ -26,7 +26,7 @@ public:
 			win->FadeFromTransparent(3);
 			win->FadeToColor(glm::vec3(1,0,0),1);
 
-			Enemy->Scale(0.0001);
+			//Player->Scale(0.0001);
 			activated = true;
 		}
 	}

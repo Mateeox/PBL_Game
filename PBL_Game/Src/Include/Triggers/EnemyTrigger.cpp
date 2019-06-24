@@ -1,8 +1,11 @@
 #include "EnemyTrigger.hpp"
 
-EnemyTrigger::EnemyTrigger(Transform &transform, SceneNode *enemy, SimpleGUI::GuiElement *aBackground, SimpleGUI::GuiElement *aWin) : Trigger(transform), background(aBackground), win(aWin)
+EnemyTrigger::EnemyTrigger(Transform &transform, SceneNode *player, SimpleGUI::GuiElement *aBackground, SimpleGUI::GuiElement *aWin) :
+ Trigger(transform), 
+ background(aBackground),
+  win(aWin),
+  Player(player)
 {
-	this->Enemy = enemy;
 }
 
 bool EnemyTrigger::checkCollision(Collider *other)

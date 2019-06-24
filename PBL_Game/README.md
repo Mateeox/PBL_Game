@@ -15,7 +15,9 @@
 
 **cd build**
 
-**cmake ..**
+**For Release:  cmake ..**
+
+**For Debug: cmake -DCMAKE_BUILD_TYPE=Debug ..**
 
 **make**
 
