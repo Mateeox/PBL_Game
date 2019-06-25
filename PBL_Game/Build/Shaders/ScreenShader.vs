@@ -8,7 +8,7 @@ uniform float time;
 void main()
 {
     TexCoords = aTexCoords;
-    gl_Position = vec4(aPos.x, aPos.y, 0.0, 1.0); 
+    gl_Position = vec4(aPos.x, aPos.y, 0.0f, 1.0f);
 	
 	if (shake)
     {

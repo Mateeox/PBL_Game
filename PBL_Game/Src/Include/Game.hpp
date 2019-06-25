@@ -5,6 +5,7 @@
 #include "Collider.hpp"
 #include "Trigger.hpp"
 #include "Triggers/Key.hpp"
+#include "PostProcessing/PostProcessShader.hpp"
 #include "Configuration/ConfigUtils.hpp"
 #include "Component/ConeRenderer.hpp"
 #include "PathFinding/MapTile.hpp"
@@ -61,7 +62,7 @@ class Game
   Shader *shaderViewCone;
   Shader * guiShader;
 
-  Shader * PostProcessShader;
+  PostProcessShader * postProcessShader;
   SceneNode wholeScene;
 
   SceneNode *leftScene;
