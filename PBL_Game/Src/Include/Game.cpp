@@ -226,7 +226,7 @@ void Game::Granko()
   PlayerCollider *leftPlayerCollider = new PlayerCollider(this, leftPlayerObjWithCollider->transform);
   PlayerCollider *rightPlayerCollider = new PlayerCollider(this, rightPlayerObjWithCollider->transform);
 
-  killer = new EnemyTrigger(Enemy_Node.local, &leftPlayerNode, LostBcg, LostText);
+  killer = new EnemyTrigger(Enemy_Node.local, &leftPlayerNode, LostBcg, LostText, postProcessShader);
   enemyGameObject->AddComponent(killer);
 
   killer->setDimensions(-0.12, 0, 0.25, 2.3 / 10, 2, 3.05 / 10);
@@ -461,6 +461,7 @@ glm::vec2 leftDown = FindFirstFromLeftDownCorner(mapped, MapSize);
 void Game::Update(float interpolation)
 {
   postProcessShader->UpdateTime(interpolation);
+  postProcessShader->UpdateKill(interpolation);
   if (!inputBlockade)
   {
 
