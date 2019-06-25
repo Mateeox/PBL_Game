@@ -20,6 +20,7 @@ PostProcessShader::PostProcessShader(const char *vertex_file_path, const char *f
 		2.0 / 16, 4.0 / 16, 2.0 / 16,
 		1.0 / 16, 2.0 / 16, 1.0 / 16
 	};
+	this->use();
 	glUniform2fv(glGetUniformLocation(this->shaderProgramID, "offsets"), 9, (GLfloat*)offsets);
 	glUniform1fv(glGetUniformLocation(this->shaderProgramID, "blur_kernel"), 9, blur_kernel);
 	this->setFloat("time", shakeTime);
@@ -31,6 +32,7 @@ void PostProcessShader::Shake()
 	if (!shake) {
 		shake = true;
 		currTime = shakeTime;
+		this->use();
 		this->setFloat("time", currTime);
 		this->setBool("shake", shake);
 	}
@@ -41,6 +43,7 @@ void PostProcessShader::StopShaking()
 	if (shake)
 	{
 		shake = false;
+		this->use();
 		this->setBool("shake", shake);
 	}
 }
@@ -48,8 +51,10 @@ void PostProcessShader::StopShaking()
 void PostProcessShader::UpdateTime(float time)
 {
 	currTime -= time;
-	if (currTime <= 0)
+	if (currTime <= 0) {
 		StopShaking();
-	else
+	} else {
+		this->use();
 		setFloat("time", currTime);
+	}
 }
