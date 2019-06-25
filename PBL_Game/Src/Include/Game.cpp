@@ -491,70 +491,74 @@ void Game::Render()
 {
   glfwPollEvents();
   
-  glScissor(0, 0, Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT);
-  glEnable(GL_SCISSOR_TEST);
 
   framebuffer->BindFrameBuffer();
+
   glEnable(GL_DEPTH_TEST);
-  glClearColor(0, 0, 0, 1);
+  glScissor(0, 0, Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT);
+  glEnable(GL_SCISSOR_TEST);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   if (debugMode)
-    ImguiStartEndDraw();
+	  ImguiStartEndDraw();
 
   Transform originTransform = Transform::origin();
 
   if (EnemyOnLefSide)
   {
-    SetViewAndPerspective(camera, leftPlayerNode, &Enemy_Node.local);
+	  SetViewAndPerspective(camera, leftPlayerNode, &Enemy_Node.local);
   }
   else
   {
-    SetViewAndPerspective(camera, leftPlayerNode, nullptr);
+	  SetViewAndPerspective(camera, leftPlayerNode, nullptr);
   }
 
-  leftScene->Render(originTransform, shaderProgram_For_Model, true);
-  if (EnemyOnLefSide)
-  {
-    Enemy_Node.Render(originTransform, shaderProgram_For_Model, true);
-  }
-  if (!EnemyOnLefSide)
-  {
-    SetViewAndPerspective(camera2, rightPlayerNode, &Enemy_Node.local);
-  }
-  else
-  {
-    SetViewAndPerspective(camera2, rightPlayerNode, nullptr);
-  }
-
-    framebuffer->bindBack();
-
-      // RENDER LEWEJ STRONY
+  // RENDER LEWEJ STRONY
   glViewport(0, 0, (Game::WINDOW_WIDTH / 2) + 125, Game::WINDOW_HEIGHT);
   glScissor(0, 0, (Game::WINDOW_WIDTH / 2) + offset, Game::WINDOW_HEIGHT);
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-  glClear(GL_COLOR_BUFFER_BIT);
-  PostProcessShader->use();
-  screenQuad->DrawEffect(framebuffer->frameBufferTexture);
+  leftScene->Render(originTransform,shaderProgram_For_Model, true);
+  if (EnemyOnLefSide)
+  {
+	  Enemy_Node.Render(originTransform, shaderProgram_For_Model, true);
+  }
+  if (!EnemyOnLefSide)
+  {
+	  SetViewAndPerspective(camera2, rightPlayerNode, &Enemy_Node.local);
+  }
+  else
+  {
+	  SetViewAndPerspective(camera2, rightPlayerNode, nullptr);
+  }
 
-  framebuffer->BindFrameBuffer();
-  glEnable(GL_DEPTH_TEST);
+  // RENDER PRAWEJ STRONY
+  glViewport((Game::WINDOW_WIDTH / 2) - 125, 0, (Game::WINDOW_WIDTH / 2) + 125, Game::WINDOW_HEIGHT);
+  glScissor((Game::WINDOW_WIDTH / 2) + offset, 0, (Game::WINDOW_WIDTH / 2) - offset, Game::WINDOW_HEIGHT);
   glClearColor(0, 0, 0, 1);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glClear(GL_COLOR_BUFFER_BIT);
 
   rightScene->Render(originTransform, shaderProgram_For_Model, true);
   if (!EnemyOnLefSide)
   {
-    Enemy_Node.Render(originTransform, shaderProgram_For_Model, true);
+	  Enemy_Node.Render(originTransform, shaderProgram_For_Model, true);
   }
+
 
   framebuffer->bindBack();
 
+  glViewport(0, 0, (Game::WINDOW_WIDTH ), Game::WINDOW_HEIGHT);
+  glScissor(0, 0, (Game::WINDOW_WIDTH ), Game::WINDOW_HEIGHT);
 
-    // RENDER PASKA ODDZIELAJACAEGO KAMERY - TODO
+  glDisable(GL_DEPTH_TEST);
+  PostProcessShader->use();
+  screenQuad->DrawEffect(framebuffer->frameBufferTexture);
+
+
+
+
+  // RENDER PASKA ODDZIELAJACAEGO KAMERY - TODO
   glViewport((Game::WINDOW_WIDTH / 2) + offset - 5, 0, 10, Game::WINDOW_HEIGHT);
   glScissor((Game::WINDOW_WIDTH / 2) + offset - 5, 0, 10, Game::WINDOW_HEIGHT);
   glEnable(GL_SCISSOR_TEST);
@@ -564,22 +568,17 @@ void Game::Render()
   glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  // RENDER PRAWEJ STRONY
-  glViewport((Game::WINDOW_WIDTH / 2) - 125, 0, (Game::WINDOW_WIDTH ) , Game::WINDOW_HEIGHT);
-  glScissor((Game::WINDOW_WIDTH / 2) + offset, 0, (Game::WINDOW_WIDTH ), Game::WINDOW_HEIGHT);
-  glClearColor(0, 0, 0, 1);
-  glClear(GL_COLOR_BUFFER_BIT);
 
-  glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-  glClear(GL_COLOR_BUFFER_BIT);
-  PostProcessShader->use();
-  screenQuad->DrawEffect(framebuffer->frameBufferTexture);
+
+
 
   //Render Gui
-
   glScissor(0, 0, Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT);
   glViewport(0, 0, Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT);
   glDisable(GL_DEPTH_TEST);
+
+
+
 
   TrapPartInfo->Draw();
 
@@ -590,6 +589,7 @@ void Game::Render()
 
   WinBcg->Draw();
   WinText->Draw();
+
 
   // Render grafik
   //Plot();
