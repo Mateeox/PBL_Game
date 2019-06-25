@@ -1,10 +1,11 @@
 #include "EnemyTrigger.hpp"
 
-EnemyTrigger::EnemyTrigger(Transform &transform, SceneNode *player, SimpleGUI::GuiElement *aBackground, SimpleGUI::GuiElement *aWin) :
- Trigger(transform), 
- background(aBackground),
-  win(aWin),
-  Player(player)
+EnemyTrigger::EnemyTrigger(Transform &transform, SceneNode *player, SimpleGUI::GuiElement *aBackground, SimpleGUI::GuiElement *aWin, PostProcessShader* postProcess) :
+	Trigger(transform),
+	background(aBackground),
+	win(aWin),
+	Player(player),
+	postProcess(postProcess)
 {
 }
 

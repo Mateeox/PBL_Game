@@ -80,7 +80,7 @@ Game::Game(Window &aOkno) : okienko(aOkno),
   shaderAnimatedModel = new Shader("Shaders/skinning.vs", "Shaders/skinning.fs");
   shaderViewCone = new Shader("Shaders/viewCone.vs", "Shaders/viewCone.fs");
   guiShader = new Shader("Shaders/GuiShader.vs", "Shaders/GuiShader.fs");
-  PostProcessShader = new Shader("Shaders/ScreenShader.vs", "Shaders/ScreenShader.fs");
+  postProcessShader = new PostProcessShader("Shaders/ScreenShader.vs", "Shaders/ScreenShader.fs");
 
   shaderProgram_For_Model->use();
   shaderProgram_For_Model->setVec3("material.ambient", 0.1, 0.1, 0.1);
@@ -226,7 +226,7 @@ void Game::Granko()
   PlayerCollider *leftPlayerCollider = new PlayerCollider(this, leftPlayerObjWithCollider->transform);
   PlayerCollider *rightPlayerCollider = new PlayerCollider(this, rightPlayerObjWithCollider->transform);
 
-  killer = new EnemyTrigger(Enemy_Node.local, &leftPlayerNode, LostBcg, LostText);
+  killer = new EnemyTrigger(Enemy_Node.local, &leftPlayerNode, LostBcg, LostText, postProcessShader);
   enemyGameObject->AddComponent(killer);
 
   killer->setDimensions(-0.12, 0, 0.25, 2.3 / 10, 2, 3.05 / 10);
@@ -460,7 +460,8 @@ glm::vec2 leftDown = FindFirstFromLeftDownCorner(mapped, MapSize);
 }
 void Game::Update(float interpolation)
 {
-
+  postProcessShader->UpdateTime(interpolation);
+  postProcessShader->UpdateKill(interpolation);
   if (!inputBlockade)
   {
 
@@ -539,6 +540,7 @@ void Game::Render()
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT);
 
+
   rightScene->Render(originTransform, shaderProgram_For_Model, true);
   if (!EnemyOnLefSide)
   {
@@ -552,7 +554,7 @@ void Game::Render()
   glScissor(0, 0, (Game::WINDOW_WIDTH ), Game::WINDOW_HEIGHT);
 
   glDisable(GL_DEPTH_TEST);
-  PostProcessShader->use();
+  postProcessShader->use();
   screenQuad->DrawEffect(framebuffer->frameBufferTexture);
 
 
@@ -567,7 +569,6 @@ void Game::Render()
 
   glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
-
 
 
 
@@ -899,6 +900,7 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation, 
             player.local = transformBeforeMove;
             playerCollider->transform = transformBeforeMove;
           }
+		  postProcessShader->Shake();
           break;
         }
   }

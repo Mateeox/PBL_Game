@@ -3,11 +3,17 @@ out vec4  color;
 in vec2 TexCoords;
 
 uniform sampler2D screenTexture;
-uniform float     blur_kernel[9];
+uniform bool    shake;
+uniform bool    kill;
+uniform float   blur_kernel[9];
+uniform vec2    offsets[9];
 void main()
 {
 	color = vec4(0.0f);
 	vec3 sample[9];
+	if(shake || kill)
+        for(int i = 0; i < 9; i++)
+            sample[i] = vec3(texture(screenTexture, TexCoords.st + offsets[i]));
 	if(shake)
     {
         for(int i = 0; i < 9; i++)
@@ -15,7 +21,7 @@ void main()
         color.a = 1.0f;
     } else
     {
-        color =  texture(screenTexture, TexCoords);
+        color = texture(screenTexture, TexCoords);
     }
 }	
 
