@@ -55,6 +55,20 @@ float EnemyController::GetPlayerDistance()
 	return sqrt((x1 - x2) * (x1 - x2) + (z1 - z2) * (z1 - z2)) * 10;
 }
 
+
+void EnemyController::SelectActivePlayer(bool onLeftSide)
+{
+
+	if (onLeftSide)
+	{
+		currentPlayer = &leftplayer;
+	}
+	else
+	{
+		currentPlayer = &rightplayer;
+	}
+
+}
 void EnemyController::SwtichPlayer()
 {
 	if (currentPlayer == &leftplayer)
@@ -147,14 +161,14 @@ void EnemyController::SwtichStartWithEnd()
 			Currenttarget = firstTarget;
 
 			game->EnemyOnLefSide = !game->EnemyOnLefSide;
-			SwtichPlayer();
+			SelectActivePlayer(game->EnemyOnLefSide);
 		}
 		else
 		{
 			Currenttarget = firstStart;
 
 			game->EnemyOnLefSide = !game->EnemyOnLefSide;
-			SwtichPlayer();
+			SelectActivePlayer(game->EnemyOnLefSide);
 		}
 	}
 }

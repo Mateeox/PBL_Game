@@ -20,7 +20,7 @@ Window::Window(uint16_t Width, uint16_t height, const char *title) : iWidth(Widt
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// Open a window and create its OpenGL context
-	window = glfwCreateWindow(Width, height, title, NULL, NULL);
+	window = glfwCreateWindow(Width, height, title, glfwGetPrimaryMonitor(), NULL);
 	if (window == NULL)
 	{
 		glfwTerminate();

@@ -70,6 +70,8 @@ public:
     void ChangeEnemyState(EnemyState state);
     float GetPlayerDistance();
     void SwtichPlayer();
+
+	void SelectActivePlayer(bool onLeftSide);
     void Update(float interpolation);
     void SwtichStartWithEnd();
 	void MoveEnemyToMapTile(SceneNode *enemyNode, GridLocation mapTile, float interpolation, float speed, float NodeXOffset, float NodeZOffset);
