@@ -3,9 +3,9 @@ PROLOGUE:
 1.
 	"OHMMMMMMMMMMM"
 	
-	(The hell is goint on? Where am I?)
+	(The hell is going on? Where am I?)
 	
-	"Are you awake? Very well. You will gain a peivilege of being a sacrifice for great Apgarion."
+	"Are you awake? Very well. You will gain a privilege of being a sacrifice for great Apgarion."
 	
 	(For who?)
 	
@@ -14,7 +14,7 @@ PROLOGUE:
 	
 	(They pushed me inside dark house and closed doors behind me. I took out flashlight from pocket.)
 	
-	(Then I looked at wall and noticed big stain of blood. It frightened me so much that i dropped the flashlight.)
+	(Then I looked at wall and noticed big stain of blood. It frightened me so much that I dropped the flashlight.)
 	
 	GHHRHRHRRHH
 	
@@ -34,7 +34,7 @@ PROLOGUE:
 	
 	(I started to run away again.)
 	
-	(After few minutes of ruuning I noticed i ended in the same room.)
+	(After a few minutes of running I noticed I ended in the same room.)
 	
 	(Monster's noises disappeared. I decided to catch a breath.)
 	
@@ -46,7 +46,7 @@ PROLOGUE:
 	
 	GHRHRHRHRRRRRR
 	
-	Damn, no time to thinking.
+	Damn, no time to think.
 	
 	(I hid shard in my pocket and continued running.)
 	
