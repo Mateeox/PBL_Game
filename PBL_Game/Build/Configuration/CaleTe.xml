@@ -159,7 +159,7 @@
     <ConfigParameter>
         <Type>I</Type>
         <Name>Debug</Name>
-        <Value>1</Value>
+        <Value>0</Value>
     </ConfigParameter>
 
     <!--- Enemy Scale/-->
