@@ -478,6 +478,16 @@ void Game::Update(float interpolation)
   playerModel->Update();
   player2Model->Update();
 
+  if (renderPloot)
+  {
+	  if (glfwGetKey(okienko.window, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS)
+	  {
+		  renderPloot = false;
+		  inputBlockade = false;
+	  }
+  }
+
+
   if (leftSideActive)
   {
     ProcessInput(interpolation, camera);
@@ -593,6 +603,7 @@ void Game::Render()
 
 
   // Render grafik
+  if(renderPloot)
   Plot();
 
   if (debugMode)
@@ -1091,10 +1102,7 @@ void Game::Plot()
     }
     else if (!glfwGetKey(okienko.window, GLFW_KEY_ENTER) == GLFW_PRESS && keyPressed)
       keyPressed = false;
-    if (glfwGetKey(okienko.window, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS)
-    {
-      currentPlotImage++;
-    }
+
 
     if (currentPlotNumber != plotNumber)
     {

@@ -36,6 +36,9 @@ static bool Tab_Pressed = false;
 static bool Enemy_Swtiched = false;
 
 
+static bool renderPloot = true;
+
+
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 
 
