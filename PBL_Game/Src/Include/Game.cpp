@@ -144,7 +144,7 @@ void Game::Granko()
   TrapPartInfo = new SimpleGUI::GuiElement("Textures/Parts0.png", glm::scale(TrapPartInfoTransform, glm::vec3(0.5, 0.5, 0.5)), guiShader);
 
   glm::mat4 TrapCollectorTransform{1.f};
-  TrapCollector = new SimpleGUI::GuiElement("Textures/TrapCollector.png", TrapCollectorTransform, guiShader);
+  TrapCollector = new SimpleGUI::GuiElement("Textures/TrapCollector2.png", TrapCollectorTransform, guiShader);
 
   TrapPartInfo->AddTexture("Textures/Parts1.png", "Parts1");
   TrapPartInfo->AddTexture("Textures/Parts2.png", "Parts2");
@@ -593,7 +593,7 @@ void Game::Render()
 
 
   // Render grafik
-  //Plot();
+  Plot();
 
   if (debugMode)
     ImguiDrawData();
