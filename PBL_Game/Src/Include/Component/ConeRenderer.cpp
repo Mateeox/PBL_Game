@@ -27,66 +27,66 @@ ComponentSystem::ComponentType ConeRenderer::GetComponentType()
 
 void ConeRenderer::Draw(Shader *shader, glm::mat4 &transform)
 {
-	if (shader == nullptr)
-	{
-		defaultShader.use();
-	}
-	else
-	{
-		shader->use();
-	}
+	// if (shader == nullptr)
+	// {
+	// 	defaultShader.use();
+	// }
+	// else
+	// {
+	// 	shader->use();
+	// }
 
-	glm::vec2 startPoint(transform[3][0], transform[3][2]);
-	glm::vec2 endPointLeft = rotatePointAroundPoint(glm::vec2(startPoint.x + radius, startPoint.y), startPoint, directionAngle);
-	glm::vec2 endPointRight = rotatePointAroundPoint(endPointLeft, startPoint, angle);
-	double radiusSquared = radius * radius;
+	// glm::vec2 startPoint(transform[3][0], transform[3][2]);
+	// glm::vec2 endPointLeft = rotatePointAroundPoint(glm::vec2(startPoint.x + radius, startPoint.y), startPoint, directionAngle);
+	// glm::vec2 endPointRight = rotatePointAroundPoint(endPointLeft, startPoint, angle);
+	// double radiusSquared = radius * radius;
 
-	objectsInCone.clear();
-	//don't judge me, this workaround is 10x faster than rewriting everything
-	std::vector<SceneNode *> rootVector{rootNode};
-	collectObjectsInCone(startPoint, endPointLeft, endPointRight, &rootVector, Transform::origin(), radiusSquared);
-	glm::vec2 right(endPointLeft);
-	finalVertices.clear();
-	addToFinalVertices(startPoint);
+	// objectsInCone.clear();
+	// //don't judge me, this workaround is 10x faster than rewriting everything
+	// std::vector<SceneNode *> rootVector{rootNode};
+	// collectObjectsInCone(startPoint, endPointLeft, endPointRight, &rootVector, Transform::origin(), radiusSquared);
+	// glm::vec2 right(endPointLeft);
+	// finalVertices.clear();
+	// addToFinalVertices(startPoint);
 
-	auto pointsAfterTransformation = calculatePointsAfterTransformation(objectsInCone);
-	for (int i = 0; i < segmentsNumber; ++i)
-	{
-		glm::vec2 left(right);
-		right = rotatePointAroundPoint(left, startPoint, anglePerSegment);
-		if (!pointsAfterTransformation.empty())
-		{
-			double currentSmallestDistanceSquared = radiusSquared;
+	// auto pointsAfterTransformation = calculatePointsAfterTransformation(objectsInCone);
+	// for (int i = 0; i < segmentsNumber; ++i)
+	// {
+	// 	glm::vec2 left(right);
+	// 	right = rotatePointAroundPoint(left, startPoint, anglePerSegment);
+	// 	if (!pointsAfterTransformation.empty())
+	// 	{
+	// 		double currentSmallestDistanceSquared = radiusSquared;
 
-			for (auto points : pointsAfterTransformation)
-			{
-				for (unsigned int j = 0; j < points.size(); j += 3)
-				{
-					checkIntersection(currentSmallestDistanceSquared, startPoint, right, points[j], points[j + 1]);
-					checkIntersection(currentSmallestDistanceSquared, startPoint, right, points[j + 1], points[j + 2]);
-					checkIntersection(currentSmallestDistanceSquared, startPoint, right, points[j + 2], points[j]);
-				}
-			}
+	// 		for (auto points : pointsAfterTransformation)
+	// 		{
+	// 			for (unsigned int j = 0; j < points.size(); j += 3)
+	// 			{
+	// 				checkIntersection(currentSmallestDistanceSquared, startPoint, right, points[j], points[j + 1]);
+	// 				checkIntersection(currentSmallestDistanceSquared, startPoint, right, points[j + 1], points[j + 2]);
+	// 				checkIntersection(currentSmallestDistanceSquared, startPoint, right, points[j + 2], points[j]);
+	// 			}
+	// 		}
 
-			if (currentSmallestDistanceSquared < radiusSquared)
-			{
-				auto currentRadius = glm::sqrt(currentSmallestDistanceSquared);
-				left = rotatePointAroundPoint(glm::vec2(startPoint.x + currentRadius, startPoint.y), startPoint, directionAngle + anglePerSegment * i);
-				if (i == (segmentsNumber - 1))
-				{
-					right = rotatePointAroundPoint(left, startPoint, anglePerSegment);
-				}
-			}
-		}
-		addToFinalVertices(left);
-	}
-	addToFinalVertices(right);
+	// 		if (currentSmallestDistanceSquared < radiusSquared)
+	// 		{
+	// 			auto currentRadius = glm::sqrt(currentSmallestDistanceSquared);
+	// 			left = rotatePointAroundPoint(glm::vec2(startPoint.x + currentRadius, startPoint.y), startPoint, directionAngle + anglePerSegment * i);
+	// 			if (i == (segmentsNumber - 1))
+	// 			{
+	// 				right = rotatePointAroundPoint(left, startPoint, anglePerSegment);
+	// 			}
+	// 		}
+	// 	}
+	// 	addToFinalVertices(left);
+	// }
+	// addToFinalVertices(right);
 
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, finalVertices.size() * sizeof(float), finalVertices.data());
+	// glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	// glBufferSubData(GL_ARRAY_BUFFER, 0, finalVertices.size() * sizeof(float), finalVertices.data());
 
-	glBindVertexArray(VAO);
-	glDrawArrays(GL_TRIANGLE_FAN, 0, finalVertices.size() / 3);
+	// glBindVertexArray(VAO);
+	//glDrawArrays(GL_TRIANGLE_FAN, 0, finalVertices.size() / 3);
 }
 
 void ConeRenderer::rotateRight()

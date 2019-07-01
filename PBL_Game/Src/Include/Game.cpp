@@ -889,6 +889,7 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation, 
 
   glm::vec3 move = movementDir * velocity * interpolation;
   //move.x *= (((Game::WINDOW_WIDTH / 2) + offset)/ (Game::WINDOW_HEIGHT)) +1;
+  move.x*=1.5;
   player.Translate(move.x, move.y, move.z);
   Collider *playerCollider = (Collider *)player.gameObject->GetComponent(ComponentSystem::ComponentType::Collider);
   //check if there are any collisions, if yes - abort the move

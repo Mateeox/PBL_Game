@@ -16,7 +16,7 @@ enum EnemyState
 class EnemyController
 {
     EnemyState state = NotInteresed;
-    const float InterestDistance = 50;
+    const float InterestDistance = 25;
 
     const float minPlayerDistance = 0.005f;
     const float DistanceToInterestRatio = 0.65;

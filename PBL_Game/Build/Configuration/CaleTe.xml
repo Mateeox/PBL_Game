@@ -42,7 +42,7 @@
     <ConfigParameter>
         <Type>F</Type>
         <Name>MinFollowing</Name>
-        <Value>1500</Value>
+        <Value>300</Value>
     </ConfigParameter>
 
     <ConfigParameter>

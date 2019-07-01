@@ -12,7 +12,7 @@ class ConeRenderer : public Drawable
 	double anglePerSegment;
 	double radius = 3.0;
 	double directionAngle = 3;
-	const int segmentsNumber = 25;
+	const int segmentsNumber = 8;
 	const double angle = 1.2;
 	const double coneHeight = 0.2;
 	const double rotationSpeed = 0.1;
