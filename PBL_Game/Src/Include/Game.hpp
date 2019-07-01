@@ -64,6 +64,7 @@ class Game
   Shader *shaderAnimatedModel;
   Shader *shaderViewCone;
   Shader * guiShader;
+  Shader * skyboxShader;
 
   PostProcessShader * postProcessShader;
   SceneNode wholeScene;
@@ -76,6 +77,13 @@ class Game
   std::vector<Collider *> collidableObjects;
   std::vector<Trigger *> triggers;
   std::map<int,bool> KeyInEq;
+
+
+//skybox 
+unsigned int skyboxVAO, skyboxVBO;
+unsigned int cubemapTexture;
+
+void drawSkyBox();
 
 
 //Map Generation

@@ -59,15 +59,6 @@ uniform PointLight pointLights[NR_POINT_LIGHTS];
 uniform SpotLight spotLight;
 uniform Material material;
 
-float dist = 0;
-float fogFactor = 0;
- 
-const vec3 fogColor = vec3(0.5, 0.5,0.5);
-uniform float FogDensity = 0.15;
-
-vec3 finalColor = vec3(0, 0, 0);
-
-uniform float viewSpaceZOffset = 5.0f;
 
 // function prototypes
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir);
@@ -76,15 +67,7 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 
 void main()
 {    
-    dist = abs(viewSpace.z-viewSpaceZOffset);
 
-    fogFactor = (80 - dist)/(80 - 20);
-   fogFactor = clamp( fogFactor, 0.0, 1.0 );
- 
-    fogFactor = 1.0 /exp( (dist * FogDensity)* (dist * FogDensity));
-   fogFactor = clamp( fogFactor, 0.0, 1.0 );
- 
-   finalColor = (fogColor * fogFactor);
    
     vec3 norm = normalize(Normal);
     vec3 viewDir = normalize(viewPos - FragPos);
