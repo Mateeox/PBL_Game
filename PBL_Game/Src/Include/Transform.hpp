@@ -27,6 +27,7 @@ public:
   void SetTransform(glm::mat4 transform);
   void SetRotation(float x, float y, float z);
   void SetPosition(float x, float y, float z);
+  void SetPosition(glm::vec3 vector);
   void SetScale(float x, float y, float z);
 
   static  Transform origin();
@@ -38,6 +39,8 @@ public:
   
   std::string Serialize();
   void Deserialize(std::string data);
+
+  glm::mat4  GetTransformCopy();
   glm::vec3 getPosition();
   glm::vec3 getScale();
 };

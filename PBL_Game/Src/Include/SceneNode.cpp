@@ -129,6 +129,13 @@ void SceneNode::SetPosition(float x, float y, float z)
 	local.SetPosition(x, y, z);
 	dirty_flag = true;
 }
+
+void SceneNode::SetPosition(glm::vec3 vector)
+{
+	
+	local.SetPosition(vector);
+	dirty_flag = true;
+}
 void SceneNode::Rotate(float value, glm::vec3 axis)
 {
   local.Rotate(value, axis);

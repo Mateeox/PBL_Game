@@ -50,7 +50,7 @@ unsigned int loadCubemap(std::vector<std::string> faces)
 
 void Game::drawSkyBox()
 {
-      // draw skybox as last
+  // draw skybox as last
   glDepthFunc(GL_LEQUAL); // change depth function so depth test passes when values are equal to depth buffer's content
   skyboxShader->use();
   view = glm::mat4(glm::mat3(camera.GetViewMatrix())); // remove translation from the view matrix
@@ -63,7 +63,6 @@ void Game::drawSkyBox()
   glDrawArrays(GL_TRIANGLES, 0, 36);
   glBindVertexArray(0);
   glDepthFunc(GL_LESS);
-
 }
 
 void Game::InitializeConfig()
@@ -131,6 +130,8 @@ Game::Game(Window &aOkno) : okienko(aOkno),
   shaderViewCone = new Shader("Shaders/viewCone.vs", "Shaders/viewCone.fs");
   guiShader = new Shader("Shaders/GuiShader.vs", "Shaders/GuiShader.fs");
   postProcessShader = new PostProcessShader("Shaders/ScreenShader.vs", "Shaders/ScreenShader.fs");
+
+  mirrorShader = new Shader("Shaders/Mirror.vs", "Shaders/Mirror.fs");
 
   skyboxShader = new Shader("Shaders/skybox.vs", "Shaders/skybox.fs");
 
@@ -374,6 +375,54 @@ void Game::Granko()
   UpdatePlayer(leftPlayerNode, camera, interpolation, true);
   UpdatePlayer(rightPlayerNode, camera2, interpolation, true);
 
+      float cubeVertices[] = {
+        // positions          // normals
+        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+
+        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+
+        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+        -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+        -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+
+         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+
+        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+
+        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+         0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+         0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+         0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
+    };
+
+
+
+
   float skyboxVertices[] = {
       // positions
       -1.0f, 1.0f, -1.0f,
@@ -438,6 +487,28 @@ void Game::Granko()
 
   skyboxShader->use();
   skyboxShader->setInt("skybox", 0);
+
+  mirrorShader->use();
+  mirrorShader->setInt("skybox", 0);
+
+
+    model = glm::mat4(1.0f);
+     // cube VAO
+    glGenVertexArrays(1, &cubeVAO);
+    glGenBuffers(1, &cubeVBO);
+    glBindVertexArray(cubeVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glBindVertexArray(0);
+
+
+    model = leftPlayerNode.local.GetTransformCopy();
+    model = glm::scale(model,glm::vec3(10,25,10));
+  
 
   while (glfwGetKey(okienko.window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
          glfwWindowShouldClose(okienko.window) == 0)
@@ -644,7 +715,21 @@ void Game::Render()
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  leftScene->Render(originTransform, shaderProgram_For_Model, true);
+
+ 
+      mirrorShader->use();
+     mirrorShader->setMat4("model", model);
+        mirrorShader->setMat4("view", view);
+        mirrorShader->setMat4("projection", projection);
+        mirrorShader->setVec3("cameraPos", camera.Position);
+
+      glBindVertexArray(cubeVAO);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+       glBindVertexArray(0);
+
+  leftScene->Render(originTransform, nullptr, true);
   if (EnemyOnLefSide)
   {
     Enemy_Node.Render(originTransform, shaderProgram_For_Model, true);
@@ -658,13 +743,15 @@ void Game::Render()
     SetViewAndPerspective(camera2, rightPlayerNode, nullptr);
   }
 
-  drawSkyBox();
+ drawSkyBox();
+
 
   // RENDER PRAWEJ STRONY
   glViewport((Game::WINDOW_WIDTH / 2) - 125, 0, (Game::WINDOW_WIDTH / 2) + 125, Game::WINDOW_HEIGHT);
   glScissor((Game::WINDOW_WIDTH / 2) + offset, 0, (Game::WINDOW_WIDTH / 2) - offset, Game::WINDOW_HEIGHT);
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT);
+
 
   rightScene->Render(originTransform, shaderProgram_For_Model, true);
   if (!EnemyOnLefSide)
@@ -673,15 +760,14 @@ void Game::Render()
   }
 
 
- drawSkyBox();
-
+  drawSkyBox();
 
   framebuffer->bindBack();
 
   glViewport(0, 0, (Game::WINDOW_WIDTH), Game::WINDOW_HEIGHT);
   glScissor(0, 0, (Game::WINDOW_WIDTH), Game::WINDOW_HEIGHT);
 
-    glDisable(GL_DEPTH_TEST);
+  glDisable(GL_DEPTH_TEST);
   postProcessShader->use();
   screenQuad->DrawEffect(framebuffer->frameBufferTexture);
 
@@ -701,7 +787,6 @@ void Game::Render()
   glDisable(GL_DEPTH_TEST);
 
   TrapPartInfo->Draw();
-
   TrapCollector->Draw();
 
   LostBcg->Draw();
@@ -1182,6 +1267,11 @@ void Game::SetViewAndPerspective(Camera &aCamera, SceneNode &player, Transform *
   shaderAnimatedModel->use();
   shaderAnimatedModel->setMat4("projection", projection);
   shaderAnimatedModel->setMat4("view", view);
+
+  mirrorShader->use();
+  mirrorShader->setMat4("projection", projection);
+  mirrorShader->setMat4("view", view);
+  mirrorShader->setVec3("cameraPos", aCamera.Position);
 }
 
 // Funkcje do wyswietlania grafik

@@ -41,6 +41,19 @@ void Transform::SetPosition(float x, float y, float z)
 
 }
 
+void Transform::SetPosition(glm::vec3 vector)
+{
+
+	glm::mat4 position = glm::mat4(1.0f);
+	Position = glm::vec3(vector);
+
+	position = glm::scale(position, Scale);
+	position = glm::translate(position, glm::vec3(vector));
+
+	transform = position;
+
+}
+
 Transform Transform::combine(Transform &other)
 {
   Transform t;
@@ -49,6 +62,11 @@ Transform Transform::combine(Transform &other)
 }
 
 glm::mat4 & Transform::GetTransform()
+{
+  return transform;
+}
+
+glm::mat4  Transform::GetTransformCopy()
 {
   return transform;
 }

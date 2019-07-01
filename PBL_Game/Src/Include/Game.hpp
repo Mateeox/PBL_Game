@@ -65,6 +65,7 @@ class Game
   Shader *shaderViewCone;
   Shader * guiShader;
   Shader * skyboxShader;
+  Shader * mirrorShader;
 
   PostProcessShader * postProcessShader;
   SceneNode wholeScene;
@@ -85,6 +86,11 @@ unsigned int cubemapTexture;
 
 void drawSkyBox();
 
+   glm::mat4 model;
+       unsigned int cubeVAO, cubeVBO;
+
+
+SceneNode * mirrorBoxNode = nullptr;
 
 //Map Generation
 MapGenerator * generator = nullptr;
