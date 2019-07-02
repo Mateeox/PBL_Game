@@ -16,54 +16,6 @@
 static bool swapButtonPressed = false;
 static bool Reset_BUTTON_PRESSED = false;
 
-// unsigned int loadCubemap(std::vector<std::string> faces)
-// {
-//   unsigned int textureID;
-//   glGenTextures(1, &textureID);
-//   glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
-//   stbi_set_flip_vertically_on_load(false);
-
-//   int width, height, nrChannels;
-//   for (unsigned int i = 0; i < faces.size(); i++)
-//   {
-//     unsigned char *data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
-//     if (data)
-//     {
-//       glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-//                    0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-//       stbi_image_free(data);
-//     }
-//     else
-//     {
-//       std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
-//       stbi_image_free(data);
-//     }
-//   }
-//   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-//   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-//   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-//   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-//   return textureID;
-// }
-
-void Game::drawSkyBox()
-{
-  // draw skybox as last
-  glDepthFunc(GL_LEQUAL); // change depth function so depth test passes when values are equal to depth buffer's content
-  skyboxShader->use();
-  view = glm::mat4(glm::mat3(camera.GetViewMatrix())); // remove translation from the view matrix
-  skyboxShader->setMat4("view", view);
-  skyboxShader->setMat4("projection", projection);
-  // skybox cube
-  glBindVertexArray(skyboxVAO);
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-  glDrawArrays(GL_TRIANGLES, 0, 36);
-  glBindVertexArray(0);
-  glDepthFunc(GL_LESS);
-}
 
 void Game::InitializeConfig()
 {
@@ -371,7 +323,7 @@ void Game::Granko()
 
   framebuffer = new FrameBuffer(1920, 1080);
 
-  mirrorBuffer = new FrameBuffer(1920, 1080);
+  mirrorBuffer = new FrameBuffer(1080, 1080);
   screenQuad = new ScreenQuad();
 
   UpdatePlayer(leftPlayerNode, camera, interpolation, true);
@@ -385,116 +337,11 @@ void Game::Granko()
 -0.5f,  0.5f, 0.0f, 0.0f, 0.0f, -1.0f
   };
 
-      // // positions          // normals
-      // -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
-      // 0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
-      // 0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
-      // 0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
-      // -0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
-      // -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+      unsigned int indices[] = {
+        0, 1, 3, // first triangle
+        1, 2, 3  // second triangle
+    };
 
-      // -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-      // 0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-      // 0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-      // 0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-      // -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-      // -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-
-      // -0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
-      // -0.5f, 0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
-      // -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
-      // -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
-      // -0.5f, -0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
-      // -0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
-
-      // 0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
-      // 0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-      // 0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-      // 0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-      // 0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
-      // 0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
-
-      // -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
-      // 0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
-      // 0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
-      // 0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
-      // -0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
-      // -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
-
-      // -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-      // 0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-      // 0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
-      // 0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
-      // -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
-      // -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f};
-
-  float skyboxVertices[] = {
-      // positions
-      -1.0f, 1.0f, -1.0f,
-      -1.0f, -1.0f, -1.0f,
-      1.0f, -1.0f, -1.0f,
-      1.0f, -1.0f, -1.0f,
-      1.0f, 1.0f, -1.0f,
-      -1.0f, 1.0f, -1.0f,
-
-      -1.0f, -1.0f, 1.0f,
-      -1.0f, -1.0f, -1.0f,
-      -1.0f, 1.0f, -1.0f,
-      -1.0f, 1.0f, -1.0f,
-      -1.0f, 1.0f, 1.0f,
-      -1.0f, -1.0f, 1.0f,
-
-      1.0f, -1.0f, -1.0f,
-      1.0f, -1.0f, 1.0f,
-      1.0f, 1.0f, 1.0f,
-      1.0f, 1.0f, 1.0f,
-      1.0f, 1.0f, -1.0f,
-      1.0f, -1.0f, -1.0f,
-
-      -1.0f, -1.0f, 1.0f,
-      -1.0f, 1.0f, 1.0f,
-      1.0f, 1.0f, 1.0f,
-      1.0f, 1.0f, 1.0f,
-      1.0f, -1.0f, 1.0f,
-      -1.0f, -1.0f, 1.0f,
-
-      -1.0f, 1.0f, -1.0f,
-      1.0f, 1.0f, -1.0f,
-      1.0f, 1.0f, 1.0f,
-      1.0f, 1.0f, 1.0f,
-      -1.0f, 1.0f, 1.0f,
-      -1.0f, 1.0f, -1.0f,
-
-      -1.0f, -1.0f, -1.0f,
-      -1.0f, -1.0f, 1.0f,
-      1.0f, -1.0f, -1.0f,
-      1.0f, -1.0f, -1.0f,
-      -1.0f, -1.0f, 1.0f,
-      1.0f, -1.0f, 1.0f};
-
-  glGenVertexArrays(1, &skyboxVAO);
-  glGenBuffers(1, &skyboxVBO);
-  glBindVertexArray(skyboxVAO);
-  glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
-
-  // std::vector<std::string> faces{
-  //     std::string("Textures/SkyBox/ame_greenhaze/greenhaze_lf.tga"),
-  //     std::string("Textures/SkyBox/ame_greenhaze/greenhaze_rt.tga"),
-  //     std::string("Textures/SkyBox/ame_greenhaze/greenhaze_up.tga"),
-  //     std::string("Textures/SkyBox/ame_greenhaze/greenhaze_dn.tga"),
-  //     std::string("Textures/SkyBox/ame_greenhaze/greenhaze_ft.tga"),
-  //     std::string("Textures/SkyBox/ame_greenhaze/greenhaze_bk.tga"),
-  // };
-  // cubemapTexture = loadCubemap(faces);
-
-  // skyboxShader->use();
-  // skyboxShader->setInt("skybox", 0);
-
-  // mirrorShader->use();
-  // mirrorShader->setInt("skybox", 0);
 
   modelTransofrm = Transform::origin();
 
@@ -502,17 +349,25 @@ void Game::Granko()
   // cube VAO
   glGenVertexArrays(1, &cubeVAO);
   glGenBuffers(1, &cubeVBO);
+  glGenBuffers(1, &cubeEBO);
+  
   glBindVertexArray(cubeVAO);
+
+
   glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
   glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_STATIC_DRAW);
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeEBO);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(1);
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
   glBindVertexArray(0);
 
-  modelTransofrm.SetPosition(leftPlayerNode.local.getPosition());
-  modelTransofrm.ScaleTransform(10, 25, 10);
+  modelTransofrm.SetPosition(leftPlayerNode.local.getPosition()*leftPlayerNode.local.getScale());
+  //modelTransofrm.ScaleTransform(10, 25, 10);
 
   model = leftPlayerNode.local.GetTransformCopy();
   model = glm::scale(model, glm::vec3(10, 25, 10));
@@ -693,8 +548,11 @@ void Game::Update(float interpolation)
 
 void Game::Render()
 {
-  glfwPollEvents();
 
+  glfwPollEvents();
+  Camera cameraFore(modelTransofrm.getPosition(),CAMERA_DEFAULT_WORLD_UP,90,0);
+  cameraFore.Position.y = 0.5;
+  cameraFore.Zoom = 45;
   Transform originTransform = Transform::origin();
   ///////////////////////////MIRROR
   mirrorBuffer->BindFrameBuffer();
@@ -709,18 +567,19 @@ void Game::Render()
 
   if (EnemyOnLefSide)
   {
-    SetViewAndPerspective(camera, leftPlayerNode, &Enemy_Node.local);
+    SetViewAndPerspective(cameraFore, leftPlayerNode, &Enemy_Node.local);
   }
   else
   {
-    SetViewAndPerspective(camera, leftPlayerNode, nullptr);
+    SetViewAndPerspective(cameraFore, leftPlayerNode, nullptr);
   }
 
   // RENDER LEWEJ STRONY
-  glViewport(0, 0, (Game::WINDOW_WIDTH / 2) + 125, Game::WINDOW_HEIGHT);
-  glScissor(0, 0, (Game::WINDOW_WIDTH / 2) + offset, Game::WINDOW_HEIGHT);
+  glViewport(0, 0, (Game::WINDOW_WIDTH) , Game::WINDOW_HEIGHT);
+  glScissor(0, 0, (Game::WINDOW_WIDTH ), Game::WINDOW_HEIGHT);
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT);
+  
 
   leftScene->Render(originTransform, nullptr, true);
   if (EnemyOnLefSide)
@@ -729,30 +588,16 @@ void Game::Render()
   }
   if (!EnemyOnLefSide)
   {
-    SetViewAndPerspective(camera2, rightPlayerNode, &Enemy_Node.local);
+    SetViewAndPerspective(cameraFore, rightPlayerNode, &Enemy_Node.local);
   }
   else
   {
-    SetViewAndPerspective(camera2, rightPlayerNode, nullptr);
+    SetViewAndPerspective(cameraFore, rightPlayerNode, nullptr);
   }
-
-  //drawSkyBox();
-
-  // RENDER PRAWEJ STRONY
-  glViewport((Game::WINDOW_WIDTH / 2) - 125, 0, (Game::WINDOW_WIDTH / 2) + 125, Game::WINDOW_HEIGHT);
-  glScissor((Game::WINDOW_WIDTH / 2) + offset, 0, (Game::WINDOW_WIDTH / 2) - offset, Game::WINDOW_HEIGHT);
-  glClearColor(0, 0, 0, 1);
-  glClear(GL_COLOR_BUFFER_BIT);
-
-  rightScene->Render(originTransform, shaderProgram_For_Model, true);
-  if (!EnemyOnLefSide)
-  {
-    Enemy_Node.Render(originTransform, shaderProgram_For_Model, true);
-  }
-
-  //drawSkyBox();
 
   mirrorBuffer->bindBack();
+
+
 
   ////////////////////////////////////////////////////////////////// SCENE
   framebuffer->BindFrameBuffer();
@@ -784,13 +629,12 @@ void Game::Render()
   mirrorShader->setMat4("model", model);
   mirrorShader->setMat4("view", view);
   mirrorShader->setMat4("projection", projection);
-  // camera.Position = modelTransofrm.getPosition();
   mirrorShader->setVec3("cameraPos", camera.Position);
 
   glUniform1i(glGetUniformLocation(mirrorShader->shaderProgramID, "skybox"), 0);
   mirrorBuffer->bindTexture();
   glBindVertexArray(cubeVAO);
-  glDrawArrays(GL_TRIANGLES, 0,  sizeof(Shapes::RainBow_Square));
+  glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
   glBindVertexArray(0);
 
   leftScene->Render(originTransform, nullptr, true);
@@ -821,6 +665,16 @@ void Game::Render()
     Enemy_Node.Render(originTransform, shaderProgram_For_Model, true);
   }
 
+    // RENDER PASKA ODDZIELAJACAEGO KAMERY - TODO
+  glViewport((Game::WINDOW_WIDTH / 2) + offset - 5, 0, 10, Game::WINDOW_HEIGHT);
+  glScissor((Game::WINDOW_WIDTH / 2) + offset - 5, 0, 10, Game::WINDOW_HEIGHT);
+  glEnable(GL_SCISSOR_TEST);
+  glClearColor(0, 0, 0, 1);
+  glClear(GL_COLOR_BUFFER_BIT);
+
+  glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+  glClear(GL_COLOR_BUFFER_BIT);
+
   //drawSkyBox();
 
   framebuffer->bindBack();
@@ -832,15 +686,7 @@ void Game::Render()
   postProcessShader->use();
   screenQuad->DrawEffect(framebuffer->frameBufferTexture);
 
-  // RENDER PASKA ODDZIELAJACAEGO KAMERY - TODO
-  glViewport((Game::WINDOW_WIDTH / 2) + offset - 5, 0, 10, Game::WINDOW_HEIGHT);
-  glScissor((Game::WINDOW_WIDTH / 2) + offset - 5, 0, 10, Game::WINDOW_HEIGHT);
-  glEnable(GL_SCISSOR_TEST);
-  glClearColor(0, 0, 0, 1);
-  glClear(GL_COLOR_BUFFER_BIT);
 
-  glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-  glClear(GL_COLOR_BUFFER_BIT);
 
   //Render Gui
   glScissor(0, 0, Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT);
@@ -1200,6 +1046,9 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation, 
   camera.Position.x = player.local.getPosition().x * PlayerScale;
   camera.Position.y = cameraYOffset;
   camera.Position.z = player.local.getPosition().z * PlayerScale + cameraZOffset;
+
+  if(player.gameObject->getTag() == "playerLeft")
+  lastUpdatePosition = camera.Position;
 
   playerObj->Update(&okienko, TrapScale);
 }

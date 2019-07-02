@@ -58,6 +58,9 @@ class Game
  FrameBuffer* mirrorBuffer;
  ScreenQuad* screenQuad;
 
+
+ glm::vec3 lastUpdatePosition;
+
   //
   Window &okienko;
   Shader *shaderProgram;
@@ -81,16 +84,12 @@ class Game
   std::map<int,bool> KeyInEq;
 
 
-//skybox 
-unsigned int skyboxVAO, skyboxVBO;
-unsigned int cubemapTexture;
 
-void drawSkyBox();
 
 
 Transform modelTransofrm;
    glm::mat4 model;
-       unsigned int cubeVAO, cubeVBO;
+       unsigned int cubeVAO, cubeVBO,cubeEBO;
 
 
 SceneNode * mirrorBoxNode = nullptr;
