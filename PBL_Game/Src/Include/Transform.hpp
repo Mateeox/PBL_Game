@@ -13,7 +13,7 @@
 class Transform
 {
 
-  glm::mat4 transform;
+ 
   glm::vec3 Position;
   glm::vec3 Scale;
   glm::vec3 Rotation;
@@ -22,6 +22,7 @@ class Transform
 
 public:
   Transform();
+   glm::mat4 transform;
 
   void ScaleTransform(GLfloat x, GLfloat y, GLfloat z);
   void SetTransform(glm::mat4 transform);

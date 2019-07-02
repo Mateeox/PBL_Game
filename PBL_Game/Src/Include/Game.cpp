@@ -16,37 +16,37 @@
 static bool swapButtonPressed = false;
 static bool Reset_BUTTON_PRESSED = false;
 
-unsigned int loadCubemap(std::vector<std::string> faces)
-{
-  unsigned int textureID;
-  glGenTextures(1, &textureID);
-  glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
-  stbi_set_flip_vertically_on_load(false);
+// unsigned int loadCubemap(std::vector<std::string> faces)
+// {
+//   unsigned int textureID;
+//   glGenTextures(1, &textureID);
+//   glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+//   stbi_set_flip_vertically_on_load(false);
 
-  int width, height, nrChannels;
-  for (unsigned int i = 0; i < faces.size(); i++)
-  {
-    unsigned char *data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
-    if (data)
-    {
-      glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-                   0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-      stbi_image_free(data);
-    }
-    else
-    {
-      std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
-      stbi_image_free(data);
-    }
-  }
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+//   int width, height, nrChannels;
+//   for (unsigned int i = 0; i < faces.size(); i++)
+//   {
+//     unsigned char *data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+//     if (data)
+//     {
+//       glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+//                    0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+//       stbi_image_free(data);
+//     }
+//     else
+//     {
+//       std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
+//       stbi_image_free(data);
+//     }
+//   }
+//   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+//   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+//   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-  return textureID;
-}
+//   return textureID;
+// }
 
 void Game::drawSkyBox()
 {
@@ -370,58 +370,63 @@ void Game::Granko()
   std::cout << "Triggers gathered: " << triggers.size() << std::endl;
 
   framebuffer = new FrameBuffer(1920, 1080);
+
+  mirrorBuffer = new FrameBuffer(1920, 1080);
   screenQuad = new ScreenQuad();
 
   UpdatePlayer(leftPlayerNode, camera, interpolation, true);
   UpdatePlayer(rightPlayerNode, camera2, interpolation, true);
 
-      float cubeVertices[] = {
-        // positions          // normals
-        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+  float cubeVertices[] = {
 
-        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+ 0.5f,  0.5f, 0.0f, 0.0f, 0.0f, -1.0f,
+ 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, -1.0f,
+-0.5f, -0.5f, 0.0f, 0.0f, 0.0f, -1.0f,
+-0.5f,  0.5f, 0.0f, 0.0f, 0.0f, -1.0f
+  };
 
-        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+      // // positions          // normals
+      // -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+      // 0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+      // 0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+      // 0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+      // -0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+      // -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
 
-         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+      // -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+      // 0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+      // 0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+      // 0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+      // -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+      // -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
 
-        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+      // -0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
+      // -0.5f, 0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
+      // -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
+      // -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
+      // -0.5f, -0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
+      // -0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
 
-        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-         0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-         0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-         0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
-    };
+      // 0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
+      // 0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+      // 0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+      // 0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+      // 0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
+      // 0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
 
+      // -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
+      // 0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
+      // 0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
+      // 0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
+      // -0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
+      // -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
 
-
+      // -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+      // 0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+      // 0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
+      // 0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
+      // -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
+      // -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f};
 
   float skyboxVertices[] = {
       // positions
@@ -475,40 +480,42 @@ void Game::Granko()
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
 
-  std::vector<std::string> faces{
-      std::string("Textures/SkyBox/ame_greenhaze/greenhaze_lf.tga"),
-      std::string("Textures/SkyBox/ame_greenhaze/greenhaze_rt.tga"),
-      std::string("Textures/SkyBox/ame_greenhaze/greenhaze_up.tga"),
-      std::string("Textures/SkyBox/ame_greenhaze/greenhaze_dn.tga"),
-      std::string("Textures/SkyBox/ame_greenhaze/greenhaze_ft.tga"),
-      std::string("Textures/SkyBox/ame_greenhaze/greenhaze_bk.tga"),
-  };
-  cubemapTexture = loadCubemap(faces);
+  // std::vector<std::string> faces{
+  //     std::string("Textures/SkyBox/ame_greenhaze/greenhaze_lf.tga"),
+  //     std::string("Textures/SkyBox/ame_greenhaze/greenhaze_rt.tga"),
+  //     std::string("Textures/SkyBox/ame_greenhaze/greenhaze_up.tga"),
+  //     std::string("Textures/SkyBox/ame_greenhaze/greenhaze_dn.tga"),
+  //     std::string("Textures/SkyBox/ame_greenhaze/greenhaze_ft.tga"),
+  //     std::string("Textures/SkyBox/ame_greenhaze/greenhaze_bk.tga"),
+  // };
+  // cubemapTexture = loadCubemap(faces);
 
-  skyboxShader->use();
-  skyboxShader->setInt("skybox", 0);
+  // skyboxShader->use();
+  // skyboxShader->setInt("skybox", 0);
 
-  mirrorShader->use();
-  mirrorShader->setInt("skybox", 0);
+  // mirrorShader->use();
+  // mirrorShader->setInt("skybox", 0);
 
+  modelTransofrm = Transform::origin();
 
-    model = glm::mat4(1.0f);
-     // cube VAO
-    glGenVertexArrays(1, &cubeVAO);
-    glGenBuffers(1, &cubeVBO);
-    glBindVertexArray(cubeVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_STATIC_DRAW);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-    glBindVertexArray(0);
+  model = glm::mat4(1.0f);
+  // cube VAO
+  glGenVertexArrays(1, &cubeVAO);
+  glGenBuffers(1, &cubeVBO);
+  glBindVertexArray(cubeVAO);
+  glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_STATIC_DRAW);
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
+  glEnableVertexAttribArray(1);
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
+  glBindVertexArray(0);
 
+  modelTransofrm.SetPosition(leftPlayerNode.local.getPosition());
+  modelTransofrm.ScaleTransform(10, 25, 10);
 
-    model = leftPlayerNode.local.GetTransformCopy();
-    model = glm::scale(model,glm::vec3(10,25,10));
-  
+  model = leftPlayerNode.local.GetTransformCopy();
+  model = glm::scale(model, glm::vec3(10, 25, 10));
 
   while (glfwGetKey(okienko.window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
          glfwWindowShouldClose(okienko.window) == 0)
@@ -688,7 +695,9 @@ void Game::Render()
 {
   glfwPollEvents();
 
-  framebuffer->BindFrameBuffer();
+  Transform originTransform = Transform::origin();
+  ///////////////////////////MIRROR
+  mirrorBuffer->BindFrameBuffer();
 
   glEnable(GL_DEPTH_TEST);
   glScissor(0, 0, Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT);
@@ -697,8 +706,6 @@ void Game::Render()
 
   if (debugMode)
     ImguiStartEndDraw();
-
-  Transform originTransform = Transform::origin();
 
   if (EnemyOnLefSide)
   {
@@ -715,19 +722,76 @@ void Game::Render()
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT);
 
+  leftScene->Render(originTransform, nullptr, true);
+  if (EnemyOnLefSide)
+  {
+    Enemy_Node.Render(originTransform, shaderProgram_For_Model, true);
+  }
+  if (!EnemyOnLefSide)
+  {
+    SetViewAndPerspective(camera2, rightPlayerNode, &Enemy_Node.local);
+  }
+  else
+  {
+    SetViewAndPerspective(camera2, rightPlayerNode, nullptr);
+  }
 
- 
-      mirrorShader->use();
-     mirrorShader->setMat4("model", model);
-        mirrorShader->setMat4("view", view);
-        mirrorShader->setMat4("projection", projection);
-        mirrorShader->setVec3("cameraPos", camera.Position);
+  //drawSkyBox();
 
-      glBindVertexArray(cubeVAO);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-       glBindVertexArray(0);
+  // RENDER PRAWEJ STRONY
+  glViewport((Game::WINDOW_WIDTH / 2) - 125, 0, (Game::WINDOW_WIDTH / 2) + 125, Game::WINDOW_HEIGHT);
+  glScissor((Game::WINDOW_WIDTH / 2) + offset, 0, (Game::WINDOW_WIDTH / 2) - offset, Game::WINDOW_HEIGHT);
+  glClearColor(0, 0, 0, 1);
+  glClear(GL_COLOR_BUFFER_BIT);
+
+  rightScene->Render(originTransform, shaderProgram_For_Model, true);
+  if (!EnemyOnLefSide)
+  {
+    Enemy_Node.Render(originTransform, shaderProgram_For_Model, true);
+  }
+
+  //drawSkyBox();
+
+  mirrorBuffer->bindBack();
+
+  ////////////////////////////////////////////////////////////////// SCENE
+  framebuffer->BindFrameBuffer();
+
+  glEnable(GL_DEPTH_TEST);
+  glScissor(0, 0, Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT);
+  glEnable(GL_SCISSOR_TEST);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  if (debugMode)
+    ImguiStartEndDraw();
+
+  if (EnemyOnLefSide)
+  {
+    SetViewAndPerspective(camera, leftPlayerNode, &Enemy_Node.local);
+  }
+  else
+  {
+    SetViewAndPerspective(camera, leftPlayerNode, nullptr);
+  }
+
+  // RENDER LEWEJ STRONY
+  glViewport(0, 0, (Game::WINDOW_WIDTH / 2) + 125, Game::WINDOW_HEIGHT);
+  glScissor(0, 0, (Game::WINDOW_WIDTH / 2) + offset, Game::WINDOW_HEIGHT);
+  glClearColor(0, 0, 0, 1);
+  glClear(GL_COLOR_BUFFER_BIT);
+
+  mirrorShader->use();
+  mirrorShader->setMat4("model", model);
+  mirrorShader->setMat4("view", view);
+  mirrorShader->setMat4("projection", projection);
+  // camera.Position = modelTransofrm.getPosition();
+  mirrorShader->setVec3("cameraPos", camera.Position);
+
+  glUniform1i(glGetUniformLocation(mirrorShader->shaderProgramID, "skybox"), 0);
+  mirrorBuffer->bindTexture();
+  glBindVertexArray(cubeVAO);
+  glDrawArrays(GL_TRIANGLES, 0,  sizeof(Shapes::RainBow_Square));
+  glBindVertexArray(0);
 
   leftScene->Render(originTransform, nullptr, true);
   if (EnemyOnLefSide)
@@ -743,8 +807,7 @@ void Game::Render()
     SetViewAndPerspective(camera2, rightPlayerNode, nullptr);
   }
 
- drawSkyBox();
-
+  //drawSkyBox();
 
   // RENDER PRAWEJ STRONY
   glViewport((Game::WINDOW_WIDTH / 2) - 125, 0, (Game::WINDOW_WIDTH / 2) + 125, Game::WINDOW_HEIGHT);
@@ -752,15 +815,13 @@ void Game::Render()
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT);
 
-
   rightScene->Render(originTransform, shaderProgram_For_Model, true);
   if (!EnemyOnLefSide)
   {
     Enemy_Node.Render(originTransform, shaderProgram_For_Model, true);
   }
 
-
-  drawSkyBox();
+  //drawSkyBox();
 
   framebuffer->bindBack();
 

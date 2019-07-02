@@ -55,6 +55,7 @@ class Game
 
  //PostProcess
  FrameBuffer* framebuffer;
+ FrameBuffer* mirrorBuffer;
  ScreenQuad* screenQuad;
 
   //
@@ -86,6 +87,8 @@ unsigned int cubemapTexture;
 
 void drawSkyBox();
 
+
+Transform modelTransofrm;
    glm::mat4 model;
        unsigned int cubeVAO, cubeVBO;
 

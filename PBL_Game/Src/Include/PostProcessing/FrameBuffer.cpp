@@ -41,3 +41,5 @@ void FrameBuffer::bindTexture()
 	glBindTexture(GL_TEXTURE_2D, frameBufferTexture);
 	
 }
+
+
