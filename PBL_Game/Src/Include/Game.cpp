@@ -16,7 +16,6 @@
 static bool swapButtonPressed = false;
 static bool Reset_BUTTON_PRESSED = false;
 
-
 void Game::InitializeConfig()
 {
   using namespace ConfigUtils;
@@ -331,17 +330,15 @@ void Game::Granko()
 
   float cubeVertices[] = {
 
- 0.5f,  0.5f, 0.0f, 0.0f, 0.0f, -1.0f,
- 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, -1.0f,
--0.5f, -0.5f, 0.0f, 0.0f, 0.0f, -1.0f,
--0.5f,  0.5f, 0.0f, 0.0f, 0.0f, -1.0f
+      0.5f, 0.5f, 0.0f, 0.0f, 0.0f, -1.0f,
+      0.5f, -0.5f, 0.0f, 0.0f, 0.0f, -1.0f,
+      -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, -1.0f,
+      -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, -1.0f};
+
+  unsigned int indices[] = {
+      0, 1, 3, // first triangle
+      1, 2, 3  // second triangle
   };
-
-      unsigned int indices[] = {
-        0, 1, 3, // first triangle
-        1, 2, 3  // second triangle
-    };
-
 
   modelTransofrm = Transform::origin();
 
@@ -350,9 +347,8 @@ void Game::Granko()
   glGenVertexArrays(1, &cubeVAO);
   glGenBuffers(1, &cubeVBO);
   glGenBuffers(1, &cubeEBO);
-  
-  glBindVertexArray(cubeVAO);
 
+  glBindVertexArray(cubeVAO);
 
   glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
   glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_STATIC_DRAW);
@@ -366,7 +362,7 @@ void Game::Granko()
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
   glBindVertexArray(0);
 
-  modelTransofrm.SetPosition(leftPlayerNode.local.getPosition()*leftPlayerNode.local.getScale());
+  modelTransofrm.SetPosition(leftPlayerNode.local.getPosition() * leftPlayerNode.local.getScale());
   //modelTransofrm.ScaleTransform(10, 25, 10);
 
   model = leftPlayerNode.local.GetTransformCopy();
@@ -550,8 +546,10 @@ void Game::Render()
 {
 
   glfwPollEvents();
-  Camera cameraFore(modelTransofrm.getPosition(),CAMERA_DEFAULT_WORLD_UP,90,0);
+  Camera cameraFore(modelTransofrm.getPosition(), CAMERA_DEFAULT_WORLD_UP, 90, 0);
+  cameraFore.Position.x = modelTransofrm.getPosition().x + 0.125;
   cameraFore.Position.y = 0.5;
+  cameraFore.Position.z = modelTransofrm.getPosition().z - 0.655;
   cameraFore.Zoom = 45;
   Transform originTransform = Transform::origin();
   ///////////////////////////MIRROR
@@ -567,19 +565,18 @@ void Game::Render()
 
   if (EnemyOnLefSide)
   {
-    SetViewAndPerspective(cameraFore, leftPlayerNode, &Enemy_Node.local);
+    SetViewAndPerspective(cameraFore, leftPlayerNode, &Enemy_Node.local,true);
   }
   else
   {
-    SetViewAndPerspective(cameraFore, leftPlayerNode, nullptr);
+    SetViewAndPerspective(cameraFore, leftPlayerNode, nullptr,true);
   }
 
   // RENDER LEWEJ STRONY
-  glViewport(0, 0, (Game::WINDOW_WIDTH) , Game::WINDOW_HEIGHT);
-  glScissor(0, 0, (Game::WINDOW_WIDTH ), Game::WINDOW_HEIGHT);
+  glViewport(0, 0, (Game::WINDOW_WIDTH), Game::WINDOW_HEIGHT);
+  glScissor(0, 0, (Game::WINDOW_WIDTH), Game::WINDOW_HEIGHT);
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT);
-  
 
   leftScene->Render(originTransform, nullptr, true);
   if (EnemyOnLefSide)
@@ -588,16 +585,14 @@ void Game::Render()
   }
   if (!EnemyOnLefSide)
   {
-    SetViewAndPerspective(cameraFore, rightPlayerNode, &Enemy_Node.local);
+    SetViewAndPerspective(cameraFore, rightPlayerNode, &Enemy_Node.local,true);
   }
   else
   {
-    SetViewAndPerspective(cameraFore, rightPlayerNode, nullptr);
+    SetViewAndPerspective(cameraFore, rightPlayerNode, nullptr,true);
   }
 
   mirrorBuffer->bindBack();
-
-
 
   ////////////////////////////////////////////////////////////////// SCENE
   framebuffer->BindFrameBuffer();
@@ -629,7 +624,6 @@ void Game::Render()
   mirrorShader->setMat4("model", model);
   mirrorShader->setMat4("view", view);
   mirrorShader->setMat4("projection", projection);
-  mirrorShader->setVec3("cameraPos", camera.Position);
 
   glUniform1i(glGetUniformLocation(mirrorShader->shaderProgramID, "skybox"), 0);
   mirrorBuffer->bindTexture();
@@ -665,7 +659,7 @@ void Game::Render()
     Enemy_Node.Render(originTransform, shaderProgram_For_Model, true);
   }
 
-    // RENDER PASKA ODDZIELAJACAEGO KAMERY - TODO
+  // RENDER PASKA ODDZIELAJACAEGO KAMERY - TODO
   glViewport((Game::WINDOW_WIDTH / 2) + offset - 5, 0, 10, Game::WINDOW_HEIGHT);
   glScissor((Game::WINDOW_WIDTH / 2) + offset - 5, 0, 10, Game::WINDOW_HEIGHT);
   glEnable(GL_SCISSOR_TEST);
@@ -685,8 +679,6 @@ void Game::Render()
   glDisable(GL_DEPTH_TEST);
   postProcessShader->use();
   screenQuad->DrawEffect(framebuffer->frameBufferTexture);
-
-
 
   //Render Gui
   glScissor(0, 0, Game::WINDOW_WIDTH, Game::WINDOW_HEIGHT);
@@ -1047,8 +1039,8 @@ void Game::UpdatePlayer(SceneNode &player, Camera &camera, float interpolation, 
   camera.Position.y = cameraYOffset;
   camera.Position.z = player.local.getPosition().z * PlayerScale + cameraZOffset;
 
-  if(player.gameObject->getTag() == "playerLeft")
-  lastUpdatePosition = camera.Position;
+  if (player.gameObject->getTag() == "playerLeft")
+    lastUpdatePosition = camera.Position;
 
   playerObj->Update(&okienko, TrapScale);
 }
@@ -1127,9 +1119,16 @@ GameObject *Game::findByTagSingle(const std::vector<SceneNode *> &data, std::str
   return nullptr;
 }
 
-void Game::SetViewAndPerspective(Camera &aCamera, SceneNode &player, Transform *enemy)
+void Game::SetViewAndPerspective(Camera &aCamera, SceneNode &player, Transform *enemy, bool clip)
 {
-  projection = glm::perspective(aCamera.Zoom, (float)Game::WINDOW_WIDTH / (float)Game::WINDOW_HEIGHT, 0.1f, 100.0f);
+  if (clip)
+  {
+    projection = glm::perspective(aCamera.Zoom, (float)Game::WINDOW_WIDTH / (float)Game::WINDOW_HEIGHT, 0.75f, 100.0f);
+  }
+  else
+  {
+    projection = glm::perspective(aCamera.Zoom, (float)Game::WINDOW_WIDTH / (float)Game::WINDOW_HEIGHT, 0.1f, 100.0f);
+  }
   view = aCamera.GetViewMatrix();
 
   shaderProgram->use();

@@ -252,7 +252,7 @@ private:
 
  
 
-  void SetViewAndPerspective(Camera &aCamera, SceneNode &player, Transform *enemy);
+  void SetViewAndPerspective(Camera &aCamera, SceneNode &player, Transform *enemy,bool clip = false);
   void Plot();
   void DisplayAnimationInfo(AnimatedModel * model);
 };
